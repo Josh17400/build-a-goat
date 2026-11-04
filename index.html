@@ -12,63 +12,136 @@
 <link rel="icon" type="image/png" href="./apple-touch-icon.png">
 <title>Build a GOAT</title>
 <style>
+:root{--bg:#0b0c10;--bg2:#12141a;--card:#171a21;--card2:#1d2029;--line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.12);
+  --tx:#eef0f5;--tx2:#a9afbd;--tx3:#9399a8;--acc:#ff8a1f;--acc2:#ffb15e;--gold:#ffc84a;--green:#5fd68a;--red:#ff6b6b;--blue:#6aa8ff;
+  --r:16px;--dockH:0px}
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:radial-gradient(circle at top,#22252f,#0e0f13 70%);color:#eceef3;min-height:100vh}
-#app{max-width:860px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(60px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
-button{font-family:inherit;min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-/* phones: every control is at least a 44 pt thumb target */
-@media (pointer:coarse),(max-width:600px){button.sm{min-width:44px;min-height:44px;padding:6px 10px;font-size:1rem}
-  .attr{grid-template-columns:96px 1fr 30px auto}.attr .row{gap:6px!important}input[type=range]{height:34px}}
-h1{font-size:2.2rem;margin:.2em 0;letter-spacing:1px}
-h1 span{color:#ff8a1f}
-h2{margin:.2em 0 .5em;font-size:1.3rem}
-.sub{color:#9aa0ad;font-size:.92rem}
-.card{background:#1a1c23;border:1px solid #2c303b;border-radius:14px;padding:14px 16px;margin:12px 0}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.grow{flex:1}
-button{background:#ff8a1f;color:#16120c;border:0;border-radius:10px;padding:11px 18px;font-weight:700;font-size:1rem;cursor:pointer}
-button:hover{filter:brightness(1.1)}
-button:disabled{opacity:1;cursor:default;background:#262a34;color:#8a90a0;outline:none}
-button.ghost{background:#2a2e39;color:#eceef3}
-button.sm{padding:4px 10px;font-size:.9rem;border-radius:8px}
-button.sel{outline:2px solid #ff8a1f;background:#3a2a1a;color:#ffb36b}
-input[type=text]{background:#0f1116;border:1px solid #333846;color:#fff;border-radius:8px;padding:9px 11px;font-size:1rem;width:100%}
-input[type=range]{width:100%;accent-color:#ff8a1f}
-.attr{display:grid;grid-template-columns:110px 1fr 36px 118px;gap:8px;align-items:center;margin:5px 0}
-.bar{height:10px;background:#2a2e39;border-radius:6px;overflow:hidden}
-.bar i{display:block;height:100%;background:linear-gradient(90deg,#ff8a1f,#ffc46b)}
-.grp{display:flex;justify-content:space-between;margin:12px 0 2px;padding-bottom:3px;border-bottom:1px solid #2c303b;color:#ffb36b;font-weight:700;font-size:.9rem;text-transform:uppercase;letter-spacing:.5px}
-.plaque{background:linear-gradient(160deg,#2a2112,#16130d);border:2px solid #c9a24a;border-radius:16px;padding:16px;margin:12px 0;box-shadow:0 0 30px #c9a24a33}
-.pname{font-size:1.7rem;font-weight:900;letter-spacing:.5px}
-.ach{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:6px;margin-top:8px}
-.ach div{background:#12141a;border-radius:8px;padding:6px 8px;opacity:.55}.ach div.got{opacity:1;border:1px solid #c9a24a55}.ach div.new{border:1px solid #ffc84a;box-shadow:0 0 10px #ffc84a66}
-.ach small{display:block;color:#9aa0ad;font-size:.75rem}
-.reveal{opacity:0;animation:rv .45s forwards}@keyframes rv{to{opacity:1}}
-.lookwrap{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start}
-.looks{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:4px 10px;margin-top:8px}
-.looks div{display:grid;grid-template-columns:78px 30px 1fr 30px;align-items:center;gap:4px;font-size:.85rem}
-.looks span{color:#9aa0ad}.looks b{text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.82rem}
-.big{font-size:2rem;font-weight:800}
-.pill.bad{color:#ff8585}
-.traits{margin-top:8px}
-@media (max-width:600px){.traits .pill{font-size:.78rem;padding:3px 8px}}
-.pill{display:inline-block;padding:3px 9px;border-radius:20px;background:#2a2e39;font-size:.82rem;margin:2px}
-.good{color:#5fd68a}.bad{color:#ff6b6b}.gold{color:#ffc84a}.muted{color:#a3a9b7}
-.ev{margin:3px 0;font-size:.93rem}
-.stars{color:#ffc84a;letter-spacing:2px}
-table{width:100%;border-collapse:collapse;font-size:.85rem}
-th,td{padding:5px 4px;text-align:right;border-bottom:1px solid #262a33;white-space:nowrap}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,system-ui,sans-serif;color:var(--tx);min-height:100vh;
+  background:radial-gradient(1200px 600px at 50% -200px,#2a2016 0%,rgba(42,32,22,0) 60%),linear-gradient(#0f1116,#0b0c10);background-attachment:fixed;-webkit-font-smoothing:antialiased}
+#app{max-width:760px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(var(--dockH) + 24px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))}
+h1{font-size:1.65rem;font-weight:800;letter-spacing:-.02em;margin:.3em 0 .1em}
+h1 span{background:linear-gradient(90deg,var(--acc),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+h2{font-size:1.08rem;font-weight:700;letter-spacing:-.01em;margin:0 0 .45em}
+.sub{color:var(--tx2);font-size:.88rem;line-height:1.4}
+.muted{color:var(--tx3)}.good{color:var(--green)}.bad{color:var(--red)}.gold{color:var(--gold)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.grow{flex:1;min-width:0}
+.card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:var(--r);padding:14px;margin:10px 0;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.sh{display:flex;align-items:center;gap:8px;font-size:.72rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--tx3);margin:0 0 10px}
+.sh .grow{flex:1}.sh b{color:var(--tx2);letter-spacing:.02em;text-transform:none;font-size:.85rem}
+.ic{width:1.15em;height:1.15em;vertical-align:-.2em;flex:none;display:inline-block}
+.ici{margin-right:.35em}
+.c-gold{color:var(--gold)}.c-orange{color:var(--acc)}.c-green{color:var(--green)}.c-red{color:var(--red)}.c-blue{color:var(--blue)}.c-muted{color:var(--tx3)}
+button{font-family:inherit;font-size:1rem;font-weight:700;border:0;border-radius:12px;padding:12px 18px;min-height:44px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+  background:linear-gradient(180deg,#ff9a35,#f27a0c);color:#1a1005;box-shadow:0 6px 18px rgba(255,138,31,.25),inset 0 1px 0 rgba(255,255,255,.25);transition:transform .08s}
+button:active{transform:scale(.97)}
+button.ghost{background:var(--card2);color:var(--tx);border:1px solid var(--line2);box-shadow:none}
+button.sm{padding:6px 12px;font-size:.95rem;min-width:44px;border-radius:10px}
+button:disabled{background:#1f222b;color:#6f7686;box-shadow:none;border:1px solid var(--line);cursor:default}
+button.sel{background:linear-gradient(180deg,#3a2614,#2b1d10);color:var(--acc2);border:1px solid rgba(255,138,31,.7);box-shadow:0 0 0 1px rgba(255,138,31,.25)}
+.wide{width:100%}
+input[type=text]{width:100%;background:var(--bg2);border:1px solid var(--line2);color:var(--tx);border-radius:12px;padding:12px 14px;font-size:1rem;font-family:inherit}
+input[type=range]{width:100%;accent-color:var(--acc);height:34px}
+/* segmented control */
+.seg{display:flex;gap:4px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:4px}
+.seg button{flex:1;min-width:0;background:transparent;color:var(--tx2);box-shadow:none;border:0;padding:10px 6px;font-size:.92rem;border-radius:10px}
+.seg button.on{background:linear-gradient(180deg,#2d313d,#252833);color:var(--tx);box-shadow:0 2px 8px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.06)}
+/* chips */
+.chips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.chip{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:2px;background:var(--bg2);color:var(--tx);border:1px solid var(--line);box-shadow:none;padding:10px 12px;border-radius:14px;font-size:.92rem}
+.chip small{color:var(--tx3);font-weight:500;font-size:.76rem;line-height:1.3}
+.chip.on{border-color:rgba(255,138,31,.75);background:linear-gradient(180deg,#2c1d10,#201610);color:var(--acc2)}
+/* builder tabs */
+.tabs{position:sticky;top:0;z-index:5;margin:6px -14px 4px;padding:8px 10px;gap:2px!important;padding-top:calc(8px + env(safe-area-inset-top));margin-top:calc(-10px - env(safe-area-inset-top));
+  background:linear-gradient(rgba(11,12,16,.96),rgba(11,12,16,.88));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:1 1 0;background:transparent;color:var(--tx3);box-shadow:none;padding:8px 4px;font-size:.8rem;border-radius:999px;white-space:nowrap;min-width:0;display:flex;align-items:center;justify-content:center}
+@media (max-width:420px){.tabs button .n{display:none}}
+.tabs button.on{background:var(--card2);color:var(--tx);border:1px solid var(--line2)}
+.tabs button .n{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;font-size:.7rem;margin-right:5px;background:#262a34;color:var(--tx2)}
+.tabs button.on .n{background:var(--acc);color:#1a1005}
+.tabs button.done .n{background:#24382c;color:var(--green)}
+/* bottom dock */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:10;padding:10px calc(14px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left));
+  background:rgba(12,13,18,.97);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line)}
+.dock .in{max-width:732px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
+.dock .row{flex-wrap:nowrap}
+.dock .meta{font-size:.82rem;color:var(--tx2);display:flex;gap:12px;align-items:center;justify-content:space-between}
+.dock .meta b{color:var(--tx);font-size:1rem}
+.dock .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dock button{width:100%}
+/* skills accordion */
+.acc{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin:8px 0;background:var(--bg2)}
+.acch{width:100%;display:grid;grid-template-columns:1fr 92px 34px 20px;align-items:center;gap:10px;background:transparent;color:var(--tx);box-shadow:none;border:0;border-radius:0;padding:12px 12px;text-align:left;font-size:.95rem}
+.acch .v{font-weight:800;text-align:right}.acch .chev{color:var(--tx3);transition:transform .15s}
+.acc.open .acch .chev{transform:rotate(90deg)}
+.accb{padding:2px 12px 10px;border-top:1px solid var(--line)}
+.attr{display:grid;grid-template-columns:minmax(0,1fr) 64px 30px auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.9rem}
+.attr:last-child{border-bottom:0}
+.attr .ctl{display:flex;gap:6px}
+.bar{height:8px;background:#262a34;border-radius:6px;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#f27a0c,#ffc46b)}
+/* hero (player header) */
+.hero{display:flex;gap:12px;align-items:center}
+.hero .hn{font-size:1.15rem;font-weight:800;letter-spacing:-.01em;line-height:1.15}
+.hero .hm{font-size:.82rem;color:var(--tx2);margin-top:3px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.ovr{flex:none;width:68px;height:68px;border-radius:50%;display:grid;place-items:center;text-align:center;background:conic-gradient(var(--acc) calc(var(--p)*1%),#262a34 0);position:relative}
+.ovr::before{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--card)}
+.ovr div{position:relative;line-height:1}.ovr b{font-size:1.45rem;font-weight:900;display:block}.ovr span{font-size:.58rem;color:var(--tx3);letter-spacing:.1em}
+.role{font-size:.72rem;font-weight:700;color:var(--gold);text-align:center;margin-top:4px;max-width:80px}
+details{border-top:1px solid var(--line);margin-top:10px;padding-top:8px}
+details>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:700;color:var(--tx2);min-height:32px}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:"";margin-left:auto;width:8px;height:8px;border-right:2px solid var(--tx3);border-bottom:2px solid var(--tx3);transform:rotate(45deg);transition:transform .15s}
+details[open]>summary::after{transform:rotate(-135deg)}
+details.card{border-top:1px solid var(--line);padding-top:14px}
+details.card>summary{margin:-4px 0;font-size:.95rem;color:var(--tx)}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;background:#232733;border:1px solid var(--line);font-size:.78rem;margin:3px 3px 0 0;color:var(--tx)}
+.pill.bad{color:#ff8585}.pill.gold{color:var(--gold);background:#2b2214;border-color:rgba(255,200,74,.25)}
+.pip{display:inline-flex;gap:2px;margin-left:2px}
+.pip i{width:6px;height:6px;border-radius:50%;background:#3a3f4c}.pip i.on{background:var(--acc)}
+.bankbar{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 12px;border-radius:12px;background:linear-gradient(90deg,#2b1f10,#1f1a12);border:1px solid rgba(255,200,74,.25)}
+.bankbar b{color:var(--gold)}
+/* events, seasons */
+.ev{display:flex;gap:8px;align-items:flex-start;margin:6px 0;font-size:.9rem;line-height:1.35}
+.ev .ic{margin-top:.1em}
+.season{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.season b{font-size:.98rem}
+.line{font-size:.8rem;color:var(--tx2);margin-top:3px}
+.stars{color:var(--gold);white-space:nowrap}
+.opt{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;margin:8px 0 0;background:var(--bg2);color:var(--tx);border:1px solid var(--line);box-shadow:none;padding:12px;border-radius:14px}
+.opt .t{font-weight:700;font-size:.95rem}.opt small{display:block;color:var(--tx3);font-weight:500;font-size:.8rem;margin-top:3px;line-height:1.35}
+.risk{display:inline-block;font-size:.68rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:6px;margin-top:6px}
+.risk.h{background:rgba(255,107,107,.14);color:#ff8f8f}.risk.m{background:rgba(255,200,74,.13);color:var(--gold)}.risk.l{background:rgba(95,214,138,.13);color:var(--green)}.risk.s{background:rgba(255,255,255,.07);color:var(--tx2)}
+.stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.stat{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:9px 6px;text-align:center;font-size:.72rem;color:var(--tx3);letter-spacing:.04em}
+.stat b{display:block;font-size:1.15rem;color:var(--tx);letter-spacing:0;margin-bottom:2px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.meter{height:10px;background:#262a34;border-radius:6px;overflow:hidden;margin:8px 0 6px}
+.meter i{display:block;height:100%;background:linear-gradient(90deg,#f27a0c,var(--gold));border-radius:6px}
+table{width:100%;border-collapse:collapse;font-size:.8rem;font-variant-numeric:tabular-nums}
+th{color:var(--tx3);font-weight:700;font-size:.7rem;letter-spacing:.05em}
+th,td{padding:6px 4px;text-align:right;border-bottom:1px solid rgba(255,255,255,.05);white-space:nowrap}
 th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
-.scroll{overflow-x:auto}
-.tier{font-size:2.4rem;font-weight:900;text-align:center;margin:6px 0;background:linear-gradient(90deg,#ffc84a,#ff8a1f);-webkit-background-clip:text;background-clip:text;color:transparent}
-.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
-.stat{background:#12141a;border-radius:10px;padding:8px;text-align:center}
-.stat b{display:block;font-size:1.4rem}
-.choice{display:block;width:100%;text-align:left;margin:6px 0;background:#232733;color:#eceef3}
-.choice small{display:block;color:#9aa0ad;font-weight:400}
-.flash{animation:fl .5s}
-@keyframes fl{from{background:#3a2a1a}to{background:#1a1c23}}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tier{font-size:1.9rem;font-weight:900;letter-spacing:-.02em;background:linear-gradient(90deg,var(--gold),var(--acc));-webkit-background-clip:text;background-clip:text;color:transparent}
+.plaque{background:radial-gradient(400px 200px at 20% 0,#3a2c12,transparent),linear-gradient(160deg,#241c0f,#14110b);border:1px solid #c9a24a;border-radius:20px;padding:16px;margin:10px 0;box-shadow:0 0 0 1px rgba(201,162,74,.2),0 18px 40px rgba(201,162,74,.15)}
+.pname{font-size:1.5rem;font-weight:900;letter-spacing:-.01em}
+.ach{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+.ach div{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:8px 10px;opacity:.5;font-size:.85rem}
+.ach div.got{opacity:1;border-color:rgba(201,162,74,.35)}.ach div.new{border-color:var(--gold);box-shadow:0 0 12px rgba(255,200,74,.35)}
+.ach small{display:block;color:var(--tx3);font-size:.72rem;margin-top:2px}
+.looks{display:grid;grid-template-columns:1fr;gap:6px;margin-top:4px}
+.looks div{display:grid;grid-template-columns:96px 44px minmax(0,1fr) 44px;align-items:center;gap:6px;font-size:.88rem}
+.looks span{color:var(--tx3)}.looks b{text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.88rem}
+.looks button{padding:0;min-width:44px}
+.avwrap{display:flex;justify-content:center;margin:2px 0 8px}
+.reveal{opacity:0;animation:rv .45s forwards}@keyframes rv{to{opacity:1}}
+.flash{animation:fl .5s}@keyframes fl{from{box-shadow:0 0 0 2px rgba(255,138,31,.5)}to{box-shadow:0 10px 30px rgba(0,0,0,.25)}}
+.big{font-size:1.6rem;font-weight:900}
+.note{font-size:.8rem;color:var(--tx3);margin-top:8px}
+.result{border-left:3px solid var(--green)}.result.bad{border-left-color:var(--red)}
+@media (min-width:640px){.chips{grid-template-columns:repeat(3,minmax(0,1fr))}.looks{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -129,16 +202,6 @@ function buyPerk(k,d){if(S.daily)return;S.perks=S.perks||{};const p=PERKS_GTP.fi
 function trimToBudget(){let g=0;while(spent()>START_BUDGET&&g++<2000){const k=SUBKEYS.reduce((a,b)=>S.attrs[b]>S.attrs[a]?b:a);S.attrs[k]--;}}
 function setDiff(d){if(S.daily)return;S.diff=d;try{localStorage.setItem('bag_diff',d);}catch{}trimToBudget();render();}
 const traitLimit=()=>S.perks&&S.perks.trait3?3:2;
-function gtpCard(){const bank=gtpBank(),cost=perkCost();
-  if(!bank&&!cost&&!S.daily)return`<div class="card"><b>💎 Generational Talent Points: 0</b><div class="sub">Earn GTP on Pro or Hall of Fame from great seasons and careers, then spend them here on perks for your next player.</div></div>`;
-  if(S.daily)return`<div class="card"><b>💎 Generational Talent Points: ${bank}</b><div class="sub">Perks are turned off for the Daily Build so everyone plays on equal terms. You still earn GTP.</div></div>`;
-  return`<div class="card"><div class="row"><b class="grow">💎 Generational Talent Points</b><b class="gold">${bank-cost} left</b>${cost?`<span class="pill">${cost} in cart</span>`:''}</div>
-  <div class="sub">Earn GTP on Pro (1×) and Hall of Fame (1.5×) from great seasons and careers. Spend them here on your next player.</div>
-  ${PERKS_GTP.map(([k,l,d,c,mx])=>{const n=(S.perks&&S.perks[k])||0;return`<div class="row" style="margin:6px 0;gap:8px"><div class="grow"><b>${l}</b>${n?` <span class="gold">×${n}</span>`:''}<div class="sub">${d} · ${c} GTP</div></div>
-    <button class="ghost sm" aria-label="Remove ${l}" onclick="buyPerk('${k}',-1)" ${n?'':'disabled'}>−</button><button class="sm" aria-label="Buy ${l}" onclick="buyPerk('${k}',1)" ${n>=mx||bank-cost<c?'disabled':''}>+</button></div>`;}).join('')}</div>`;}
-function diffCard(){return`<div class="card"><b>🎚️ Difficulty</b><div class="row" style="margin-top:6px;gap:6px">${Object.entries(DIFFS).map(([k,v])=>`<button class="ghost ${S.diff===k?'sel':''}" onclick="setDiff('${k}')" ${S.daily&&k!=='pro'?'disabled':''}>${v.name}</button>`).join('')}</div><div class="sub" style="margin-top:6px">${diff().d}${S.daily?' The Daily Build is always played on Pro.':''}</div></div>`;}
-
-
 const TEAMS=['Harbor City Hawks','Ironvale Forge','Desert Mesa Suns','Lakeport Gulls','Northwood Timber','Bay Bridge Bolts','Copper Canyon Coyotes','Granite Peaks','Midtown Monarchs','Riverside Rafters','Pinecrest Pilots','Cobalt City Comets','Twin Lakes Loons','Steel Valley Smelters','Sunbelt Stingers','Capitol Statesmen','Prairie Thunder','Seabreeze Sharks','Old Mill Millers','Emerald Coast Eels','Redstone Rockets','Frostfield Wolves','Bayou Gators','High Plains Hornets','Crescent Bay Crabs','Union Square Unity','Golden Gate Grizzlies','Lone Pine Lumberjacks','Mountain Air Eagles','Neon City Knights'];
 const SCHOOLS={blue:['Kingsford University','Carolina Pines','Bluegrass State','Royal Oak University','Phoenix Hill University','Lakeshore State','Tobacco Road University'],power:['State Tech','Great Lakes University','Southern Methodical','Western Ridge State','Bayview University','Desert Sun State','Iron Range University'],mid:['Riverbend College','Saint Ambrose','Coastal Christian','Northern Prairie','Valley A&M']};
 const TIER={blue:{lbl:'Blue Blood',str:80,dev:1.12,hype:4,min:-4,d:'National TV every night. Big development, but you fight for minutes.'},power:{lbl:'Power Conference',str:64,dev:1.0,hype:2,min:0,d:'Solid program, solid role, solid exposure.'},mid:{lbl:'Mid-Major',str:46,dev:.94,hype:0,min:6,d:'The keys are yours. Big stats, less hype.'}};
@@ -448,25 +511,6 @@ function retirePend(){const c=career(),sc=goatScore(c),[t]=tierOf(sc,c);
     {label:'🔁 One more year',desc:'Chase one more milestone. It could also tarnish the ending.',fn:()=>{addNext({declAdj:.3});return 'Came back for one more year';}}]};}
 function benchList(c){const g=x=>c.cnt[x]||0,tdS=S.nba.some(s=>s.ppg>=10&&s.rpg>=10&&s.apg>=10&&s.gp>=40);
   return[['6 Ring Standard',g('Champion')>=6],['5+ MVPs',g('MVP')>=5],['30,000 Point Club',c.pts>=30000],['40,000 Points',c.pts>=40000],['10× All-NBA 1st Team',g('All-NBA 1st')>=10],['15× All-Star',g('All-Star')>=15],['Season Triple-Double Average',tdS],['Defensive Player of the Year',g('DPOY')>=1]];}
-function legacyCard(){const c=career(),sc=goatScore(c),[t]=tierOf(sc,c),g=x=>c.cnt[x]||0,last=S.nba[S.nba.length-1];
-  const steps=[[60,'Perennial All-Star'],[120,'Hall of Famer'],[200,'Top 10 All-Time'],[350,"🐐 GOAT"]],nx=steps.find(s=>sc<s[0]);
-  const pace=last?c.pts+last.ppg*70*Math.max(0,34-S.age)*.8:0;
-  return`<div class="card"><div class="row"><b class="grow">📈 Legacy Meter</b><span class="gold">${S.nba.length<4?"Early career":t==="Bust"||t==="Role Player"?(last&&last.mins>=28?"Starter on the rise":"Fighting for minutes"):t}</span></div>
-  <div class="bar" style="height:14px;margin:8px 0"><i style="width:${Math.min(100,sc/350*100)}%"></i></div>
-  <div class="sub">GOAT Score <b class="gold">${sc}</b> / 350${nx?` · next: <b>${nx[1]}</b> at ${nx[0]}`:' · 🐐 GOAT territory!'}</div>
-  <div class="sub">${Math.round(c.pts).toLocaleString()} career pts${last&&S.age<34?` · on pace for ~${(Math.round(pace/1000)*1000).toLocaleString()}`:''} · ${g('Champion')} 🏆 · ${g('MVP')} MVP · ${g('All-Star')}× All-Star</div>
-  <div style="margin-top:6px">${benchList(c).map(([l,ok])=>`<span class="pill ${ok?'good':'muted'}">${ok?'✅':'⬜'} ${l}</span>`).join('')}</div></div>`;}
-function seasonCard(s){const aw=s.aw.filter(x=>x!=='MVP');
-  return`<div class="card flash"><b>Season ${s.yr} · ${s.team} · age ${s.age}</b>
-  <div class="sub"><b class="${s.mins>=28?'good':'muted'}">${s.mins>=28?'🏀 Starter':s.mins>=18?'🪑 Bench rotation':'🧊 Deep bench'}</b> · ${f1(s.mins)} MPG · ${f1(s.ppg)} PPG · ${f1(s.rpg)} RPG · ${f1(s.apg)} APG · ${s.gp} games · ${s.wins}-${82-s.wins}</div>
-  ${s.scRank&&s.scRank<=15?`<div class="ev">📊 ${ord(s.scRank)} in the league in scoring</div>`:''}
-  ${s.mvpRank&&s.mvpRank<=8?`<div class="ev ${s.mvpRank===1?'gold':''}">👑 ${s.mvpRank===1?'Wins MVP!':`Finished ${ord(s.mvpRank)} in MVP voting`}</div>`:''}
-  ${aw.length?`<div class="ev gold">${aw.join(' · ')}</div>`:''}${s.inj?`<div class="ev bad">${s.inj}</div>`:''}${s.gp<65?`<div class="ev muted">⚠️ Only ${s.gp} games played: not eligible for MVP, All-NBA or other awards (65-game rule)</div>`:''}
-  ${s.path.length?s.path.map(x=>`<div class="ev ${x.includes(': beat')?'good':'bad'}">${x}</div>`).join(''):'<div class="ev muted">Missed the playoffs</div>'}
-  ${s.po.includes('CHAMPION')?'<div class="ev gold"><b>🏆 NBA CHAMPIONS!</b></div>':''}
-  ${s.gtp?`<div class="ev gold">💎 +${s.gtp} GTP</div>`:''}${s.notes.map(x=>`<div class="ev">${x}</div>`).join('')}${s.ovr<61&&S.stage==='nba'?'<div class="ev bad">⚠️ On the roster bubble. Players below 61 OVR can get cut.</div>':''}
-  ${s.rv?`<div class="sub" style="margin-top:6px">⚔️ Rival ${s.rv.name}: ${f1(s.rv.ppg)} PPG, ${s.rv.wins} wins</div>`:''}</div>`;}
-
 // ---------- verdict ----------
 function career(){const c={gp:0,pts:0,reb:0,ast:0,stl:0,blk:0,min:0};const cnt={};let peak=0,peakP=0;
   for(const s of S.nba){c.gp+=s.gp;c.pts+=s.ppg*s.gp;c.reb+=s.rpg*s.gp;c.ast+=s.apg*s.gp;c.stl+=s.spg*s.gp;c.blk+=s.bpg*s.gp;c.min+=s.mins*s.gp;peak=Math.max(peak,s.ovr);peakP=Math.max(peakP,s.ppg);for(const a of s.aw)cnt[a]=(cnt[a]||0)+1;}
@@ -872,11 +916,6 @@ function avatar(L,age,size,bg){size=size||90;const id='av'+(++AVN),g=(a,i)=>a[(i
   <ellipse cx="46" cy="70" rx="4" ry="2.4" fill="${sn>=5?'#b3263a':'#ff7a7a'}" opacity="${sn>=5?.2:.13}"/><ellipse cx="74" cy="70" rx="4" ry="2.4" fill="${sn>=5?'#b3263a':'#ff7a7a'}" opacity="${sn>=5?.2:.13}"/>
   ${wrinkles}<path d="M60 62 Q57.2 69 59 70.6 Q61.5 71.6 64 69.8" stroke="${shade(sk,sn>=5?-.38:-.2)}" stroke-width="1.6" fill="none" stroke-linecap="round"/>${facial}${st==='Mullet'&&hw>=4?browsL+hair:hair+(hw<4?head:'')+browsL}${eyes}${hw===5?mouth:''}${hw>=4?head:''}${jewelry}
   ${hw===5?'':mouth}${bg?'</g>':''}</svg>`;}
-function lookEditor(){return`<div class="card"><div class="lookwrap"><div style="margin:0 auto">${avatar(S.look,18,150,1)}</div><div style="flex:1;min-width:260px">
-  <div class="row"><b class="grow">Look</b><button class="sm" onclick="S.look=randLook();render()">🎲 Random Look</button></div>
-  <div class="looks">${LOOKS.map(([k,l,o])=>`<div><span>${l}</span><button class="ghost sm" aria-label="Previous ${l}" onclick="cyc('${k}',-1)">◀</button><b>${o()[(S.look[k]||0)%o().length]}</b><button class="ghost sm" aria-label="Next ${l}" onclick="cyc('${k}',1)">▶</button></div>`).join('')}
-  <div><span>Number</span><button class="ghost sm" aria-label="Lower number" onclick="S.look.num=(S.look.num+99)%100;render()">◀</button><b>#${S.look.num}</b><button class="ghost sm" aria-label="Higher number" onclick="S.look.num=(S.look.num+1)%100;render()">▶</button></div></div></div></div></div>`;}
-
 // ---------- archetypes & randomize ----------
 const ARCH=[
   ['🎯 Sharpshooter','SG',77,'Lean',{three:3,mid:2.5,ft:2,close:1,handle:1,speed:1,iq:1,cons:1.5}],
@@ -929,10 +968,6 @@ const ACH=[
   ['old','🥊 Old School','Make the Hall of Fame in the 90s',(c,sc,t)=>S.era==='90s'&&big3(t)]];
 function checkAch(c,sc,t){const have=JSON.parse(localStorage.getItem('bag_ach')||'{}'),now=[];
   for(const[id,,,f]of ACH)if(!have[id]&&f(c,sc,t)){have[id]=Date.now();now.push(id);}localStorage.setItem('bag_ach',JSON.stringify(have));return now;}
-function achHTML(fresh){const have=JSON.parse(localStorage.getItem('bag_ach')||'{}'),n=Object.keys(have).length;fresh=fresh||[];
-  return`<div class="card"><div class="row"><h2 class="grow" style="margin:0">🏅 Achievements</h2><b class="gold">${n}/${ACH.length}</b></div>
-  <div class="ach">${ACH.map(([id,l,d])=>`<div class="${have[id]?'got':''} ${fresh.includes(id)?'new':''}"><b>${have[id]?l:'🔒 '+l.replace(/^\S+\s/,'')}</b><small>${d}${fresh.includes(id)?' · NEW!':''}</small></div>`).join('')}</div></div>`;}
-
 // ---------- Hall of Fame plaque (made for screenshots) ----------
 function plaqueHTML(c,sc,t){const g=x=>c.cnt[x]||0,gp=c.gp||1,top=[['Champion','🏆','Ring'],['MVP','👑','MVP'],['Finals MVP','🏅','Finals MVP'],['All-Star','⭐','All-Star'],['DPOY','🛡️','DPOY'],['All-NBA 1st','🥇','All-NBA 1st']].filter(([k])=>g(k)).slice(0,4);
   return`<div class="plaque"><div class="row" style="align-items:flex-start;gap:14px">${avatar(S.look,S.age,100,1)}<div class="grow">
@@ -1029,98 +1064,450 @@ function summerNBA(){const o=ovr(),a=S.age,
 
 function chooseSummer(i){const p=S.summerPend;if(!p)return;const o=p.opts[i]||p.opts[p.opts.length-1];o.fn();S.summerNote=[S.lastResult.ok?1:-1,S.lastResult.text];S.summerPend=null;
   if(S.stage==='college'&&S.colNext){S.colNext=false;simCol();}}
-function resultCard(){const r=S.lastResult;return r?`<div class="card" style="border-color:${r.ok?'#2f7a4b':'#8a3434'}"><b class="${r.ok?'good':'bad'}">${r.ok?'✅ It paid off':'❌ It backfired'}</b><div style="margin-top:4px">${r.text.replace(/^☀️ /,'')}</div></div>`:'';}
-function summerCard(){const p=S.summerPend;return`<div class="card flash"><h2>${p.title}</h2><div class="sub">${p.text}</div>${p.opts.map((o,i)=>`<button class="choice" onclick="act(chooseSummer,${i})">${o.label}<small>${o.desc}</small></button>`).join('')}</div>`;}
+// ---------- custom icon set (replaces every emoji in the UI) ----------
+// Build a GOAT custom icon set: 24x24 line icons (stroke=currentColor, 1.9 width, round caps/joins)
+const ICONS={
+  trophy:'<path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 5.5H4.5V7a3 3 0 0 0 3 3"/><path d="M17 5.5h2.5V7a3 3 0 0 1-3 3"/><path d="M12 14v3.5"/><path d="M8.5 20.5h7"/><path d="M9.5 20.5v-1.5a1.5 1.5 0 0 1 1.5-1.5h2a1.5 1.5 0 0 1 1.5 1.5v1.5"/>',
+  crown:'<path d="M3.5 8l4.2 4L12 5.5l4.3 6.5 4.2-4-1.9 10H5.4z"/><path d="M6 21h12"/><circle cx="12" cy="14.6" r="1.25" fill="currentColor" stroke="none"/>',
+  medal:'<path d="M8 2.8l2.9 6.9"/><path d="M16 2.8l-2.9 6.9"/><circle cx="12" cy="15" r="5.8"/><path d="M12 12.4l.85 1.75 1.9.25-1.4 1.3.35 1.9-1.7-.9-1.7.9.35-1.9-1.4-1.3 1.9-.25z"/>',
+  star:'<path d="M12 3.2L14.41 9.28L20.94 9.7L15.9 13.87L17.53 20.2L12 16.7L6.47 20.2L8.1 13.87L3.06 9.7L9.59 9.28Z"/>',
+  starFill:'<path d="M12 3.2L14.41 9.28L20.94 9.7L15.9 13.87L17.53 20.2L12 16.7L6.47 20.2L8.1 13.87L3.06 9.7L9.59 9.28Z" fill="currentColor"/>',
+  sparkle:'<path d="M10.5 6c.7 4.6 2.4 6.3 7 7-4.6.7-6.3 2.4-7 7-.7-4.6-2.4-6.3-7-7 4.6-.7 6.3-2.4 7-7z"/><path d="M18.5 2.8v4.4M16.3 5h4.4"/>',
+  shield:'<path d="M12 2.8l7.5 2.8v5.6c0 4.8-3.2 8.4-7.5 10-4.3-1.6-7.5-5.2-7.5-10V5.6z"/><path d="M12 7v10.2"/>',
+  flame:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4.1 2-6 .5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+  goat:'<path d="M7.5 8h9c0 3.5-.9 6.6-2 8.7-.5 1-1.4 1.6-2.5 1.6s-2-.6-2.5-1.6C8.4 14.6 7.5 11.5 7.5 8z"/><path d="M11 8C10.6 4.8 8.3 2.8 4.6 2.8c2 1.2 3.4 3 3.9 5.2"/><path d="M13 8c.4-3.2 2.7-5.2 6.4-5.2-2 1.2-3.4 3-3.9 5.2"/><path d="M7.6 9.2c-1.6-.4-3.4 0-4.6 1 1.3.9 3.1 1.1 4.9.8"/><path d="M16.4 9.2c1.6-.4 3.4 0 4.6 1-1.3.9-3.1 1.1-4.9.8"/><path d="M11 18l1 3.5 1-3.5"/><circle cx="10.2" cy="11.7" r="1" fill="currentColor" stroke="none"/><circle cx="13.8" cy="11.7" r="1" fill="currentColor" stroke="none"/>',
+  gem:'<path d="M6.5 4h11L21 9l-9 11L3 9z"/><path d="M3 9h18"/><path d="M12 20L8.5 9l2-5M12 20l3.5-11-2-5"/>',
+  ring:'<path d="M10 3.5h4l1.6 2.2L12 9.4 8.4 5.7z"/><circle cx="12" cy="15.2" r="5.6"/>',
+  pillars:'<path d="M3.5 8.5L12 3.5l8.5 5z"/><path d="M5 11h14"/><path d="M6.5 11v6.5M10 11v6.5M14 11v6.5M17.5 11v6.5"/><path d="M4.5 17.5h15M3 20.5h18"/>',
+  ball:'<circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/><path d="M6.2 5.2c2 1.9 3.1 4.2 3.1 6.8s-1.1 4.9-3.1 6.8"/><path d="M17.8 5.2c-2 1.9-3.1 4.2-3.1 6.8s1.1 4.9 3.1 6.8"/>',
+  football:'<path d="M4.5 19.5A15 15 0 0 1 19.5 4.5 15 15 0 0 1 4.5 19.5z"/><path d="M9.5 14.5l5-5"/><path d="M9.6 12.6l1.8 1.8M11.1 11.1l1.8 1.8M12.6 9.6l1.8 1.8"/>',
+  target:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5.4"/><circle cx="12" cy="12" r="1.9" fill="currentColor" stroke="none"/>',
+  shoe:'<path d="M3 18V8.5A1.5 1.5 0 0 1 4.5 7H7c.3 1.7 1.6 3 3.3 3h.7l3 2.6c1 .9 2.3 1.4 3.6 1.4h1.4a2.5 2.5 0 0 1 2.5 2.5v.5a1 1 0 0 1-1 1z"/><path d="M3 15.2h18.3"/><path d="M10.4 12.4l1.4-1.6M12.9 14.4l1.4-1.6"/>',
+  bench:'<rect x="4" y="5" width="16" height="3.5" rx="1"/><rect x="3" y="11.5" width="18" height="3" rx="1"/><path d="M6.5 8.5v3M17.5 8.5v3M6 14.5V20M18 14.5V20"/>',
+  wall:'<rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3 9.7h18M3 14.3h18M9 5v4.7M15 5v4.7M6 9.7v4.6M12 9.7v4.6M18 9.7v4.6M9 14.3V19M15 14.3V19"/>',
+  card:'<rect x="7" y="3.5" width="10" height="15" rx="2" transform="rotate(12 12 12)" fill="currentColor" fill-opacity=".28"/>',
+  clipboard:'<rect x="5" y="4.5" width="14" height="17" rx="2.5"/><rect x="9" y="2.5" width="6" height="4" rx="1.2"/><path d="M8.6 10.6l2.6 2.6M11.2 10.6l-2.6 2.6"/><circle cx="14.6" cy="16.2" r="1.8"/>',
+  dumbbell:'<rect x="5" y="6.5" width="3.5" height="11" rx="1.2"/><rect x="15.5" y="6.5" width="3.5" height="11" rx="1.2"/><path d="M8.5 12h7"/><path d="M2.8 9.5v5M21.2 9.5v5"/>',
+  gamepad:'<path d="M7 7h10a5 5 0 0 1 5 5v1.5a3.5 3.5 0 0 1-6.3 2.1L14.5 14h-5l-1.2 1.6A3.5 3.5 0 0 1 2 13.5V12a5 5 0 0 1 5-5z"/><path d="M6.8 9.6v3.6M5 11.4h3.6"/><circle cx="15.6" cy="10.4" r="1.05" fill="currentColor" stroke="none"/><circle cx="17.9" cy="12.4" r="1.05" fill="currentColor" stroke="none"/>',
+  dice:'<rect x="3.5" y="3.5" width="17" height="17" rx="3.8"/><circle cx="8.2" cy="8.2" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.8" cy="8.2" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="8.2" cy="15.8" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.8" cy="15.8" r="1.4" fill="currentColor" stroke="none"/>',
+  sliders:'<path d="M4 6.5h9M17 6.5h3"/><circle cx="15" cy="6.5" r="2"/><path d="M4 12h2M10 12h10"/><circle cx="8" cy="12" r="2"/><path d="M4 17.5h7M15 17.5h5"/><circle cx="13" cy="17.5" r="2"/>',
+  trendUp:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
+  trendDown:'<path d="M3 7l6 6 4-4 8 8"/><path d="M21 11v6h-6"/>',
+  bars:'<rect x="4.5" y="12" width="3.5" height="8" rx="1"/><rect x="10.25" y="4" width="3.5" height="16" rx="1"/><rect x="16" y="8" width="3.5" height="12" rx="1"/>',
+  pulse:'<path d="M2.5 12h4l2.5-6.5 5 13 2.5-6.5h5"/>',
+  bolt:'<path d="M13 2.5L4.5 13.5H12l-1 8 8.5-11H12z"/>',
+  burst:'<path d="M12 2.6L13.5 7.87L16.89 6.18L15.81 9.8L20.86 10.44L16.33 12.76L18.24 15.6L14.83 15.37L15.21 20.83L12 16.4L9.33 19.33L9.17 15.37L4.38 16.4L7.67 12.76L4.71 10.72L8.19 9.8L6.09 4.95L10.5 7.87Z"/>',
+  ruler:'<rect x="7" y="2.5" width="10" height="19" rx="2"/><path d="M7 6.5h3.5M7 10h2M7 13.5h3.5M7 17h2"/>',
+  tower:'<path d="M8 21V7.6L12 5l4 2.6V21"/><path d="M12 5V2.5"/><path d="M10.5 10.5h3M10.5 14h3M10.5 17.5h3"/><path d="M5 21h14"/>',
+  arrowUp:'<path d="M12 20V4.5M5.5 11L12 4.5l6.5 6.5"/>',
+  triangle:'<path d="M12 4.5l8.5 14.5h-17z"/>',
+  bulb:'<path d="M9.2 17c0-1.6-.6-2.6-1.5-3.5A6.2 6.2 0 1 1 16.3 13.5c-.9.9-1.5 1.9-1.5 3.5z"/><path d="M9.6 20h4.8"/><path d="M12 17v-3.5"/>',
+  book:'<path d="M12 6.5c-1.8-1.4-4.3-2-8.5-2v13c4.2 0 6.7.6 8.5 2 1.8-1.4 4.3-2 8.5-2v-13c-4.2 0-6.7.6-8.5 2z"/><path d="M12 6.5v13"/>',
+  gradCap:'<path d="M12 4.5L2.5 9l9.5 4.5L21.5 9z"/><path d="M6.5 11v4.5c0 1.4 2.5 2.8 5.5 2.8s5.5-1.4 5.5-2.8V11"/><path d="M21.5 9v5.5"/>',
+  flask:'<path d="M9.5 3h5M10 3v6L4.8 18a2 2 0 0 0 1.7 3h11a2 2 0 0 0 1.7-3L14 9V3"/><path d="M6.7 15h10.6"/>',
+  dna:'<path d="M8 3c0 4.5 8 4.5 8 9s-8 4.5-8 9"/><path d="M16 3c0 4.5-8 4.5-8 9s8 4.5 8 9"/><path d="M9.99 5.41H14.01M9.99 14.41H14.01M14.01 9.59H9.99M14.01 18.59H9.99"/>',
+  medical:'<path d="M9.5 3.5h5v6h6v5h-6v6h-5v-6h-6v-5h6z"/>',
+  bandage:'<g transform="rotate(-45 12 12)"><rect x="2.5" y="8" width="19" height="8" rx="4"/><path d="M9 8v8M15 8v8"/><circle cx="10.8" cy="10.8" r="0.75" fill="currentColor" stroke="none"/><circle cx="13.2" cy="10.8" r="0.75" fill="currentColor" stroke="none"/><circle cx="10.8" cy="13.2" r="0.75" fill="currentColor" stroke="none"/><circle cx="13.2" cy="13.2" r="0.75" fill="currentColor" stroke="none"/></g>',
+  heart:'<path d="M12 20.5l-6.8-6.6C3.6 12.3 3 11 3 9.3A4.8 4.8 0 0 1 7.8 4.5c1.7 0 2.9.7 4.2 2.1 1.3-1.4 2.5-2.1 4.2-2.1A4.8 4.8 0 0 1 21 9.3c0 1.7-.6 3-2.2 4.6z"/>',
+  heartCrack:'<path d="M12 20.5l-6.8-6.6C3.6 12.3 3 11 3 9.3A4.8 4.8 0 0 1 7.8 4.5c1.7 0 2.9.7 4.2 2.1 1.3-1.4 2.5-2.1 4.2-2.1A4.8 4.8 0 0 1 21 9.3c0 1.7-.6 3-2.2 4.6z"/><path d="M12 6.6l-1.6 3.9 3.2 2.3-2.4 3.4.8 4.3"/>',
+  moon:'<path d="M12 3a6.4 6.4 0 0 0 9 9 9 9 0 1 1-9-9z"/>',
+  snowflake:'<path d="M12 21L12 3M10.14 4.93L12 6.6L13.86 4.93M4.21 16.5L19.79 7.5M17.2 6.85L16.68 9.3L19.05 10.07M4.21 7.5L19.79 16.5M19.05 13.93L16.68 14.7L17.2 17.15M13.86 19.07L12 17.4L10.14 19.07M6.8 17.15L7.32 14.7L4.95 13.93M4.95 10.07L7.32 9.3L6.8 6.85"/>',
+  bust:'<path d="M12 3a8 8 0 0 0-8 8c0 2.8 1.3 4.6 3 5.6V19a1.5 1.5 0 0 0 1.5 1.5h7A1.5 1.5 0 0 0 17 19v-2.4c1.7-1 3-2.8 3-5.6a8 8 0 0 0-8-8z"/><circle cx="9" cy="11.5" r="1.9" fill="currentColor" stroke="none"/><circle cx="15" cy="11.5" r="1.9" fill="currentColor" stroke="none"/><path d="M10.5 17.5v3M13.5 17.5v3"/>',
+  video:'<rect x="2.5" y="6.5" width="13" height="11" rx="2.5"/><path d="M15.5 10.5l6-3.5v10l-6-3.5"/>',
+  camera:'<path d="M3 8.5a2 2 0 0 1 2-2h2.5L9 4h6l1.5 2.5H19a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.8"/>',
+  tv:'<rect x="2.5" y="6.5" width="19" height="13" rx="2.5"/><path d="M8 2.5l4 4 4-4"/>',
+  mic:'<rect x="9" y="2.5" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21M9 21h6"/>',
+  megaphone:'<path d="M3.5 9.5v5a1 1 0 0 0 1 1H7l8 4.5V4L7 8.5H4.5a1 1 0 0 0-1 1z"/><path d="M18.5 9a4 4 0 0 1 0 6"/><path d="M7 8.5v7"/>',
+  news:'<path d="M18.5 20.5H5.5A1.5 1.5 0 0 1 4 19V5a1 1 0 0 1 1-1h11a1 1 0 0 1 1 1v14a1.5 1.5 0 0 0 3 0V9.5h-3"/><rect x="7" y="7" width="7" height="3.5" rx="0.6"/><path d="M7 14h7M7 17h5"/>',
+  pen:'<path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"/><path d="M14.5 5.5l3 3"/><path d="M13 20.5h7.5"/>',
+  cash:'<rect x="2.5" y="6" width="19" height="12" rx="2.5"/><circle cx="12" cy="12" r="2.8"/><circle cx="6.5" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="17.5" cy="12" r="1" fill="currentColor" stroke="none"/>',
+  briefcase:'<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M3 12.5h18"/>',
+  phone:'<rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18.5h3"/>',
+  phoneOff:'<rect x="6.5" y="2.5" width="11" height="19" rx="2.5"/><path d="M10.5 18.5h3"/><path d="M3.5 3.5l17 17"/>',
+  globe:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>',
+  music:'<path d="M9 18V5.5L20 3v12.5"/><path d="M9 9.5l11-2.5"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="15.5" r="2.5"/>',
+  disc:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.4"/><path d="M7.2 12A4.8 4.8 0 0 1 12 7.2"/>',
+  gift:'<rect x="3.5" y="8" width="17" height="4" rx="1"/><path d="M5 12v7.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V12M12 8v12.5"/><path d="M12 8c-1-3.5-5.5-4.5-5.5-1.8C6.5 8 9.5 8 12 8zM12 8c1-3.5 5.5-4.5 5.5-1.8C17.5 8 14.5 8 12 8z"/>',
+  swirl:'<path d="M12 11a2 2 0 0 1 4 0 4 4 0 0 1-8 0 6 6 0 0 1 12 0 8 8 0 0 1-16 0"/>',
+  home:'<path d="M3.5 10.5L12 3.5l8.5 7"/><path d="M5.5 9v10.5a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V9"/><path d="M10 20.5V15h4v5.5"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/>',
+  calendar:'<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><rect x="7" y="13" width="3.2" height="3.2" rx="0.6" fill="currentColor" stroke="none"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+  user:'<circle cx="12" cy="8" r="4"/><path d="M4.5 20.5V20a6 6 0 0 1 6-6h3a6 6 0 0 1 6 6v.5"/>',
+  users:'<circle cx="9" cy="8" r="3.6"/><path d="M2.5 20.5v-1a5 5 0 0 1 5-5h3a5 5 0 0 1 5 5v1"/><path d="M15.5 4.6a3.6 3.6 0 0 1 0 6.8"/><path d="M18 14.7a5 5 0 0 1 3.5 4.8v1"/>',
+  swords:'<path d="M14.5 17.5L3 6V3h3l11.5 11.5"/><path d="M13 19l6-6M16 16l4 4M19 21l2-2"/><path d="M14.5 6.5L18 3h3v3l-3.5 3.5"/><path d="M5 14l4 4M7 17l-3 3M3 19l2 2"/>',
+  logout:'<path d="M9.5 20.5H6a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2h3.5"/><path d="M15.5 16.5L20 12l-4.5-4.5M20 12H9.5"/>',
+  refresh:'<path d="M3.5 12A8.5 8.5 0 0 1 18 6l2.5 2.5"/><path d="M20.5 3.5v5h-5"/><path d="M20.5 12A8.5 8.5 0 0 1 6 18l-2.5-2.5"/><path d="M3.5 20.5v-5h5"/>',
+  check:'<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  x:'<path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/>',
+  alert:'<path d="M12 3.8L21.2 19.8H2.8z"/><path d="M12 9.5v4.5"/><circle cx="12" cy="16.9" r="1.05" fill="currentColor" stroke="none"/>',
+  lock:'<rect x="4.5" y="10.5" width="15" height="10.5" rx="2.5"/><path d="M8 10.5v-3a4 4 0 0 1 8 0v3"/><circle cx="12" cy="15.7" r="1.4" fill="currentColor" stroke="none"/>',
+  ban:'<circle cx="12" cy="12" r="9"/><path d="M5.64 5.64l12.72 12.72"/>',
+  chevL:'<path d="M15 5l-7 7 7 7"/>',
+  chevR:'<path d="M9 5l7 7-7 7"/>',
+  fast:'<path d="M3.5 6.5l8 5.5-8 5.5zM12.5 6.5l8 5.5-8 5.5z"/>',
+  skip:'<path d="M5.5 5.5l9.5 6.5-9.5 6.5z"/><path d="M18.5 5.5v13"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  minus:'<path d="M5 12h14"/>',
+  square:'<rect x="4.5" y="4.5" width="15" height="15" rx="3.5"/>',
+  checkSquare:'<rect x="4.5" y="4.5" width="15" height="15" rx="3.5"/><path d="M8.5 12.2l2.5 2.5 4.8-5.2"/>',
+  xCircle:'<circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/>',
+  pip:'<circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/>',
+  pipEmpty:'<circle cx="12" cy="12" r="4"/>',
+  dot:'<circle cx="12" cy="12" r="5.5" fill="currentColor" stroke="none"/>',
+  faceNeutral:'<circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1.15" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1.15" fill="currentColor" stroke="none"/><path d="M9 15.5h6"/>',
+  faceGrin:'<circle cx="12" cy="12" r="9"/><path d="M7.8 10.2q1.2-1.6 2.4 0M13.8 10.2q1.2-1.6 2.4 0"/><path d="M7.8 13.2h8.4a4.2 4.2 0 0 1-8.4 0z"/>',
+  faceMug:'<circle cx="12" cy="12" r="9"/><path d="M7.3 8.3l3 1.2M16.7 8.3l-3 1.2"/><circle cx="9.2" cy="11.5" r="1.1" fill="currentColor" stroke="none"/><circle cx="14.8" cy="11.5" r="1.1" fill="currentColor" stroke="none"/><path d="M9.5 16.4q2.5-1 5 0"/>',
+  faceMad:'<circle cx="12" cy="12" r="9"/><path d="M7 7.8l3.5 2M17 7.8l-3.5 2"/><circle cx="9.2" cy="11.6" r="1.1" fill="currentColor" stroke="none"/><circle cx="14.8" cy="11.6" r="1.1" fill="currentColor" stroke="none"/><path d="M8.8 17.2a3.2 3.2 0 0 1 6.4 0z"/>',
+  faceCool:'<circle cx="12" cy="12" r="9"/><path d="M3.5 9.5h17"/><path d="M6 9.5h5v1.3a2.5 2.5 0 0 1-5 0zM13 9.5h5v1.3a2.5 2.5 0 0 1-5 0z" fill="currentColor"/><path d="M9 15.3q3 2.2 6 0"/>',
+  faceSmirk:'<circle cx="12" cy="12" r="9"/><path d="M7.8 10h2.6M13.6 10h2.6"/><path d="M9.5 15.6q3.5 1 5.6-1.8"/>',
+  faceWink:'<circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1.15" fill="currentColor" stroke="none"/><path d="M13.6 10.4q1.4-1.4 2.8 0"/><path d="M8.5 14.3q3.5 3.2 7 0"/>',
+  faceSad:'<circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1.15" fill="currentColor" stroke="none"/><circle cx="15" cy="10" r="1.15" fill="currentColor" stroke="none"/><path d="M8.8 16.6q3.2-2.6 6.4 0"/>'
+};
+function icon(name,cls){return `<svg class="ic ${cls||''}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]||ICONS.dot}</svg>`;}
+// emoji (no U+FE0F) -> icon name, or [name, tint class]
+const EMOJI_ICON={
+  "🎯":['target','c-orange'],
+  "🏆":['trophy','c-gold'],
+  "🏀":['ball','c-orange'],
+  "🏋":'dumbbell',
+  "💎":['gem','c-blue'],
+  "🛡":['shield','c-blue'],
+  "🤝":'users',
+  "🐐":['goat','c-gold'],
+  "😤":'faceMug',
+  "🏅":['medal','c-gold'],
+  "☀":['sun','c-gold'],
+  "⚔":['swords','c-red'],
+  "→":'chevR',
+  "📹":'video',
+  "📈":['trendUp','c-green'],
+  "📚":'book',
+  "🔥":['flame','c-orange'],
+  "🧠":['bulb','c-gold'],
+  "🧊":['snowflake','c-blue'],
+  "🔄":'refresh',
+  "🧱":'wall',
+  "👑":['crown','c-gold'],
+  "🧘":['moon','c-blue'],
+  "⭐":['starFill','c-gold'],
+  "📏":'ruler',
+  "💪":'dumbbell',
+  "🏫":'gradCap',
+  "📉":['trendDown','c-red'],
+  "🧪":'flask',
+  "🏠":'home',
+  "🎤":'mic',
+  "🚑":['medical','c-red'],
+  "✅":['checkSquare','c-green'],
+  "🏚":['home','c-muted'],
+  "★":['starFill','c-gold'],
+  "🎮":'gamepad',
+  "👟":'shoe',
+  "🤕":['bandage','c-red'],
+  "💰":['cash','c-green'],
+  "🧑‍🏫":'clipboard',
+  "🎓":'gradCap',
+  "💍":['ring','c-gold'],
+  "🪑":'bench',
+  "🎙":'mic',
+  "🥇":['medal','c-gold'],
+  "⚠":['alert','c-gold'],
+  "🥊":['swords','c-orange'],
+  "⚡":['bolt','c-gold'],
+  "📅":'calendar',
+  "📸":'camera',
+  "🌍":'globe',
+  "🟢":['dot','c-green'],
+  "🟡":['dot','c-gold'],
+  "🔴":['dot','c-red'],
+  "🧬":'dna',
+  "🎰":'dice',
+  "🌎":'globe',
+  "🏈":'football',
+  "🚨":['alert','c-red'],
+  "🌟":['sparkle','c-gold'],
+  "📵":['phoneOff','c-red'],
+  "🥶":['snowflake','c-blue'],
+  "🧑‍🤝‍🧑":'users',
+  "🎥":'video',
+  "📱":'phone',
+  "📺":'tv',
+  "🦘":'arrowUp',
+  "🎖":'medal',
+  "🚫":['ban','c-red'],
+  "❌":['xCircle','c-red'],
+  "💥":['burst','c-orange'],
+  "📞":'phone',
+  "🛌":'moon',
+  "🙅":'ban',
+  "🛫":'arrowUp',
+  "😂":'faceGrin',
+  "🌀":'swirl',
+  "⬜":['square','c-muted'],
+  "🎲":'dice',
+  "◀":'chevL',
+  "▶":'chevR',
+  "🦾":'dumbbell',
+  "🔺":['triangle','c-red'],
+  "🔒":['lock','c-muted'],
+  "🧃":'bolt',
+  "💼":'briefcase',
+  "➕":'plus',
+  "📣":['megaphone','c-orange'],
+  "🎚":'sliders',
+  "👨‍👦":'users',
+  "📰":'news',
+  "🤒":['medical','c-red'],
+  "😬":'faceSad',
+  "🦵":['bandage','c-red'],
+  "🧓":['clock','c-muted'],
+  "🌴":['sun','c-gold'],
+  "📋":'clipboard',
+  "😷":['medical','c-red'],
+  "🎁":['gift','c-gold'],
+  "🩹":['bandage','c-red'],
+  "💔":['heartCrack','c-red'],
+  "🎉":['sparkle','c-gold'],
+  "✍":'pen',
+  "🫁":'pulse',
+  "🧤":'shield',
+  "👴":'user',
+  "📤":'logout',
+  "🩼":['bandage','c-red'],
+  "👍":['check','c-green'],
+  "🤐":'ball',
+  "🥈":['medal','c-muted'],
+  "😴":'moon',
+  "🙌":['check','c-green'],
+  "🧑‍💼":'clipboard',
+  "😒":'faceNeutral',
+  "🛋":'moon',
+  "📲":'phone',
+  "🤷":'faceNeutral',
+  "🥋":'clipboard',
+  "🍑":'bulb',
+  "🕰":'clock',
+  "👋":'logout',
+  "🔁":'refresh',
+  "📊":'bars',
+  "🕺":'music',
+  "💿":'disc',
+  "😐":'faceNeutral',
+  "😁":'faceGrin',
+  "😎":'faceCool',
+  "😏":'faceSmirk',
+  "😡":['faceMad','c-red'],
+  "😉":'faceWink',
+  "🐻":'dumbbell',
+  "🦄":'sparkle',
+  "🏛":['pillars','c-gold'],
+  "💀":'bust',
+  "🐜":'ruler',
+  "🗼":'tower',
+  "📜":'gradCap',
+  "🦿":'shield',
+  "💦":['flame','c-orange'],
+  "🟥":['card','c-red'],
+  "🏟":'home',
+  "🎂":['gift','c-gold'],
+  "🧒":['heart','c-red'],
+  "🤦":'faceSad',
+  "🟨":['card','c-gold'],
+  "🗞":'news',
+  "🎨":'sparkle',
+  "🐶":['heart','c-red'],
+  "🎵":'music',
+  "🚗":'clock',
+  "🍕":['medical','c-red'],
+  "🔇":['snowflake','c-blue'],
+  "🧹":['bench','c-muted'],
+  "⚪":['dot','c-muted'],
+  "🏙":['cash','c-green'],
+  "💉":'flask',
+  "🏕":'target',
+  "⬆":'arrowUp',
+  "🏖":['sun','c-gold'],
+  "🏝":['sun','c-gold'],
+  "🌏":'globe',
+  "🍔":'dumbbell',
+  "🎬":'video',
+  "☆":['star','c-muted'],
+  "●":['pip','c-orange'],
+  "○":['pipEmpty','c-muted'],
+  "➖":'minus',
+  "⏩":'fast',
+  "⏭":'skip',
+  "📝":'pen'
+};
 
 // ---------- UI ----------
 const app=document.getElementById('app');
 function act(fn,...a){fn(...a);render();}
-function attrRows(mode){return ATTRS.map(([c,cl])=>`<div class="grp"><span>${cl}</span><b>${Math.round(eff(c))}</b></div>`+SUBS[c].map(([k,l])=>{const v=S.attrs[k],e=Math.round(es(k));
-  let ctl='';if(mode==='build')ctl=`<button class="ghost sm" aria-label="Remove a point from ${l}" onclick="adj('${k}',-1)" ${v<=MIN_A?'disabled':''}>−</button><button class="sm" aria-label="Add a point to ${l}" onclick="adj('${k}',1)" ${v>=BUILD_MAX||spent()+cost(v)>START_BUDGET?'disabled':''}>+</button><button class="sm" aria-label="Add 5 points to ${l}" onclick="for(let i=0;i<5;i++)adj('${k}',1)" ${v>=BUILD_MAX||spent()+cost(v)>START_BUDGET?'disabled':''}>+5</button>`;
-  else if(mode==='bank')ctl=`<button class="sm" aria-label="Add a point to ${l}" onclick="spend('${k}')" ${S.bank<cost(v)||v>=99?'disabled':''}>+${cost(v)>1?` (${cost(v)})`:''}</button>`;
-  return`<div class="attr"><span>${l}</span><div class="bar"><i style="width:${e}%"></i></div><b title="base ${v}">${e}</b><span class="row" style="gap:4px">${ctl}</span></div>`;}).join('')).join('');}
+const UI=()=>S.ui||(S.ui={tab:'setup',open:null,spend:false});
+const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+// every emoji in the game's text is swapped for a custom icon when a screen is drawn
+const EMO_RE=/(?:\p{Extended_Pictographic}|[←-⇿⌀-⏿■-◿☀-➿⬀-⯿])(?:️|‍(?:\p{Extended_Pictographic}|[☀-➿]))*️?/gu;
+function emo(m){if(typeof EMOJI_ICON==='undefined')return m;const v=EMOJI_ICON[m.replace(/️/g,'')]||EMOJI_ICON[m];if(!v)return'';const[nm,cls]=Array.isArray(v)?v:[v,''];return icon(nm,'ici '+(cls||''));}
+function iconize(root){if(typeof EMOJI_ICON==='undefined')return;const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),todo=[];let n;
+  while((n=w.nextNode())){EMO_RE.lastIndex=0;if(EMO_RE.test(n.nodeValue))todo.push(n);}
+  for(const t of todo){const s=t.nodeValue;let out='',last=0;EMO_RE.lastIndex=0;for(const m of s.matchAll(EMO_RE)){out+=esc(s.slice(last,m.index))+emo(m[0]);last=m.index+m[0].length;}out+=esc(s.slice(last));
+    const tpl=document.createElement('template');tpl.innerHTML=out;t.replaceWith(tpl.content);}
+  for(const el of root.querySelectorAll('[aria-label],[title]'))for(const a of['aria-label','title']){const v=el.getAttribute(a);if(v){EMO_RE.lastIndex=0;if(EMO_RE.test(v))el.setAttribute(a,v.replace(EMO_RE,'').replace(/\s+/g,' ').trim());}}}
+const pips=n=>`<span class="pip">${[1,2,3,4,5].map(i=>`<i class="${i<=n?'on':''}"></i>`).join('')}</span>`;
+const starsHTML=n=>`<span class="stars">${'★'.repeat(n)}${'☆'.repeat(5-n)}</span>`;
+function dock(inner){return inner?`<div class="dock"><div class="in">${inner}</div></div>`:'';}
+
+// ---------- skills ----------
+function skillRow(k,l,mode){const v=S.attrs[k],e=Math.round(es(k));let ctl;
+  if(mode==='build'){const off=v>=BUILD_MAX||spent()+cost(v)>START_BUDGET;ctl=`<button class="ghost sm" aria-label="Remove a point from ${l}" onclick="adj('${k}',-1)" ${v<=MIN_A?'disabled':''}>−</button><button class="sm" aria-label="Add a point to ${l}" onclick="adj('${k}',1)" ${off?'disabled':''}>+</button><button class="ghost sm" aria-label="Add 5 points to ${l}" onclick="for(let i=0;i<5;i++)adj('${k}',1)" ${off?'disabled':''}>+5</button>`;}
+  else ctl=`<button class="sm" aria-label="Add a point to ${l}" onclick="spend('${k}')" ${S.bank<cost(v)||v>=99?'disabled':''}>+${cost(v)>1?cost(v):''}</button>`;
+  return`<div class="attr"><span>${l}</span><div class="bar"><i style="width:${e}%"></i></div><b>${e}</b><div class="ctl">${ctl}</div></div>`;}
+function skillAcc(mode){const u=UI();return ATTRS.map(([c,cl])=>{const open=u.open===c,v=Math.round(eff(c));
+  return`<div class="acc ${open?'open':''}"><button class="acch" aria-label="${cl} skills" aria-expanded="${open}" onclick="UI().open=UI().open==='${c}'?null:'${c}';render()"><span>${cl}</span><div class="bar"><i style="width:${v}%"></i></div><span class="v">${v}</span><span class="chev">▶</span></button>${open?`<div class="accb">${SUBS[c].map(([k,l])=>skillRow(k,l,mode)).join('')}</div>`:''}</div>`;}).join('');}
+function attrRows(mode){return skillAcc(mode);}
 function adj(k,d){if(d>0&&spent()+cost(S.attrs[k])<=START_BUDGET&&S.attrs[k]<BUILD_MAX)S.attrs[k]++;if(d<0&&S.attrs[k]>MIN_A)S.attrs[k]--;render();}
 function spend(k){const c=cost(S.attrs[k]);if(S.bank>=c&&S.attrs[k]<99){S.bank-=c;S.attrs[k]++;}render();}
 function setF(k,v){S[k]=v;render();}
 function toggleTrait(k){const i=S.picked.indexOf(k);if(i>=0)S.picked.splice(i,1);else if(S.picked.length<traitLimit())S.picked.push(k);render();}
-function startCareer(){S.name=document.getElementById('nm').value.trim()||'Mystery Prospect';if(S.daily){S.diff='pro';S.perks={};}const pc=perkCost();if(pc){setGtp(gtpBank()-pc);S.perksBought={...S.perks};}if(S.daily)R=mulberry(seedFrom('goat'+todayKey()));
+function startCareer(){S.name=(S.name||'').trim()||'Mystery Prospect';if(S.daily){S.diff='pro';S.perks={};}const pc=perkCost();if(pc){setGtp(gtpBank()-pc);S.perksBought={...S.perks};}if(S.daily)R=mulberry(seedFrom('goat'+todayKey()));
   for(const[k]of TRAITS)S.traits[k]=S.picked.includes(k)?(S.perks.maxed?5:ri(4,5)):ri(1,5);
-  S.bank=START_BUDGET-spent();S.ceiling=ovr()+7+gauss()*8+(S.traits.work-3)*2.5+(S.traits.late-3)*1.2;if(S.perks.dna)S.ceiling+=3;if(S.perks.hype)S.hype+=15;S.armor=!!S.perks.armor;S.startOvr=OV();S.stage='hs';render();}
-function playerCard(mode){return`<div class="card"><div class="row">${avatar(S.look,S.age,70,1)}<div class="grow"><h2>${S.name} <span class="muted">· ${S.pos} · ${ht(S.height)} · ${S.frame}</span></h2>
-  <div class="sub">${era().name} · Age ${S.age}${S.stage==="nba"?"":" · Hype "+Math.max(0,Math.round(S.hype))} ${S.stage==='hs'||S.stage==='offers'?`· <span class="stars">${'★'.repeat(stars())}${'☆'.repeat(5-stars())}</span>`:''}</div></div>
-  <div style="text-align:center"><div class="big">${OV()}</div><div class="sub">OVERALL</div><div class="sub gold" style="font-size:.75rem;max-width:90px">${S.stage==='nba'||S.stage==='end'?'':'NBA level: '}${ovrLabel(OV())}</div></div></div>
-  <div class="traits">${TRAITS.filter(([k])=>S.traits[k]>=4||S.traits[k]<=1).map(([k,l])=>`<span class="pill ${S.traits[k]<=1?'bad':''}" title="${l}: ${S.traits[k]}/5">${l} ${'●'.repeat(S.traits[k])}${'○'.repeat(5-S.traits[k])}</span>`).join('')+`<span class="pill muted" title="${TRAITS.filter(([k])=>S.traits[k]>1&&S.traits[k]<4).map(([k,l])=>l+' '+S.traits[k]+'/5').join(', ')}">+${TRAITS.filter(([k])=>S.traits[k]>1&&S.traits[k]<4).length} average</span>`}${S.badges.map(b=>`<span class="pill gold" style="background:#3a2a1a">🎯 ${b}</span>`).join('')}</div>
-  ${mode?`<div style="margin-top:8px">${S.bank>0?`<div class="gold" style="margin:6px 0"><b>${S.bank} bonus point${S.bank>1?'s':''}</b> to spend! <span class="sub">(Unspent points carry over. Anything left when you declare for the draft gets auto-assigned.)</span></div>`:''}${attrRows('bank')}</div>`:''}</div>`;}
-function evList(ev){return ev.map(([g,t])=>`<div class="ev ${g>0?'good':g<0?'bad':''}">${t}</div>`).join('');}
+  S.bank=START_BUDGET-spent();S.ceiling=ovr()+7+gauss()*8+(S.traits.work-3)*2.5+(S.traits.late-3)*1.2;if(S.perks.dna)S.ceiling+=3;if(S.perks.hype)S.hype+=15;S.armor=!!S.perks.armor;S.startOvr=OV();S.stage='hs';UI().spend=false;render();scrollTo(0,0);}
 
-function render(){const st=S.stage;let h='';
-  if(st==='build'){const left=START_BUDGET-spent();
-    h=`<h1>Build a <span>GOAT</span></h1><div class="sub">Build a raw prospect. Survive high school and college. Find out if he's the greatest ever, or a bust.</div>
-    ${diffCard()}${gtpCard()}<div class="card"><div class="row"><b class="grow">🎰 League Era</b>${S.daily?'<span class="pill">📅 Daily era</span>':`<button class="ghost sm" onclick="spinEra()" ${S.spins<=0?'disabled':''}>Re-spin (${S.spins} left)</button>`}</div>
-    <div style="font-size:1.25rem;margin-top:6px"><b>${era().name}</b></div><div class="sub">${era().d} Build for your era.</div>
-    <div class="row" style="margin-top:10px"><button class="ghost sm ${S.daily?'sel':''}" onclick="toggleDaily()">📅 Daily Build: ${S.daily?'ON':'OFF'}</button><span class="sub grow">Same era and same dice for everyone today. See who builds better.</span></div>
-    ${S.daily&&dailyBest().length?`<div class="sub" style="margin-top:6px">Today's best: ${dailyBest().slice(0,3).map(x=>`<b>${x.name}</b> ${x.score}`).join(' · ')}</div>`:''}</div>
-    <div class="card"><b>Name</b><input id="nm" type="text" maxlength="24" value="${S.name}" placeholder="Name your prospect" oninput="S.name=this.value">
-    </div>${lookEditor()}
-    <div class="card"><b>⚡ Quick Start</b> <span class="sub">Pick an archetype, then tweak it, or roll the dice.</span><div class="row" style="margin-top:8px;gap:6px">${ARCH.map((a,i)=>`<button class="ghost sm ${S.arch===a[0]?'sel':''}" onclick="applyArch(${i})">${a[0]}</button>`).join('')}<button class="sm" onclick="randomBuild()">🎲 Randomize Everything</button></div></div>
-    <div class="card"><b>Position</b><div class="row" style="margin-top:6px">${Object.keys(POS).map(p=>`<button class="ghost ${S.pos===p?'sel':''}" onclick="S.pos='${p}';S.height=POS['${p}'].h;render()">${p}</button>`).join('')}</div>
-    <div style="margin-top:12px"><b>Height: ${ht(S.height)}</b> <span class="sub">(${S.height>POS[S.pos].h?'tall for a '+S.pos+': more injuries':S.height<POS[S.pos].h?'undersized for a '+S.pos:'standard size for a '+S.pos})</span><div class="sub" style="margin-top:2px">📏 Height effect: <b>${heightNote()}</b>${S.height<=76&&es('dunk')<S.attrs.dunk?` <span class="gold">· Dunk is capped at ${Math.round(es('dunk'))} by your size. Add Vertical to raise it.</span>`:''}</div>
-    <input type="range" min="${POS[S.pos].h-4}" max="${POS[S.pos].h+5+(S.perks&&S.perks.growth?3:0)}" value="${S.height}" oninput="S.height=+this.value;render()"></div>
-    <div style="margin-top:8px"><b>Frame</b><div class="row" style="margin-top:6px">${Object.keys(FRAMES).map(f=>`<button class="ghost ${S.frame===f?'sel':''}" onclick="setF('frame','${f}')">${f}</button>`).join('')}</div><div class="sub" style="margin-top:4px">${FRAMES[S.frame].d}</div></div></div>
-    <div class="card"><div class="row"><b class="grow">Skills</b><span class="${left?'gold':'muted'}"><b>${left}</b> points left</span><span class="pill">OVR ${OV()}</span></div>
-    <div class="sub">Points above 70 cost 2, above 85 cost 3. OVR is a weighted average of all 21 skills for your position and era, so maxing two skills barely moves it. You can't be great at everything, so pick what you'll live and die with.</div>${attrRows('build')}</div>
-    <div class="card"><b>Pick ${traitLimit()} locked-in traits</b> <span class="sub">— the other ${TRAITS.length-traitLimit()} get rolled at random. Choose wisely.</span>
-    ${TRAITS.map(([k,l,d])=>`<button class="choice ${S.picked.includes(k)?'sel':''}" onclick="toggleTrait('${k}')">${l}<small>${d}</small></button>`).join('')}</div>
-    ${left>0?`<div class="gold" style="margin:6px 0">You have ${left} unspent points. They carry over as bonus points.</div>`:''}${S.picked.length<traitLimit()?`<div class="sub" style="margin:6px 0">Pick ${traitLimit()-S.picked.length} more trait${traitLimit()-S.picked.length===1?'':'s'} to start.</div>`:''}<button onclick="startCareer()" ${S.picked.length<traitLimit()?'disabled':''}>Start High School →</button>${hofHTML()}${achHTML()}`;}
-  else if(st==='hs'){const i=S.hs.length;
-    h=`<h1>High School</h1>${playerCard(true)}${S.summerPend?summerCard():resultCard()+`<button onclick="act(simHS)">Play ${YR[i]} Year →</button>`}${S.hs.slice().reverse().map(s=>`<div class="card"><b>${s.title}</b> <span class="stars">${'★'.repeat(s.stars)}</span><div class="sub">${s.line}</div>${evList(s.ev)}</div>`).join('')}`;}
-  else if(st==='offers'){h=`<h1>Recruiting</h1>${playerCard(true)}<div class="card"><div class="sub">Stars come from skill (OVR) plus hype. Hype comes from big games, camps, mixtapes and Star Power.</div><h2>You're a <span class="stars">${'★'.repeat(stars())}</span> recruit</h2><div class="sub">${S.offers.length} scholarship offers${stars()>=5?' — every program in the country wants him. Take your pick.':stars()===4?' — plenty of big-time options.':stars()===3?' — a few solid options.':' — slim pickings. Make the most of it.'}</div>
-    ${S.offers.map((o,i)=>`<button class="choice" onclick="chooseSchool(${i})">🎓 ${o.name} — ${TIER[o.tier].lbl}<small>${TIER[o.tier].d}<br><span class="gold">${o.perk[0]}: ${o.perk[1]}</span></small></button>`).join('')}</div><h2 style="margin-top:16px">High School Recap</h2>${S.hs.slice().reverse().map(s=>`<div class="card"><b>${s.title}</b> <span class="stars">${'★'.repeat(s.stars)}</span><div class="sub">${s.line}</div>${evList(s.ev)}</div>`).join('')}`;}
-  else if(st==='college'){const y=S.col.length,last=S.col[y-1];
-    const colCards=S.col.slice().reverse().map(s=>`<div class="card"><b>${s.title}</b><div class="sub">${s.line}</div>${s.acc.map(a=>`<div class="ev gold">${a}</div>`).join('')}${evList(s.ev)}</div>`).join('');
-    h=`<h1>${S.school}</h1>${playerCard(true)}`;
-    if(S.summerPend)h+=summerCard();else if(!y)h+=`<button onclick="act(simCol)">Play Freshman Season →</button>`;
-    else{const[a,b]=projRange();h+=`<div class="card flash"><h2>Draft Decision</h2><div>If you declare now (age ${draftAge()}): projected <b class="gold">${pickTxt(a)} – ${pickTxt(b)}</b></div>${a>30?`<div class="ev bad">⚠️ Scouts see him outside the first round${b>=61?' and he could go undrafted':''}. Another year could help.</div>`:''}<div class="sub">The combine can still move him a few spots either way.</div>
-      <div class="sub">Scouts love youth. Every year you stay, you get better, but they knock you for age (${{18:'+9',19:'+7',20:'+4',21:'+1',22:'−2',23:'−5'}[draftAge()]??'−7'} draft bonus at age ${draftAge()}). Your draft stock can drop even after a great year.</div>
-      <div class="row" style="margin-top:10px"><button onclick="declare()">Declare for the Draft</button>${S.mustDeclare?'<span class="muted">Out of eligibility</span>':`<button class="ghost" onclick="returnSchool()">Return for ${YR[y]} Year</button>`}</div></div>`;}h+=colCards;}else if(st==='draft'){const p=S.pick,cb=S.combine,d0=S.board.length*.35;
-    h=`<h1>Draft Night</h1><div class="card"><h2>📏 Draft Combine</h2><div class="grid2">${[['Vertical',cb.vert+'"'],['3/4 Sprint',cb.sprint+'s'],['Bench Reps',cb.bench],['Wingspan',ht(cb.wing)]].map(([l,v])=>`<div class="stat"><b>${v}</b>${l}</div>`).join('')}</div>
-    <div class="sub" style="margin-top:6px">${cb.adj>=1?'📈 Scouts are buzzing. His stock is rising.':cb.adj<=-1?'📉 Underwhelming testing. His stock slips.':'➖ Solid testing. No big moves.'}</div></div>
-    <div class="card"><h2>🎙️ On the Clock</h2>${S.board.map((b,i)=>`<div class="ev reveal" style="animation-delay:${i*.35}s">#${b.n} · <b>${b.name}</b> <span class="muted">${b.pos} · ${b.school}</span></div>`).join('')}</div>
-    <div class="card reveal" style="text-align:center;animation-delay:${d0+.4}s">${avatar(S.look,S.age,96,1)}<div class="sub">${p>=61?'60 names called... his isn\'t one of them.':`With the #${p} pick in the NBA Draft, the`}</div>
-    <div class="big" style="margin:10px 0">${p>=61?'UNDRAFTED':S.team}</div><div class="sub">${p>=61?`He signs a two-way contract with the ${S.team}. Time to prove everyone wrong.`:`select <b>${S.name}</b> out of ${S.school}`}</div>
-    <div style="margin-top:12px"><span class="pill">Scout Grade: ${grade(S.scoutAtDraft)}</span><span class="pill">True Ceiling: ???</span><span class="pill">Age ${S.age}</span></div></div>
-    <div class="card reveal" style="animation-delay:${d0+.9}s">⚔️ Also in this draft class: <b>${S.rival.name}</b>, taken by the ${S.rival.team}. The media is already calling him your rival.</div><button onclick="S.stage='nba';render()">Start NBA Career →</button>`;}
-  else if(st==='nba'){h=`<h1>NBA Career</h1>${playerCard(false)}${S.rival?`<div class="sub">⚔️ Rival: <b>${S.rival.name}</b> (${S.rival.team})${S.rival.retired?' · retired':''}</div>`:''}${legacyCard()}${resultCard()}`;
-    if(S.pend){const p=S.pend;h+=`<div class="card flash"><h2>${p.title}</h2><div class="sub">${p.text}</div>${p.opts.map((o,i)=>`<button class="choice" onclick="act(choose,${i})">${o.label}<small>${o.desc}</small></button>`).join('')}</div>`;}
-    else h+=`<div class="row"><button onclick="act(simNBA)">Sim Season ${S.nba.length+1} →</button><button class="ghost" onclick="simAll()">Sim to Next Decision ⏩</button><button class="ghost" onclick="simEnd()">Sim Whole Career ⏭</button></div>`;
-    if(S.nba.length)h+=seasonCard(S.nba[S.nba.length-1]);
-    h+=seasonTable(true);}
-  else if(st==='end')h=endHTML();
-  app.innerHTML=h;}
-function simEnd(){let g=0;while(S.stage==='nba'&&g++<120){if(S.pend)choose(S.pend.kind==='summer'?S.pend.opts.length-2:0);else simNBA();}render();}
-function simAll(){let g=0;while(S.stage==='nba'&&!S.pend&&g++<25)simNBA();render();}
+// ---------- player header ----------
+function hero(){const o=OV(),st=S.stage;
+  return`<div class="hero">${avatar(S.look,S.age,60,1)}<div class="grow"><div class="hn">${esc(S.name)}</div><div class="hm">${S.pos} · ${ht(S.height)} · ${S.frame} · Age ${S.age}</div>
+  <div class="hm">${era().name.replace(EMO_RE,'').trim()}${st!=='nba'?` · Hype ${Math.max(0,Math.round(S.hype))}`:''}${st==='hs'||st==='offers'?` · ${starsHTML(stars())}`:''}${S.rival&&st==='nba'?` · ⚔️ ${S.rival.name}${S.rival.retired?' (retired)':''}`:''}</div></div>
+  <div><div class="ovr" style="--p:${o}"><div><b>${o}</b><span>OVR</span></div></div><div class="role">${st==='nba'||st==='end'?'':'NBA: '}${ovrLabel(o)}</div></div></div>`;}
+function traitsBlock(){const hi=TRAITS.filter(([k])=>S.traits[k]>=4).length,lo=TRAITS.filter(([k])=>S.traits[k]<=1).length;
+  return`<details><summary>Traits · ${hi} strength${hi===1?'':'s'}${lo?` · ${lo} weakness${lo===1?'':'es'}`:''}</summary><div>${TRAITS.slice().sort((a,b)=>S.traits[b[0]]-S.traits[a[0]]).map(([k,l])=>`<span class="pill ${S.traits[k]<=1?'bad':''}">${l}${pips(S.traits[k])}</span>`).join('')}${S.badges.map(b=>`<span class="pill gold">🎯 ${b}</span>`).join('')}</div></details>`;}
+function bankBlock(){if(S.bank<=0)return'';const u=UI();
+  return`<div class="bankbar"><div class="grow"><b>${S.bank} bonus point${S.bank>1?'s':''}</b><div class="sub">Carry over until the draft, then auto-assign.</div></div><button class="sm" onclick="UI().spend=!UI().spend;render()">${u.spend?'Done':'Spend'}</button></div>${u.spend?`<div style="margin-top:8px">${skillAcc('bank')}</div>`:''}`;}
+function playerCard(mode){return`<div class="card">${hero()}${traitsBlock()}${mode?bankBlock():''}</div>`;}
+function evList(ev){return ev.map(([g,t])=>`<div class="ev ${g>0?'good':g<0?'bad':''}">${t}</div>`).join('');}
+function seasonList(arr){if(!arr.length)return'';const rev=arr.slice().reverse();
+  const one=s=>`<div class="season"><b>${s.title}</b>${s.stars?starsHTML(s.stars):''}</div><div class="line">${s.line}</div>${(s.acc||[]).map(a=>`<div class="ev gold">${a}</div>`).join('')}${evList(s.ev)}`;
+  return`<div class="card">${one(rev[0])}</div>${rev.length>1?`<details class="card"><summary>Earlier seasons · ${rev.length-1}</summary>${rev.slice(1).map(s=>`<div style="margin-top:14px">${one(s)}</div>`).join('')}</details>`:''}`;}
+
+// ---------- decisions ----------
+const RISK=[[/High risk/,'h','High risk'],[/Medium risk/,'m','Medium risk'],[/Low risk/,'l','Low risk'],[/Safe/,'s','Safe']];
+function optBtn(o,on){const r=RISK.find(x=>x[0].test(o.desc)),d=o.desc.replace(/\s·\s\S*\s?(High risk|Medium risk|Low risk|Safe)\s*$/,'');
+  return`<button class="opt" onclick="${on}"><div class="grow"><div class="t">${o.label}</div><small>${d}</small>${r?`<span class="risk ${r[1]}">${r[2]}</span>`:''}</div></button>`;}
+function summerCard(){const p=S.summerPend;return`<div class="card flash"><div class="sh">☀️ <span class="grow">Summer decision</span></div><h2>${p.title.replace(/^☀️\s*/,'')}</h2><div class="sub">${p.text}</div>${p.opts.map((o,i)=>optBtn(o,`act(chooseSummer,${i})`)).join('')}</div>`;}
+function decisionCard(){const p=S.pend;return`<div class="card flash"><div class="sh">${p.kind==='summer'?'☀️':p.kind==='fa'?'✍️':p.kind==='retire'?'🕰️':'⚡'} <span class="grow">${p.kind==='summer'?'Summer decision':p.kind==='fa'?'Free agency':p.kind==='retire'?'Retirement':'Career moment'}</span></div>${/summer decision/i.test(p.title)?'':`<h2>${p.title.replace(EMO_RE,'').trim()}</h2>`}<div class="sub">${p.text}</div>${p.opts.map((o,i)=>optBtn(o,`act(choose,${i})`)).join('')}</div>`;}
+function resultCard(){const r=S.lastResult;return r?`<div class="card result ${r.ok?'':'bad'}"><div class="ev ${r.ok?'good':'bad'}">${r.ok?'✅':'❌'} <b>${r.ok?'It paid off':'It backfired'}</b></div><div class="sub">${r.text.replace(/^☀️\s*/,'')}</div></div>`:'';}
+
+// ---------- NBA cards ----------
+function legacyCard(){const c=career(),sc=goatScore(c),[t]=tierOf(sc,c),g=x=>c.cnt[x]||0,last=S.nba[S.nba.length-1];
+  const steps=[[60,'Perennial All-Star'],[120,'Hall of Famer'],[200,'Top 10 All-Time'],[350,'GOAT']],nx=steps.find(s=>sc<s[0]),pace=last?c.pts+last.ppg*70*Math.max(0,34-S.age)*.8:0;
+  const label=S.nba.length<4?'Early career':t==='Bust'||t==='Role Player'?(last&&last.mins>=28?'Starter on the rise':'Fighting for minutes'):t.replace(EMO_RE,'').trim();
+  return`<div class="card"><div class="sh">📈 <span class="grow">Legacy</span><b class="gold">${label}</b></div>
+  <div class="row" style="align-items:baseline;gap:6px"><span class="big">${sc}</span><span class="muted">/ 350 GOAT score</span></div><div class="meter"><i style="width:${Math.min(100,sc/350*100)}%"></i></div>
+  <div class="sub">${nx?`Next: <b>${nx[1]}</b> at ${nx[0]}`:'GOAT territory'}${last&&S.age<34?` · on pace for ~${(Math.round(pace/1000)*1000).toLocaleString()} pts`:''}</div>
+  <div class="stat4" style="margin-top:10px"><div class="stat"><b>${Math.round(c.pts).toLocaleString()}</b>PTS</div><div class="stat"><b>${g('Champion')}</b>RINGS</div><div class="stat"><b>${g('All-Star')}</b>ALL-STAR</div><div class="stat"><b>${Math.round(S.gtpRun||0)}</b>GTP</div></div>
+  <details><summary>Legend benchmarks · ${benchList(c).filter(x=>x[1]).length}/${benchList(c).length}</summary>${benchList(c).map(([l,ok])=>`<div class="ev ${ok?'good':'muted'}">${ok?'✅':'⬜'} ${l}</div>`).join('')}</details></div>`;}
+function seasonCard(s){const aw=s.aw.filter(x=>x!=='MVP'),role=s.mins>=28?['good','Starter']:s.mins>=18?['muted','Bench rotation']:['muted','Deep bench'];
+  return`<div class="card flash"><div class="sh">🏀 <span class="grow">Season ${s.yr} · Age ${s.age}</span><b class="${role[0]}">${role[1]}</b></div><div style="font-weight:700">${s.team} · ${s.wins}-${82-s.wins}</div>
+  <div class="stat4" style="margin:10px 0 4px"><div class="stat"><b>${f1(s.ppg)}</b>PPG</div><div class="stat"><b>${f1(s.rpg)}</b>RPG</div><div class="stat"><b>${f1(s.apg)}</b>APG</div><div class="stat"><b>${s.gp}</b>GAMES</div></div>
+  ${s.scRank&&s.scRank<=15?`<div class="ev">📊 ${ord(s.scRank)} in the league in scoring</div>`:''}
+  ${s.mvpRank&&s.mvpRank<=8?`<div class="ev ${s.mvpRank===1?'gold':''}">👑 ${s.mvpRank===1?'Wins MVP!':`Finished ${ord(s.mvpRank)} in MVP voting`}</div>`:''}
+  ${aw.length?`<div class="ev gold">🏅 ${aw.join(' · ')}</div>`:''}${s.inj?`<div class="ev bad">${/🚑|🛡/.test(s.inj)?'':'🤕 '}${s.inj}</div>`:''}${s.gp<65?`<div class="ev muted">⚠️ ${s.gp} games: not eligible for MVP, All-NBA or other awards (65-game rule)</div>`:''}
+  ${s.path.length?s.path.map(x=>`<div class="ev ${x.includes(': beat')?'good':'bad'}">${x.includes(': beat')?'✅':'❌'} ${x}</div>`).join(''):'<div class="ev muted">🚫 Missed the playoffs</div>'}
+  ${s.po.includes('CHAMPION')?'<div class="ev gold">🏆 <b>NBA Champions</b></div>':''}
+  ${s.gtp?`<div class="ev gold">💎 +${s.gtp} GTP</div>`:''}${s.notes.map(x=>`<div class="ev">${x}</div>`).join('')}${s.ovr<61&&S.stage==='nba'?'<div class="ev bad">⚠️ On the roster bubble. Players below 61 OVR can get cut.</div>':''}
+  ${s.rv?`<div class="note">⚔️ Rival ${s.rv.name}: ${f1(s.rv.ppg)} PPG, ${s.rv.wins} wins</div>`:''}</div>`;}
 function seasonTable(rev){if(!S.nba.length)return'';const rows=S.nba.map(s=>`<tr><td>${s.yr}</td><td>${s.team.split(' ').slice(-1)}</td><td>${s.age}</td><td>${s.ovr}</td><td>${s.gp}</td><td>${f1(s.mins)}</td><td><b>${f1(s.ppg)}</b></td><td>${f1(s.rpg)}</td><td>${f1(s.apg)}</td><td>${f1(s.spg)}</td><td>${f1(s.bpg)}</td><td>${(s.fg*100).toFixed(1)}</td><td>${(s.tp*100).toFixed(1)}</td><td>${(s.ft*100).toFixed(1)}</td><td>${s.wins}-${82-s.wins}</td></tr>
-  ${s.aw.length||s.inj||true?`<tr><td></td><td colspan="14" style="text-align:left;white-space:normal" class="sub">${s.po}${s.aw.length?' · <span class="gold">'+s.aw.join(' · ')+'</span>':''}${s.inj?' · <span class="bad">'+s.inj+'</span>':''}</td></tr>`:''}`);
-  return`<div class="card scroll"><table><tr><th>Yr</th><th>Team</th><th>Age</th><th>OVR</th><th>GP</th><th>MIN</th><th>PTS</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>FG%</th><th>3P%</th><th>FT%</th><th>W-L</th></tr>${(rev?rows.reverse():rows).join('')}</table></div>`;}
+  <tr><td></td><td colspan="14" style="text-align:left;white-space:normal" class="sub">${s.po}${s.aw.length?' · <span class="gold">'+s.aw.join(' · ')+'</span>':''}${s.inj?' · <span class="bad">'+s.inj+'</span>':''}</td></tr>`);
+  return`<div class="scroll" style="margin-top:10px"><table><tr><th>YR</th><th>TEAM</th><th>AGE</th><th>OVR</th><th>GP</th><th>MIN</th><th>PTS</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>FG%</th><th>3P%</th><th>FT%</th><th>W-L</th></tr>${(rev?rows.reverse():rows).join('')}</table></div>`;}
+
+// ---------- builder pieces ----------
+function gtpCard(){const bank=gtpBank(),cost=perkCost();
+  if(S.daily)return`<div class="card"><div class="sh">💎 <span class="grow">Generational Talent Points</span><b>${bank}</b></div><div class="sub">Perks are off for the Daily Build so everyone plays on equal terms. You still earn GTP.</div></div>`;
+  if(!bank&&!cost)return`<div class="card"><div class="sh">💎 <span class="grow">Generational Talent Points</span><b>0</b></div><div class="sub">Earn GTP on Pro or Hall of Fame from great seasons, then spend it here on perks for your next player.</div></div>`;
+  return`<details class="card" ${cost?'open':''}><summary>💎 GTP Shop · <span class="gold">${bank-cost} available</span>${cost?` · ${cost} in cart`:''}</summary>
+  ${PERKS_GTP.map(([k,l,d,c,mx])=>{const n=(S.perks&&S.perks[k])||0;return`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><div class="grow"><b>${l}</b>${n?` <span class="gold">×${n}</span>`:''}<div class="sub">${d} · ${c} GTP</div></div>
+    <button class="ghost sm" aria-label="Remove ${l}" onclick="buyPerk('${k}',-1)" ${n?'':'disabled'}>−</button><button class="sm" aria-label="Buy ${l}" onclick="buyPerk('${k}',1)" ${n>=mx||bank-cost<c?'disabled':''}>+</button></div>`;}).join('')}</details>`;}
+function diffCard(){return`<div class="card"><div class="sh">🎚️ <span class="grow">Difficulty</span></div><div class="seg">${Object.entries(DIFFS).map(([k,v])=>`<button class="${S.diff===k?'on':''}" onclick="setDiff('${k}')" ${S.daily&&k!=='pro'?'disabled':''}>${v.name.replace(/^\S+\s/,'')}</button>`).join('')}</div><div class="note">${diff().d}${S.daily?' The Daily Build is always played on Pro.':''}</div></div>`;}
+function lookEditor(){return`<div class="card"><div class="avwrap">${avatar(S.look,18,150,1)}</div><div class="row" style="margin-bottom:8px"><span class="sh grow" style="margin:0">Customize</span><button class="sm ghost" onclick="S.look=randLook();render()">🎲 Random look</button></div>
+  <div class="looks">${LOOKS.map(([k,l,o])=>`<div><span>${l}</span><button class="ghost sm" aria-label="Previous ${l}" onclick="cyc('${k}',-1)">◀</button><b>${o()[(S.look[k]||0)%o().length].replace(EMO_RE,'').trim()}</b><button class="ghost sm" aria-label="Next ${l}" onclick="cyc('${k}',1)">▶</button></div>`).join('')}
+  <div><span>Number</span><button class="ghost sm" aria-label="Lower number" onclick="S.look.num=(S.look.num+99)%100;render()">◀</button><b>#${S.look.num}</b><button class="ghost sm" aria-label="Higher number" onclick="S.look.num=(S.look.num+1)%100;render()">▶</button></div></div></div>`;}
+function heightText(){return`${S.height>POS[S.pos].h?'Tall for a '+S.pos+' (a little more injury risk)':S.height<POS[S.pos].h?'Undersized for a '+S.pos:'Standard size for a '+S.pos}`;}
+function dunkCap(){return S.height<=76&&es('dunk')<S.attrs.dunk?`<div class="ev gold">⚠️ Dunk is capped at ${Math.round(es('dunk'))} by his size. Add Vertical to raise it.</div>`:'';}
+function updHeight(){const a=document.getElementById('hval'),b=document.getElementById('hnote'),c=document.getElementById('heff');if(a)a.textContent=ht(S.height);if(b)b.textContent=heightText();if(c)c.innerHTML=heightNote();}
+const TABS=[['setup','Setup'],['look','Look'],['body','Body'],['skills','Skills'],['traits','Traits']];
+function goTab(k){UI().tab=k;render();scrollTo(0,0);}
+function buildHTML(){const u=UI(),left=START_BUDGET-spent(),ti=Math.max(0,TABS.findIndex(t=>t[0]===u.tab)),tab=TABS[ti][0];let h=`<div class="tabs">${TABS.map(([k,l],i)=>`<button class="${tab===k?'on':''} ${i<ti?'done':''}" onclick="goTab('${k}')"><span class="n">${i+1}</span>${l}</button>`).join('')}</div>`;
+  if(tab==='setup')h+=`<h1>Build a <span>GOAT</span></h1><div class="sub">Build a raw prospect, survive high school and college, and find out if he becomes the greatest of all time.</div>${diffCard()}
+    <div class="card"><div class="sh">🎰 <span class="grow">League era</span>${S.daily?'<b>Daily</b>':`<button class="ghost sm" onclick="spinEra()" ${S.spins<=0?'disabled':''}>🎲 Re-spin · ${S.spins}</button>`}</div><div style="font-size:1.15rem;font-weight:800">${era().name}</div><div class="sub">${era().d}</div>
+    <details><summary>📅 Daily Build${S.daily?' · on':''}</summary><div class="sub">Same era and same dice for everyone today. Played on Pro with no perks.</div><button class="${S.daily?'sel':'ghost'} wide" style="margin-top:8px" onclick="toggleDaily()">${S.daily?'Daily Build is on · tap to turn off':'Play today\'s Daily Build'}</button>${S.daily&&dailyBest().length?`<div class="note">Today's best: ${dailyBest().slice(0,3).map(x=>`<b>${esc(x.name)}</b> ${x.score}`).join(' · ')}</div>`:''}</details></div>
+    ${gtpCard()}<div class="card"><div class="sh">⚡ <span class="grow">Quick start</span></div><div class="chips">${ARCH.map((a,i)=>`<button class="chip ${S.arch===a[0]?'on':''}" onclick="applyArch(${i})">${a[0]}<small>${a[1]} · ${ht(a[2])}</small></button>`).join('')}<button class="chip" onclick="randomBuild()">🎲 Randomize<small>Body, skills and traits</small></button></div><div class="note">Presets fill in your body and skills. You can still change everything.</div></div>${hofHTML()}${achHTML()}`;
+  if(tab==='look')h+=`<h1>Look</h1><div class="card"><div class="sh">✍️ <span class="grow">Name</span></div><input id="nm" type="text" maxlength="24" value="${esc(S.name)}" placeholder="Name your prospect" oninput="S.name=this.value"></div>${lookEditor()}`;
+  if(tab==='body')h+=`<h1>Body</h1><div class="card"><div class="sh">🏀 <span class="grow">Position</span></div><div class="seg">${Object.keys(POS).map(p=>`<button class="${S.pos===p?'on':''}" onclick="S.pos='${p}';S.height=POS['${p}'].h;render()">${p}</button>`).join('')}</div></div>
+    <div class="card"><div class="sh">📏 <span class="grow">Height</span><b id="hval">${ht(S.height)}</b></div><input type="range" aria-label="Height" min="${POS[S.pos].h-4}" max="${POS[S.pos].h+5+(S.perks&&S.perks.growth?3:0)}" value="${S.height}" oninput="S.height=+this.value;updHeight()" onchange="render()"><div class="sub" id="hnote">${heightText()}</div><div class="note" id="heff">${heightNote()}</div>${dunkCap()}</div>
+    <div class="card"><div class="sh">💪 <span class="grow">Frame</span></div><div class="seg">${Object.keys(FRAMES).map(f=>`<button class="${S.frame===f?'on':''}" onclick="setF('frame','${f}')">${f}</button>`).join('')}</div><div class="note">${FRAMES[S.frame].d}</div></div>`;
+  if(tab==='skills')h+=`<h1>Skills</h1><div class="sub">Tap a group to open it. Points above 70 cost 2, above 85 cost 3. OVR weighs every skill for your position and era.</div>${skillAcc('build')}`;
+  if(tab==='traits')h+=`<h1>Traits</h1><div class="sub">Lock in ${traitLimit()}. The other ${TRAITS.length-traitLimit()} are rolled at random.</div><div class="card"><div class="chips">${TRAITS.map(([k,l,d])=>`<button class="chip ${S.picked.includes(k)?'on':''}" onclick="toggleTrait('${k}')">${l}<small>${d}</small></button>`).join('')}</div></div>`;
+  const ready=S.picked.length>=traitLimit(),nxt=TABS[ti+1];
+  return h+dock(`<div class="meta"><span><b>${left}</b> pts left</span><span>OVR <b>${OV()}</b></span><span>Traits <b>${S.picked.length}/${traitLimit()}</b></span></div>
+    <div class="two">${nxt?`<button class="ghost" onclick="goTab('${nxt[0]}')">Next: ${nxt[1]} ▶</button>`:`<button class="ghost" onclick="goTab('setup')">◀ Back to Setup</button>`}<button onclick="${ready?'startCareer()':"goTab('traits')"}" class="${ready?'':'ghost'}">${ready?'Start High School':`Pick ${traitLimit()-S.picked.length} trait${traitLimit()-S.picked.length===1?'':'s'}`}</button></div>`);}
+
+// ---------- screens ----------
+function render(){const st=S.stage;let h='';
+  if(st==='build')h=buildHTML();
+  else if(st==='hs'){const i=S.hs.length;h=`<h1>High School</h1>${playerCard(true)}${S.summerPend?summerCard():resultCard()}${seasonList(S.hs)}`+(S.summerPend?'':dock(`<button onclick="act(simHS)">Play ${YR[i]} Year</button>`));}
+  else if(st==='offers'){const n=stars();h=`<h1>Recruiting</h1>${playerCard(true)}<div class="card"><div class="sh">🎓 <span class="grow">Scholarship offers</span><b>${S.offers.length}</b></div><div class="row" style="align-items:baseline"><h2 style="margin:0">${n}-star recruit</h2>${starsHTML(n)}</div>
+    <div class="sub">${n>=5?'Every program in the country wants him. Take your pick.':n===4?'Plenty of big-time options.':n===3?'A few solid options.':'Slim pickings. Make the most of it.'}</div>
+    ${S.offers.map((o,i)=>`<button class="opt" onclick="chooseSchool(${i})"><div class="grow"><div class="t">${o.name}</div><small>${TIER[o.tier].lbl} · ${TIER[o.tier].d}</small><span class="risk l" style="text-transform:none;letter-spacing:0;font-size:.74rem">${o.perk[0]}: ${o.perk[1]}</span></div></button>`).join('')}
+    <div class="note">Stars come from skill (OVR) plus hype from big games, camps, mixtapes and Star Power.</div></div>${seasonList(S.hs)}`;}
+  else if(st==='college'){const y=S.col.length;let dk='';h=`<h1>${S.school}</h1>${playerCard(true)}`;
+    if(S.summerPend)h+=summerCard();
+    else if(!y)dk=`<button onclick="act(simCol)">Play Freshman Season</button>`;
+    else{const[a,b]=projRange(),ab={18:'+9',19:'+7',20:'+4',21:'+1',22:'−2',23:'−5'}[draftAge()]??'−7';
+      h+=`<div class="card flash"><div class="sh">📋 <span class="grow">Draft decision</span><b>Age ${draftAge()}</b></div><div style="font-size:1.25rem;font-weight:800">${pickTxt(a)} – ${pickTxt(b)}</div><div class="sub">Projected range if he declares now</div>
+      ${a>30?`<div class="ev bad">⚠️ Outside the first round${b>=61?', and he could go undrafted':''}. Another year could help.</div>`:''}
+      <details><summary>How draft stock works</summary><div class="sub">Scouts love youth: he gets a ${ab} draft bonus at age ${draftAge()}. Each year he stays he improves, but scouts knock him for age, so stock can drop even after a great year. The combine can still move him a few spots.</div></details></div>`;
+      dk=`<div class="two"><button onclick="declare()">Declare for the Draft</button>${S.mustDeclare?'<button class="ghost" disabled>Out of eligibility</button>':`<button class="ghost" onclick="returnSchool()">Return for ${YR[y]} Year</button>`}</div>`;}
+    h+=resultCard()+seasonList(S.col)+dock(dk);}
+  else if(st==='draft'){const p=S.pick,cb=S.combine,d0=S.board.length*.3;
+    h=`<h1>Draft Night</h1><div class="card"><div class="sh">📏 <span class="grow">Combine</span></div><div class="stat4">${[['VERT',cb.vert+'"'],['SPRINT',cb.sprint+'s'],['BENCH',cb.bench],['WING',ht(cb.wing)]].map(([l,v])=>`<div class="stat"><b>${v}</b>${l}</div>`).join('')}</div>
+    <div class="note">${cb.adj>=1?'📈 Scouts are buzzing. His stock is rising.':cb.adj<=-1?'📉 Underwhelming testing. His stock slips.':'➖ Solid testing. No big moves.'}</div></div>
+    <div class="card"><div class="sh">🎙️ <span class="grow">On the clock</span></div>${S.board.map((b,i)=>`<div class="ev reveal" style="animation-delay:${i*.3}s"><span class="muted">#${b.n}</span> <b>${b.name}</b> <span class="muted">${b.pos} · ${b.school}</span></div>`).join('')}</div>
+    <div class="card reveal" style="text-align:center;animation-delay:${d0+.3}s"><div class="avwrap">${avatar(S.look,S.age,96,1)}</div><div class="sub">${p>=61?'60 names called. His isn\'t one of them.':`With the #${p} pick in the NBA Draft, the`}</div>
+    <div class="big" style="margin:6px 0">${p>=61?'Undrafted':S.team}</div><div class="sub">${p>=61?`He signs a two-way deal with the ${S.team}. Time to prove everyone wrong.`:`select <b>${esc(S.name)}</b> out of ${S.school}`}</div>
+    <div style="margin-top:10px"><span class="pill">Scout grade ${grade(S.scoutAtDraft)}</span><span class="pill">True ceiling ???</span><span class="pill">Age ${S.age}</span></div></div>
+    <div class="card reveal" style="animation-delay:${d0+.7}s"><div class="ev">⚔️ <span>Also in this class: <b>${S.rival.name}</b>, taken by the ${S.rival.team}. The media is already calling him your rival.</span></div></div>`+dock(`<button onclick="S.stage='nba';render();scrollTo(0,0)">Start NBA Career</button>`);}
+  else if(st==='nba'){let dk='';h=`<h1>NBA Career</h1>${playerCard(false)}${legacyCard()}${resultCard()}`;
+    if(S.pend)h+=decisionCard();else dk=`<button onclick="act(simNBA)">Sim Season ${S.nba.length+1}</button><div class="two"><button class="ghost" onclick="simAll()">Next Decision ⏩</button><button class="ghost" onclick="simEnd()">Whole Career ⏭</button></div>`;
+    if(S.nba.length)h+=seasonCard(S.nba[S.nba.length-1]);
+    if(S.nba.length>1)h+=`<details class="card"><summary>📊 Season log · ${S.nba.length} seasons</summary>${seasonTable(true)}</details>`;
+    h+=dock(dk);}
+  else if(st==='end')h=endHTML();
+  app.innerHTML=h;iconize(app);const d=app.querySelector('.dock');document.documentElement.style.setProperty('--dockH',(d?d.offsetHeight:0)+'px');}
+function simEnd(){let g=0;while(S.stage==='nba'&&g++<120){if(S.pend)choose(S.pend.kind==='summer'?S.pend.opts.length-2:0);else simNBA();}render();scrollTo(0,0);}
+function simAll(){let g=0;while(S.stage==='nba'&&!S.pend&&g++<25)simNBA();render();}
 function endHTML(){const c=career(),sc=goatScore(c),[t,d]=tierOf(sc,c),k=c.cnt,g=x=>k[x]||0,gp=c.gp||1;
   const p=S.pick,sg=grade(S.scoutAtDraft),tc=grade(Math.max(S.ceiling,c.peak));let story;
   const lowT=['Bust','Role Player'].includes(t);if(p<=10&&c.peak<72&&lowT)story='One of the biggest busts of his draft class.';else if(p<=10&&lowT)story='Never lived up to his lottery billing.';else if(p>=31&&c.peak>=84)story='The steal of the draft. 29+ teams passed on a superstar.';
   else if(p>=15&&c.peak>=86)story='Teams slept on him. They regret it.';else if(p<=3&&c.peak>=88)story='Lived up to every ounce of the hype.';else if(c.peak>=S.ceiling-1&&t!=='Bust')story='Squeezed every drop out of his talent.';else if(t==='Bust')story='It just never came together.';else story='Left some potential on the table.';
-  const acc=[['Champion','🏆 Champion'],['MVP','👑 MVP'],['Finals MVP','🏅 Finals MVP'],['All-NBA 1st','All-NBA 1st Team'],['All-NBA 2nd','All-NBA 2nd Team'],['All-NBA 3rd','All-NBA 3rd Team'],['All-Star','⭐ All-Star'],['DPOY','🛡️ DPOY'],['Scoring Title','🔥 Scoring Title'],['ROY','Rookie of the Year'],['6MOY','6th Man of the Year'],['MIP','Most Improved']].filter(([x])=>g(x));
+  const acc=[['Champion','🏆 Champion'],['MVP','👑 MVP'],['Finals MVP','🏅 Finals MVP'],['All-NBA 1st','🥇 All-NBA 1st'],['All-NBA 2nd','🥈 All-NBA 2nd'],['All-NBA 3rd','🎖️ All-NBA 3rd'],['All-Star','⭐ All-Star'],['DPOY','🛡️ DPOY'],['Scoring Title','🔥 Scoring title'],['ROY','🌟 Rookie of the Year'],['6MOY','🪑 6th Man'],['MIP','📈 Most Improved']].filter(([x])=>g(x));
   const bm=benchList(c),rv=S.rival,meR=g('Champion')*3+g('MVP')*4+c.pts/5000,rvR=rv?rv.rings*3+rv.mvps*4+rv.pts/5000:0;
-  return`<h1>${S.name}</h1><div class="sub">${S.retired} at age ${S.age} after ${c.seasons} season${c.seasons===1?'':'s'}.</div>
-  ${plaqueHTML(c,sc,t)}<div class="sub" style="text-align:center;margin:8px 0">${d} <span class="muted">(GOAT = 350+)</span><br>📸 Screenshot the plaque and send it!</div>
-  <div class="card"><h2>More Career Numbers</h2><div class="grid2">
-  ${[['SPG',c.stl/gp],['BPG',c.blk/gp]].map(([l,v])=>`<div class="stat"><b>${f1(v)}</b>${l}</div>`).join('')}
-  <div class="stat"><b>${Math.round(c.reb).toLocaleString()}</b>Total REB</div><div class="stat"><b>${Math.round(c.ast).toLocaleString()}</b>Total AST</div><div class="stat"><b>${c.gp}</b>Games</div><div class="stat"><b>${c.peak}</b>Peak OVR</div></div></div>
-  <div class="card"><h2>Accolades</h2>${acc.length?acc.map(([x,l])=>`<span class="pill gold" style="font-size:.95rem">${g(x)}× ${l}</span>`).join(''):'<span class="muted">None. Tough business.</span>'}</div>
-  <div class="card"><h2>The Draft Story</h2><div>${pickTxt(p)} out of ${S.school} at age ${S.age-c.seasons+1}</div>
-  <div style="margin:6px 0"><span class="pill">Scout Grade: ${sg}</span><span class="pill">True Ceiling: <b class="gold">${tc}</b></span><span class="pill">Peak: ${grade(c.peak)}</span></div><div class="gold">${story}</div>${(S.log||[]).map(x=>`<div class="sub">📝 ${x}</div>`).join('')}</div>
-  ${rv?`<div class="card"><h2>⚔️ You vs ${rv.name}</h2><table><tr><th></th><th>${S.name}</th><th>${rv.name}</th></tr><tr><td>Rings</td><td>${g('Champion')}</td><td>${rv.rings}</td></tr><tr><td>MVPs</td><td>${g('MVP')}</td><td>${rv.mvps}</td></tr><tr><td>Career PTS</td><td>${Math.round(c.pts).toLocaleString()}</td><td>${Math.round(rv.pts).toLocaleString()}</td></tr></table><div class="gold" style="margin-top:6px">${meR>=rvR?'🏆 You won the rivalry.':'😤 History remembers '+rv.name+' first.'}</div></div>`:''}<div class="card"><h2>Legend Benchmarks</h2>${bm.map(([l,ok])=>`<div class="ev ${ok?'good':'muted'}">${ok?'✅':'⬜'} ${l}</div>`).join('')}</div>
-  <div class="card"><h2>💎 Generational Talent Points</h2>${diff().mult?`<div>Earned <b class="gold">+${S.gtpRun||0} GTP</b> on ${diff().name} (${diff().mult}×). Your bank: <b>${gtpBank()}</b></div><div class="sub" style="margin-top:4px">${(S.gtpLog||[]).map(([w,g])=>w+' +'+g).join(' · ')}</div>`:'<div class="sub">Rookie difficulty earns no GTP. Try Pro or Hall of Fame to earn points for your next player.</div>'}</div>${S.diff==='rookie'?'<div class="sub" style="margin:8px 0">🔒 Achievements don’t unlock on Rookie. Play Pro or Hall of Fame to earn them.</div>':''}${achHTML(S.newAch)}${seasonTable(false)}<button onclick="R=Math.random;S=newPlayer();render()">Build Another →</button>${hofHTML()}`;}
+  return`<h1>${esc(S.name)}</h1><div class="sub">${S.retired} at age ${S.age} after ${c.seasons} season${c.seasons===1?'':'s'}.</div>${plaqueHTML(c,sc,t)}
+  <div class="sub" style="text-align:center">${d}</div><div class="note" style="text-align:center">📸 Screenshot the plaque and send it</div>
+  <div class="card"><div class="sh">📜 <span class="grow">The story</span></div><div class="gold" style="font-weight:700">${story}</div><div style="margin-top:6px"><span class="pill">Scout grade ${sg}</span><span class="pill">True ceiling <b class="gold">${tc}</b></span><span class="pill">Peak ${grade(c.peak)}</span></div><div class="note">${pickTxt(p)} out of ${S.school} at age ${S.age-c.seasons+1}</div></div>
+  ${acc.length?`<div class="card"><div class="sh">🏆 <span class="grow">Accolades</span></div>${acc.map(([x,l])=>`<span class="pill gold">${l} ×${g(x)}</span>`).join('')}</div>`:''}
+  ${rv?`<div class="card"><div class="sh">⚔️ <span class="grow">Rivalry</span><b class="${meR>=rvR?'good':'bad'}">${meR>=rvR?'Won':'Lost'}</b></div><table><tr><th></th><th>${esc(S.name)}</th><th>${rv.name}</th></tr><tr><td>Rings</td><td>${g('Champion')}</td><td>${rv.rings}</td></tr><tr><td>MVPs</td><td>${g('MVP')}</td><td>${rv.mvps}</td></tr><tr><td>Points</td><td>${Math.round(c.pts).toLocaleString()}</td><td>${Math.round(rv.pts).toLocaleString()}</td></tr></table><div class="note">${meR>=rvR?'You won the rivalry.':'History remembers '+rv.name+' first.'}</div></div>`:''}
+  <div class="card"><div class="sh">💎 <span class="grow">Generational Talent Points</span><b class="gold">${diff().mult?'+'+(S.gtpRun||0):'—'}</b></div>${diff().mult?`<div class="sub">Earned on ${diff().name.replace(/^\S+\s/,'')} (${diff().mult}×). Your bank: <b>${gtpBank()}</b></div><details><summary>Breakdown</summary><div class="sub">${(S.gtpLog||[]).map(([w,g])=>w+' +'+g).join(' · ')}</div></details>`:'<div class="sub">Rookie earns no GTP and unlocks no achievements. Try Pro or Hall of Fame.</div>'}</div>
+  <details class="card"><summary>📊 More career numbers</summary><div class="stat3" style="margin-top:10px">${[['SPG',f1(c.stl/gp)],['BPG',f1(c.blk/gp)],['GAMES',c.gp],['TOTAL REB',Math.round(c.reb).toLocaleString()],['TOTAL AST',Math.round(c.ast).toLocaleString()],['PEAK OVR',c.peak]].map(([l,v])=>`<div class="stat"><b>${v}</b>${l}</div>`).join('')}</div></details>
+  <details class="card"><summary>🌟 Legend benchmarks · ${bm.filter(x=>x[1]).length}/${bm.length}</summary>${bm.map(([l,ok])=>`<div class="ev ${ok?'good':'muted'}">${ok?'✅':'⬜'} ${l}</div>`).join('')}</details>
+  ${(S.log||[]).length?`<details class="card"><summary>📝 Career decisions · ${S.log.length}</summary>${S.log.map(x=>`<div class="ev">${x}</div>`).join('')}</details>`:''}
+  <details class="card"><summary>🏀 Season log · ${c.seasons}</summary>${seasonTable(false)}</details>${achHTML(S.newAch)}${hofHTML()}`+dock(`<button onclick="R=Math.random;S=newPlayer();render();scrollTo(0,0)">Build Another</button>`);}
 function hofHTML(){const h=JSON.parse(localStorage.getItem('bag_hof')||'[]');if(!h.length)return'';
-  return`<div class="card"><h2>Your Hall of Builds</h2><div class="scroll"><table><tr><th>#</th><th>Player</th><th>Tier</th><th>Score</th><th>PPG</th><th>Rings</th><th>MVP</th><th>Pick</th></tr>
-  ${h.map((x,i)=>`<tr><td>${i+1}</td><td>${x.name} <span class="muted">${x.pos}</span></td><td>${x.diff?DIFFS[x.diff].name.split(' ')[0]+' ':''}${x.tier}</td><td>${x.score}</td><td>${f1(x.ppg)}</td><td>${x.rings}</td><td>${x.mvp}</td><td>${x.pick>=61?'UDFA':'#'+x.pick}</td></tr>`).join('')}</table></div></div>`;}
+  return`<details class="card"><summary>🏛️ Your Hall of Builds · ${h.length}</summary><div class="scroll" style="margin-top:8px"><table><tr><th>#</th><th>PLAYER</th><th>TIER</th><th>SCORE</th><th>PPG</th><th>RINGS</th><th>MVP</th><th>PICK</th></tr>
+  ${h.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.name)} <span class="muted">${x.pos}</span></td><td>${x.diff?DIFFS[x.diff].name.split(' ')[0]+' ':''}${x.tier}</td><td>${x.score}</td><td>${f1(x.ppg)}</td><td>${x.rings}</td><td>${x.mvp}</td><td>${x.pick>=61?'UDFA':'#'+x.pick}</td></tr>`).join('')}</table></div></details>`;}
+function achHTML(fresh){const have=JSON.parse(localStorage.getItem('bag_ach')||'{}'),n=Object.keys(have).length;fresh=fresh||[];
+  return`<details class="card" ${fresh.length?'open':''}><summary>🏅 Achievements · ${n}/${ACH.length}${fresh.length?` · <span class="gold">${fresh.length} new</span>`:''}</summary>${S.diff==='rookie'&&S.stage==='end'?'<div class="note">🔒 Achievements don’t unlock on Rookie.</div>':''}
+  <div class="ach">${ACH.map(([id,l,d])=>`<div class="${have[id]?'got':''} ${fresh.includes(id)?'new':''}"><b>${have[id]?l:'🔒 '+l.replace(EMO_RE,'').trim()}</b><small>${d}${fresh.includes(id)?' · New':''}</small></div>`).join('')}</div></details>`;}
+
 
 S=newPlayer();render();
 // Bulk career sim for balance data (used by Witness; never called in normal play)

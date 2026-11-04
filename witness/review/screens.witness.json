@@ -1,0 +1,13 @@
+[{"name":"builder tabs","seed":4,"steps":[
+ {"at":0.4,"shot":"r-setup.png"},
+ {"at":0.5,"evalAs":{"x":"(goTab('look'),1)"},"shot":"r-look.png"},
+ {"at":0.6,"evalAs":{"x":"(goTab('body'),1)"},"shot":"r-body.png"},
+ {"at":0.7,"evalAs":{"x":"(goTab('skills'),UI().open='sho',render(),1)"},"shot":"r-skills.png"},
+ {"at":0.8,"evalAs":{"x":"(goTab('traits'),1)"},"shot":"r-traits.png"}]},
+ {"name":"hs","seed":4,"scene":"hs","steps":[{"at":1,"shot":"r-hs.png"}]},
+ {"name":"offers","seed":4,"scene":"offers","steps":[{"at":1,"shot":"r-offers.png"}]},
+ {"name":"college","seed":4,"scene":"college","steps":[{"at":1,"shot":"r-college.png"}]},
+ {"name":"draft","seed":4,"scene":"draft","steps":[{"at":4,"shot":"r-draft.png"}]},
+ {"name":"decision","seed":4,"scene":"decision","steps":[{"at":1,"shot":"r-decision.png"}]},
+ {"name":"nba","seed":4,"scene":"nba","steps":[{"at":1,"shot":"r-nba.png"}]},
+ {"name":"end","seed":4,"scene":"end","steps":[{"at":1,"shot":"r-end.png"}]}]

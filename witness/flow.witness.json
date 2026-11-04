@@ -7,155 +7,164 @@
     "at": 0.3,
     "call": [
      "tap",
-     "PG"
+     "Post Bully"
     ]
    },
    {
     "at": 0.4,
+    "evalAs": {
+     "x": "(goTab('body'),1)"
+    }
+   },
+   {
+    "at": 0.5,
     "call": [
      "tap",
-     "\ud83d\udc3b Post Bully"
+     "PG"
     ]
    },
    {
-    "at": 4.85,
+    "at": 0.6,
+    "evalAs": {
+     "x": "(goTab('skills'),1)"
+    }
+   },
+   {
+    "at": 0.7,
+    "call": [
+     "tap",
+     "Shooting skills"
+    ]
+   },
+   {
+    "at": 0.8,
+    "call": [
+     "tap",
+     "Add a point to Three-Point"
+    ]
+   },
+   {
+    "at": 0.9,
+    "evalAs": {
+     "x": "(goTab('traits'),1)"
+    },
     "expect": [
      "state.stage=='build'",
-     "state.ovr>40"
+     "state.ovr>30"
     ]
    },
    {
-    "at": 4.9,
+    "at": 1.0,
     "call": [
      "tap",
      "Work Ethic"
     ]
    },
    {
-    "at": 5.0,
+    "at": 1.1,
     "call": [
      "tap",
      "Durability"
     ]
    },
    {
-    "at": 5.1,
+    "at": 1.2,
     "call": [
      "tap",
      "Start High School"
     ]
    },
    {
-    "at": 5.2,
+    "at": 1.3,
     "call": [
      "tap",
      "Play"
     ]
    },
    {
-    "at": 5.25,
+    "at": 1.35,
     "evalAs": {
      "x": "(chooseSummer(3),render(),1)"
     }
    },
    {
-    "at": 5.3,
+    "at": 1.4,
     "call": [
      "tap",
      "Play"
     ]
    },
    {
-    "at": 5.35,
+    "at": 1.45,
     "evalAs": {
      "x": "(chooseSummer(3),render(),1)"
     }
    },
    {
-    "at": 5.4,
+    "at": 1.5,
     "call": [
      "tap",
      "Play"
     ]
    },
    {
-    "at": 5.45,
+    "at": 1.55,
     "evalAs": {
      "x": "(chooseSummer(3),render(),1)"
     }
    },
    {
-    "at": 5.5,
+    "at": 1.6,
     "call": [
      "tap",
      "Play"
     ]
    },
    {
-    "at": 5.6,
-    "call": [
-     "tap",
-     "\ud83c\udf93"
-    ]
+    "at": 1.7,
+    "evalAs": {
+     "x": "(chooseSchool(0),1)"
+    }
    },
    {
-    "at": 5.7,
+    "at": 1.8,
     "call": [
      "tap",
      "Play Freshman"
     ]
    },
    {
-    "at": 5.8,
+    "at": 1.9,
     "call": [
      "tap",
      "Declare"
     ]
    },
    {
-    "at": 5.9,
+    "at": 2.0,
     "call": [
      "tap",
      "Start NBA"
     ]
    },
    {
-    "at": 6.0,
+    "at": 2.1,
     "call": [
      "tap",
-     "Sim to Next"
+     "Next Decision"
     ]
    },
    {
-    "at": 6.2,
-    "call": [
-     "tap",
-     "Sim"
-    ]
-   },
-   {
-    "at": 6.4,
-    "call": [
-     "tap",
-     "Sim to Next"
-    ]
-   },
-   {
-    "at": 6.6,
-    "call": [
-     "tap",
-     "Sim"
-    ]
-   },
-   {
-    "at": 6.8,
+    "at": 2.6,
     "expect": [
      "state.seasons>=1",
      "state.hs==4",
      "state.college>=1",
      "state.pick!=null"
     ],
-    "shot": "nba.png"
+    "expectPage": [
+     "!/\\p{Extended_Pictographic}/u.test(document.getElementById('app').innerText)"
+    ]
    }
   ]
  }
