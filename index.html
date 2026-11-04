@@ -1136,7 +1136,17 @@ function autosim(n,build,college,faMode){const save=S,rend=render,keep=['bag_ach
     lotteryBustPct:lot.length?+(lot.filter(r=>r.sc<20).length/lot.length*100).toFixed(1):null,secondRoundStarPct:late.length?+(late.filter(r=>r.as>=3).length/late.length*100).toFixed(1):null};console.log("AUTOSIM "+JSON.stringify(res));return "done";}
 // Witness test hook (inert unless run under Witness)
 if(globalThis.__witnessApi){const W=globalThis.__witnessApi;W.start({name:'Build a GOAT',fps:30,
-  reset(){['bag_hof','bag_ach','bag_daily','bag_recent','bag_gtp','bag_diff'].forEach(k=>localStorage.removeItem(k));R=Math.random;S=newPlayer();render();},
+  reset({scene}={}){['bag_hof','bag_ach','bag_daily','bag_recent','bag_gtp','bag_diff'].forEach(k=>localStorage.removeItem(k));R=Math.random;S=newPlayer();render();
+    // test scenes: jump straight to a screen (witness --scene hs|offers|college|draft|nba|decision|end)
+    const order=['build','hs','offers','college','draft','nba','decision','end'],at=order.indexOf(scene||'build');if(at<=0)return;
+    S.name='Test Prospect';applyArch(2);S.picked=['work','dur'];startCareer();if(at===1){simHS();render();return;}
+    for(let i=0;i<4;i++)simHS();if(at===2){render();return;}
+    chooseSchool(0);simCol();if(at===3){render();return;}
+    declare();if(at===4){render();return;}
+    S.stage='nba';let g=0;while(g++<6){if(S.pend)choose(S.pend.kind==='summer'?S.pend.opts.length-1:0);else simNBA();}
+    if(at===6){while(!S.pend&&S.stage==='nba'&&g++<30)simNBA();render();return;}
+    if(at===5){if(S.pend)choose(0);render();return;}
+    simEnd();render();},
   snapshot:()=>({stage:S.stage,name:S.name,pos:S.pos,ovr:OV(),bank:S.bank,age:S.age,hype:Math.round(S.hype),pick:S.pick??null,
     hs:S.hs.length,college:S.col.length,seasons:S.nba.length,decision:S.pend?S.pend.title:null,yourTurn:true,
     choices:W.dom.tappables().map(c=>({label:c.label,id:c.id})),screenText:W.dom.text(app).slice(0,1200)}),
