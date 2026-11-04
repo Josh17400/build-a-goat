@@ -1,0 +1,6 @@
+[{"name":"settings: reset all progress","seed":2,"steps":[
+ {"at":0.3,"evalAs":{"x":"(localStorage.setItem('bag_gtp','50'),localStorage.setItem('bag_ach','{\"a\":1}'),render(),1)"}},
+ {"at":0.4,"call":["tap","Settings"],"expectPage":["document.body.textContent.includes('50 GTP')"]},
+ {"at":0.5,"call":["tap","Reset all progress"]},
+ {"at":0.6,"call":["tap","Yes, erase everything"],"shot":"r-settings.png",
+  "expectPage":["localStorage.getItem('bag_gtp')===null","localStorage.getItem('bag_ach')===null","document.body.textContent.includes('Progress reset')","S.stage==='build'"]}]}]

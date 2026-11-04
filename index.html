@@ -36,6 +36,7 @@ button{font-family:inherit;font-size:1rem;font-weight:700;border:0;border-radius
   background:linear-gradient(180deg,#ff9a35,#f27a0c);color:#1a1005;box-shadow:0 6px 18px rgba(255,138,31,.25),inset 0 1px 0 rgba(255,255,255,.25);transition:transform .08s}
 button:active{transform:scale(.97)}
 button.ghost{background:var(--card2);color:var(--tx);border:1px solid var(--line2);box-shadow:none}
+button.danger{background:#c0392b;color:#fff;box-shadow:none}.iconbtn{width:44px;height:44px;padding:0;display:grid;place-items:center;flex:none}.iconbtn .ic{width:22px;height:22px}
 button.sm{padding:6px 12px;font-size:.95rem;min-width:44px;border-radius:10px}
 button:disabled{background:#1f222b;color:#6f7686;box-shadow:none;border:1px solid var(--line);cursor:default}
 button.sel{background:linear-gradient(180deg,#3a2614,#2b1d10);color:var(--acc2);border:1px solid rgba(255,138,31,.7);box-shadow:0 0 0 1px rgba(255,138,31,.25)}
@@ -1193,6 +1194,16 @@ function summerNBA(){const o=ovr(),a=S.age,
 
 function chooseSummer(i){const p=S.summerPend;if(!p)return;const o=p.opts[i]||p.opts[p.opts.length-1];o.fn();S.summerNote=[S.lastResult.ok?1:-1,S.lastResult.text];S.summerPend=null;
   if(S.stage==='college'&&S.colNext){S.colNext=false;simCol();S.lastResult=null;}}
+// ---------- settings ----------
+const SAVE_KEYS=['bag_gtp','bag_ach','bag_hof','bag_recent','bag_daily','bag_diff'];
+function settingsCard(){const u=UI(),ach=Object.keys((()=>{try{return JSON.parse(localStorage.getItem('bag_ach')||'{}');}catch{return{};}})()).length,hof=(()=>{try{return JSON.parse(localStorage.getItem('bag_hof')||'[]').length;}catch{return 0;}})();
+  return`<div class="card flash"><div class="sh">${icon('sliders')} <span class="grow">Settings</span><button class="ghost sm" onclick="UI().settings=false;render()">Close</button></div>
+  <div class="sub">Saved on this device: <b>${gtpBank()} GTP</b> · <b>${ach}</b> achievements · <b>${hof}</b> careers in your Hall of Builds.</div>
+  ${u.resetDone?'<div class="ev good" style="margin-top:10px">Progress reset. Fresh start.</div>':''}
+  ${u.confirmReset?`<div class="ev bad" style="margin-top:10px">This erases your GTP, perks, achievements, Hall of Builds and daily results. It can’t be undone.</div>
+    <div class="two" style="margin-top:8px"><button class="danger" onclick="resetProgress()">Yes, erase everything</button><button class="ghost" onclick="UI().confirmReset=false;render()">Cancel</button></div>`
+  :`<button class="ghost" style="margin-top:10px;width:100%" onclick="UI().confirmReset=true;UI().resetDone=false;render()">Reset all progress</button>`}</div>`;}
+function resetProgress(){for(const k of SAVE_KEYS)try{localStorage.removeItem(k);}catch{}R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,settings:true,resetDone:true};render();scrollTo(0,0);}
 // ---------- league screens ----------
 const tShort=t=>t.split(' ').slice(-1)[0];
 function classCard(){const c=classRank();if(!c)return'';
@@ -1603,7 +1614,7 @@ function updHeight(){const a=document.getElementById('hval'),b=document.getEleme
 const TABS=[['setup','Setup'],['look','Look'],['body','Body'],['skills','Skills'],['traits','Traits']];
 function goTab(k){document.activeElement?.blur?.();UI().tab=k;render();scrollTo(0,0);}
 function buildHTML(){const u=UI(),left=START_BUDGET-spent(),ti=Math.max(0,TABS.findIndex(t=>t[0]===u.tab)),tab=TABS[ti][0];let h=`<div class="tabs">${TABS.map(([k,l],i)=>`<button class="${tab===k?'on':''} ${i<ti?'done':''}" onclick="goTab('${k}')"><span class="n">${i+1}</span>${l}</button>`).join('')}</div>`;
-  if(tab==='setup')h+=`<h1>Build a <span>GOAT</span></h1><div class="sub">Build a raw prospect, survive high school and college, and find out if you become the greatest of all time.</div>${diffCard()}
+  if(tab==='setup')h+=`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>Build a <span>GOAT</span></h1><button class="ghost sm iconbtn" aria-label="Settings" onclick="UI().settings=!UI().settings;UI().confirmReset=false;render()">${icon('sliders')}</button></div>${UI().settings?settingsCard():''}<div class="sub">Build a raw prospect, survive high school and college, and find out if you become the greatest of all time.</div>${diffCard()}
     <div class="card"><div class="sh">🎰 <span class="grow">League era</span>${S.daily?'<b>Daily</b>':`<button class="ghost sm" onclick="spinEra()" ${S.spins<=0?'disabled':''}>🎲 Re-spin · ${S.spins}</button>`}</div><div style="font-size:1.15rem;font-weight:800">${era().name}</div><div class="sub">${era().d}</div><div class="sub">Teams in this era pay extra for <b>${catName(eraWants())}</b>. It shapes draft buzz and free agency choices.</div>
     <details><summary>📅 Daily Build${S.daily?' · on':''}</summary><div class="sub">Same era and same dice for everyone today. Played on Pro with no perks.</div><button class="${S.daily?'sel':'ghost'} wide" style="margin-top:8px" onclick="toggleDaily()">${S.daily?'Daily Build is on · tap to turn off':'Play today\'s Daily Build'}</button>${S.daily&&dailyBest().length?`<div class="note">Today's best: ${dailyBest().slice(0,3).map(x=>`<b>${esc(x.name)}</b> ${x.score}`).join(' · ')}</div>`:''}</details></div>
     ${gtpCard()}<div class="card"><div class="sh">⚡ <span class="grow">Quick start</span></div><div class="chips">${ARCH.map((a,i)=>`<button class="chip ${S.arch===a[0]?'on':''}" onclick="applyArch(${i})">${a[0]}<small>${a[1]} · ${ht(a[2])}</small></button>`).join('')}<button class="chip" onclick="randomBuild()">🎲 Randomize<small>Body, skills and traits</small></button></div><div class="note">Presets fill in your body and skills. You can still change everything.</div></div>${hofHTML()}${achHTML()}`;
