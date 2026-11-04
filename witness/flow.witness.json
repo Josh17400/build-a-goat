@@ -1,0 +1,162 @@
+[
+ {
+  "name": "full career: build \u2192 HS \u2192 college \u2192 draft \u2192 NBA",
+  "seed": 3,
+  "steps": [
+   {
+    "at": 0.3,
+    "call": [
+     "tap",
+     "PG"
+    ]
+   },
+   {
+    "at": 0.4,
+    "call": [
+     "tap",
+     "\ud83d\udc3b Post Bully"
+    ]
+   },
+   {
+    "at": 4.85,
+    "expect": [
+     "state.stage=='build'",
+     "state.ovr>40"
+    ]
+   },
+   {
+    "at": 4.9,
+    "call": [
+     "tap",
+     "Work Ethic"
+    ]
+   },
+   {
+    "at": 5.0,
+    "call": [
+     "tap",
+     "Durability"
+    ]
+   },
+   {
+    "at": 5.1,
+    "call": [
+     "tap",
+     "Start High School"
+    ]
+   },
+   {
+    "at": 5.2,
+    "call": [
+     "tap",
+     "Play"
+    ]
+   },
+   {
+    "at": 5.25,
+    "evalAs": {
+     "x": "(chooseSummer(3),render(),1)"
+    }
+   },
+   {
+    "at": 5.3,
+    "call": [
+     "tap",
+     "Play"
+    ]
+   },
+   {
+    "at": 5.35,
+    "evalAs": {
+     "x": "(chooseSummer(3),render(),1)"
+    }
+   },
+   {
+    "at": 5.4,
+    "call": [
+     "tap",
+     "Play"
+    ]
+   },
+   {
+    "at": 5.45,
+    "evalAs": {
+     "x": "(chooseSummer(3),render(),1)"
+    }
+   },
+   {
+    "at": 5.5,
+    "call": [
+     "tap",
+     "Play"
+    ]
+   },
+   {
+    "at": 5.6,
+    "call": [
+     "tap",
+     "\ud83c\udf93"
+    ]
+   },
+   {
+    "at": 5.7,
+    "call": [
+     "tap",
+     "Play Freshman"
+    ]
+   },
+   {
+    "at": 5.8,
+    "call": [
+     "tap",
+     "Declare"
+    ]
+   },
+   {
+    "at": 5.9,
+    "call": [
+     "tap",
+     "Start NBA"
+    ]
+   },
+   {
+    "at": 6.0,
+    "call": [
+     "tap",
+     "Sim to Next"
+    ]
+   },
+   {
+    "at": 6.2,
+    "call": [
+     "tap",
+     "Sim"
+    ]
+   },
+   {
+    "at": 6.4,
+    "call": [
+     "tap",
+     "Sim to Next"
+    ]
+   },
+   {
+    "at": 6.6,
+    "call": [
+     "tap",
+     "Sim"
+    ]
+   },
+   {
+    "at": 6.8,
+    "expect": [
+     "state.seasons>=1",
+     "state.hs==4",
+     "state.college>=1",
+     "state.pick!=null"
+    ],
+    "shot": "nba.png"
+   }
+  ]
+ }
+]

@@ -1,0 +1,7 @@
+[{"name":"gtp shop end to end","seed":11,"steps":[
+{"at":0.3,"evalAs":{"x":"(localStorage.setItem('bag_gtp','100'),setDiff('hof'),1)"}},
+{"at":0.4,"evalAs":{"x":"(buyPerk('trait3',1),buyPerk('pts',1),1)"},"expectPage":["gtpBank()===100","perkCost()===60","START_BUDGET===315","traitLimit()===3"]},
+{"at":0.5,"evalAs":{"x":"(window.scrollTo(0,document.querySelectorAll('.card')[1].offsetTop-10),1)"},"shot":"gtp-shop.png"},
+{"at":0.6,"evalAs":{"x":"(applyArch(0),toggleTrait('work'),toggleTrait('dur'),toggleTrait('clutch'),startCareer(),1)"},"expectPage":["gtpBank()===40","S.picked.length===3"]},
+{"at":0.7,"evalAs":{"x":"(simEnd&&(()=>{for(let i=0;i<4;i++){simHS();}chooseSchool(0);simCol();declare();S.stage='nba';simEnd();})(),window.scrollTo(0,0),1)"},"expectPage":["S.stage==='end'","gtpBank()===40+S.gtpRun","S.gtpRun>=0"]},
+{"at":0.8,"evalAs":{"x":"(window.scrollTo(0,[...document.querySelectorAll('h2')].find(e=>e.textContent.includes('Generational')).getBoundingClientRect().top+scrollY-200),1)"},"shot":"gtp-end.png"}]}]

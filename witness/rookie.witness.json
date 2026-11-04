@@ -1,0 +1,6 @@
+[{"name":"rookie unlocks no achievements, pro does; Build Another works","seed":5,"steps":[
+{"at":0.3,"evalAs":{"x":"(setDiff('rookie'),applyArch(1),toggleTrait('work'),toggleTrait('dur'),startCareer(),(()=>{for(let i=0;i<4;i++)simHS();chooseSchool(0);simCol();declare();S.stage='nba';simEnd();})(),1)"},
+ "expectPage":["S.stage==='end'","Object.keys(JSON.parse(localStorage.getItem('bag_ach')||'{}')).length===0","(S.gtpRun||0)===0","document.body.innerText.includes('Achievements don')"]},
+{"at":0.4,"call":["tap","Build Another"],"expectPage":["S.stage==='build'","!!document.getElementById('nm')"]},
+{"at":0.5,"evalAs":{"x":"(setDiff('pro'),applyArch(1),toggleTrait('work'),toggleTrait('dur'),startCareer(),(()=>{for(let i=0;i<4;i++)simHS();chooseSchool(0);simCol();declare();S.stage='nba';simEnd();})(),1)"},
+ "expectPage":["S.stage==='end'","S.newAch.length>0","S.newAch.length===Object.keys(JSON.parse(localStorage.getItem('bag_ach')||'{}')).length"]}]}]
