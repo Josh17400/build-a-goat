@@ -36,6 +36,8 @@ button{font-family:inherit;font-size:1rem;font-weight:700;border:0;border-radius
   background:linear-gradient(180deg,#ff9a35,#f27a0c);color:#1a1005;box-shadow:0 6px 18px rgba(255,138,31,.25),inset 0 1px 0 rgba(255,255,255,.25);transition:transform .08s}
 button:active{transform:scale(.97)}
 button.ghost{background:var(--card2);color:var(--tx);border:1px solid var(--line2);box-shadow:none}
+
+.fx{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.fx span{font-size:.78rem;font-weight:700;padding:3px 8px;border-radius:999px;background:rgba(127,127,127,.12)}
 button.danger{background:#c0392b;color:#fff;box-shadow:none}.iconbtn{width:44px;height:44px;padding:0;display:grid;place-items:center;flex:none}.iconbtn .ic{width:22px;height:22px}
 button.sm{padding:6px 12px;font-size:.95rem;min-width:44px;border-radius:10px}
 button:disabled{background:#1f222b;color:#6f7686;box-shadow:none;border:1px solid var(--line);cursor:default}
@@ -173,7 +175,9 @@ const SUBS={sho:[['close','Close Shot'],['mid','Mid-Range'],['three','Three-Poin
 const SUBKEYS=Object.values(SUBS).flat().map(x=>x[0]);
 // height effect per inch vs 6'6" (78in); shorter players lose more on blocks and boards than tall players gain
 const HMOD={oreb:2,dreb:2,intD:1.5,blk:2.4,dunk:1.8,post:1.2,str:.6,close:.8,layup:.4,perD:-.6,handle:-1.6,pass:-.4,speed:-1.3,vert:-.4,three:-.4,stl:-.4};
-const FRAMES={Lean:{speed:4,vert:3,str:-6,post:-2,oreb:-2,inj:-.02,d:'Quick & bouncy, but you get pushed around'},Balanced:{inj:0,d:'No strengths, no weaknesses'},Strong:{str:6,post:3,oreb:2,speed:-3,vert:-2,inj:.03,d:'Bully ball, but heavier on the joints'}};
+const FRAMES={Lean:{speed:6,vert:5,stam:5,str:-9,post:-4,intD:-3,oreb:-3,dreb:-2,inj:-.03,decl:-.1,mins:1,d:'Quick, bouncy and tireless, but you get pushed around inside',hid:['Healthier','Ages slowly','Extra minutes']},
+  Balanced:{cons:3,iq:2,inj:0,dev:.025,d:'No glaring weakness. Steady and easy to coach',hid:['Faster development','Steadier nights']},
+  Strong:{str:9,post:5,intD:4,oreb:4,dreb:3,close:2,speed:-5,vert:-4,stam:-3,inj:.04,decl:.15,ppg:1,d:'Bully ball inside, but slower and heavier on the joints',hid:['Draws contact (+points)','Ages faster','More injuries']}};
 const TRAITS=[['work','Work Ethic','You develop faster and age slower'],['dur','Durability','Fewer and lighter injuries'],['clutch','Clutch Gene','You win more playoff series'],['coach','Coachability','You get more out of college'],['star','Star Power','Hype, All-Star votes, draft buzz'],['motor','Motor','You hustle every possession: more rebounds, steals and minutes'],['lead','Leadership','You make teammates better: more wins and playoff series'],['killer','Killer Instinct','Scorer’s mentality: more shots and points, fewer assists'],['late','Late Bloomer','Raw early, but a higher ceiling and a later peak (a gamble)'],['lock','Lockdown Mindset','You take defense personally: steals, blocks, DPOY votes'],['touch','Shooter’s Touch','Soft hands: better 3P%, FT% and FG%']];
 const MIN_A=40, BUILD_MAX=90;
 // ---------- difficulty & Generational Talent Points (GTP) ----------
@@ -338,7 +342,7 @@ const YR=['Freshman','Sophomore','Junior','Senior','Super Senior'];
 function autoSpend(){const w=POS[S.pos].w;let n=0,g=0;while(S.bank>0&&g++<2000){let r=R(),a=0,c="iq";for(const[k]of ATTRS){a+=w[k];if(r<=a){c=k;break;}}const k=pick(SUBS[c])[0];const co=cost(S.attrs[k]);if(S.attrs[k]<99&&S.bank>=co){S.bank-=co;S.attrs[k]++;n+=co;}else if(S.bank<2)break;}if(S.bank===1){S.attrs.cons++;S.bank=0;n++;}return n;}
 function hsHype(){S.hype+=(S.traits.star-3)*1.5;}
 function simHS(){if(S.summerPend)chooseSummer(S.summerPend.opts.length-1);S.lastResult=null;hsHype();const i=S.hs.length;S.age=14+i;
-  develop(.07*(1+(S.traits.work-3)*.15)*(1-(S.traits.late-3)*.18));
+  develop((.07+(FRAMES[S.frame].dev||0)*.4)*(1+(S.traits.work-3)*.15)*(1-(S.traits.late-3)*.18));
   S.lastTag=null;const ev=[roll(hsEvents())];if(R()<.35)ev.push(roll(hsEvents(),S.lastTag));if(S.summerNote){ev.unshift(S.summerNote);S.summerNote=null;}
   const o=ovr(),ppg=clamp(6+(o-40)*.75+gauss()*2.5,2,42),rpg=clamp(2+(eff('reb')-40)*.18+gauss(),1,20),apg=clamp(1+(eff('pla')-40)*.12+gauss()*.6,.3,12),spg=clamp(.5+(es('stl')-40)*.035+(es('speed')-50)*.01+(S.traits.motor-3)*.08+(S.traits.lock-3)*.08+gauss()*.25,.1,5),bpg=clamp(.15+(es('blk')-40)*.045+(S.height-78)*.05+(S.traits.lock-3)*.08+gauss()*.25,0,6);
   if(ppg>=20&&!S.hurt)S.hype+=Math.min(4,(ppg-18)*.35);S.hype=Math.max(0,S.hype);const hm=S.hurt?.6:1,hurtTxt=S.hurt?` · ${ri(4,9)} games (injured)`:'';S.hurt=0;
@@ -358,7 +362,7 @@ const pickFor=g=>clamp(Math.round(1+(83-g)*2.4),1,61);
 function projRange(){const p=pickFor(scoutGrade());return[clamp(p-6,1,61),clamp(p+6,1,61)];}
 const pickTxt=p=>p>=61?'Undrafted':p<=30?`1st Rd (#${p})`:`2nd Rd (#${p})`;
 function simCol(){const y=S.col.length,T=TIER[S.tier];S.age=18+y;
-  develop(.17*T.dev*(1+(S.traits.coach-3)*.1)*(1+(S.traits.work-3)*.15)*(1-(S.traits.late-3)*.16));
+  develop((.17+(FRAMES[S.frame].dev||0)*.6)*T.dev*(1+(S.traits.coach-3)*.1)*(1+(S.traits.work-3)*.15)*(1-(S.traits.late-3)*.16));
   S.hype+=T.hype*(1+(S.traits.star-3)*.2);
   S.lastTag=null;const ev=[roll(colEvents(y+1))];if(R()<.3)ev.push(roll(colEvents(y+1),S.lastTag));if(S.summerNote){ev.unshift(S.summerNote);S.summerNote=null;}
   const o=ovr(),mins=clamp(16+(o-50)*1.0+T.min+y*2,8,36),mf=mins/36*(S.tier==='mid'?1.12:1);
@@ -471,8 +475,8 @@ const bsm=()=>S.badges.includes('Big Shot Maker');
 function simNBA(){const n=S.nba.length,prev=n?S.nba[n-1]:null;if(n)S.age++;
   const t=S.traits,a=S.age,X=S.next||{};S.next={};const prevO=ovr(),notes=[];if(S.lastResult&&!S.lastResult.n)notes.push((S.lastResult.ok?'✅ Summer: ':'❌ Summer: ')+S.lastResult.text);S.lastResult=null;
   if(X.boost)growTo(ovr()+X.boost);
-  if(a<=27+(t.late>=4?2:0)){develop(clamp((.22+(t.work-3)*.03)*(a<=23?1-(t.late-3)*.15:.8+(t.late-3)*.08),.05,.4));}
-  else if(a>=30){const d=(a-29)*.55*(1+(3-t.dur)*.12)*(1-(t.work-3)*.08)*(a>=34?1.8:1)*(1+(X.declAdj||0))+gauss()*.4;declineTo(ovr()-Math.max(0,d));}
+  if(a<=27+(t.late>=4?2:0)){develop(clamp((.22+(FRAMES[S.frame].dev||0)+(t.work-3)*.03)*(a<=23?1-(t.late-3)*.15:.8+(t.late-3)*.08),.05,.4));}
+  else if(a>=30){const d=(a-29)*.55*(1+(3-t.dur)*.12)*(1-(t.work-3)*.08)*(a>=34?1.8:1)*(1+(X.declAdj||0)+(FRAMES[S.frame].decl||0))+gauss()*.4;declineTo(ovr()-Math.max(0,d));}
   growTo(ovr()+clamp(gauss()*.8,-1,1.5));
   S.teamStr=clamp(S.teamStr+gauss()*4+(n<4&&S.pick<=10?2:0)+(50-S.teamStr)*.12+(X.team||0),20,85);
   // injury
@@ -483,9 +487,9 @@ function simNBA(){const n=S.nba.length,prev=n?S.nba[n-1]:null;if(n)S.age++;
     else if(S.armor){S.armor=false;const g=ri(18,40);lost+=g;inj=`🛡️ Injury insurance! A major injury was downgraded (${g} games)`;}else{const g=ri(45,82);lost+=g;inj=`🚑 ${capF(pick(INJ.major))} (${g} games)`;S.injuryProne=true;S.attrs.speed=Math.max(30,S.attrs.speed-ri(4,8));S.attrs.vert=Math.max(30,S.attrs.vert-ri(4,8));S.ceiling-=ri(2,5);}}
   const gp=clamp(82-lost,0,82);const o=ovr();
   let opp=0;if(n<2)opp=S.pick<=5?5:S.pick<=14?3:S.pick<=30?0:S.pick<=60?-4:-6;
-  let mins=clamp(14.5+(o-55)*1.2+opp+(S.minAdj||0)+(es('stam')-60)*.08+(t.motor-3)*.6,4,38);if(o<52)mins=Math.min(mins,8);
+  let mins=clamp(14.5+(o-55)*1.2+opp+(S.minAdj||0)+(FRAMES[S.frame].mins||0)+(es('stam')-60)*.08+(t.motor-3)*.6,4,38);if(o<52)mins=Math.min(mins,8);
   const mf=mins/36,nf=()=>1+gauss()*.075*(1.25-(es('cons')-40)/120);
-  const ppg=Math.max(0,(8+(o-55)*.45+(eff('sho')+eff('fin')-120)*.1+(S.usage||0)+(X.usage||0)+(t.killer-3)*.9)*mf*nf()*era().pace),
+  const ppg=Math.max(0,(8+(o-55)*.45+(eff('sho')+eff('fin')-120)*.1+(S.usage||0)+(X.usage||0)+(FRAMES[S.frame].ppg||0)+(t.killer-3)*.9)*mf*nf()*era().pace),
     rpg=Math.max(0,(2.4+(es('dreb')-40)*.14+(es('oreb')-40)*.07)*mf*nf()*(1+(t.motor-3)*.05)),apg=Math.max(0,(1.3+(es('pass')-40)*.13+(es('handle')-40)*.05)*mf*nf()*(1-(t.killer-3)*.04)),
     spg=Math.max(0,(.45+(es('stl')-40)*.028+(es('speed')-50)*.006)*mf*nf()*(1+(t.motor-3)*.05+(t.lock-3)*.05)),bpg=Math.max(0,(.12+(es('blk')-40)*.04+(es('vert')-50)*.005)*mf*nf()*(1+(t.lock-3)*.05)),
     fg=clamp(.40+((es('close')+es('layup')+es('dunk'))/3-50)*.0017+(S.height-78)*.003+(t.touch-3)*.004+gauss()*.012,.36,.68),tp=clamp(.26+(es('three')-40)*.0029+(t.touch-3)*.008+era().tp+gauss()*.015,.18,.47),ft=clamp(.52+(es('ft')-40)*.0068+(t.touch-3)*.015+gauss()*.02,.4,.95);
@@ -1197,13 +1201,24 @@ function chooseSummer(i){const p=S.summerPend;if(!p)return;const o=p.opts[i]||p.
 // ---------- settings ----------
 const SAVE_KEYS=['bag_gtp','bag_ach','bag_hof','bag_recent','bag_daily','bag_diff'];
 function settingsCard(){const u=UI(),ach=Object.keys((()=>{try{return JSON.parse(localStorage.getItem('bag_ach')||'{}');}catch{return{};}})()).length,hof=(()=>{try{return JSON.parse(localStorage.getItem('bag_hof')||'[]').length;}catch{return 0;}})();
-  return`<div class="card flash"><div class="sh">${icon('sliders')} <span class="grow">Settings</span><button class="ghost sm" onclick="UI().settings=false;render()">Close</button></div>
+  return`${diffCard()}<div class="card"><div class="sh">🏅 <span class="grow">Your progress</span></div>
   <div class="sub">Saved on this device: <b>${gtpBank()} GTP</b> · <b>${ach}</b> achievements · <b>${hof}</b> careers in your Hall of Builds.</div>
   ${u.resetDone?'<div class="ev good" style="margin-top:10px">Progress reset. Fresh start.</div>':''}
   ${u.confirmReset?`<div class="ev bad" style="margin-top:10px">This erases your GTP, perks, achievements, Hall of Builds and daily results. It can’t be undone.</div>
     <div class="two" style="margin-top:8px"><button class="danger" onclick="resetProgress()">Yes, erase everything</button><button class="ghost" onclick="UI().confirmReset=false;render()">Cancel</button></div>`
   :`<button class="ghost" style="margin-top:10px;width:100%" onclick="UI().confirmReset=true;UI().resetDone=false;render()">Reset all progress</button>`}</div>`;}
-function resetProgress(){for(const k of SAVE_KEYS)try{localStorage.removeItem(k);}catch{}R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,settings:true,resetDone:true};render();scrollTo(0,0);}
+function resetProgress(){for(const k of SAVE_KEYS)try{localStorage.removeItem(k);}catch{}R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,menu:'settings',resetDone:true};render();scrollTo(0,0);}
+const MENU=[['settings','sliders','Settings','Difficulty and reset'],['gtp','💎','GTP Store','Perks for your next player'],['hof','🏛️','Hall of Builds','Your best careers'],['ach','🏅','Achievements','What you have unlocked']];
+function openMenu(k){document.activeElement?.blur?.();const u=UI();u.menu=k;u.confirmReset=false;if(k!=='settings')u.resetDone=false;render();scrollTo(0,0);}
+function menuBtn(){return`<button class="ghost sm iconbtn" aria-label="Menu" onclick="openMenu('open')">${icon('menu')}</button>`;}
+function menuHTML(){const k=UI().menu,m=MENU.find(x=>x[0]===k),hofN=(()=>{try{return JSON.parse(localStorage.getItem('bag_hof')||'[]').length;}catch{return 0;}})(),achN=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('bag_ach')||'{}')).length;}catch{return 0;}})();
+  const top=`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>${m?m[2]:'Menu'}</h1><button class="ghost sm" onclick="openMenu(${m?"'open'":'null'})">${m?'◀ Menu':'Close'}</button></div>`;
+  if(!m)return top+`<div class="card">${MENU.map(([k,ic,l,d])=>`<button class="opt" onclick="openMenu('${k}')"><div class="grow"><div class="t">${ic==='sliders'?icon('sliders'):ic} ${l}</div><small>${k==='gtp'?gtpBank()+' GTP · ':k==='hof'?hofN+' careers · ':k==='ach'?achN+'/'+ACH.length+' · ':diff().name.replace(/^\S+\s/,'')+' · '}${d}</small></div></button>`).join('')}</div>`+dock(`<button onclick="openMenu(null)">Back to your build</button>`);
+  let b='';if(k==='settings')b=settingsCard();
+  if(k==='gtp')b=gtpCard(true);
+  if(k==='hof')b=hofHTML(true)||'<div class="card"><div class="sub">No careers yet. Finish a career and it lands here.</div></div>';
+  if(k==='ach')b=achHTML([],true);
+  return top+b+dock(`<button onclick="openMenu(null)">Back to your build</button>`);}
 // ---------- league screens ----------
 const tShort=t=>t.split(' ').slice(-1)[0];
 function classCard(){const c=classRank();if(!c)return'';
@@ -1255,6 +1270,7 @@ const ICONS={
   dumbbell:'<rect x="5" y="6.5" width="3.5" height="11" rx="1.2"/><rect x="15.5" y="6.5" width="3.5" height="11" rx="1.2"/><path d="M8.5 12h7"/><path d="M2.8 9.5v5M21.2 9.5v5"/>',
   gamepad:'<path d="M7 7h10a5 5 0 0 1 5 5v1.5a3.5 3.5 0 0 1-6.3 2.1L14.5 14h-5l-1.2 1.6A3.5 3.5 0 0 1 2 13.5V12a5 5 0 0 1 5-5z"/><path d="M6.8 9.6v3.6M5 11.4h3.6"/><circle cx="15.6" cy="10.4" r="1.05" fill="currentColor" stroke="none"/><circle cx="17.9" cy="12.4" r="1.05" fill="currentColor" stroke="none"/>',
   dice:'<rect x="3.5" y="3.5" width="17" height="17" rx="3.8"/><circle cx="8.2" cy="8.2" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.8" cy="8.2" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="8.2" cy="15.8" r="1.4" fill="currentColor" stroke="none"/><circle cx="15.8" cy="15.8" r="1.4" fill="currentColor" stroke="none"/>',
+  menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
   sliders:'<path d="M4 6.5h9M17 6.5h3"/><circle cx="15" cy="6.5" r="2"/><path d="M4 12h2M10 12h10"/><circle cx="8" cy="12" r="2"/><path d="M4 17.5h7M15 17.5h5"/><circle cx="13" cy="17.5" r="2"/>',
   trendUp:'<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
   trendDown:'<path d="M3 7l6 6 4-4 8 8"/><path d="M21 11v6h-6"/>',
@@ -1597,33 +1613,39 @@ function seasonTable(rev){if(!S.nba.length)return'';const rows=S.nba.map(s=>`<tr
   return`<div class="scroll" style="margin-top:10px"><table><tr><th>YR</th><th>TEAM</th><th>AGE</th><th>OVR</th><th>GP</th><th>MIN</th><th>PTS</th><th>REB</th><th>AST</th><th>STL</th><th>BLK</th><th>FG%</th><th>3P%</th><th>FT%</th><th>W-L</th></tr>${(rev?rows.reverse():rows).join('')}</table></div>`;}
 
 // ---------- builder pieces ----------
-function gtpCard(){const bank=gtpBank(),cost=perkCost();
+function gtpCard(full){const bank=gtpBank(),cost=perkCost();
   if(S.daily)return`<div class="card"><div class="sh">💎 <span class="grow">Generational Talent Points</span><b>${bank}</b></div><div class="sub">Perks are off for the Daily Build so everyone plays on equal terms. You still earn GTP.</div></div>`;
   if(!bank&&!cost)return`<div class="card"><div class="sh">💎 <span class="grow">Generational Talent Points</span><b>0</b></div><div class="sub">Earn GTP on Pro or Hall of Fame from great seasons, then spend it here on perks for your next player.</div></div>`;
   const canBuy=PERKS_GTP.some(([k,l,d,c,mx])=>c<=bank-cost&&((S.perks&&S.perks[k])||0)<mx);
-  return`<details class="card" ${cost||canBuy?'open':''}><summary role="button">💎 GTP Shop · <span class="gold">${bank-cost} available</span>${cost?` · ${cost} in cart`:canBuy?' · tap a perk to buy':''}</summary>
+  return`<details class="card" ${full||cost||canBuy?'open':''}><summary role="button">💎 GTP Shop · <span class="gold">${bank-cost} available</span>${cost?` · ${cost} in cart`:canBuy?' · tap a perk to buy':''}</summary>
   ${PERKS_GTP.map(([k,l,d,c,mx])=>{const n=(S.perks&&S.perks[k])||0;return`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><div class="grow"><b>${l}</b>${n?` <span class="gold">×${n}</span>`:''}<div class="sub">${d} · ${c} GTP</div></div>
     <button class="ghost sm" aria-label="Remove ${l}" onclick="buyPerk('${k}',-1)" ${n?'':'disabled'}>−</button><button class="sm" aria-label="Buy ${l}" onclick="buyPerk('${k}',1)" ${n>=mx||bank-cost<c?'disabled':''}>+</button></div>`;}).join('')}</details>`;}
 function diffCard(){return`<div class="card"><div class="sh">🎚️ <span class="grow">Difficulty</span></div><div class="seg">${Object.entries(DIFFS).map(([k,v])=>`<button class="${S.diff===k?'on':''}" onclick="setDiff('${k}')" ${S.daily&&k!=='pro'?'disabled':''}>${v.name.replace(/^\S+\s/,'')}</button>`).join('')}</div><div class="note">${diff().d}${S.daily?' The Daily Build is always played on Pro.':''}</div></div>`;}
 function lookEditor(){return`<div class="card"><div class="avwrap">${avatar(S.look,18,150,1)}</div><div class="row" style="margin-bottom:8px"><span class="sh grow" style="margin:0">Customize</span><button class="sm ghost" onclick="S.look=randLook();render()">🎲 Random look</button></div>
   <div class="looks">${LOOKS.map(([k,l,o])=>`<div><span>${l}</span><button class="ghost sm" aria-label="Previous ${l}" onclick="cyc('${k}',-1)">◀</button><b>${o()[(S.look[k]||0)%o().length].replace(EMO_RE,'').trim()}</b><button class="ghost sm" aria-label="Next ${l}" onclick="cyc('${k}',1)">▶</button></div>`).join('')}
   <div><span>Number</span><button class="ghost sm" aria-label="Lower number" onclick="S.look.num=(S.look.num+99)%100;render()">◀</button><b>#${S.look.num}</b><button class="ghost sm" aria-label="Higher number" onclick="S.look.num=(S.look.num+1)%100;render()">▶</button></div></div></div>`;}
+const SKN=Object.fromEntries(Object.values(SUBS).flat());
+function frameFx(){const f=FRAMES[S.frame],ks=Object.keys(f).filter(k=>SKN[k]),up=ks.filter(k=>f[k]>0),dn=ks.filter(k=>f[k]<0);
+  return`<div class="fx">${up.map(k=>`<span class="good">${SKN[k]} +${f[k]}</span>`).join('')}${dn.map(k=>`<span class="bad">${SKN[k]} ${f[k]}</span>`).join('')}</div><div class="note">🔒 Hidden: ${f.hid.join(' · ')}</div>`;}
 function heightText(){return`${S.height>POS[S.pos].h?'Tall for a '+S.pos+' (a little more injury risk)':S.height<POS[S.pos].h?'Undersized for a '+S.pos:'Standard size for a '+S.pos}`;}
 function dunkCap(){return S.height<=76&&es('dunk')<S.attrs.dunk?`<div class="ev gold">⚠️ Dunk is capped at ${Math.round(es('dunk'))} by your size. Add Vertical to raise it.</div>`:'';}
 function updHeight(){const a=document.getElementById('hval'),b=document.getElementById('hnote'),c=document.getElementById('heff');if(a)a.textContent=ht(S.height);if(b)b.textContent=heightText();if(c)c.innerHTML=heightNote();}
 const TABS=[['setup','Setup'],['look','Look'],['body','Body'],['skills','Skills'],['traits','Traits']];
 function goTab(k){document.activeElement?.blur?.();UI().tab=k;render();scrollTo(0,0);}
-function buildHTML(){const u=UI(),left=START_BUDGET-spent(),ti=Math.max(0,TABS.findIndex(t=>t[0]===u.tab)),tab=TABS[ti][0];let h=`<div class="tabs">${TABS.map(([k,l],i)=>`<button class="${tab===k?'on':''} ${i<ti?'done':''}" onclick="goTab('${k}')"><span class="n">${i+1}</span>${l}</button>`).join('')}</div>`;
-  if(tab==='setup')h+=`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>Build a <span>GOAT</span></h1><button class="ghost sm iconbtn" aria-label="Settings" onclick="UI().settings=!UI().settings;UI().confirmReset=false;render()">${icon('sliders')}</button></div>${UI().settings?settingsCard():''}<div class="sub">Build a raw prospect, survive high school and college, and find out if you become the greatest of all time.</div>${diffCard()}
+function buildHTML(){if(UI().menu)return menuHTML();const u=UI(),left=START_BUDGET-spent(),ti=Math.max(0,TABS.findIndex(t=>t[0]===u.tab)),tab=TABS[ti][0];let h=`<div class="tabs">${TABS.map(([k,l],i)=>`<button class="${tab===k?'on':''} ${i<ti?'done':''}" onclick="goTab('${k}')"><span class="n">${i+1}</span>${l}</button>`).join('')}</div>`;
+  const hd=t=>`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>${t}</h1>${menuBtn()}</div>`;
+  if(tab==='setup')h+=`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>Build a <span>GOAT</span></h1>${menuBtn()}</div><div class="sub">Build a raw prospect, survive high school and college, and find out if you become the greatest of all time. Playing on <b>${diff().name.replace(/^\S+\s/,'')}</b> (change it in the menu under Settings).</div>
     <div class="card"><div class="sh">🎰 <span class="grow">League era</span>${S.daily?'<b>Daily</b>':`<button class="ghost sm" onclick="spinEra()" ${S.spins<=0?'disabled':''}>🎲 Re-spin · ${S.spins}</button>`}</div><div style="font-size:1.15rem;font-weight:800">${era().name}</div><div class="sub">${era().d}</div><div class="sub">Teams in this era pay extra for <b>${catName(eraWants())}</b>. It shapes draft buzz and free agency choices.</div>
     <details><summary>📅 Daily Build${S.daily?' · on':''}</summary><div class="sub">Same era and same dice for everyone today. Played on Pro with no perks.</div><button class="${S.daily?'sel':'ghost'} wide" style="margin-top:8px" onclick="toggleDaily()">${S.daily?'Daily Build is on · tap to turn off':'Play today\'s Daily Build'}</button>${S.daily&&dailyBest().length?`<div class="note">Today's best: ${dailyBest().slice(0,3).map(x=>`<b>${esc(x.name)}</b> ${x.score}`).join(' · ')}</div>`:''}</details></div>
-    ${gtpCard()}<div class="card"><div class="sh">⚡ <span class="grow">Quick start</span></div><div class="chips">${ARCH.map((a,i)=>`<button class="chip ${S.arch===a[0]?'on':''}" onclick="applyArch(${i})">${a[0]}<small>${a[1]} · ${ht(a[2])}</small></button>`).join('')}<button class="chip" onclick="randomBuild()">🎲 Randomize<small>Body, skills and traits</small></button></div><div class="note">Presets fill in your body and skills. You can still change everything.</div></div>${hofHTML()}${achHTML()}`;
-  if(tab==='look')h+=`<h1>Look</h1><div class="card"><div class="sh">✍️ <span class="grow">Name</span></div><input id="nm" type="text" maxlength="24" value="${esc(S.name)}" placeholder="Name your prospect" oninput="S.name=this.value"></div>${lookEditor()}`;
-  if(tab==='body')h+=`<h1>Body</h1><div class="card"><div class="sh">🏀 <span class="grow">Position</span></div><div class="seg">${Object.keys(POS).map(p=>`<button class="${S.pos===p?'on':''}" onclick="(S.hPos=S.hPos||{})[S.pos]=S.height;S.pos='${p}';S.height=S.hPos['${p}']??POS['${p}'].h;render()">${p}</button>`).join('')}</div></div>
+    ${gtpBank()&&!S.daily?`<button class="opt" onclick="openMenu('gtp')"><div class="grow"><div class="t">💎 ${gtpBank()} GTP to spend</div><small>Open the GTP Store to buy perks for this player</small></div></button>`:''}`;
+  if(tab==='look')h+=`${hd('Look')}<div class="card"><div class="sh">✍️ <span class="grow">Name</span></div><input id="nm" type="text" maxlength="24" value="${esc(S.name)}" placeholder="Name your prospect" oninput="S.name=this.value"></div>${lookEditor()}`;
+  if(tab==='body')h+=`${hd('Body')}<div class="card"><div class="sh">🏀 <span class="grow">Position</span></div><div class="seg">${Object.keys(POS).map(p=>`<button class="${S.pos===p?'on':''}" onclick="(S.hPos=S.hPos||{})[S.pos]=S.height;S.pos='${p}';S.height=S.hPos['${p}']??POS['${p}'].h;render()">${p}</button>`).join('')}</div></div>
     <div class="card"><div class="sh">📏 <span class="grow">Height</span><b id="hval">${ht(S.height)}</b></div><input type="range" aria-label="Height" min="${POS[S.pos].h-4}" max="${POS[S.pos].h+5+(S.perks&&S.perks.growth?3:0)}" value="${S.height}" oninput="S.height=+this.value;updHeight()" onchange="render()"><div class="sub" id="hnote">${heightText()}</div><div class="note" id="heff">${heightNote()}</div>${dunkCap()}</div>
-    <div class="card"><div class="sh">💪 <span class="grow">Frame</span></div><div class="seg">${Object.keys(FRAMES).map(f=>`<button class="${S.frame===f?'on':''}" onclick="setF('frame','${f}')">${f}</button>`).join('')}</div><div class="note">${FRAMES[S.frame].d}</div></div>`;
-  if(tab==='skills')h+=`<h1>Skills</h1><div class="sub">Tap a group to open it. Skills cost 1 point each up to 70, then 2, then 3 above 85 (the + button shows the price). Max 90 here; grow higher during the career. Numbers shown include your height bonus. OVR weighs every skill for your position.</div>${skillAcc('build')}`;
-  if(tab==='traits')h+=`<h1>Traits</h1><div class="sub">Lock in ${traitLimit()}. The other ${TRAITS.length-traitLimit()} are rolled at random.</div><div class="card"><div class="chips">${TRAITS.map(([k,l,d])=>`<button class="chip ${S.picked.includes(k)?'on':''}" onclick="toggleTrait('${k}')">${l}<small>${d}</small></button>`).join('')}</div></div>`;
+    <div class="card"><div class="sh">💪 <span class="grow">Frame</span></div><div class="seg">${Object.keys(FRAMES).map(f=>`<button class="${S.frame===f?'on':''}" onclick="setF('frame','${f}')">${f}</button>`).join('')}</div><div class="note">${FRAMES[S.frame].d}</div>${frameFx()}</div>`;
+  if(tab==='skills'&&!u.skillsPicked)h+=`${hd('Skills')}<div class="sub">Start from a premade build, or put every point in yourself.</div><div class="card"><div class="sh">⚡ <span class="grow">Quick start</span></div><div class="chips">${ARCH.map((a,i)=>`<button class="chip ${S.arch===a[0]?'on':''}" onclick="UI().skillsPicked=1;applyArch(${i})">${a[0]}<small>${a[1]} · ${ht(a[2])} · ${a[3]}</small></button>`).join('')}<button class="chip" onclick="UI().skillsPicked=1;randomBuild()">🎲 Randomize<small>Body, skills and traits</small></button></div><div class="note">Premade builds set your position, height, frame and skills. You can still change everything after.</div>
+    <button class="ghost wide" style="margin-top:10px" onclick="UI().skillsPicked=1;render()">✍️ Build my own</button></div>`;
+  else if(tab==='skills')h+=`${hd('Skills')}<div class="row" style="margin-bottom:6px"><span class="grow sub" style="margin:0">${S.arch?`Using the <b>${S.arch}</b> build. Tweak anything below.`:'Your own build.'}</span><button class="ghost sm" onclick="UI().skillsPicked=0;render()">⚡ Premade builds</button></div><div class="sub">Tap a group to open it. Skills cost 1 point each up to 70, then 2, then 3 above 85 (the + button shows the price). Max 90 here; grow higher during the career. Numbers shown include your height bonus. OVR weighs every skill for your position.</div>${skillAcc('build')}`;
+  if(tab==='traits')h+=`${hd('Traits')}<div class="sub">Lock in ${traitLimit()}. The other ${TRAITS.length-traitLimit()} are rolled at random.</div><div class="card"><div class="chips">${TRAITS.map(([k,l,d])=>`<button class="chip ${S.picked.includes(k)?'on':''}" onclick="toggleTrait('${k}')">${l}<small>${d}</small></button>`).join('')}</div></div>`;
   const ready=S.picked.length>=traitLimit(),nxt=TABS[ti+1];
   return h+dock(`<div class="meta"><span><b>${left}</b> pts left${left>0&&ready?' <small class="muted">(saved as bonus pts)</small>':''}</span><span>OVR <b>${OV()}</b></span><span>Traits <b>${S.picked.length}/${traitLimit()}</b></span></div>
     <div class="two">${nxt?`<button class="ghost" onclick="goTab('${nxt[0]}')">Next: ${nxt[1]} ▶</button>`:`<button class="ghost" onclick="goTab('setup')">◀ Back to Setup</button>`}<button onclick="${ready?'startCareer()':"goTab('traits')"}" class="${ready?'':'ghost'}">${ready?'Start High School':`Pick ${traitLimit()-S.picked.length} trait${traitLimit()-S.picked.length===1?'':'s'}`}</button></div>`);}
@@ -1687,11 +1709,11 @@ function endHTML(){const c=career(),sc=goatScore(c),[t,d]=tierOf(sc,c),k=c.cnt,g
   <details class="card"><summary>🌟 Legend benchmarks · ${bm.filter(x=>x[1]).length}/${bm.length}</summary>${bm.map(([l,ok])=>`<div class="ev ${ok?'good':'muted'}">${ok?'✅':'⬜'} ${l}</div>`).join('')}</details>
   ${(S.log||[]).length?`<details class="card"><summary>📝 Career decisions · ${S.log.length}</summary>${S.log.map(x=>`<div class="ev">${x}</div>`).join('')}</details>`:''}
   ${eraCard()}<details class="card"><summary>🏀 Season log · ${c.seasons}</summary>${seasonTable(false)}</details>${achHTML(S.newAch)}${hofHTML()}`+dock(`<button onclick="R=Math.random;S=newPlayer();render();scrollTo(0,0)">Build Another</button>`);}
-function hofHTML(){const h=JSON.parse(localStorage.getItem('bag_hof')||'[]');if(!h.length)return'';
-  return`<details class="card"><summary>🏛️ Your Hall of Builds · ${h.length}</summary><div class="scroll" style="margin-top:8px"><table><tr><th>#</th><th>PLAYER</th><th>TIER</th><th>SCORE</th><th>PPG</th><th>RINGS</th><th>MVP</th><th>PICK</th></tr>
+function hofHTML(full){const h=JSON.parse(localStorage.getItem('bag_hof')||'[]');if(!h.length)return'';
+  return`<details class="card" ${full?'open':''}><summary>🏛️ Your Hall of Builds · ${h.length}</summary><div class="scroll" style="margin-top:8px"><table><tr><th>#</th><th>PLAYER</th><th>TIER</th><th>SCORE</th><th>PPG</th><th>RINGS</th><th>MVP</th><th>PICK</th></tr>
   ${h.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.name)} <span class="muted">${x.pos}</span></td><td>${x.diff?DIFFS[x.diff].name.split(' ')[0]+' ':''}${x.tier}</td><td>${x.score}</td><td>${f1(x.ppg)}</td><td>${x.rings}</td><td>${x.mvp}</td><td>${x.pick>=61?'UDFA':'#'+x.pick}</td></tr>`).join('')}</table></div></details>`;}
-function achHTML(fresh){const have=JSON.parse(localStorage.getItem('bag_ach')||'{}'),n=Object.keys(have).length;fresh=fresh||[];
-  return`<details class="card" ${fresh.length?'open':''}><summary>🏅 Achievements · ${n}/${ACH.length}${fresh.length?` · <span class="gold">${fresh.length} new</span>`:''}</summary>${S.diff==='rookie'&&S.stage==='end'?'<div class="note">🔒 Achievements don’t unlock on Rookie.</div>':''}
+function achHTML(fresh,full){const have=JSON.parse(localStorage.getItem('bag_ach')||'{}'),n=Object.keys(have).length;fresh=fresh||[];
+  return`<details class="card" ${full||fresh.length?'open':''}><summary>🏅 Achievements · ${n}/${ACH.length}${fresh.length?` · <span class="gold">${fresh.length} new</span>`:''}</summary>${S.diff==='rookie'&&S.stage==='end'?'<div class="note">🔒 Achievements don’t unlock on Rookie.</div>':''}
   <div class="ach">${ACH.map(([id,l,d])=>`<div class="${have[id]?'got':''} ${fresh.includes(id)?'new':''}"><b>${have[id]?l:'🔒 '+l.replace(EMO_RE,'').trim()}</b><small>${d}${fresh.includes(id)?' · New':''}</small></div>`).join('')}</div></details>`;}
 
 

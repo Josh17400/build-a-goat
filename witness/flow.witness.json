@@ -4,6 +4,12 @@
   "seed": 3,
   "steps": [
    {
+    "at": 0.25,
+    "evalAs": {
+     "x": "(goTab('skills'),1)"
+    }
+   },
+   {
     "at": 0.3,
     "call": [
      "tap",

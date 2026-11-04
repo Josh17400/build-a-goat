@@ -1,6 +1,28 @@
-[{"name":"settings: reset all progress","seed":2,"steps":[
+[{"name":"menu: settings reset, difficulty, store, hall, achievements","seed":2,"steps":[
  {"at":0.3,"evalAs":{"x":"(localStorage.setItem('bag_gtp','50'),localStorage.setItem('bag_ach','{\"a\":1}'),render(),1)"}},
- {"at":0.4,"call":["tap","Settings"],"expectPage":["document.body.textContent.includes('50 GTP')"]},
- {"at":0.5,"call":["tap","Reset all progress"]},
- {"at":0.6,"call":["tap","Yes, erase everything"],"shot":"r-settings.png",
-  "expectPage":["localStorage.getItem('bag_gtp')===null","localStorage.getItem('bag_ach')===null","document.body.textContent.includes('Progress reset')","S.stage==='build'"]}]}]
+ {"at":0.35,"call":["tap","Menu"]},
+ {"at":0.38,"expectPage":["document.getElementById('app').textContent.includes('GTP Store')","document.getElementById('app').textContent.includes('Hall of Builds')","document.getElementById('app').textContent.includes('Achievements')"]},
+ {"at":0.4,"call":["tap","GTP Store"]},
+ {"at":0.43,"expectPage":["document.getElementById('app').textContent.includes('GTP Shop')","document.querySelector('#app details[open]')!=null"]},
+ {"at":0.45,"call":["tap","Menu"]},
+ {"at":0.5,"call":["tap","Achievements"]},
+ {"at":0.53,"expectPage":["document.querySelector('#app details[open] .ach')!=null"]},
+ {"at":0.55,"call":["tap","Menu"]},
+ {"at":0.6,"call":["tap","Settings"]},
+ {"at":0.63,"expectPage":["document.getElementById('app').textContent.includes('50 GTP')","document.getElementById('app').textContent.includes('Difficulty')"]},
+ {"at":0.65,"evalAs":{"x":"(setDiff('hof'),1)"},"expectPage":["S.diff==='hof'"]},
+ {"at":0.7,"call":["tap","Reset all progress"]},
+ {"at":0.8,"call":["tap","Yes, erase everything"]},
+ {"at":0.83,"shot":"r-settings.png",
+  "expectPage":["localStorage.getItem('bag_gtp')===null","localStorage.getItem('bag_ach')===null","document.getElementById('app').textContent.includes('Progress reset')","S.stage==='build'"]},
+ {"at":0.9,"call":["tap","Back to your build"]},
+ {"at":0.93,"expectPage":["!UI().menu","document.getElementById('app').textContent.includes('League era')"]}]},
+{"name":"skills: quick start pops up first, then premade or own","seed":4,"steps":[
+ {"at":0.3,"evalAs":{"x":"(goTab('skills'),1)"},"expectPage":["document.getElementById('app').textContent.includes('Quick start')","document.getElementById('app').textContent.includes('Build my own')"]},
+ {"at":0.4,"call":["tap","Rim Protector"]},
+ {"at":0.45,"expectPage":["S.pos==='C'","S.frame==='Strong'","document.getElementById('app').textContent.includes('Using the')","!document.getElementById('app').textContent.includes('Build my own')"]},
+ {"at":0.5,"call":["tap","Premade builds"]},
+ {"at":0.55,"expectPage":["document.getElementById('app').textContent.includes('Build my own')"]},
+ {"at":0.6,"call":["tap","Build my own"]},
+ {"at":0.65,"expectPage":["document.getElementById('app').textContent.includes('Shooting')"]},
+ {"at":0.7,"evalAs":{"x":"(goTab('body'),1)"},"expectPage":["document.getElementById('app').textContent.includes('Hidden:')","document.getElementById('app').textContent.includes('Strength +9')"],"shot":"r-frame.png"}]}]
