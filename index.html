@@ -18,7 +18,7 @@
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,system-ui,sans-serif;color:var(--tx);min-height:100vh;
-  background:radial-gradient(1200px 600px at 50% -200px,#2a2016 0%,rgba(42,32,22,0) 60%),linear-gradient(#0f1116,#0b0c10);background-attachment:fixed;-webkit-font-smoothing:antialiased}
+  background:radial-gradient(1200px 600px at 50% -200px,#2a2016 0%,rgba(42,32,22,0) 60%),linear-gradient(#0f1116,#0b0c10);background-color:#0b0c10;-webkit-font-smoothing:antialiased}
 #app{max-width:760px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(var(--dockH) + 24px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))}
 h1{font-size:1.65rem;font-weight:800;letter-spacing:-.02em;margin:.3em 0 .1em}
 h1 span{background:linear-gradient(90deg,var(--acc),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
@@ -63,7 +63,8 @@ input[type=range]{width:100%;accent-color:var(--acc);height:34px}
 .tabs button.done .n{background:#24382c;color:var(--green)}
 /* bottom dock */
 .dock{position:fixed;left:0;right:0;bottom:0;z-index:10;padding:10px calc(14px + env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left));
-  background:rgba(12,13,18,.97);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line)}
+  background:rgb(12,13,18);border-top:1px solid var(--line);transform:translateZ(0)}
+body.kb .dock{display:none}
 .dock .in{max-width:732px;margin:0 auto;display:flex;flex-direction:column;gap:8px}
 .dock .row{flex-wrap:nowrap}
 .dock .meta{font-size:.82rem;color:var(--tx2);display:flex;gap:12px;align-items:center;justify-content:space-between}
@@ -1465,7 +1466,7 @@ function heightText(){return`${S.height>POS[S.pos].h?'Tall for a '+S.pos+' (a li
 function dunkCap(){return S.height<=76&&es('dunk')<S.attrs.dunk?`<div class="ev gold">⚠️ Dunk is capped at ${Math.round(es('dunk'))} by your size. Add Vertical to raise it.</div>`:'';}
 function updHeight(){const a=document.getElementById('hval'),b=document.getElementById('hnote'),c=document.getElementById('heff');if(a)a.textContent=ht(S.height);if(b)b.textContent=heightText();if(c)c.innerHTML=heightNote();}
 const TABS=[['setup','Setup'],['look','Look'],['body','Body'],['skills','Skills'],['traits','Traits']];
-function goTab(k){UI().tab=k;render();scrollTo(0,0);}
+function goTab(k){document.activeElement?.blur?.();UI().tab=k;render();scrollTo(0,0);}
 function buildHTML(){const u=UI(),left=START_BUDGET-spent(),ti=Math.max(0,TABS.findIndex(t=>t[0]===u.tab)),tab=TABS[ti][0];let h=`<div class="tabs">${TABS.map(([k,l],i)=>`<button class="${tab===k?'on':''} ${i<ti?'done':''}" onclick="goTab('${k}')"><span class="n">${i+1}</span>${l}</button>`).join('')}</div>`;
   if(tab==='setup')h+=`<h1>Build a <span>GOAT</span></h1><div class="sub">Build a raw prospect, survive high school and college, and find out if you become the greatest of all time.</div>${diffCard()}
     <div class="card"><div class="sh">🎰 <span class="grow">League era</span>${S.daily?'<b>Daily</b>':`<button class="ghost sm" onclick="spinEra()" ${S.spins<=0?'disabled':''}>🎲 Re-spin · ${S.spins}</button>`}</div><div style="font-size:1.15rem;font-weight:800">${era().name}</div><div class="sub">${era().d}</div><div class="sub">Teams in this era pay extra for <b>${catName(eraWants())}</b>. It shapes draft buzz and free agency interest, not your OVR.</div>
@@ -1512,7 +1513,11 @@ function render(){const st=S.stage;let h='';
     if(S.nba.length>1)h+=`<details class="card"><summary>📊 Season log · ${S.nba.length} seasons</summary>${seasonTable(true)}</details>`;
     h+=dock(dk);}
   else if(st==='end')h=endHTML();
-  app.innerHTML=h;iconize(app);const d=app.querySelector('.dock');document.documentElement.style.setProperty('--dockH',(d?d.offsetHeight:0)+'px');}
+  app.innerHTML=h;iconize(app);if(!app.contains(document.activeElement))document.body.classList.remove('kb');const d=app.querySelector('.dock');document.documentElement.style.setProperty('--dockH',(d?d.offsetHeight:0)+'px');}
+const isField=e=>e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)&&e.target.type!=='range';
+document.addEventListener('focusin',e=>{if(isField(e))document.body.classList.add('kb');});
+document.addEventListener('focusout',e=>{if(!isField(e))return;document.body.classList.remove('kb');setTimeout(()=>{window.scrollTo(window.scrollX,window.scrollY);document.body.style.minHeight='100.1vh';requestAnimationFrame(()=>document.body.style.minHeight='');},60);});
+if(window.visualViewport)visualViewport.addEventListener('resize',()=>{if(visualViewport.height>=innerHeight-1&&!document.activeElement?.matches?.('input[type=text]'))window.scrollTo(window.scrollX,window.scrollY);});
 function simEnd(){let g=0;while(S.stage==='nba'&&g++<120){if(S.pend)choose(S.pend.kind==='summer'?S.pend.opts.length-2:0);else simNBA();}render();scrollTo(0,0);}
 function simAll(){let g=0;while(S.stage==='nba'&&!S.pend&&g++<25)simNBA();render();}
 function endHTML(){const c=career(),sc=goatScore(c),[t,d]=tierOf(sc,c),k=c.cnt,g=x=>k[x]||0,gp=c.gp||1;
