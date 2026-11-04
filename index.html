@@ -112,7 +112,8 @@ details.card>summary{margin:-4px 0;font-size:.95rem;color:var(--tx)}
 .line{font-size:.8rem;color:var(--tx2);margin-top:3px}
 .stars{color:var(--gold);white-space:nowrap}
 .opt{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;margin:8px 0 0;background:var(--bg2);color:var(--tx);border:1px solid var(--line);box-shadow:none;padding:12px;border-radius:14px}
-.opt .t{font-weight:700;font-size:.95rem}.opt small{display:block;color:var(--tx3);font-weight:500;font-size:.8rem;margin-top:3px;line-height:1.35}
+.opt .t{font-weight:700;font-size:.95rem}
+.opt.fa{align-items:center}.opt.fa .why{margin-top:6px}.opt.fa .why summary{font-size:.8rem;color:var(--acc2);padding:4px 0}.opt.fa .why ul{margin:4px 0 0;padding-left:18px;font-size:.8rem;line-height:1.45}.opt.fa .why li.good{color:var(--green)}.opt.fa .why li.bad{color:var(--red)}.opt small{display:block;color:var(--tx3);font-weight:500;font-size:.8rem;margin-top:3px;line-height:1.35}
 .risk{display:inline-block;font-size:.68rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:6px;margin-top:6px}
 .risk.h{background:rgba(255,107,107,.14);color:#ff8f8f}.risk.m{background:rgba(255,200,74,.13);color:var(--gold)}.risk.l{background:rgba(95,214,138,.13);color:var(--green)}.risk.s{background:rgba(255,255,255,.07);color:var(--tx2)}
 .stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
@@ -463,7 +464,17 @@ function faPend(){const last=S.nba[S.nba.length-1],rv=S.rival&&!S.rival.retired&
     let u=kind==='Contender'?(o>=82?-1:-3):kind==='Rebuilding'?5:0,m=kind==='Contender'?-2:kind==='Rebuilding'?4:0;
     u+=fit==='Great'?1.5:fit==='Poor'?-1.5:0;m+=(fit==='Poor'?-2:0)+(lvl==='High'?1:lvl==='Low'?-3:0);
     const em=clamp(14.5+(o-55)*1.2+m,4,38),role=em>=30&&u>=3?(lvl==='High'?'Max money, featured role':'Featured role'):em>=25?'Starter role':em>=17?'Rotation role':lvl==='Low'?'Bench role, minimum deal':'Bench role';
-    return{label:`${stay?'🤝':'🏀'} ${stay?'Re-sign with the ':''}${team}`,desc:`${kind} · Interest: ${lvl} · ${fit} fit (they need ${catName(need)}) · ${role}`,
+    const pro=[],con=[],ev=eraValue();
+    if(o>=80)pro.push(`You are a star (${OV()} OVR)`);else if(o>=72)pro.push(`You are a proven starter (${OV()} OVR)`);else if(o<64)con.push(`Your ${OV()} OVR is below what they want`);
+    if(last.ppg>=20)pro.push(`You scored ${f1(last.ppg)} a game last year`);else if(last.ppg<8)con.push(`Only ${f1(last.ppg)} points a game last year`);
+    if(ev>=.4)pro.push(`This era pays for ${catName(want)}, and that is your game`);else if(ev<=-.4)con.push(`Teams right now want ${catName(want)}, not your strength`);
+    if(fit==='Great')pro.push(`You fill their biggest need: ${catName(need)}`);else if(fit==='Poor')con.push(`They need ${catName(need)}, and that is a weakness for you`);
+    if(S.age<=26)pro.push(`At ${S.age}, your prime is ahead of you`);else if(S.age>=31)con.push(`At ${S.age}, they worry about decline`);
+    if(S.injuryProne)con.push('Your injury history worries them');
+    if(stay)pro.push('Loyalty: they know you and want to keep you');
+    if(str>=62&&!stay)con.push('Contenders are picky about who they sign');
+    if(kind==='Rebuilding')pro.push('A rebuilding team can hand you a big role');
+    return{why:{pro,con},label:`${stay?'🤝':'🏀'} ${stay?'Re-sign with the ':''}${team}`,desc:`${kind} · Interest: ${lvl} · ${fit} fit (they need ${catName(need)}) · ${role}`,
       fn:()=>{S.team=team;S.teamStr=str;S.usage=u;S.minAdj=m;return stay?`You re-signed with the ${team}`:`You signed with the ${team}`;}};};
   const used=new Set([S.team,S.rival?.team]),nt=()=>{let t,g=0;do t=pick(TEAMS);while(used.has(t)&&g++<50);used.add(t);return t;};
   const opts=[offer(S.team,S.teamStr,true),offer(nt(),rnd(62,74)),offer(nt(),rnd(50,61)),offer(nt(),rnd(30,48))];
@@ -1422,7 +1433,11 @@ function seasonList(arr){if(!arr.length)return'';const rev=arr.slice().reverse()
 
 // ---------- decisions ----------
 const RISK=[[/High risk/,'h','High risk'],[/Medium risk/,'m','Medium risk'],[/Low risk/,'l','Low risk'],[/Safe/,'s','Safe']];
-function optBtn(o,on){const r=RISK.find(x=>x[0].test(o.desc)),d=o.desc.replace(/\s·\s\S*\s?(High risk|Medium risk|Low risk|Safe)\s*$/,'');
+function faOpt(o,on){const w=o.why,li=(a,c)=>a.map(x=>`<li class="${c}">${x}</li>`).join('');
+  return`<div class="opt fa"><div class="grow"><div class="t">${o.label}</div><small>${o.desc}</small>
+  <details class="why"><summary>Why ${w.con.length&&!w.pro.length?'they are not sold':'they are interested'}</summary><ul>${li(w.pro,'good')}${li(w.con,'bad')}</ul></details></div>
+  <button class="sm" aria-label="Sign: ${o.label.replace(/^\S+\s/,'')}" onclick="${on}">Sign</button></div>`;}
+function optBtn(o,on){if(o.why)return faOpt(o,on);const r=RISK.find(x=>x[0].test(o.desc)),d=o.desc.replace(/\s·\s\S*\s?(High risk|Medium risk|Low risk|Safe)\s*$/,'');
   return`<button class="opt" onclick="${on}"><div class="grow"><div class="t">${o.label}</div><small>${d}</small>${r?`<span class="risk ${r[1]}">${r[2]}</span>`:''}</div></button>`;}
 function summerCard(){const p=S.summerPend;return`<div class="card flash"><div class="sh">☀️ <span class="grow">Summer decision</span></div><h2>${p.title.replace(/^☀️\s*/,'')}</h2><div class="sub">${p.text}</div>${p.opts.map((o,i)=>optBtn(o,`act(chooseSummer,${i})`)).join('')}</div>`;}
 function decisionCard(){const p=S.pend;return`<div class="card flash"><div class="sh">${p.kind==='summer'?'☀️':p.kind==='fa'?'✍️':p.kind==='retire'?'🕰️':'⚡'} <span class="grow">${p.kind==='summer'?'Summer decision':p.kind==='fa'?'Free agency':p.kind==='retire'?'Retirement':'Career moment'}</span></div>${/summer decision/i.test(p.title)?'':`<h2>${p.title.replace(EMO_RE,'').trim()}</h2>`}<div class="sub">${p.text}</div>${p.opts.map((o,i)=>optBtn(o,`act(choose,${i})`)).join('')}</div>`;}

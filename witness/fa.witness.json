@@ -1,0 +1,5 @@
+[{"name":"free agency offers show reasons and sign","seed":4,"scene":"nba","steps":[
+ {"at":0.5,"evalAs":{"x":"(S.nba.length||simNBA(),S.pend=faPend(),render(),document.querySelectorAll('.opt.fa details').forEach(d=>d.open=true),1)"},"shot":"r-fa.png",
+  "expectPage":["document.querySelectorAll('.opt.fa').length>=4","document.querySelectorAll('.opt.fa li').length>=4"]},
+ {"at":0.6,"evalAs":{"x":"(document.querySelectorAll('.opt.fa button')[1].click(),1)"},
+  "expectPage":["!S.pend||S.pend.kind!=='fa'","document.body.textContent.includes('Decision made')"]}]}]
