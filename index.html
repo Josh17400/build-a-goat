@@ -178,7 +178,7 @@ const MIN_A=40, BUILD_MAX=90;
 // ---------- difficulty & Generational Talent Points (GTP) ----------
 const DIFFS={rookie:{name:'🟢 Rookie',budget:400,mult:0,d:'400 skill points. Great careers are common. Earns no GTP and unlocks no achievements.'},
   pro:{name:'🟡 Pro',budget:350,mult:1,d:'350 skill points. A real challenge. Earns GTP.'},
-  hof:{name:'🔴 Hall of Fame',budget:300,mult:1.5,d:'300 skill points. Decent is normal, greatness is rare. Earns 1.5× GTP.'}};
+  hof:{name:'🔴 Hall of Fame',budget:300,mult:1.5,lg:3,nbaPts:.4,d:'300 skill points. Decent is normal, greatness is rare. Earns 1.5× GTP.'}};
 const diff=()=>DIFFS[S.diff]||DIFFS.pro;
 Object.defineProperty(globalThis,'START_BUDGET',{configurable:true,get:()=>diff().budget+15*((S&&S.perks&&S.perks.pts)||0)});
 const gtpBank=()=>{try{return Math.max(0,parseInt(localStorage.getItem('bag_gtp')||'0',10)||0);}catch{return 0;}};
@@ -387,7 +387,7 @@ const LPOS=['PG','SG','SF','PF','C'],CONF=t=>TEAMS.indexOf(t)<15?'East':'West';
 function lgName(L){let n,g=0;do n=pick(R()<.5?FIRST:FIRST2)+' '+pick(R()<.5?LAST:LAST2);while(L.used.includes(n)&&g++<40);L.used.push(n);return n;}
 function npc(L,age,ovr,ceil,team){const pos=pick(LPOS),p={id:L.id++,name:lgName(L),pos,age,ovr,ceil:Math.max(ovr,ceil),team,yrs:0,
   d:clamp(ovr*.85+gauss()*8+(pos==='C'||pos==='PF'?4:0)+6,35,99),star:gauss()*1,rings:0,mvps:0,pts:0,aw:{},car:{gp:0,pts:0,reb:0,ast:0},retired:false};L.P.push(p);return p;}
-const rookieCeil=(o,age)=>o+rnd(-2,7)+(22-age)*1+(R()<.12?rnd(5,14):0);
+const rookieCeil=(o,age)=>o+(diff().lg||0)+rnd(-2,7)+(22-age)*1+(R()<.12?rnd(5,14):0);
 const rookieOvr=k=>clamp(73-(k-1)*.38+gauss()*2.5,46,80);
 const active=L=>L.P.filter(p=>!p.retired);
 const roster=(L,t)=>L.P.filter(p=>!p.retired&&p.team===t);
@@ -395,7 +395,7 @@ const W8=[.2,.17,.15,.13,.11,.09,.08,.07];
 function teamRating(list){const s=list.slice().sort((a,b)=>b-a);let r=0;for(let i=0;i<8;i++)r+=(s[i]??45)*W8[i];return r;}
 // you are not stored in the league: you are added to your team when ratings are computed
 function genLeague(){const L={yr:0,P:[],hist:[],used:[],id:1,lastWins:{},z:{}};
-  for(const t of TEAMS)for(let i=0;i<13;i++){const age=ri(20,33);npc(L,age,clamp(52+gauss()*6+(i<2?8:i<5?4:0),45,86),0,t);}
+  for(const t of TEAMS)for(let i=0;i<13;i++){const age=ri(20,33);npc(L,age,clamp(52+(diff().lg||0)+gauss()*6+(i<2?8:i<5?4:0),45,88),0,t);}
   for(let y=0;y<14;y++){lgPlay(L,null);lgOffseason(L,y<13);}
   return L;}
 function lgZ(L,me){const r={};for(const t of TEAMS){const ov=roster(L,t).map(p=>p.ovr);let v=teamRating(ov);
@@ -531,7 +531,7 @@ function simNBA(){const n=S.nba.length,prev=n?S.nba[n-1]:null;if(n)S.age++;
   const c0=career();for(const m of[10000,20000,30000,40000]){const before=c0.pts;if(before<m&&before+ppg*gp>=m)notes.push(`🎉 You pass ${m.toLocaleString()} career points!`);}
   if(R()<.65)notes.unshift(flavor({ppg,rpg,apg,bpg,tp,path}));
   let gs=0;for(const x of aw)gs+=GTP_AW[x]||0;if(mins>=28&&gp>=40)gs+=1;const gtp=earnGtp(gs,`Year ${n+1}`);
-  {let bp=0;for(const x of aw)bp+=BANK_AW[x]||0;if(mins>=28&&gp>=40)bp+=3;if(rounds>=0)bp+=2;if(bp>0){S.bank+=bp;notes.push(`💰 +${bp} bonus pts to spend`);}}
+  {let bp=0;for(const x of aw)bp+=BANK_AW[x]||0;if(mins>=28&&gp>=40)bp+=3;if(rounds>=0)bp+=2;bp=Math.round(bp*(diff().nbaPts??1));if(bp>0){S.bank+=bp;notes.push(`💰 +${bp} bonus pts to spend`);}}
   S.nba.push({gtp,yr:n+1,age:a,team:S.team,gp,mins,ppg,rpg,apg,spg,bpg,fg,tp,ft,wins,po,aw,inj,ovr:Math.round(o),mvpRank,scRank,path,notes,rv});
   // what happens this offseason
   const sea=S.nba.length,oo=ovr();S.queue=[];
@@ -549,9 +549,11 @@ function faPend(){const last=S.nba[S.nba.length-1],rv=S.rival&&!S.rival.retired&
   const offer=(team,str,stay)=>{const lw=stay?last.wins:null;const need=R()<.45?want:pick(ATTRS)[0],fz=(eff(need)-o)/8,fit=fz>=.6?'Great':fz>=-.4?'Good':'Poor';
     const sc=base+fz*2+gauss()*2.5-(str>=62?4:0)+(stay?3:0),lvl=sc>=76?'High':sc>=66?'Medium':'Low';
     const kind=lw!=null?(lw>=54?'Contender':lw>=40?'Playoff team':'Rebuilding'):str>=62?'Contender':str>=50?'Playoff team':'Rebuilding';
-    let u=kind==='Contender'?(o>=82?-1:-3):kind==='Rebuilding'?5:0,m=kind==='Contender'?-2:kind==='Rebuilding'?4:0;
+    // your role depends on where you would rank on that roster, not on how good the team is
+    const rk=S.L?roster(S.L,team).filter(p=>p.ovr>o).length:(kind==='Contender'?2:0);
+    let u=rk===0?(kind==='Rebuilding'?5:3):rk===1?1:rk<=4?(kind==='Contender'?-2:-1):-1.5,m=rk===0?(kind==='Rebuilding'?4:2):rk===1?0:rk<=4?-1:-2;
     u+=fit==='Great'?1.5:fit==='Poor'?-1.5:0;m+=(fit==='Poor'?-2:0)+(lvl==='High'?1:lvl==='Low'?-3:0);
-    const em=clamp(14.5+(o-55)*1.2+m,4,38),role=em>=30&&u>=3?(lvl==='High'?'Max money, featured role':'Featured role'):em>=25?'Starter role':em>=17?'Rotation role':lvl==='Low'?'Bench role, minimum deal':'Bench role';
+    const em=clamp(14.5+(o-55)*1.2+m,4,38),role=em<17?(lvl==='Low'?'Bench role, minimum deal':'Bench role'):rk===0?(lvl==='High'?'Max money, featured role':'Featured role'):rk===1?'Co-star role':rk<=4?'Starter role':'Rotation role';
     const pro=[],con=[],ev=eraValue();
     if(o>=80)pro.push(`You are a star (${OV()} OVR)`);else if(o>=72)pro.push(`You are a proven starter (${OV()} OVR)`);else if(o<64)con.push(`Your ${OV()} OVR is below what they want`);
     if(last.ppg>=20)pro.push(`You scored ${f1(last.ppg)} a game last year`);else if(last.ppg<8)con.push(`Only ${f1(last.ppg)} points a game last year`);
