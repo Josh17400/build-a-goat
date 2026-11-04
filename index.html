@@ -190,6 +190,59 @@ button.ghost,button.sm{font-family:var(--fc)}
 .pop{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}@keyframes pop{from{transform:scale(.85);opacity:.3}to{transform:none;opacity:1}}
 .toggle{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 0}
 @media (prefers-reduced-motion:reduce){.pop{animation:none}}
+/* ---------- motion ---------- */
+.ham{width:46px;height:46px;padding:0;border-radius:14px;display:grid;place-content:center;gap:5px;background:var(--grain),linear-gradient(180deg,#2a211b,#1a1512);border:1px solid rgba(255,138,31,.45);box-shadow:0 0 16px rgba(255,138,31,.18),inset 0 1px 0 rgba(255,255,255,.08);flex:none}
+.ham i{display:block;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--acc),var(--gold));transition:width .25s,transform .25s;margin-left:auto}
+.ham i:nth-child(1){width:22px}.ham i:nth-child(2){width:15px}.ham i:nth-child(3){width:19px}
+.ham:hover i,.ham:active i{width:22px}
+.ham.wig{animation:wig 3.2s 1.2s ease-in-out 2}@keyframes wig{0%,86%,100%{transform:none}90%{transform:rotate(-8deg) scale(1.06)}95%{transform:rotate(6deg) scale(1.06)}}
+.drawer{position:fixed;inset:0;z-index:40}
+.drawer .bd{position:absolute;inset:0;background:rgba(5,4,3,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.drawer .pn{position:absolute;top:0;right:0;bottom:0;width:min(88vw,360px);overflow-y:auto;padding:calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) 16px;
+  background:var(--grain),radial-gradient(420px 260px at 100% 0,rgba(255,138,31,.22),transparent 70%),linear-gradient(180deg,#1d1713,#0d0b09);border-left:1px solid rgba(255,138,31,.4);box-shadow:-20px 0 50px rgba(0,0,0,.6)}
+.drawer.in .bd{animation:fade .3s both}.drawer.in .pn{animation:slide .42s cubic-bezier(.2,1,.3,1) both}
+.drawer.out .bd{animation:fade .22s reverse both}.drawer.out .pn{animation:slide .24s cubic-bezier(.6,0,.8,.4) reverse both}
+@keyframes fade{from{opacity:0}}@keyframes slide{from{transform:translateX(105%)}}
+.drawer .logo{font-family:var(--fd);font-size:2.1rem;letter-spacing:.03em;line-height:1;display:flex;align-items:center;gap:10px}
+.drawer .logo span{background:linear-gradient(90deg,var(--acc),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.drawer .ball{width:34px;height:34px;flex:none}
+.drawer.in .ball{animation:bounce .9s .15s cubic-bezier(.3,0,.5,1) both}
+@keyframes bounce{0%{transform:translateY(-40px) rotate(-90deg);opacity:0}40%{transform:translateY(0) rotate(0);opacity:1}60%{transform:translateY(-12px)}80%{transform:translateY(0)}90%{transform:translateY(-4px)}100%{transform:none}}
+.drawer .x{width:44px;height:44px;padding:0;margin-left:auto;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);box-shadow:none;position:relative}
+.drawer .x i{position:absolute;left:12px;top:20px;width:20px;height:3px;border-radius:3px;background:var(--tx)}
+.drawer .x i:first-child{transform:rotate(45deg)}.drawer .x i:last-child{transform:rotate(-45deg)}
+.drawer.in .x i:first-child{animation:x1 .45s .1s both}.drawer.in .x i:last-child{animation:x2 .45s .1s both}
+@keyframes x1{from{transform:translateY(-6px)}}@keyframes x2{from{transform:translateY(6px)}}
+.drawer .gtpchip{display:inline-flex;align-items:center;gap:6px;margin:12px 0 4px;padding:6px 12px;border-radius:999px;background:rgba(255,200,74,.1);border:1px solid rgba(255,200,74,.35);color:var(--gold);font-weight:700;font-size:.88rem}
+.mi{display:flex;align-items:center;gap:12px;width:100%;margin-top:10px;padding:12px;border-radius:16px;text-align:left;color:var(--tx);background:var(--grain),linear-gradient(180deg,rgba(40,33,28,.9),rgba(24,20,17,.9));border:1px solid rgba(255,255,255,.08);box-shadow:0 6px 16px rgba(0,0,0,.35);font-family:"Barlow",system-ui,sans-serif}
+.mi .bub{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;flex:none;background:radial-gradient(circle at 30% 25%,#ffb760,#e8680a);color:#1a1005;box-shadow:0 4px 12px rgba(255,120,20,.35)}
+.mi .bub .ic{width:22px;height:22px}
+.mi .t{font-family:var(--fc);font-weight:800;font-size:1.15rem;letter-spacing:.02em}.mi small{display:block;color:var(--tx3);font-size:.8rem;margin-top:1px}
+.mi .chev{margin-left:auto;color:var(--tx3);font-size:1.2rem}
+.mi:active{transform:scale(.97) translateX(-3px)}
+.drawer.in .mi{animation:mi .45s cubic-bezier(.2,1.3,.4,1) both}
+.drawer.in .mi:nth-of-type(1){animation-delay:.08s}.drawer.in .mi:nth-of-type(2){animation-delay:.14s}.drawer.in .mi:nth-of-type(3){animation-delay:.2s}.drawer.in .mi:nth-of-type(4){animation-delay:.26s}
+@keyframes mi{from{opacity:0;transform:translateX(50px)}}
+.drawer .foot{margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.drawer.in .foot{animation:fade .5s .35s both}
+/* screen entrances */
+#app.enter>*:not(.dock):not(.tabs):not(.reveal):not(.drawer){animation:enter .45s cubic-bezier(.2,.9,.3,1.15) both}
+#app.enter>*:nth-child(2){animation-delay:.03s!important}#app.enter>*:nth-child(3){animation-delay:.07s!important}#app.enter>*:nth-child(4){animation-delay:.11s!important}#app.enter>*:nth-child(5){animation-delay:.15s!important}#app.enter>*:nth-child(6){animation-delay:.19s!important}#app.enter>*:nth-child(n+7){animation-delay:.23s!important}
+@keyframes enter{from{opacity:0;transform:translateY(18px) scale(.985)}}
+html.wt *,html.wt *::before,html.wt *::after,html.wt #app.enter>*:nth-child(n){animation-duration:0s!important;animation-delay:0s!important;animation-iteration-count:1!important}
+/* moments */
+.ovr.bump{animation:bump .6s cubic-bezier(.2,1.8,.4,1)}@keyframes bump{40%{transform:scale(1.14);box-shadow:0 0 34px rgba(255,170,60,.75)}}
+.newseason{animation:pop .55s cubic-bezier(.2,1.6,.4,1) both,glow 1.6s .2s both}@keyframes glow{0%{box-shadow:0 0 0 2px rgba(255,170,60,.7),0 0 30px rgba(255,138,31,.45)}100%{box-shadow:0 14px 34px rgba(0,0,0,.45)}}
+.newseason .ev.gold{animation:pop .5s cubic-bezier(.2,1.8,.4,1) both}.newseason .ev.gold:nth-of-type(2){animation-delay:.15s}.newseason .ev.gold:nth-of-type(3){animation-delay:.3s}
+.result{animation:pop .5s cubic-bezier(.2,1.6,.4,1)}.result.bad{animation:shake .45s}@keyframes shake{20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(2px)}}
+.dock button:not(.ghost):not(:disabled){position:relative;overflow:hidden}
+.dock button:not(.ghost):not(:disabled)::after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);animation:shine 3.8s 1s ease-in-out infinite}
+@keyframes shine{0%,70%{left:-60%}100%{left:130%}}
+.confetti{position:fixed;inset:0;pointer-events:none;z-index:60;overflow:hidden}
+.confetti i{position:absolute;top:-14px;width:8px;height:14px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{transform:translate(var(--dx),110vh) rotate(var(--r));opacity:.9}}
+.chip.on,.seg button.on{animation:pop .35s cubic-bezier(.2,1.6,.4,1)}
+@media (prefers-reduced-motion:reduce){#app.enter>*,.drawer *,.drawer .pn,.drawer .bd,.newseason,.result,.ovr.bump,.chip.on,.seg button.on,.ham.wig{animation:none!important}.dock button::after{display:none}.confetti{display:none}}
 </style>
 </head>
 <body>
@@ -1085,13 +1138,12 @@ const ARCH=[
   ['🦾 Two-Way Wing','SF',79,'Balanced',{perD:2.5,three:2,stl:2,speed:1.5,vert:1.5,layup:1.5,iq:1}],
   ['🧠 Floor General','PG',74,'Balanced',{pass:3,handle:3,iq:2.5,three:1.5,mid:1.5,speed:1.5,cons:1}],
   ['💥 Slasher','SG',77,'Lean',{layup:3,dunk:2.5,speed:2.5,vert:2,handle:1.5,ft:1}],
-  ['🐻 Post Bully','PF',81,'Strong',{post:3,str:3,close:2.5,oreb:2,dreb:2,intD:1.5}],
-  ['🦄 Unicorn','C',85,'Lean',{three:2,blk:2,handle:1.5,vert:1.5,dreb:1.5,mid:1.5,dunk:1.5}]];
+  ['🐻 Post Bully','PF',81,'Strong',{post:3,str:3,close:2.5,oreb:2,dreb:2,intD:1.5}]];
 function fillPoints(pk){for(const k of SUBKEYS)S.attrs[k]=MIN_A;let g=0,miss=0;
   while(g++<6000&&miss<60){const k=pk();if(S.attrs[k]>=BUILD_MAX){miss++;continue;}if(spent()+cost(S.attrs[k])>START_BUDGET){miss++;continue;}S.attrs[k]++;miss=0;}}
-function applyArch(i){const[l,pos,h,fr,w]=ARCH[i],keys=Object.keys(w),tot=keys.reduce((s,k)=>s+w[k],0);S.pos=pos;S.height=h;S.frame=fr;S.arch=l;
+function applyArch(i){const[l,pos,h,fr,w]=ARCH[i],keys=Object.keys(w),tot=keys.reduce((s,k)=>s+w[k],0);S.arch=l;
   fillPoints(()=>{if(R()<.22)return pick(SUBKEYS);let r=R()*tot;for(const k of keys){r-=w[k];if(r<=0)return k;}return keys[0];});render();}
-function randomBuild(){S.pos=pick(Object.keys(POS));S.height=POS[S.pos].h+ri(-3,4);S.frame=pick(Object.keys(FRAMES));S.arch=null;fillPoints(()=>pick(SUBKEYS));
+function randomBuild(){S.arch=null;fillPoints(()=>pick(SUBKEYS));
   const T=TRAITS.map(t=>t[0]);S.picked=[T.splice(ri(0,T.length-1),1)[0],T.splice(ri(0,T.length-1),1)[0]];if(!S.name)S.name=pick(FIRST)+' '+pick(LAST);render();}
 
 // ---------- what an OVR means ----------
@@ -1249,10 +1301,22 @@ function settingsCard(){const u=UI(),ach=Object.keys((()=>{try{return JSON.parse
   :`<button class="ghost" style="margin-top:10px;width:100%" onclick="UI().confirmReset=true;UI().resetDone=false;render()">Reset all progress</button>`}</div>`;}
 function resetProgress(){for(const k of SAVE_KEYS)try{localStorage.removeItem(k);}catch{}R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,menu:'settings',resetDone:true};render();scrollTo(0,0);}
 const MENU=[['settings','sliders','Settings','Difficulty and reset'],['gtp','💎','GTP Store','Perks for your next player'],['hof','🏛️','Hall of Builds','Your best careers'],['ach','🏅','Achievements','What you have unlocked']];
-function openMenu(k){document.activeElement?.blur?.();const u=UI();u.menu=k;u.confirmReset=false;if(k!=='settings')u.resetDone=false;render();scrollTo(0,0);}
-function menuBtn(){return`<button class="ghost sm iconbtn" aria-label="Menu" onclick="openMenu('open')">${icon('menu')}</button>`;}
+function openMenu(k){document.activeElement?.blur?.();const u=UI();if(k==='open'){drawerAnim=true;u.wig=1;}u.menu=k;u.confirmReset=false;if(k!=='settings')u.resetDone=false;if(k!=='open')scrollTo(0,0);render();}
+function menuBtn(){return`<button class="ham ${UI().wig?'':'wig'}" aria-label="Menu" onclick="openMenu('open')"><i></i><i></i><i></i></button>`;}
+let drawerAnim=false;
+function closeMenu(){const d=document.querySelector('.drawer');if(!d||d.classList.contains('out')){UI().menu=null;return render();}d.classList.remove('in');d.classList.add('out');setTimeout(()=>{if(UI().menu==='open'){UI().menu=null;render();}},230);}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&typeof S!=='undefined'&&S.ui&&S.ui.menu==='open')closeMenu();});
+const BALL='<svg class="ball" viewBox="0 0 40 40" aria-hidden="true"><defs><radialGradient id="bg1" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffb05a"/><stop offset="1" stop-color="#d9580a"/></radialGradient></defs><circle cx="20" cy="20" r="18" fill="url(#bg1)"/><g fill="none" stroke="#3a1a05" stroke-width="1.6"><path d="M2 20h36M20 2v36"/><path d="M7 7c6 5 6 21 0 26M33 7c-6 5-6 21 0 26"/></g></svg>';
+function drawerHTML(){const hofN=(()=>{try{return JSON.parse(localStorage.getItem('bag_hof')||'[]').length;}catch{return 0;}})(),achN=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('bag_ach')||'{}')).length;}catch{return 0;}})(),cls=drawerAnim?'in':'';drawerAnim=false;
+  const sub={settings:diff().name.replace(/^\S+\s/,'')+' · difficulty and reset',gtp:gtpBank()+' GTP · perks for your next player',hof:hofN+' careers · your best builds',ach:achN+'/'+ACH.length+' unlocked'};
+  const ic={settings:icon('sliders'),gtp:'💎',hof:'🏛️',ach:'🏅'};
+  return`<div class="drawer ${cls}" role="dialog" aria-label="Menu"><div class="bd" onclick="closeMenu()"></div><div class="pn">
+  <div class="row" style="flex-wrap:nowrap"><div class="logo">${BALL}<div>BUILD A <span>GOAT</span></div></div><button class="x" aria-label="Close menu" onclick="closeMenu()"><i></i><i></i></button></div>
+  <div class="gtpchip">💎 ${gtpBank()} GTP</div>
+  ${MENU.map(([k,,l])=>`<button class="mi" onclick="openMenu('${k}')"><span class="bub">${ic[k]}</span><span class="grow"><span class="t">${l}</span><small>${sub[k]}</small></span><span class="chev">›</span></button>`).join('')}
+  <div class="foot"><button class="${SND.P.sfx?'':'ghost'} sm" aria-label="Sound effects ${SND.P.sfx?'on':'off'}" onclick="SND.set('sfx',${!SND.P.sfx})">Sound ${SND.P.sfx?'on':'off'}</button><button class="${SND.P.music?'':'ghost'} sm" aria-label="Music ${SND.P.music?'on':'off'}" onclick="SND.set('music',${!SND.P.music})">Music ${SND.P.music?'on':'off'}</button></div></div></div>`;}
 function menuHTML(){const k=UI().menu,m=MENU.find(x=>x[0]===k),hofN=(()=>{try{return JSON.parse(localStorage.getItem('bag_hof')||'[]').length;}catch{return 0;}})(),achN=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('bag_ach')||'{}')).length;}catch{return 0;}})();
-  const top=`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>${m?m[2]:'Menu'}</h1><button class="ghost sm" onclick="openMenu(${m?"'open'":'null'})">${m?'◀ Menu':'Close'}</button></div>`;
+  const top=`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>${m?m[2]:'Menu'}</h1><button class="ghost sm" onclick="openMenu('open')">◀ Menu</button></div>`;
   if(!m)return top+`<div class="card">${MENU.map(([k,ic,l,d])=>`<button class="opt" onclick="openMenu('${k}')"><div class="grow"><div class="t">${ic==='sliders'?icon('sliders'):ic} ${l}</div><small>${k==='gtp'?gtpBank()+' GTP · ':k==='hof'?hofN+' careers · ':k==='ach'?achN+'/'+ACH.length+' · ':diff().name.replace(/^\S+\s/,'')+' · '}${d}</small></div></button>`).join('')}</div>`+dock(`<button onclick="openMenu(null)">Back to your build</button>`);
   let b='';if(k==='settings')b=settingsCard()+soundCard();
   if(k==='gtp')b=gtpCard(true);
@@ -1615,7 +1679,7 @@ function playerCard(mode){return`<div class="card">${hero()}${traitsBlock()}${mo
 function evList(ev){return ev.map(([g,t])=>`<div class="ev ${g>0?'good':g<0?'bad':''}">${t}</div>`).join('');}
 function seasonList(arr){if(!arr.length)return'';const rev=arr.slice().reverse();
   const one=s=>`<div class="season"><b>${s.title}</b>${s.stars?starsHTML(s.stars):''}</div><div class="line">${s.line}</div>${(s.acc||[]).map(a=>`<div class="ev gold">${a}</div>`).join('')}${evList(s.ev)}`;
-  return`<div class="card">${one(rev[0])}</div>${rev.length>1?`<details class="card"><summary>Earlier seasons · ${rev.length-1}</summary>${rev.slice(1).map(s=>`<div style="margin-top:14px">${one(s)}</div>`).join('')}</details>`:''}`;}
+  return`<div class="card season0">${one(rev[0])}</div>${rev.length>1?`<details class="card"><summary>Earlier seasons · ${rev.length-1}</summary>${rev.slice(1).map(s=>`<div style="margin-top:14px">${one(s)}</div>`).join('')}</details>`:''}`;}
 
 // ---------- decisions ----------
 const RISK=[[/High risk/,'h','High risk'],[/Medium risk/,'m','Medium risk'],[/Low risk/,'l','Low risk'],[/Safe/,'s','Safe']];
@@ -1666,13 +1730,13 @@ function lookEditor(){return`<div class="card"><div class="avwrap">${avatar(S.lo
   <div><span>Number</span><button class="ghost sm" aria-label="Lower number" onclick="S.look.num=(S.look.num+99)%100;render()">◀</button><b>#${S.look.num}</b><button class="ghost sm" aria-label="Higher number" onclick="S.look.num=(S.look.num+1)%100;render()">▶</button></div></div></div>`;}
 const SKN=Object.fromEntries(Object.values(SUBS).flat());
 function frameFx(){const f=FRAMES[S.frame],ks=Object.keys(f).filter(k=>SKN[k]),up=ks.filter(k=>f[k]>0),dn=ks.filter(k=>f[k]<0);
-  return`<div class="fx">${up.map(k=>`<span class="good">${SKN[k]} +${f[k]}</span>`).join('')}${dn.map(k=>`<span class="bad">${SKN[k]} ${f[k]}</span>`).join('')}</div><div class="note">🔒 Hidden: ${f.hid.join(' · ')}</div>`;}
+  return`<div class="fx">${up.map(k=>`<span class="good">${SKN[k]} +${f[k]}</span>`).join('')}${dn.map(k=>`<span class="bad">${SKN[k]} ${f[k]}</span>`).join('')}</div>`;}
 function heightText(){return`${S.height>POS[S.pos].h?'Tall for a '+S.pos+' (a little more injury risk)':S.height<POS[S.pos].h?'Undersized for a '+S.pos:'Standard size for a '+S.pos}`;}
 function dunkCap(){return S.height<=76&&es('dunk')<S.attrs.dunk?`<div class="ev gold">⚠️ Dunk is capped at ${Math.round(es('dunk'))} by your size. Add Vertical to raise it.</div>`:'';}
 function updHeight(){const a=document.getElementById('hval'),b=document.getElementById('hnote'),c=document.getElementById('heff');if(a)a.textContent=ht(S.height);if(b)b.textContent=heightText();if(c)c.innerHTML=heightNote();}
 const TABS=[['setup','Setup'],['look','Look'],['body','Body'],['skills','Skills'],['traits','Traits']];
 function goTab(k){document.activeElement?.blur?.();UI().tab=k;render();scrollTo(0,0);}
-function buildHTML(){if(UI().menu)return menuHTML();const u=UI(),left=START_BUDGET-spent(),ti=Math.max(0,TABS.findIndex(t=>t[0]===u.tab)),tab=TABS[ti][0];let h=`<div class="tabs">${TABS.map(([k,l],i)=>`<button class="${tab===k?'on':''} ${i<ti?'done':''}" onclick="goTab('${k}')"><span class="n">${i+1}</span>${l}</button>`).join('')}</div>`;
+function buildHTML(){if(UI().menu&&UI().menu!=='open')return menuHTML();const u=UI(),left=START_BUDGET-spent(),ti=Math.max(0,TABS.findIndex(t=>t[0]===u.tab)),tab=TABS[ti][0];let h=`<div class="tabs">${TABS.map(([k,l],i)=>`<button class="${tab===k?'on':''} ${i<ti?'done':''}" onclick="goTab('${k}')"><span class="n">${i+1}</span>${l}</button>`).join('')}</div>`;
   const hd=t=>`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>${t}</h1>${menuBtn()}</div>`;
   if(tab==='setup')h+=`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>Build a <span>GOAT</span></h1>${menuBtn()}</div><div class="sub">Build a raw prospect, survive high school and college, and find out if you become the greatest of all time. Playing on <b>${diff().name.replace(/^\S+\s/,'')}</b> (change it in the menu under Settings).</div>
     <div class="card"><div class="sh">🎰 <span class="grow">League era</span>${S.daily?'<b>Daily</b>':`<button class="ghost sm" onclick="spinEra()" ${S.spins<=0?'disabled':''}>🎲 Re-spin · ${S.spins}</button>`}</div><div style="font-size:1.15rem;font-weight:800">${era().name}</div><div class="sub">${era().d}</div><div class="sub">Teams in this era pay extra for <b>${catName(eraWants())}</b>. It shapes draft buzz and free agency choices.</div>
@@ -1682,11 +1746,11 @@ function buildHTML(){if(UI().menu)return menuHTML();const u=UI(),left=START_BUDG
   if(tab==='body')h+=`${hd('Body')}<div class="card"><div class="sh">🏀 <span class="grow">Position</span></div><div class="seg">${Object.keys(POS).map(p=>`<button class="${S.pos===p?'on':''}" onclick="(S.hPos=S.hPos||{})[S.pos]=S.height;S.pos='${p}';S.height=S.hPos['${p}']??POS['${p}'].h;render()">${p}</button>`).join('')}</div></div>
     <div class="card"><div class="sh">📏 <span class="grow">Height</span><b id="hval">${ht(S.height)}</b></div><input type="range" aria-label="Height" min="${POS[S.pos].h-4}" max="${POS[S.pos].h+5+(S.perks&&S.perks.growth?3:0)}" value="${S.height}" oninput="S.height=+this.value;updHeight()" onchange="render()"><div class="sub" id="hnote">${heightText()}</div><div class="note" id="heff">${heightNote()}</div>${dunkCap()}</div>
     <div class="card"><div class="sh">💪 <span class="grow">Frame</span></div><div class="seg">${Object.keys(FRAMES).map(f=>`<button class="${S.frame===f?'on':''}" onclick="setF('frame','${f}')">${f}</button>`).join('')}</div><div class="note">${FRAMES[S.frame].d}</div>${frameFx()}</div>`;
-  if(tab==='skills'&&!u.skillsPicked)h+=`${hd('Skills')}<div class="sub">Start from a premade build, or put every point in yourself.</div><div class="card"><div class="sh">⚡ <span class="grow">Quick start</span></div><div class="chips">${ARCH.map((a,i)=>`<button class="chip ${S.arch===a[0]?'on':''}" onclick="UI().skillsPicked=1;applyArch(${i})">${a[0]}<small>${a[1]} · ${ht(a[2])} · ${a[3]}</small></button>`).join('')}<button class="chip" onclick="UI().skillsPicked=1;randomBuild()">🎲 Randomize<small>Body, skills and traits</small></button></div><div class="note">Premade builds set your position, height, frame and skills. You can still change everything after.</div>
+  if(tab==='skills'&&!u.skillsPicked)h+=`${hd('Skills')}<div class="sub">Start from a premade build, or put every point in yourself.</div><div class="card"><div class="sh">⚡ <span class="grow">Quick start</span></div><div class="chips">${ARCH.map((a,i)=>[a,i]).sort((x,y)=>(y[0][1]===S.pos)-(x[0][1]===S.pos)).map(([a,i])=>`<button class="chip ${S.arch===a[0]?'on':''}" onclick="UI().skillsPicked=1;applyArch(${i})">${a[0]}<small>${a[1]===S.pos?'Made for your position':'Classic '+a[1]+' skill set'}</small></button>`).join('')}<button class="chip" onclick="UI().skillsPicked=1;randomBuild()">🎲 Randomize<small>Random skills and traits</small></button></div><div class="note">Premade builds only fill in your skills. Your position, height and frame stay as you picked them. You can still change everything after.</div>
     <button class="ghost wide" style="margin-top:10px" onclick="UI().skillsPicked=1;render()">✍️ Build my own</button></div>`;
   else if(tab==='skills')h+=`${hd('Skills')}<div class="row" style="margin-bottom:6px"><span class="grow sub" style="margin:0">${S.arch?`Using the <b>${S.arch}</b> build. Tweak anything below.`:'Your own build.'}</span><button class="ghost sm" onclick="UI().skillsPicked=0;render()">⚡ Premade builds</button></div><div class="sub">Tap a group to open it. Skills cost 1 point each up to 70, then 2, then 3 above 85 (the + button shows the price). Max 90 here; grow higher during the career. Numbers shown include your height bonus. OVR weighs every skill for your position.</div>${skillAcc('build')}`;
   if(tab==='traits')h+=`${hd('Traits')}<div class="sub">Lock in ${traitLimit()}. The other ${TRAITS.length-traitLimit()} are rolled at random.</div><div class="card"><div class="chips">${TRAITS.map(([k,l,d])=>`<button class="chip ${S.picked.includes(k)?'on':''}" onclick="toggleTrait('${k}')">${l}<small>${d}</small></button>`).join('')}</div></div>`;
-  const ready=S.picked.length>=traitLimit(),nxt=TABS[ti+1];
+  const ready=S.picked.length>=traitLimit(),nxt=TABS[ti+1];if(u.menu==='open')h+=drawerHTML();
   return h+dock(`<div class="meta"><span><b>${left}</b> pts left${left>0&&ready?' <small class="muted">(saved as bonus pts)</small>':''}</span><span>OVR <b>${OV()}</b></span><span>Traits <b>${S.picked.length}/${traitLimit()}</b></span></div>
     <div class="two">${nxt?`<button class="ghost" onclick="goTab('${nxt[0]}')">Next: ${nxt[1]} ▶</button>`:`<button class="ghost" onclick="goTab('setup')">◀ Back to Setup</button>`}<button onclick="${ready?'startCareer()':"goTab('traits')"}" class="${ready?'':'ghost'}">${ready?'Start High School':`Pick ${traitLimit()-S.picked.length} trait${traitLimit()-S.picked.length===1?'':'s'}`}</button></div>`);}
 
@@ -1721,7 +1785,7 @@ function render(){const st=S.stage;let h='';
     h+=leagueCard();if(S.nba.length>1)h+=`<details class="card"><summary>📊 Season log · ${S.nba.length} seasons</summary>${seasonTable(true)}</details>`;
     h+=dock(dk);}
   else if(st==='end')h=endHTML();
-  app.innerHTML=h;iconize(app);try{sndReact();}catch{}if(!app.contains(document.activeElement))document.body.classList.remove('kb');const d=app.querySelector('.dock');document.documentElement.style.setProperty('--dockH',(d?d.offsetHeight:0)+'px');}
+  app.innerHTML=h;iconize(app);try{fxBefore();sndReact();fxAfter();}catch(e){console.warn(e);}if(!app.contains(document.activeElement))document.body.classList.remove('kb');const d=app.querySelector('.dock');document.documentElement.style.setProperty('--dockH',(d?d.offsetHeight:0)+'px');}
 const isField=e=>e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)&&e.target.type!=='range';
 document.addEventListener('focusin',e=>{if(isField(e))document.body.classList.add('kb');});
 document.addEventListener('focusout',e=>{if(!isField(e))return;document.body.classList.remove('kb');setTimeout(()=>{window.scrollTo(window.scrollX,window.scrollY);document.body.style.minHeight='100.1vh';requestAnimationFrame(()=>document.body.style.minHeight='');},60);});
@@ -1789,6 +1853,17 @@ const SND=(()=>{let ctx=null,master=null,last={};const pref=k=>{try{return local
   document.addEventListener('keydown',unlock,true);
   function set(k,v){P[k]=v;try{localStorage.setItem('bag_'+k,v?'1':'0');}catch{}if(k==='music'){if(v){M.none=false;M.start();}else M.stop();}if(k==='sfx'&&v){unlock();play('good');}render();}
   return{play,set,P,M};})();
+// ---------- motion: entrance on new screens, OVR bump, new-season glow, confetti for big moments ----------
+let FXprev=null,FXcur=null;
+function fxBefore(){FXcur={key:S.stage+'|'+(S.stage==='build'?UI().tab+'|'+(UI().menu==='open'?'':UI().menu||''):''),ovr:S.stage==='build'?null:Math.round(ovr()),seasons:S.hs.length+S.col.length+S.nba.length,stage:S.stage};}
+function confetti(n=70){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const c=document.createElement('div');c.className='confetti';const col=['#ff8a1f','#ffc84a','#ffffff','#5fd68a','#ffb15e','#6aa8ff'];
+  for(let i=0;i<n;i++){const e=document.createElement('i');e.style.left=(Math.random()*100)+'vw';e.style.background=col[i%col.length];e.style.setProperty('--dx',(Math.random()*160-80)+'px');e.style.setProperty('--r',(Math.random()*900-450)+'deg');e.style.animationDuration=(1.6+Math.random()*1.6)+'s';e.style.animationDelay=(Math.random()*.5)+'s';if(i%3===0){e.style.width='10px';e.style.height='10px';e.style.borderRadius='50%';}c.appendChild(e);}
+  document.body.appendChild(c);setTimeout(()=>c.remove(),4200);}
+function fxAfter(){const p=FXprev,c=FXcur;FXprev=c;if(!p)return;const app=document.getElementById('app');
+  if(c.key!==p.key){app.classList.remove('enter');void app.offsetWidth;app.classList.add('enter');clearTimeout(fxAfter.t);fxAfter.t=setTimeout(()=>app.classList.remove('enter'),1200);}
+  if(c.seasons>p.seasons){const s=app.querySelector('.season0');if(s)s.classList.add('newseason');const last=S.nba[S.nba.length-1];if(S.stage==='nba'&&last&&last.aw.some(a=>/MVP|Champion/.test(a)))confetti(90);}
+  if(c.stage!==p.stage){if(c.stage==='draft')confetti(80);if(c.stage==='end'){const cc=career(),[t]=tierOf(goatScore(cc),cc);if(/GOAT|Top 10|Hall/.test(t))confetti(/GOAT/.test(t)?160:100);}}
+  if(c.ovr!=null&&p.ovr!=null&&c.ovr>p.ovr&&c.stage===p.stage){const o=app.querySelector('.ovr');if(o){o.classList.add('bump');const b=o.querySelector('b');if(b){const a=p.ovr,z=c.ovr,t0=performance.now();const step=t=>{const k=Math.min(1,(t-t0)/600);b.textContent=Math.round(a+(z-a)*k);if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);}}}}
 // reacts to what changed since the last screen, so game logic never has to know about sound
 let SNDprev=null;
 function sndReact(){if(typeof SND==='undefined')return;const u=UI(),r=S.lastResult,last=S.nba[S.nba.length-1],
@@ -1833,7 +1908,7 @@ function uiList(){const out=[],vh=innerHeight,vw=innerWidth;let n=0;
     let rr=r;if(!btn){const rg=document.createRange();let L=1e9,T=1e9,Rr=-1e9,B=-1e9;for(const c of el.childNodes)if(c.nodeType===3&&c.textContent.trim()){rg.selectNodeContents(c);for(const q of rg.getClientRects()){L=Math.min(L,q.left);T=Math.min(T,q.top);Rr=Math.max(Rr,q.right);B=Math.max(B,q.bottom);}}if(Rr>L)rr={left:L,top:T,width:Rr-L,height:B-T};}
     out.push({id:'u'+(n++),kind:btn?'button':'text',rect:[rr.left,rr.top,rr.width,rr.height],text:(btn?(el.getAttribute('aria-label')||el.innerText):[...el.childNodes].filter(c=>c.nodeType===3).map(c=>c.textContent).join(' ')).trim().slice(0,60),font:parseFloat(cs.fontSize),tap:btn});}
   return out;}
-if(globalThis.__witnessApi){const W=globalThis.__witnessApi;W.start({name:'Build a GOAT',fps:30,
+if(globalThis.__witnessApi){document.documentElement.classList.add('wt');const W=globalThis.__witnessApi;W.start({name:'Build a GOAT',fps:30,
   reset({scene}={}){['bag_hof','bag_ach','bag_daily','bag_recent','bag_gtp','bag_diff'].forEach(k=>localStorage.removeItem(k));R=Math.random;S=newPlayer();render();
     // test scenes: jump straight to a screen (witness --scene hs|offers|college|draft|nba|decision|end)
     const order=['build','hs','offers','college','draft','nba','decision','end'],at=order.indexOf(scene||'build');if(at<=0)return;
