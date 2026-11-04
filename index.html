@@ -192,9 +192,8 @@ button.ghost,button.sm{font-family:var(--fc)}
 @media (prefers-reduced-motion:reduce){.pop{animation:none}}
 /* ---------- motion ---------- */
 .ham{width:46px;height:46px;padding:0;border-radius:14px;display:grid;place-content:center;gap:5px;background:var(--grain),linear-gradient(180deg,#2a211b,#1a1512);border:1px solid rgba(255,138,31,.45);box-shadow:0 0 16px rgba(255,138,31,.18),inset 0 1px 0 rgba(255,255,255,.08);flex:none}
-.ham i{display:block;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--acc),var(--gold));transition:width .25s,transform .25s;margin-left:auto}
-.ham i:nth-child(1){width:22px}.ham i:nth-child(2){width:15px}.ham i:nth-child(3){width:19px}
-.ham:hover i,.ham:active i{width:22px}
+.ham i{display:block;width:22px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--acc),var(--gold));transition:transform .25s;margin:0 auto}
+.ham:hover i:nth-child(2),.ham:active i:nth-child(2){transform:scaleX(.7)}
 .ham.wig{animation:wig 3.2s 1.2s ease-in-out 2}@keyframes wig{0%,86%,100%{transform:none}90%{transform:rotate(-8deg) scale(1.06)}95%{transform:rotate(6deg) scale(1.06)}}
 .drawer{position:fixed;inset:0;z-index:40}
 .drawer .bd{position:absolute;inset:0;background:rgba(5,4,3,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
@@ -225,6 +224,14 @@ button.ghost,button.sm{font-family:var(--fc)}
 @keyframes mi{from{opacity:0;transform:translateX(50px)}}
 .drawer .foot{margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .drawer.in .foot{animation:fade .5s .35s both}
+/* icon alignment */
+.opt:has(.t>.ici:first-child){position:relative;padding-left:44px}
+.opt .t>.ici:first-child{position:absolute;left:14px;top:14px;margin:0;width:20px;height:20px}
+.ici{margin-right:.4em}
+.sh .ic{width:1.25em;height:1.25em;vertical-align:middle}
+button .ic{vertical-align:-.18em}
+.iconbtn,.ham,.drawer .x{display:grid;place-items:center}
+.dock .meta{display:grid;grid-template-columns:1fr auto 1fr}.dock .meta>:nth-child(2){text-align:center}.dock .meta>:last-child{text-align:right}
 /* screen entrances */
 #app.enter>*:not(.dock):not(.tabs):not(.reveal):not(.drawer){animation:enter .45s cubic-bezier(.2,.9,.3,1.15) both}
 #app.enter>*:nth-child(2){animation-delay:.03s!important}#app.enter>*:nth-child(3){animation-delay:.07s!important}#app.enter>*:nth-child(4){animation-delay:.11s!important}#app.enter>*:nth-child(5){animation-delay:.15s!important}#app.enter>*:nth-child(6){animation-delay:.19s!important}#app.enter>*:nth-child(n+7){animation-delay:.23s!important}
