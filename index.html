@@ -1802,7 +1802,7 @@ function sndReact(){if(typeof SND==='undefined')return;const u=UI(),r=S.lastResu
   if((cur.sp!=null&&p.sp!=null&&cur.sp!==p.sp)||(cur.bank<p.bank))return SND.play('tick');
   if(cur.tab!==p.tab||cur.menu!==p.menu)return SND.play('tab');}
 function soundCard(){const P=SND.P,M=SND.M,tg=(k,l,d)=>`<div class="toggle"><div class="grow"><b>${l}</b><div class="sub">${d}</div></div><button class="${P[k]?'':'ghost'} sm" aria-label="${l} ${P[k]?'on':'off'}" onclick="SND.set('${k}',${!P[k]})">${P[k]?'On':'Off'}</button></div>`;
-  return`<div class="card"><div class="sh">🎵 <span class="grow">Sound</span></div>${tg('sfx','Sound effects','Swishes, buzzers, crowd cheers')}${tg('music','Music',M.none?'No music added yet':M.count?M.count+' track'+(M.count===1?'':'s'):'Plays in the background')}</div>`;}
+  return`<div class="card"><div class="sh">🎵 <span class="grow">Sound</span></div>${tg('sfx','Sound effects','Swishes, buzzers, crowd cheers')}${tg('music','Music',M.none?'No music added yet':'Game soundtrack, loops in the background')}</div>`;}
 S=newPlayer();render();
 // Bulk career sim for balance data (used by Witness; never called in normal play)
 function autosim(n,build,college,faMode){const save=S,rend=render,keep=['bag_ach','bag_daily','bag_recent','bag_gtp','bag_diff'].map(k=>[k,localStorage.getItem(k)]);render=()=>{};const tiers={},rows=[];
