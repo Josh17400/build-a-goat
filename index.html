@@ -14,7 +14,12 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:radial-gradient(circle at top,#22252f,#0e0f13 70%);color:#eceef3;min-height:100vh}
-#app{max-width:860px;margin:0 auto;padding:16px 14px 60px}
+#app{max-width:860px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) calc(14px + env(safe-area-inset-right)) calc(60px + env(safe-area-inset-bottom)) calc(14px + env(safe-area-inset-left))}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+button{font-family:inherit;min-height:44px;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+/* phones: every control is at least a 44 pt thumb target */
+@media (pointer:coarse),(max-width:600px){button.sm{min-width:44px;min-height:44px;padding:6px 10px;font-size:1rem}
+  .attr{grid-template-columns:96px 1fr 30px auto}.attr .row{gap:6px!important}input[type=range]{height:34px}}
 h1{font-size:2.2rem;margin:.2em 0;letter-spacing:1px}
 h1 span{color:#ff8a1f}
 h2{margin:.2em 0 .5em;font-size:1.3rem}
@@ -24,7 +29,7 @@ h2{margin:.2em 0 .5em;font-size:1.3rem}
 .grow{flex:1}
 button{background:#ff8a1f;color:#16120c;border:0;border-radius:10px;padding:11px 18px;font-weight:700;font-size:1rem;cursor:pointer}
 button:hover{filter:brightness(1.1)}
-button:disabled{opacity:.35;cursor:default}
+button:disabled{opacity:1;cursor:default;background:#262a34;color:#8a90a0;outline:none}
 button.ghost{background:#2a2e39;color:#eceef3}
 button.sm{padding:4px 10px;font-size:.9rem;border-radius:8px}
 button.sel{outline:2px solid #ff8a1f;background:#3a2a1a;color:#ffb36b}
@@ -45,8 +50,11 @@ input[type=range]{width:100%;accent-color:#ff8a1f}
 .looks div{display:grid;grid-template-columns:78px 30px 1fr 30px;align-items:center;gap:4px;font-size:.85rem}
 .looks span{color:#9aa0ad}.looks b{text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.82rem}
 .big{font-size:2rem;font-weight:800}
+.pill.bad{color:#ff8585}
+.traits{margin-top:8px}
+@media (max-width:600px){.traits .pill{font-size:.78rem;padding:3px 8px}}
 .pill{display:inline-block;padding:3px 9px;border-radius:20px;background:#2a2e39;font-size:.82rem;margin:2px}
-.good{color:#5fd68a}.bad{color:#ff6b6b}.gold{color:#ffc84a}.muted{color:#8a90a0}
+.good{color:#5fd68a}.bad{color:#ff6b6b}.gold{color:#ffc84a}.muted{color:#a3a9b7}
 .ev{margin:3px 0;font-size:.93rem}
 .stars{color:#ffc84a;letter-spacing:2px}
 table{width:100%;border-collapse:collapse;font-size:.85rem}
@@ -122,6 +130,7 @@ function trimToBudget(){let g=0;while(spent()>START_BUDGET&&g++<2000){const k=SU
 function setDiff(d){if(S.daily)return;S.diff=d;try{localStorage.setItem('bag_diff',d);}catch{}trimToBudget();render();}
 const traitLimit=()=>S.perks&&S.perks.trait3?3:2;
 function gtpCard(){const bank=gtpBank(),cost=perkCost();
+  if(!bank&&!cost&&!S.daily)return`<div class="card"><b>💎 Generational Talent Points: 0</b><div class="sub">Earn GTP on Pro or Hall of Fame from great seasons and careers, then spend them here on perks for your next player.</div></div>`;
   if(S.daily)return`<div class="card"><b>💎 Generational Talent Points: ${bank}</b><div class="sub">Perks are turned off for the Daily Build so everyone plays on equal terms. You still earn GTP.</div></div>`;
   return`<div class="card"><div class="row"><b class="grow">💎 Generational Talent Points</b><b class="gold">${bank-cost} left</b>${cost?`<span class="pill">${cost} in cart</span>`:''}</div>
   <div class="sub">Earn GTP on Pro (1×) and Hall of Fame (1.5×) from great seasons and careers. Spend them here on your next player.</div>
@@ -211,7 +220,7 @@ function injuryHS(){const r=R()*(1+(3-S.traits.dur)*.15);
   if(r>.92){S.injuryProne=true;S.ceiling-=3;S.attrs.speed=Math.max(MIN_A,S.attrs.speed-5);S.attrs.vert=Math.max(MIN_A,S.attrs.vert-5);S.hype-=8;addBank(-2);return[-1,`🚑 ${pick(INJ.major)} — misses the whole season. Ceiling drops, -6 pts`];}
   S.hype-=3;addBank(-1);return[-1,`🤕 ${pick(INJ.minor)} costs him a few weeks. -3 pts`];}
 function colEvents(y){const t=S.traits;return[
-  {w:7+t.star,f:()=>{S.hype+=6;addBank(1);return[1,'💰 Lands a huge NIL deal — his face is on billboards. +3 pts']}},
+  {w:['10s','20s'].includes(S.era)?7+t.star:0,f:()=>{S.hype+=6;addBank(1);return[1,'💰 Lands a huge NIL deal — his face is on billboards. +3 pts']}},
   {tag:'perf',w:ovr()>=62?8:0,f:()=>{S.hype+=6;addBank(3);return[1,'📈 Puts up a 40-point game on national TV. +9 pts']}},
   {w:4+t.work*2,f:()=>{addBank(2);S.ceiling+=1.5;return[1,'💪 Rebuilds his jumper over the summer. +6 pts, ceiling up']}},
   {w:4+t.coach,f:()=>{S.attrs.iq=Math.min(99,S.attrs.iq+4);addBank(1);return[1,'🧠 Coach turns him into a film junkie. +4 IQ, +3 pts']}},
@@ -315,7 +324,7 @@ function simNBA(){const n=S.nba.length,prev=n?S.nba[n-1]:null;if(n)S.age++;
   growTo(ovr()+clamp(gauss()*.8,-1,1.5));
   S.teamStr=clamp(S.teamStr+gauss()*4+(n<4&&S.pick<=10?2:0)+(50-S.teamStr)*.12+(X.team||0),20,85);
   // injury
-  let lost=ri(0,4)+(X.gp||0),inj=null;const pI=.11+(S.height-80)*.012+(3-t.dur)*.04+Math.max(0,a-30)*.015+FRAMES[S.frame].inj+(S.injuryProne?.06:0)+(X.inj||0);
+  let lost=ri(0,4)+(X.gp||0),inj=null;if(X.gp)notes.push(`🩹 Missed ${Math.round(X.gp)} games recovering from the offseason`);const pI=.11+(S.height-80)*.012+(3-t.dur)*.04+Math.max(0,a-30)*.015+FRAMES[S.frame].inj+(S.injuryProne?.06:0)+(X.inj||0);
   if(R()<pI){const r=R(),majP=clamp(.1*(1+(3-t.dur)*.3),.03,.2),modP=.3;
     if(r>=majP+modP){const g=ri(4,15);lost+=g;inj=`${pick(INJ.minor)} (${g} games)`;}
     else if(r>=majP){const g=ri(18,40);lost+=g;inj=`${pick(INJ.mod)} (${g} games)`;}
@@ -331,10 +340,10 @@ function simNBA(){const n=S.nba.length,prev=n?S.nba[n-1]:null;if(n)S.age++;
   const wins=Math.round(clamp(41+(S.teamStr-50)*.9+(o-62)*1.2*mf*(gp/82)+(t.lead-3)*1.5*(gp/82)+gauss()*4,12,74));
   const rv=rivalSeason(),rival=S.rival,sameTeam=rival&&rival.team===S.team;if(rv&&sameTeam){rv.wins=wins;rival.teamStr=S.teamStr;}
   // playoffs, series by series
-  let po='Missed playoffs',champ=false,rounds=-1,lostToRival=-1;const path=[];
+  let po='Missed playoffs',champ=false,rounds=-1,lostToRival=-1;const path=[],usedOpp=[];
   if(wins>=44||(wins>=40&&R()<.5)){rounds=0;const RN=['1st Round','2nd Round','Conf Finals','NBA Finals'];
     const rvRound=rv&&!sameTeam&&rv.wins>=50?(R()<.5?2:3):-1;
-    while(rounds<4){const vsR=rounds===rvRound,oppT=vsR?rival.team:pick(TEAMS.filter(x=>x!==S.team&&x!==rival?.team));
+    while(rounds<4){const vsR=rounds===rvRound,oppT=vsR?rival.team:pick(TEAMS.filter(x=>x!==S.team&&x!==rival?.team&&!usedOpp.includes(x)));usedOpp.push(oppT);
       const p=clamp(.33+(wins-50)*.03-rounds*.05+(t.clutch-3)*.03+(t.lead-3)*.015+(o>=85&&gp>60?.05:0)+(bsm()?.04:0)-(vsR?.06:0),.05,.93),q=.5+(p-.5)*.45;
       let w=0,l=0,g7='';
       while(w<4&&l<4){if(w===3&&l===3){const q7=clamp(q+(t.clutch-3)*.04+(bsm()?.06:0),.1,.9);
@@ -365,7 +374,7 @@ function simNBA(){const n=S.nba.length,prev=n?S.nba[n-1]:null;if(n)S.age++;
   if(aw.some(x=>x.startsWith('All-NBA'))&&!aw.includes('All-Star'))aw.push('All-Star');
   const c0=career();for(const m of[10000,20000,30000,40000]){const before=c0.pts;if(before<m&&before+ppg*gp>=m)notes.push(`🎉 Passes ${m.toLocaleString()} career points!`);}
   if(R()<.65)notes.unshift(flavor({ppg,rpg,apg,bpg,tp,path}));
-  let gs=0;for(const x of aw)gs+=GTP_AW[x]||0;if(mins>=28)gs+=1;const gtp=earnGtp(gs,`Year ${n+1}`);
+  let gs=0;for(const x of aw)gs+=GTP_AW[x]||0;if(mins>=28&&gp>=40)gs+=1;const gtp=earnGtp(gs,`Year ${n+1}`);
   S.nba.push({gtp,yr:n+1,age:a,team:S.team,gp,mins,ppg,rpg,apg,spg,bpg,fg,tp,ft,wins,po,aw,inj,ovr:Math.round(o),mvpRank,scRank,path,notes,rv});
   // what happens this offseason
   const sea=S.nba.length,oo=ovr();S.queue=[];
@@ -442,7 +451,7 @@ function benchList(c){const g=x=>c.cnt[x]||0,tdS=S.nba.some(s=>s.ppg>=10&&s.rpg>
 function legacyCard(){const c=career(),sc=goatScore(c),[t]=tierOf(sc,c),g=x=>c.cnt[x]||0,last=S.nba[S.nba.length-1];
   const steps=[[60,'Perennial All-Star'],[120,'Hall of Famer'],[200,'Top 10 All-Time'],[350,"🐐 GOAT"]],nx=steps.find(s=>sc<s[0]);
   const pace=last?c.pts+last.ppg*70*Math.max(0,34-S.age)*.8:0;
-  return`<div class="card"><div class="row"><b class="grow">📈 Legacy Meter</b><span class="gold">${S.nba.length<4?"Early career":t}</span></div>
+  return`<div class="card"><div class="row"><b class="grow">📈 Legacy Meter</b><span class="gold">${S.nba.length<4?"Early career":t==="Bust"||t==="Role Player"?(last&&last.mins>=28?"Starter on the rise":"Fighting for minutes"):t}</span></div>
   <div class="bar" style="height:14px;margin:8px 0"><i style="width:${Math.min(100,sc/350*100)}%"></i></div>
   <div class="sub">GOAT Score <b class="gold">${sc}</b> / 350${nx?` · next: <b>${nx[1]}</b> at ${nx[0]}`:' · 🐐 GOAT territory!'}</div>
   <div class="sub">${Math.round(c.pts).toLocaleString()} career pts${last&&S.age<34?` · on pace for ~${(Math.round(pace/1000)*1000).toLocaleString()}`:''} · ${g('Champion')} 🏆 · ${g('MVP')} MVP · ${g('All-Star')}× All-Star</div>
@@ -882,7 +891,7 @@ function fillPoints(pk){for(const k of SUBKEYS)S.attrs[k]=MIN_A;let g=0,miss=0;
 function applyArch(i){const[l,pos,h,fr,w]=ARCH[i],keys=Object.keys(w),tot=keys.reduce((s,k)=>s+w[k],0);S.pos=pos;S.height=h;S.frame=fr;S.arch=l;
   fillPoints(()=>{if(R()<.22)return pick(SUBKEYS);let r=R()*tot;for(const k of keys){r-=w[k];if(r<=0)return k;}return keys[0];});render();}
 function randomBuild(){S.pos=pick(Object.keys(POS));S.height=POS[S.pos].h+ri(-3,4);S.frame=pick(Object.keys(FRAMES));S.arch=null;fillPoints(()=>pick(SUBKEYS));
-  const T=TRAITS.map(t=>t[0]);S.picked=[T.splice(ri(0,T.length-1),1)[0],T.splice(ri(0,T.length-1),1)[0]];S.look=randLook();if(!S.name)S.name=pick(FIRST)+' '+pick(LAST);render();}
+  const T=TRAITS.map(t=>t[0]);S.picked=[T.splice(ri(0,T.length-1),1)[0],T.splice(ri(0,T.length-1),1)[0]];if(!S.name)S.name=pick(FIRST)+' '+pick(LAST);render();}
 
 // ---------- what an OVR means ----------
 const ovrLabel=o=>o<55?'Out of the league':o<60?'End of the bench':o<65?'Rotation player':o<70?'Starter':o<75?'Quality starter':o<80?'Fringe All-Star':o<85?'All-Star':o<90?'All-NBA':'MVP level';
@@ -952,7 +961,7 @@ function relevant(){const w=weights();const cats=Object.keys(w).sort((a,b)=>w[b]
 const sname=k=>SUBS[Object.keys(SUBS).find(c=>SUBS[c].some(x=>x[0]===k))].find(x=>x[0]===k)[1];
 function pick3(list,n){const L=list.slice(),o=[];while(o.length<n&&L.length)o.push(L.splice(ri(0,L.length-1),1)[0]);return o;}
 // every summer: 1 high-risk gamble, 1 medium/low-risk gamble, 2 safe options
-function summerSet(title,text,HIGH,MED,SAFE,kind){const o={title,text,opts:[pick(HIGH),pick(MED),...pick3(SAFE,2)]};if(kind)o.kind=kind;return o;}
+function summerSet(title,text,HIGH,MED,SAFE,kind){const modern=['10s','20s'].includes(S.era),fits=x=>modern||!/NIL|podcast/i.test(x.label),H=HIGH.filter(fits),M=MED.filter(fits);const o={title,text,opts:[pick(H.length?H:HIGH),pick(M.length?M:MED),...pick3(SAFE,2)]};if(kind)o.kind=kind;return o;}
 const two=n=>{const a=relevant();let b=relevant(),g=0;while(b===a&&g++<10)b=relevant();up(a,n);up(b,n);return[a,b];};
 function summerHS(){const yr=YR[S.hs.length],P='☀️ ';return summerSet(`☀️ Summer before ${yr} Year`,'How does he spend the summer?',[
   gamble('🏚️ Train with a controversial street trainer','Unorthodox methods. Could unlock him or ruin his mechanics',.48,()=>{const[a,b]=two(5);return P+`The street trainer unlocked something. +5 ${sname(a)}, +5 ${sname(b)}`;},()=>{up('three',-4);up('cons',-3);return P+'The trainer wrecked his mechanics. -4 Three-Point, -3 Consistency';}),
@@ -1038,9 +1047,9 @@ function startCareer(){S.name=document.getElementById('nm').value.trim()||'Myste
   for(const[k]of TRAITS)S.traits[k]=S.picked.includes(k)?(S.perks.maxed?5:ri(4,5)):ri(1,5);
   S.bank=START_BUDGET-spent();S.ceiling=ovr()+7+gauss()*8+(S.traits.work-3)*2.5+(S.traits.late-3)*1.2;if(S.perks.dna)S.ceiling+=3;if(S.perks.hype)S.hype+=15;S.armor=!!S.perks.armor;S.startOvr=OV();S.stage='hs';render();}
 function playerCard(mode){return`<div class="card"><div class="row">${avatar(S.look,S.age,70,1)}<div class="grow"><h2>${S.name} <span class="muted">· ${S.pos} · ${ht(S.height)} · ${S.frame}</span></h2>
-  <div class="sub">${era().name} · Age ${S.age}${S.stage==="nba"?"":" · Hype "+Math.max(0,Math.round(S.hype))} ${S.stage==='hs'||S.stage==='offers'?`· <span class="stars">${'★'.repeat(stars())}${'☆'.repeat(5-stars())}</span>`:''}</div>
-  <div>${TRAITS.filter(([k])=>S.traits[k]>=4||S.traits[k]<=1).map(([k,l])=>`<span class="pill ${S.traits[k]<=1?'bad':''}" title="${l}: ${S.traits[k]}/5">${l} ${'●'.repeat(S.traits[k])}${'○'.repeat(5-S.traits[k])}</span>`).join('')+`<span class="pill muted" title="${TRAITS.filter(([k])=>S.traits[k]>1&&S.traits[k]<4).map(([k,l])=>l+' '+S.traits[k]+'/5').join(', ')}">+${TRAITS.filter(([k])=>S.traits[k]>1&&S.traits[k]<4).length} average</span>`}${S.badges.map(b=>`<span class="pill gold" style="background:#3a2a1a">🎯 ${b}</span>`).join('')}</div></div>
+  <div class="sub">${era().name} · Age ${S.age}${S.stage==="nba"?"":" · Hype "+Math.max(0,Math.round(S.hype))} ${S.stage==='hs'||S.stage==='offers'?`· <span class="stars">${'★'.repeat(stars())}${'☆'.repeat(5-stars())}</span>`:''}</div></div>
   <div style="text-align:center"><div class="big">${OV()}</div><div class="sub">OVERALL</div><div class="sub gold" style="font-size:.75rem;max-width:90px">${S.stage==='nba'||S.stage==='end'?'':'NBA level: '}${ovrLabel(OV())}</div></div></div>
+  <div class="traits">${TRAITS.filter(([k])=>S.traits[k]>=4||S.traits[k]<=1).map(([k,l])=>`<span class="pill ${S.traits[k]<=1?'bad':''}" title="${l}: ${S.traits[k]}/5">${l} ${'●'.repeat(S.traits[k])}${'○'.repeat(5-S.traits[k])}</span>`).join('')+`<span class="pill muted" title="${TRAITS.filter(([k])=>S.traits[k]>1&&S.traits[k]<4).map(([k,l])=>l+' '+S.traits[k]+'/5').join(', ')}">+${TRAITS.filter(([k])=>S.traits[k]>1&&S.traits[k]<4).length} average</span>`}${S.badges.map(b=>`<span class="pill gold" style="background:#3a2a1a">🎯 ${b}</span>`).join('')}</div>
   ${mode?`<div style="margin-top:8px">${S.bank>0?`<div class="gold" style="margin:6px 0"><b>${S.bank} bonus point${S.bank>1?'s':''}</b> to spend! <span class="sub">(Unspent points carry over. Anything left when you declare for the draft gets auto-assigned.)</span></div>`:''}${attrRows('bank')}</div>`:''}</div>`;}
 function evList(ev){return ev.map(([g,t])=>`<div class="ev ${g>0?'good':g<0?'bad':''}">${t}</div>`).join('');}
 
@@ -1101,9 +1110,9 @@ function endHTML(){const c=career(),sc=goatScore(c),[t,d]=tierOf(sc,c),k=c.cnt,g
   const bm=benchList(c),rv=S.rival,meR=g('Champion')*3+g('MVP')*4+c.pts/5000,rvR=rv?rv.rings*3+rv.mvps*4+rv.pts/5000:0;
   return`<h1>${S.name}</h1><div class="sub">${S.retired} at age ${S.age} after ${c.seasons} season${c.seasons===1?'':'s'}.</div>
   ${plaqueHTML(c,sc,t)}<div class="sub" style="text-align:center;margin:8px 0">${d} <span class="muted">(GOAT = 350+)</span><br>📸 Screenshot the plaque and send it!</div>
-  <div class="card"><h2>Career Averages</h2><div class="grid2">
-  ${[['PPG',c.pts/gp],['RPG',c.reb/gp],['APG',c.ast/gp],['SPG',c.stl/gp],['BPG',c.blk/gp]].map(([l,v])=>`<div class="stat"><b>${f1(v)}</b>${l}</div>`).join('')}
-  <div class="stat"><b>${Math.round(c.pts).toLocaleString()}</b>Total PTS</div><div class="stat"><b>${c.gp}</b>Games</div><div class="stat"><b>${c.peak}</b>Peak OVR</div></div></div>
+  <div class="card"><h2>More Career Numbers</h2><div class="grid2">
+  ${[['SPG',c.stl/gp],['BPG',c.blk/gp]].map(([l,v])=>`<div class="stat"><b>${f1(v)}</b>${l}</div>`).join('')}
+  <div class="stat"><b>${Math.round(c.reb).toLocaleString()}</b>Total REB</div><div class="stat"><b>${Math.round(c.ast).toLocaleString()}</b>Total AST</div><div class="stat"><b>${c.gp}</b>Games</div><div class="stat"><b>${c.peak}</b>Peak OVR</div></div></div>
   <div class="card"><h2>Accolades</h2>${acc.length?acc.map(([x,l])=>`<span class="pill gold" style="font-size:.95rem">${g(x)}× ${l}</span>`).join(''):'<span class="muted">None. Tough business.</span>'}</div>
   <div class="card"><h2>The Draft Story</h2><div>${pickTxt(p)} out of ${S.school} at age ${S.age-c.seasons+1}</div>
   <div style="margin:6px 0"><span class="pill">Scout Grade: ${sg}</span><span class="pill">True Ceiling: <b class="gold">${tc}</b></span><span class="pill">Peak: ${grade(c.peak)}</span></div><div class="gold">${story}</div>${(S.log||[]).map(x=>`<div class="sub">📝 ${x}</div>`).join('')}</div>
@@ -1135,6 +1144,14 @@ function autosim(n,build,college,faMode){const save=S,rend=render,keep=['bag_ach
     avgPick:av('pick'),undraftedPct:pct(r=>r.pick>=61),avgPeakOvr:av('peak'),avgCareerPPG:av('ppg'),avgAllStar:av('as'),avgRings:av('rings'),mvpPct:pct(r=>r.mvp>0),avgSeasons:av('seasons'),majorInjuryPct:pct(r=>r.inj>0),
     lotteryBustPct:lot.length?+(lot.filter(r=>r.sc<20).length/lot.length*100).toFixed(1):null,secondRoundStarPct:late.length?+(late.filter(r=>r.as>=3).length/late.length*100).toFixed(1):null};console.log("AUTOSIM "+JSON.stringify(res));return "done";}
 // Witness test hook (inert unless run under Witness)
+// every visible text element and control, in CSS px, so phone UI checks measure the real page (not the cartoon art)
+function uiList(){const out=[],vh=innerHeight,vw=innerWidth;let n=0;
+  for(const el of app.querySelectorAll('button,input,h1,h2,b,span,small,div,td,th')){const r=el.getBoundingClientRect();if(!r.width||!r.height||r.bottom<0||r.top>vh||r.right<0||r.left>vw)continue;
+    const btn=el.tagName==='BUTTON'||el.tagName==='INPUT',own=[...el.childNodes].some(c=>c.nodeType===3&&c.textContent.trim());
+    if(!btn&&!own)continue;if(!btn&&el.closest('button'))continue;const cs=getComputedStyle(el);if(cs.visibility==='hidden'||+cs.opacity===0)continue;
+    let rr=r;if(!btn){const rg=document.createRange();let L=1e9,T=1e9,Rr=-1e9,B=-1e9;for(const c of el.childNodes)if(c.nodeType===3&&c.textContent.trim()){rg.selectNodeContents(c);for(const q of rg.getClientRects()){L=Math.min(L,q.left);T=Math.min(T,q.top);Rr=Math.max(Rr,q.right);B=Math.max(B,q.bottom);}}if(Rr>L)rr={left:L,top:T,width:Rr-L,height:B-T};}
+    out.push({id:'u'+(n++),kind:btn?'button':'text',rect:[rr.left,rr.top,rr.width,rr.height],text:(btn?(el.getAttribute('aria-label')||el.innerText):[...el.childNodes].filter(c=>c.nodeType===3).map(c=>c.textContent).join(' ')).trim().slice(0,60),font:parseFloat(cs.fontSize),tap:btn});}
+  return out;}
 if(globalThis.__witnessApi){const W=globalThis.__witnessApi;W.start({name:'Build a GOAT',fps:30,
   reset({scene}={}){['bag_hof','bag_ach','bag_daily','bag_recent','bag_gtp','bag_diff'].forEach(k=>localStorage.removeItem(k));R=Math.random;S=newPlayer();render();
     // test scenes: jump straight to a screen (witness --scene hs|offers|college|draft|nba|decision|end)
@@ -1147,7 +1164,7 @@ if(globalThis.__witnessApi){const W=globalThis.__witnessApi;W.start({name:'Build
     if(at===6){while(!S.pend&&S.stage==='nba'&&g++<30)simNBA();render();return;}
     if(at===5){if(S.pend)choose(0);render();return;}
     simEnd();render();},
-  snapshot:()=>({stage:S.stage,name:S.name,pos:S.pos,ovr:OV(),bank:S.bank,age:S.age,hype:Math.round(S.hype),pick:S.pick??null,
+  snapshot:()=>({ui:uiList(),stage:S.stage,name:S.name,pos:S.pos,ovr:OV(),bank:S.bank,age:S.age,hype:Math.round(S.hype),pick:S.pick??null,
     hs:S.hs.length,college:S.col.length,seasons:S.nba.length,decision:S.pend?S.pend.title:null,yourTurn:true,
     choices:W.dom.tappables().map(c=>({label:c.label,id:c.id})),screenText:W.dom.text(app).slice(0,1200)}),
   calls:{autosim:{args:'n build college fa',help:'sim n careers with a strategy; returns outcome stats',run:(n,b,col,f)=>autosim(+n||200,b||'smart',col||'smart',f||'random')},tap:{args:'id',help:'tap a choice',run:id=>{const c=W.dom.tappables({elements:true}).find(x=>x.id==id||x.label==id)||W.dom.tappables({elements:true}).find(x=>x.label.startsWith(id));if(c)c.el.scrollIntoView({block:"center"});return c?W.dom.tap(c.el):{error:'no such choice '+id};}}},
