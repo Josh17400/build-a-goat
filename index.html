@@ -1403,7 +1403,7 @@ function dock(inner){return inner?`<div class="dock"><div class="in">${inner}</d
 // ---------- skills ----------
 function skillRow(k,l,mode){const v=S.attrs[k],e=Math.round(es(k));let ctl;
   if(mode==='build'){const off=v>=BUILD_MAX||spent()+cost(v)>START_BUDGET;ctl=`<button class="ghost sm" aria-label="Remove a point from ${l}" onclick="adj('${k}',-1)" ${v<=MIN_A?'disabled':''}>−</button><button class="sm" aria-label="Add a point to ${l}" onclick="adj('${k}',1)" ${off?'disabled':''}>+${cost(v)>1?cost(v):''}</button><button class="ghost sm" aria-label="Add 5 points to ${l}" onclick="for(let i=0;i<5;i++)adj('${k}',1)" ${off?'disabled':''}>+5</button>`;}
-  else ctl=`<button class="sm" aria-label="Add a point to ${l}" onclick="spend('${k}')" ${S.bank<cost(v)||v>=99?'disabled':''}>+${cost(v)>1?cost(v):''}</button>`;
+  else{const off=S.bank<cost(v)||v>=99;ctl=`<button class="sm" aria-label="Add a point to ${l}" onclick="spend('${k}')" ${off?'disabled':''}>+${cost(v)>1?cost(v):''}</button><button class="ghost sm" aria-label="Add 5 points to ${l}" onclick="spend('${k}',5)" ${off?'disabled':''}>+5</button>`;}
   return`<div class="attr"><span>${l}${IMP[k]==='hi'?'<small class="imp hi">high impact</small>':IMP[k]==='lo'?'<small class="imp">low impact</small>':''}</span><div class="bar"><i style="width:${e}%"></i></div><b>${e}</b><div class="ctl">${ctl}</div></div>`;}
 function impactMap(){const o0=ovr(),d=SUBKEYS.map(k=>{const v=S.attrs[k];S.attrs[k]=v+1;const x=ovr()-o0;S.attrs[k]=v;return[k,x];}).sort((a,b)=>b[1]-a[1]),m={};
   d.forEach(([k],i)=>m[k]=i<6?'hi':i>=d.length-6?'lo':'');return m;}
@@ -1416,7 +1416,7 @@ function adj(k,d){if(d>0&&spent()+cost(S.attrs[k])<=START_BUDGET&&S.attrs[k]<BUI
 function smartSpend(){let g=0;while(S.bank>0&&g++<600){const o0=ovr();let best=null,bs=-1;
     for(const k of SUBKEYS){const v=S.attrs[k],c=cost(v);if(v>=99||c>S.bank)continue;S.attrs[k]=v+1;const d=ovr()-o0;S.attrs[k]=v;const s=d/c*(1+(75-v)/150);if(s>bs){bs=s;best=k;}}
     if(!best)break;S.bank-=cost(S.attrs[best]);S.attrs[best]++;}render();}
-function spend(k){const c=cost(S.attrs[k]);if(S.bank>=c&&S.attrs[k]<99){S.bank-=c;S.attrs[k]++;}render();}
+function spend(k,n=1){for(let i=0;i<n;i++){const c=cost(S.attrs[k]);if(S.bank>=c&&S.attrs[k]<99){S.bank-=c;S.attrs[k]++;}else break;}render();}
 function setF(k,v){S[k]=v;render();}
 function toggleTrait(k){const i=S.picked.indexOf(k);if(i>=0)S.picked.splice(i,1);else if(S.picked.length<traitLimit())S.picked.push(k);render();}
 function startCareer(){S.name=(S.name||'').trim()||'Mystery Prospect';if(S.daily){S.diff='pro';S.perks={};}const pc=perkCost();if(pc){setGtp(gtpBank()-pc);S.perksBought={...S.perks};}if(S.daily)R=mulberry(seedFrom('goat'+todayKey()));

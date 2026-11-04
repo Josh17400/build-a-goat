@@ -5,7 +5,7 @@
  {"at":0.7,"evalAs":{"x":"(goTab('skills'),UI().open='sho',render(),1)"},"shot":"r-skills.png"},
  {"at":0.8,"evalAs":{"x":"(goTab('traits'),1)"},"shot":"r-traits.png"}]},
  {"name":"hs","seed":4,"scene":"hs","steps":[{"at":1,"shot":"r-hs.png"}]},
- {"name":"bank","seed":4,"scene":"nba","steps":[{"at":0.5,"evalAs":{"x":"(S.bank=40,render(),1)"},"shot":"r-bank.png"},{"at":0.6,"evalAs":{"x":"(smartSpend(),1)"},"expectPage":["S.bank<2"]}]},
+ {"name":"bank","seed":4,"scene":"nba","steps":[{"at":0.5,"evalAs":{"x":"(S.bank=40,UI().spend=true,UI().open='sho',render(),1)"},"shot":"r-bank.png"},{"at":0.55,"evalAs":{"x":"(spend('ft',5),1)"},"expectPage":["S.bank<=35"]},{"at":0.6,"evalAs":{"x":"(smartSpend(),1)"},"expectPage":["S.bank<2"]}]},
  {"name":"offers","seed":4,"scene":"offers","steps":[{"at":1,"shot":"r-offers.png"}]},
  {"name":"college","seed":4,"scene":"college","steps":[{"at":1,"shot":"r-college.png"}]},
  {"name":"draft","seed":4,"scene":"draft","steps":[{"at":4,"shot":"r-draft.png"}]},
