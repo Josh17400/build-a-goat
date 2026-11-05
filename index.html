@@ -1914,8 +1914,8 @@ function dock(inner){return inner?`<div class="dock"><div class="in">${inner}</d
 
 // ---------- skills ----------
 function skillRow(k,l,mode){const v=S.attrs[k],e=Math.round(es(k));let ctl;
-  if(mode==='build'){const off=v>=BUILD_MAX||spent()+cost(v)>START_BUDGET;ctl=`<button class="ghost sm" aria-label="Remove a point from ${l}" onclick="adj('${k}',-1)" ${v<=MIN_A?'disabled':''}>−</button><button class="sm" aria-label="Add a point to ${l}" onclick="adj('${k}',1)" ${off?'disabled':''}>+${cost(v)>1?cost(v):''}</button><button class="ghost sm" aria-label="Add 5 points to ${l}" onclick="for(let i=0;i<5;i++)adj('${k}',1)" ${off?'disabled':''}>+5</button>`;}
-  else{const off=S.bank<cost(v)||v>=99;ctl=`<button class="sm" aria-label="Add a point to ${l}" onclick="spend('${k}')" ${off?'disabled':''}>+${cost(v)>1?cost(v):''}</button><button class="ghost sm" aria-label="Add 5 points to ${l}" onclick="spend('${k}',5)" ${off?'disabled':''}>+5</button>`;}
+  if(mode==='build'){const off=v>=BUILD_MAX||spent()+cost(v)>START_BUDGET;ctl=`<button class="ghost sm" aria-label="Remove a point from ${l}" onclick="adj('${k}',-1)" ${v<=MIN_A?'disabled':''}>−</button><button class="sm" aria-label="Add a point to ${l}" onclick="adj('${k}',1)" ${off?'disabled':''}>+${cost(v)>1?cost(v):''}</button><button class="ghost sm" aria-label="Add 10 points to ${l}" onclick="adjN('${k}',10)" ${off?'disabled':''}>+10</button><button class="ghost sm" aria-label="Max out ${l}" onclick="adjN('${k}',99)" ${off?'disabled':''}>Max</button>`;}
+  else{const off=S.bank<cost(v)||v>=99;ctl=`<button class="sm" aria-label="Add a point to ${l}" onclick="spend('${k}')" ${off?'disabled':''}>+${cost(v)>1?cost(v):''}</button><button class="ghost sm" aria-label="Add 10 points to ${l}" onclick="spend('${k}',10)" ${off?'disabled':''}>+10</button><button class="ghost sm" aria-label="Max out ${l}" onclick="spend('${k}',99)" ${off?'disabled':''}>Max</button>`;}
   return`<div class="attr"><span>${l}${IMP[k]==='hi'?'<small class="imp hi">high impact</small>':IMP[k]==='lo'?'<small class="imp">low impact</small>':''}</span><div class="bar"><i style="width:${e}%"></i></div><b>${e}</b><div class="ctl">${ctl}</div></div>`;}
 function impactMap(){const o0=ovr(),d=SUBKEYS.map(k=>{const v=S.attrs[k];S.attrs[k]=v+1;const x=ovr()-o0;S.attrs[k]=v;return[k,x];}).sort((a,b)=>b[1]-a[1]),m={};
   d.forEach(([k],i)=>m[k]=i<6?'hi':i>=d.length-6?'lo':'');return m;}
@@ -1923,6 +1923,7 @@ let IMP={};
 function skillAcc(mode){const u=UI();IMP=impactMap();return ATTRS.map(([c,cl])=>{const open=u.open===c,v=Math.round(eff(c));
   return`<div class="acc ${open?'open':''}"><button class="acch" aria-label="${cl} skills" aria-expanded="${open}" onclick="UI().open=UI().open==='${c}'?null:'${c}';render()"><span>${cl}</span><div class="bar"><i style="width:${v}%"></i></div><span class="v">${v}</span><span class="chev">▶</span></button>${open?`<div class="accb">${SUBS[c].map(([k,l])=>skillRow(k,l,mode)).join('')}</div>`:''}</div>`;}).join('');}
 function attrRows(mode){return skillAcc(mode);}
+function adjN(k,n){const r=render;render=()=>{};try{for(let i=0;i<n;i++)adj(k,1);}finally{render=r;}render();}
 function adj(k,d){if(d>0&&spent()+cost(S.attrs[k])<=START_BUDGET&&S.attrs[k]<BUILD_MAX)S.attrs[k]++;if(d<0&&S.attrs[k]>MIN_A)S.attrs[k]--;render();}
 // auto-assign: each point goes where it raises OVR the most per point spent, leaning toward weak spots
 function buildFill(){let g=0;while(g++<900){const left=START_BUDGET-spent(),o0=ovr();let best=null,bs=-1;
@@ -2026,7 +2027,7 @@ function buildHTML(){const u=UI(),left=START_BUDGET-spent(),ti=Math.max(0,TABS.f
   if(tab==='skills'&&!u.skillsPicked)h+=`${hd('Skills')}<div class="sub">Start from a premade build, or put every point in yourself.</div><div class="card"><div class="sh">⚡ <span class="grow">Quick start</span></div><div class="chips">${ARCH.map((a,i)=>[a,i]).sort((x,y)=>(y[0][1]===S.pos)-(x[0][1]===S.pos)).map(([a,i])=>`<button class="chip ${S.arch===a[0]?'on':''}" onclick="UI().skillsPicked=1;applyArch(${i})">${a[0]}<small>${a[1]===S.pos?'Made for your position':'Classic '+a[1]+' skill set'}</small></button>`).join('')}<button class="chip" onclick="UI().skillsPicked=1;randomBuild()">🎲 Randomize<small>Random skills and traits</small></button></div><div class="note">Premade builds only fill in your skills. Your position, height and frame stay as you picked them. You can still change everything after.</div>
     <button class="ghost wide" style="margin-top:10px" onclick="UI().skillsPicked=1;render()">✍️ Build my own</button></div>`;
   else if(tab==='skills')h+=`${hd('Skills')}<div class="row" style="margin-bottom:6px"><span class="grow sub" style="margin:0">${S.arch?`Using the <b>${S.arch}</b> build. Tweak anything below.`:'Your own build.'}</span><button class="ghost sm" onclick="UI().skillsPicked=0;render()">⚡ Premade builds</button></div><div class="sub">Tap a group to open it. Skills cost 1 point each up to 70, then 2, then 3 above 85 (the + button shows the price). Max 90 here; grow higher during the career. Numbers shown include your height bonus. OVR weighs every skill for your position.</div>${skillAcc('build')}`;
-  if(tab==='traits')h+=`${hd('Traits')}<div class="sub">Lock in ${traitLimit()}. The other ${TRAITS.length-traitLimit()} are rolled at random.</div><div class="card"><div class="chips">${TRAITS.map(([k,l,d])=>`<button class="chip ${S.picked.includes(k)?'on':''}" onclick="toggleTrait('${k}')">${l}<small>${d}</small></button>`).join('')}</div></div>`;
+  if(tab==='traits')h+=`${hd('Traits')}<div class="sub">Every player has all ${TRAITS.length} traits, each rated from 1 (weak) to 5 (elite). Lock in ${traitLimit()} you care about most: they start at ${S.perks&&S.perks.maxed?'5':'4 or 5'}. The other ${TRAITS.length-traitLimit()} get a random 1 to 5 rating when your career starts, so you find out what you got in high school.</div><div class="note" style="text-align:center">Locked: <b>${S.picked.length}/${traitLimit()}</b></div><div class="card"><div class="chips">${TRAITS.map(([k,l,d])=>`<button class="chip ${S.picked.includes(k)?'on':''}" onclick="toggleTrait('${k}')">${l}<small>${d}</small></button>`).join('')}</div></div>`;
   const ready=S.picked.length>=traitLimit(),nxt=TABS[ti+1];
   return h+dock(`<div class="meta"><span><b>${left}</b> pts left${left>0&&ready?' <small class="muted">(saved as bonus pts)</small>':''}</span><span>OVR <b>${OV()}</b></span><span>Traits <b>${S.picked.length}/${traitLimit()}</b></span></div>
     <div class="two">${nxt?`<button class="ghost" onclick="goTab('${nxt[0]}')">Next: ${nxt[1]} ▶</button>`:`<button class="ghost" onclick="goTab('skills')">◀ Back: Skills</button>`}<button onclick="${ready?(hasRun()?'UI().replaceOk=1;render()':'startCareer()'):"goTab('traits')"}" class="${ready?'':'ghost'}">${ready?'Start High School':`Pick ${traitLimit()-S.picked.length} trait${traitLimit()-S.picked.length===1?'':'s'}`}</button></div>
@@ -2141,7 +2142,7 @@ const SND=(()=>{let ctx=null,master=null,last={};const pref=k=>{try{return local
   function set(k,v){P[k]=v;try{localStorage.setItem('bag_'+k,v?'1':'0');}catch{}if(k==='music'){if(v){M.none=false;M.start();}else M.stop();}if(k==='sfx'&&v){unlock();play('good');}render();}
   return{play,set,P,M};})();
 // ---------- season story: after you play a season, its pieces arrive one card at a time, then the full screen ----------
-const SEQ_L={clutch:'The Final Play',goals:'Season Goals',history:'History',season:'Season Results',summer:'Summer Decision',decision:'Big Decision',class:'Class Rankings',league:'Around the League',spend:'Spend Your Points'};
+const SEQ_L={draft:'Draft Projection',clutch:'The Final Play',goals:'Season Goals',history:'History',season:'Season Results',summer:'Summer Decision',decision:'Big Decision',class:'Class Rankings',league:'Around the League',spend:'Spend Your Points'};
 function seqPiece(k){const st=S.stage==='offers'?'hs':S.stage;
   if(k==='season'){let v;if(st==='nba'){const n=S.nba[S.nba.length-1];v=[n.ppg,n.rpg,n.apg];}else{const a=st==='hs'?S.hs:S.col,m=(a[a.length-1].line.match(/[\d.]+(?= [PRA]PG)/g)||[]).map(Number);v=m.slice(0,3);}
     const tiles=st!=='nba'&&v.length===3?`<div class="stat3 seqstats">${['PPG','RPG','APG'].map((l,j)=>`<div class="stat"><b class="cu" data-v="${v[j]}">${f1(v[j])}</b>${l}</div>`).join('')}</div>`:'';
@@ -2152,11 +2153,14 @@ function seqPiece(k){const st=S.stage==='offers'?'hs':S.stage;
   if(k==='history')return ls&&ls.hist&&ls.hist.length?`<div class="card">${ls.hist.map(x=>`<div class="ev gold">${x}</div>`).join('')}</div>`:'';
   if(k==='summer')return S.summerPend?summerCard():resultCard();
   if(k==='decision')return S.pend?decisionCard():resultCard();
+  if(k==='draft'){const a=S.col,c=a[a.length-1],pv=a[a.length-2];if(st!=='college'||!c||!c.proj)return'';const[x,y]=c.proj,mid=(x+y)/2,m0=pv&&pv.proj?(pv.proj[0]+pv.proj[1])/2:null,dv=m0==null?0:Math.round(m0-mid);
+    return`<div class="card"><div class="sh">📋 <span class="grow">Draft projection</span><b>Age ${draftAge()} on draft night</b></div><div style="font-size:1.25rem;font-weight:800">${pickTxt(x)} – ${pickTxt(y)}</div>
+    <div class="sub">${m0==null?'Where scouts have you after your first season':dv>0?`<span class="good">Up about ${dv} spot${dv>1?'s':''}</span> since last season`:dv<0?`<span class="bad">Down about ${-dv} spot${dv<-1?'s':''}</span> since last season`:'About the same as last season'}${x>30?'. Outside the first round right now':''}</div></div>`;}
   if(k==='class')return classCard(true);
   if(k==='league')return leagueCard(true);
   if(k==='spend')return playerCard(true);return'';}
 function startSeq(){const st=S.stage;if(!['hs','offers','college','nba'].includes(st)||(S.pend&&S.pend.kind==='clutch'))return;const l=st==='nba'?S.nba[S.nba.length-1]:null,k=[];
-  if(l&&l.clutch&&l.clutch.length)k.push('clutch');k.push('season');if(l&&l.goals&&l.goals.length)k.push('goals');if(l&&l.hist&&l.hist.length)k.push('history');
+  if(l&&l.clutch&&l.clutch.length)k.push('clutch');k.push('season');if(st==='college')k.push('draft');if(l&&l.goals&&l.goals.length)k.push('goals');if(l&&l.hist&&l.hist.length)k.push('history');
   if(S.summerPend)k.push('summer');if(st==='nba'&&S.pend)k.push('decision');k.push(st==='nba'?'league':'class');if(S.bank>0)k.push('spend');
   UI().seq={st,i:0,k:k.filter(x=>seqPiece(x))};}
 function playSeason(fn){fn();startSeq();render();scrollTo(0,0);}
