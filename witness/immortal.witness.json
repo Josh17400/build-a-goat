@@ -1,0 +1,22 @@
+[
+ {
+  "name": "immortal GOATs: a past GOAT sits on the all-time list and blocks the title until you pass him",
+  "seed": 7,
+  "steps": [
+   {
+    "at": 0.3,
+    "evalAs": {
+     "x": "(localStorage.setItem('bag_goats',JSON.stringify({pro:[{name:'Old Legend',pos:'SF',score:900,pts:40000,reb:9000,ast:7000,rings:9,mvps:7,as:18}]})),S.diff='pro',applyArch(1),toggleTrait('work'),toggleTrait('dur'),startCareer(),(()=>{for(let i=0;i<4;i++)simHS();chooseSchool(0);simCol();declare();S.stage='nba';simNBA();if(S.pend&&S.pend.kind==='clutch'){while(S.pend&&S.pend.kind==='clutch')choose(S.pend.best);}})(),render(),1)",
+     "top": "allTime('score')[0].name",
+     "mine": "allTime('score')[0].mine",
+     "tier": "tierOf(400,{gp:1000,min:30000,cnt:{'All-Star':10,'Champion':3}})[0]"
+    },
+    "expect": [
+     "top=='Old Legend'",
+     "mine==1",
+     "tier=='Top 10 All-Time'"
+    ]
+   }
+  ]
+ }
+]
