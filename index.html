@@ -842,7 +842,8 @@ function goatScore(c){const k=c.cnt,g=x=>k[x]||0;
   return Math.round(g('Champion')*12+g('MVP')*18+g('Finals MVP')*8+g('All-NBA 1st')*7+g('All-NBA 2nd')*4+g('All-NBA 3rd')*2+g('All-Star')*3+g('DPOY')*5+g('ROY')*2+g('Scoring Title')*3+g('6MOY')+g('MIP')+g('Comeback Player')+c.pts/1000*2+Math.max(0,c.peak-80)*2+(S.gw||0)*2+(S.fgw||0)*3+(S.lastDance?8:0));}
 function tierOf(sc,c){const avgMin=c.gp?c.min/c.gp:0,AS=c.cnt['All-Star']||0,RG=c.cnt['Champion']||0;
   if(AS===0){if(RG>=3)return['Champion Role Player',`${RG} rings as a key piece. Never the star, always on the parade float.`];sc=Math.min(sc,40);}
-  if(sc>=350)return['🐐 THE GOAT','The greatest to ever do it. Nobody is arguing.'];
+  if(sc>=350){const top=S.L&&S.L.leg?allTime('score')[0]:null;if(!top||top.me)return['🐐 THE GOAT','The greatest to ever do it. Nobody is arguing.'];
+    return['Top 10 All-Time',`A GOAT-level résumé, but ${top.name} still ranks ahead of you in the GOAT debate.`];}
   if(sc>=200)return['Top 10 All-Time','Mount Rushmore conversations. Barbershop debates forever.'];
   if(sc>=120&&AS>=6)return['Hall of Famer','First ballot. Jersey in the rafters.'];
   if(sc>=60&&AS>=4)return['Perennial All-Star','A star for a decade. Hall of Fame on the bubble.'];
@@ -1986,7 +1987,7 @@ function legacyCard(){const c=career(),sc=goatScore(c),[t]=tierOf(sc,c),g=x=>c.c
   const std=goatStd(),past=!nx,goal=past&&std&&std.score>sc?std.score:GOAT_LINE;
   return`<div class="card"><div class="sh">📈 <span class="grow">Legacy</span><b class="gold">${label}</b></div>
   <div class="row" style="align-items:baseline;gap:6px"><span class="big">${sc}</span><span class="muted">/ ${goal} ${past&&std&&std.score>sc?'GOAT standard':'GOAT score'}</span></div><div class="meter"><i style="width:${Math.min(100,sc/goal*100)}%"></i></div>
-  <div class="sub">${nx?`Next tier: <b>${nx[1]}</b> at ${nx[0]} score${std?` · GOAT standard: <b>${std.score}</b>`:''}`:std&&std.score>sc?`GOAT territory. Now chase the GOAT standard: <b>${std.score}</b> by ${esc(std.name)}`:std?`<b class="gold">You hold the GOAT standard.</b> Every point from here raises the record`:'GOAT territory. Finish strong and your score becomes the GOAT standard'}${last&&S.age<34?` · on pace for ~${(Math.round(pace/1000)*1000).toLocaleString()} pts`:''}</div>
+  <div class="sub">${nx?`Next tier: <b>${nx[1]}</b> at ${nx[0]} score${std?` · GOAT standard: <b>${std.score}</b>`:''}`:std&&std.score>sc?`${goatRank()>1?`GOAT score reached, but you are ${ord(goatRank())} in the GOAT debate. Pass ${esc(allTime('score')[0].name)} to be THE GOAT. `:''}GOAT territory. Now chase the GOAT standard: <b>${std.score}</b> by ${esc(std.name)}`:std?`<b class="gold">You hold the GOAT standard.</b> Every point from here raises the record`:goatRank()>1?`GOAT score reached, but you are ${ord(goatRank())} in the GOAT debate. Pass ${esc(allTime('score')[0].name)} to be THE GOAT`:'GOAT territory. Finish strong and your score becomes the GOAT standard'}${last&&S.age<34?` · on pace for ~${(Math.round(pace/1000)*1000).toLocaleString()} pts`:''}</div>
   <div class="stat4" style="margin-top:10px"><div class="stat"><b>${Math.round(c.pts).toLocaleString()}</b>PTS</div><div class="stat"><b>${g('Champion')}</b>RINGS</div><div class="stat"><b>${g('All-Star')}</b>ALL-STAR</div><div class="stat"><b>${Math.round(S.gtpRun||0)}</b>GTP</div></div>
   <details><summary>Legend benchmarks · ${benchList(c).filter(x=>x[1]).length}/${benchList(c).length}</summary>${benchList(c).map(([l,ok])=>`<div class="ev ${ok?'good':'muted'}">${ok?'✅':'⬜'} ${l}</div>`).join('')}</details></div>`;}
 function seasonCard(s,lite){const aw=s.aw.filter(x=>x!=='MVP'),role=s.mins>=28?['good','Starter']:s.mins>=18?['muted','Bench rotation']:['muted','Deep bench'];
