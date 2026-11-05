@@ -23,14 +23,14 @@
 ]
 },
 {
-"at": 0.45,
+"at": 0.6,
 "expectPage": [
 "S.stage==='build'",
 "!!document.querySelector('.tabs')"
 ]
 },
 {
-"at": 0.5,
+"at": 0.7,
 "evalAs": {
 "x": "(setDiff('pro'),applyArch(1),toggleTrait('work'),toggleTrait('dur'),startCareer(),(()=>{for(let i=0;i<4;i++)simHS();chooseSchool(0);simCol();declare();S.stage='nba';while(S.stage==='nba'){simEnd();if(S.pend)choose(S.pend.kind==='clutch'?S.pend.best:0);}})(),1)"
 },
