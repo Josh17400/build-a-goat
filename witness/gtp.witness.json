@@ -17,7 +17,7 @@
     "expectPage": [
      "gtpBank()===100",
      "perkCost()===60",
-     "START_BUDGET===325",
+     "START_BUDGET===diff().budget+25",
      "traitLimit()===3"
     ]
    },
