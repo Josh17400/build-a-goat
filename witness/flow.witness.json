@@ -1,6 +1,6 @@
 [
  {
-  "name": "full career: build \u2192 HS \u2192 college \u2192 draft \u2192 NBA",
+  "name": "full career: build → HS → college → draft → NBA",
   "seed": 3,
   "steps": [
    {
@@ -90,7 +90,7 @@
    {
     "at": 1.35,
     "evalAs": {
-     "x": "(chooseSummer(3),render(),1)"
+     "x": "(chooseSummer(3),seqSkip(),1)"
     }
    },
    {
@@ -103,7 +103,7 @@
    {
     "at": 1.45,
     "evalAs": {
-     "x": "(chooseSummer(3),render(),1)"
+     "x": "(chooseSummer(3),seqSkip(),1)"
     }
    },
    {
@@ -116,7 +116,7 @@
    {
     "at": 1.55,
     "evalAs": {
-     "x": "(chooseSummer(3),render(),1)"
+     "x": "(chooseSummer(3),seqSkip(),1)"
     }
    },
    {
@@ -138,6 +138,12 @@
      "tap",
      "Play Freshman"
     ]
+   },
+   {
+    "at": 1.85,
+    "evalAs": {
+     "x": "(seqSkip(),1)"
+    }
    },
    {
     "at": 1.9,
