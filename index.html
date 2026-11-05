@@ -1558,7 +1558,7 @@ function openMenu(k){document.activeElement?.blur?.();const u=UI();if(k==='open'
 const hdr=t=>`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>${t}</h1>${menuBtn()}</div>`;
 function menuBtn(){return`<button class="ham ${UI().wig?'':'wig'}" aria-label="Menu" onclick="openMenu('open')"><i></i><i></i><i></i></button>`;}
 let drawerAnim=false;
-function closeMenu(){const d=document.querySelector('.drawer');if(!d||d.classList.contains('out')){UI().menu=null;return render();}d.classList.remove('in');d.classList.add('out');setTimeout(()=>{if(UI().menu==='open'){UI().menu=null;render();}},230);}
+function closeMenu(){const d=document.querySelector('.drawer');if(!d||d.classList.contains('out')){UI().menu=null;return render();}d.classList.remove('in');d.classList.add('out');d.style.pointerEvents='none';setTimeout(()=>{if(UI().menu==='open'){UI().menu=null;render();}},230);}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&typeof S!=='undefined'&&S.ui&&S.ui.menu==='open')closeMenu();});
 const BALL='<svg class="ball" viewBox="0 0 40 40" aria-hidden="true"><defs><radialGradient id="bg1" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffb05a"/><stop offset="1" stop-color="#d9580a"/></radialGradient></defs><circle cx="20" cy="20" r="18" fill="url(#bg1)"/><g fill="none" stroke="#3a1a05" stroke-width="1.6"><path d="M2 20h36M20 2v36"/><path d="M7 7c6 5 6 21 0 26M33 7c-6 5-6 21 0 26"/></g></svg>';
 function drawerHTML(){const hofN=(()=>{try{return JSON.parse(localStorage.getItem('bag_hof')||'[]').length;}catch{return 0;}})(),achN=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('bag_ach')||'{}')).length;}catch{return 0;}})(),cls=drawerAnim?'in':'';drawerAnim=false;
