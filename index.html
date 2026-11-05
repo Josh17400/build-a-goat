@@ -232,6 +232,12 @@ button.ghost,button.sm{font-family:var(--fc)}
 button .ic{vertical-align:-.18em}
 .iconbtn,.ham,.drawer .x{display:grid;place-items:center}
 .dock .meta{display:grid;grid-template-columns:1fr auto 1fr}.dock .meta>:nth-child(2){text-align:center}.dock .meta>:last-child{text-align:right}
+/* class list */
+.mvu::before,.mvd::before{content:'';display:inline-block;margin-right:3px;border-left:4px solid transparent;border-right:4px solid transparent;vertical-align:.1em}.mvu::before{border-bottom:6px solid currentColor}.mvd::before{border-top:6px solid currentColor}
+.clslist{max-height:380px;overflow-y:auto;margin-top:8px;border-radius:10px}
+.clslist th{position:sticky;top:0;background:#1a1613;z-index:1}
+.clslist td:nth-child(4){color:var(--gold);letter-spacing:-1px}.clslist td:last-child{font-weight:700}
+.seg.sm button{padding:7px 4px;font-size:.85rem;min-height:36px}
 /* season story */
 .seqstats{margin-bottom:10px}.seqstats .stat{animation:pop .5s cubic-bezier(.2,1.6,.4,1) both;background-image:var(--grain),radial-gradient(circle at 50% 0,rgba(255,138,31,.18),transparent 70%)}
 .seqstats .stat:nth-child(1){animation-delay:.2s}.seqstats .stat:nth-child(2){animation-delay:.34s}.seqstats .stat:nth-child(3){animation-delay:.48s}
@@ -581,7 +587,7 @@ function lgStack(team,k){if(!S.L)return;const c=active(S.L).filter(p=>p.team!==t
 // your high school class: 100 prospects who grow up with you and become your draft class
 function makeClass(){const c=[];for(let i=0;i<100;i++){const dov=clamp(76-i*.33+gauss()*3,45,82);c.push({name:pick(R()<.5?FIRST:FIRST2)+' '+pick(R()<.5?LAST:LAST2),pos:pick(LPOS),dov,g:rnd(1.8,3.2),hp:clamp(30-i*.25+gauss()*8,0,45),sch:null});}return c;}
 function classRank(){if(!S.cls)return null;const a=S.age,me=ovr()+S.hype*.35,sc=S.cls.map(p=>({p,s:p.dov-(19-a)*p.g+p.hp*.35*(a-13)/5})).sort((x,y)=>y.s-x.s);
-  const rank=1+sc.filter(x=>x.s>me).length;return{rank,top:sc.slice(0,3).map(x=>x.p)};}
+  const rank=1+sc.filter(x=>x.s>me).length;return{rank,top:sc.slice(0,3).map(x=>x.p),all:sc.map(x=>x.p)};}
 
 function addNext(o){S.next=S.next||{};for(const k in o)S.next[k]=(S.next[k]||0)+o[k];}
 const bsm=()=>S.badges.includes('Big Shot Maker');
@@ -1346,8 +1352,19 @@ function menuHTML(){const k=UI().menu,m=MENU.find(x=>x[0]===k),hofN=(()=>{try{re
   return top+b+dock(`<button onclick="openMenu(null)">Back to your build</button>`);}
 // ---------- league screens ----------
 const tShort=t=>t.split(' ').slice(-1)[0];
-function classCard(){const c=classRank();if(!c)return'';
-  return`<div class="card"><div class="sh">🎓 <span class="grow">National class rankings</span><b class="gold">${c.rank<=100?'#'+c.rank:'Unranked'}</b></div><div class="sub">Top of your class: ${c.top.map((p,i)=>`<b>${i+1}. ${p.name}</b> ${p.pos}`).join(' · ')}. They grow up with you, and they will be in your draft class.</div></div>`;}
+function classCard(open){const c=classRank();if(!c)return'';
+  // rank movement since last season: snapshot the order once per season played
+  const key=S.hs.length+S.col.length;if(S.clsKey!==key){S.clsPrevSnap=S.clsSnap||null;S.clsSnap=Object.fromEntries(c.all.map((p,i)=>[S.cls.indexOf(p),i+1]));S.clsSnap.me=c.rank;S.clsKey=key;}
+  const prev=S.clsPrevSnap,mv=(id,r)=>{if(!prev||prev[id]==null)return'';const d=prev[id]-r;return d>0?`<span class="good mvu">${d}</span>`:d<0?`<span class="bad mvd">${-d}</span>`:'<span class="muted">–</span>';};
+  const st=r=>r<=10?5:r<=35?4:r<=75?3:2,fp=UI().clsPos||'All',rows=[];let r=0,meDone=false;
+  const meRow=()=>`<tr class="mine"><td>${c.rank}</td><td><b>${esc(S.name||'You')}</b> <span class="gold">(you)</span></td><td>${S.pos}</td><td class="stars">${'★'.repeat(st(c.rank))}</td><td>${mv('me',c.rank)}</td></tr>`;
+  for(const p of c.all){r++;if(!meDone&&r>=c.rank){if(fp==='All'||fp===S.pos)rows.push(meRow());meDone=true;}const rr=r>=c.rank?r+1:r;if(fp!=='All'&&p.pos!==fp)continue;
+    rows.push(`<tr><td>${rr}</td><td>${p.name}</td><td>${p.pos}</td><td class="stars">${'★'.repeat(st(rr))}</td><td>${mv(S.cls.indexOf(p),rr)}</td></tr>`);}
+  if(!meDone&&(fp==='All'||fp===S.pos))rows.push(meRow());
+  return`<div class="card"><div class="sh">🎓 <span class="grow">National class rankings</span><b class="gold">${c.rank<=100?'#'+c.rank:'Unranked'}${prev&&prev.me?' '+mv('me',c.rank):''}</b></div><div class="sub">Top of your class: ${c.top.map((p,i)=>`<b>${i+1}. ${p.name}</b> ${p.pos}`).join(' · ')}. They grow up with you, and they will be in your draft class.</div>
+  <details ${open||UI().clsOpen?'open':''} ontoggle="UI().clsOpen=this.open"><summary>Full rankings · ${c.all.length+1} prospects</summary>
+  <div class="seg sm" style="margin-top:8px">${['All','PG','SG','SF','PF','C'].map(x=>`<button class="${fp===x?'on':''}" onclick="UI().clsPos='${x}';UI().clsOpen=true;render()">${x}</button>`).join('')}</div>
+  <div class="scroll clslist"><table><tr><th>#</th><th>PLAYER</th><th>POS</th><th>STARS</th><th>MOVE</th></tr>${rows.join('')}</table></div></details></div>`;}
 function leagueCard(){const L=S.L;if(!L||!S.nba.length)return'';const last=S.nba[S.nba.length-1],W=L.lastWins,me={name:S.name+' (you)',team:S.team,ppg:last.ppg,rpg:last.rpg,apg:last.apg,ovr:OV(),me:1,gp:last.gp};
   const pl=active(L).filter(p=>p.gp>0).map(p=>({name:p.name,team:p.team,ppg:p.ppg,rpg:p.rpg,apg:p.apg,ovr:Math.round(p.ovr),mvps:p.mvps,rings:p.rings,gp:p.gp,rv:p===S.rival}));pl.push(me);
   const row=(x,i,cols)=>`<tr class="${x.me?'mine':x.rv?'rvrow':''}"><td>${i+1}</td><td>${esc(x.name)}${x.rv?' ⚔️':''}</td><td>${tShort(x.team)}</td>${cols(x)}</tr>`;
@@ -1884,7 +1901,7 @@ function seqPiece(k){const st=S.stage;
     return tiles+(st==='nba'?seasonCard(S.nba[S.nba.length-1]):seasonList(st==='hs'?S.hs:S.col,true));}
   if(k==='summer')return S.summerPend?summerCard():resultCard();
   if(k==='decision')return S.pend?decisionCard():resultCard();
-  if(k==='class')return classCard();
+  if(k==='class')return classCard(true);
   if(k==='league')return leagueCard();
   if(k==='spend')return playerCard(true);return'';}
 function startSeq(){const st=S.stage;if(!['hs','college','nba'].includes(st))return;const k=['season'];if(S.summerPend)k.push('summer');if(st==='nba'&&S.pend)k.push('decision');k.push(st==='nba'?'league':'class');if(S.bank>0)k.push('spend');
