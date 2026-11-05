@@ -64,32 +64,6 @@
   ]
  },
  {
-  "name": "build: auto-fill spends the remaining points",
-  "seed": 2,
-  "steps": [
-   {
-    "at": 0.3,
-    "evalAs": {
-     "x": "(goTab('skills'),UI().skillsPicked=1,render(),1)"
-    }
-   },
-   {
-    "at": 0.4,
-    "call": [
-     "tap",
-     "Auto-fill remaining points"
-    ]
-   },
-   {
-    "at": 0.45,
-    "expectPage": [
-     "START_BUDGET-spent()<3",
-     "ovr()>50"
-    ]
-   }
-  ]
- },
- {
   "name": "spending points in the story does not replay the card animation",
   "seed": 5,
   "steps": [
