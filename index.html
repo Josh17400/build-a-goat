@@ -140,6 +140,7 @@ th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
 .ach{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
 .ach div{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:8px 10px;opacity:.5;font-size:.85rem}
 .ach div.got{opacity:1;border-color:rgba(201,162,74,.35)}.ach div.new{border-color:var(--gold);box-shadow:0 0 12px rgba(255,200,74,.35)}
+.ach .gotlbl{display:block;font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-top:2px}
 .ach small{display:block;color:var(--tx3);font-size:.72rem;margin-top:2px}
 .looks{display:grid;grid-template-columns:1fr;gap:6px;margin-top:4px}
 .looks div{display:grid;grid-template-columns:96px 44px minmax(0,1fr) 44px;align-items:center;gap:6px;font-size:.88rem}
@@ -238,6 +239,7 @@ button .ic{vertical-align:-.18em}
 .clslist th{position:sticky;top:0;background:#1a1613;z-index:1}
 .clslist td:nth-child(4){color:var(--gold);letter-spacing:-1px}.clslist td:last-child{font-weight:700}
 .seg.sm button{padding:7px 4px;font-size:.85rem;min-height:36px}
+#app.still .seqh,#app.still .seqcard,#app.still .result,#app.still .flash,#app.still .seqstats .stat,#app.still .ovr{animation:none!important}
 /* season story */
 .seqstats{margin-bottom:10px}.seqstats .stat{animation:pop .5s cubic-bezier(.2,1.6,.4,1) both;background-image:var(--grain),radial-gradient(circle at 50% 0,rgba(255,138,31,.18),transparent 70%)}
 .seqstats .stat:nth-child(1){animation-delay:.2s}.seqstats .stat:nth-child(2){animation-delay:.34s}.seqstats .stat:nth-child(3){animation-delay:.48s}
@@ -376,7 +378,7 @@ function stars(){const s=ovr()+S.hype*0.35;return s>=72?5:s>=65?4:s>=58?3:2;}
 
 // ---------- events ----------
 function hsEvents(){const t=S.traits;return[
-  {w:/mixtape/i.test((S.summerNote||[])[1]||'')?0:8+t.star*2,f:()=>{S.hype+=8;addBank(2);return[1,'📹 Your mixtape goes viral — 4 million views overnight. +12 pts']}},
+  {w:/mixtape/i.test((S.summerNote||[])[1]||'')?0:8+t.star*2,f:()=>{S.hype+=8;addBank(2);return[1,'📹 Your highlight reel goes viral, 4 million views overnight. +12 pts']}},
   {tag:'perf',w:9,f:()=>{S.hype+=5;addBank(3);return[1,'📈 Breakout season — coaches across the state take notice. +18 pts']}},
   {w:4+t.work*2,f:()=>{addBank(2);S.ceiling+=1;return[1,'💪 You live in the gym all summer. +12 pts, ceiling up']}},
   {w:6,f:()=>{S.hype+=7;addBank(1);return[1,'⭐ You torch an elite national camp. +6 pts, big hype']}},
@@ -634,7 +636,7 @@ function simNBA(){const n=S.nba.length,prev=n?S.nba[n-1]:null;if(n)S.age++;
   // awards: voted against every real player in the league
   const C=active(L).filter(p=>p.gp>0).map(p=>({p,name:p.name,team:p.team,ovr:p.ovr,gp:p.gp,ppg:p.ppg,wins:p.wins,star:p.star,d:p.d,rook:p.yrs===0}));
   const ME={me:1,name:S.name,team:S.team,ovr:o,gp,ppg,wins,star:(t.star-3)*1.5,d:eff('def')+(t.lock-3)*2,rook:n===0};C.push(ME);
-  for(const c of C){c.mv=c.ovr+(c.wins-41)*.1+(c.ppg-22)*.12+gauss()*1.2;c.as=c.ovr+c.star+Math.max(0,c.ppg-22)*.35+gauss()*2;c.dp=c.d+gauss()*1.5;c.ry=c.ppg+gauss()*1.5;}
+  for(const c of C){c.mv=c.ovr+(c.wins-41)*.12+(c.ppg-22)*.28+gauss()*1.2;c.as=c.ovr+c.star+Math.max(0,c.ppg-22)*.35+gauss()*2;c.dp=c.d+gauss()*1.5;c.ry=c.ppg+gauss()*1.5;}
   const top=(k,f,g)=>C.filter(g).sort((x,y)=>y[k]-x[k]).slice(0,f),aw=[],W={},give=(c,x)=>{if(c.me)aw.push(x);else c.p.aw[x]=(c.p.aw[x]||0)+1;(W[x]=W[x]||[]).push(c);};
   const an=top('mv',15,c=>c.gp>=65);an.forEach((c,i)=>give(c,i<5?'All-NBA 1st':i<10?'All-NBA 2nd':'All-NBA 3rd'));
   const mvp=an[0];if(mvp){give(mvp,'MVP');if(!mvp.me)mvp.p.mvps++;}
@@ -1335,11 +1337,11 @@ function closeMenu(){const d=document.querySelector('.drawer');if(!d||d.classLis
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&typeof S!=='undefined'&&S.ui&&S.ui.menu==='open')closeMenu();});
 const BALL='<svg class="ball" viewBox="0 0 40 40" aria-hidden="true"><defs><radialGradient id="bg1" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffb05a"/><stop offset="1" stop-color="#d9580a"/></radialGradient></defs><circle cx="20" cy="20" r="18" fill="url(#bg1)"/><g fill="none" stroke="#3a1a05" stroke-width="1.6"><path d="M2 20h36M20 2v36"/><path d="M7 7c6 5 6 21 0 26M33 7c-6 5-6 21 0 26"/></g></svg>';
 function drawerHTML(){const hofN=(()=>{try{return JSON.parse(localStorage.getItem('bag_hof')||'[]').length;}catch{return 0;}})(),achN=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('bag_ach')||'{}')).length;}catch{return 0;}})(),cls=drawerAnim?'in':'';drawerAnim=false;
-  const sub={settings:diff().name.replace(/^\S+\s/,'')+' · difficulty and reset',gtp:gtpBank()+' GTP · perks for your next player',hof:hofN+' careers · your best builds',ach:achN+'/'+ACH.length+' unlocked'};
+  const sub={settings:diff().name.replace(/^\S+\s/,'')+' · difficulty and reset',gtp:(gtpBank()-perkCost())+' GTP available · perks for this player',hof:hofN+' careers · your best builds',ach:achN+'/'+ACH.length+' unlocked'};
   const ic={settings:icon('sliders'),gtp:'💎',hof:'🏛️',ach:'🏅'};
   return`<div class="drawer ${cls}" role="dialog" aria-label="Menu"><div class="bd" onclick="closeMenu()"></div><div class="pn">
   <div class="row" style="flex-wrap:nowrap"><div class="logo">${BALL}<div>BUILD A <span>GOAT</span></div></div><button class="x" aria-label="Close menu" onclick="closeMenu()"><i></i><i></i></button></div>
-  <div class="gtpchip">💎 ${gtpBank()} GTP</div>
+  <div class="gtpchip">💎 ${gtpBank()-perkCost()} GTP${perkCost()?` · ${perkCost()} in cart`:''}</div>
   ${MENU.map(([k,,l])=>`<button class="mi" onclick="openMenu('${k}')"><span class="bub">${ic[k]}</span><span class="grow"><span class="t">${l}</span><small>${sub[k]}</small></span><span class="chev">›</span></button>`).join('')}
   <div class="foot"><button class="${SND.P.sfx?'':'ghost'} sm" aria-label="Sound effects ${SND.P.sfx?'on':'off'}" onclick="SND.set('sfx',${!SND.P.sfx})">Sound ${SND.P.sfx?'on':'off'}</button><button class="${SND.P.music?'':'ghost'} sm" aria-label="Music ${SND.P.music?'on':'off'}" onclick="SND.set('music',${!SND.P.music})">Music ${SND.P.music?'on':'off'}</button></div></div></div>`;}
 function menuHTML(){const k=UI().menu,m=MENU.find(x=>x[0]===k),hofN=(()=>{try{return JSON.parse(localStorage.getItem('bag_hof')||'[]').length;}catch{return 0;}})(),achN=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('bag_ach')||'{}')).length;}catch{return 0;}})();
@@ -1361,7 +1363,7 @@ function classCard(open){const c=classRank();if(!c)return'';
   for(const p of c.all){r++;if(!meDone&&r>=c.rank){if(fp==='All'||fp===S.pos)rows.push(meRow());meDone=true;}const rr=r>=c.rank?r+1:r;if(fp!=='All'&&p.pos!==fp)continue;
     rows.push(`<tr><td>${rr}</td><td>${p.name}</td><td>${p.pos}</td><td class="stars">${'★'.repeat(st(rr))}</td><td>${mv(S.cls.indexOf(p),rr)}</td></tr>`);}
   if(!meDone&&(fp==='All'||fp===S.pos))rows.push(meRow());
-  return`<div class="card"><div class="sh">🎓 <span class="grow">National class rankings</span><b class="gold">${c.rank<=100?'#'+c.rank:'Unranked'}${prev&&prev.me?' '+mv('me',c.rank):''}</b></div><div class="sub">Top of your class: ${c.top.map((p,i)=>`<b>${i+1}. ${p.name}</b> ${p.pos}`).join(' · ')}. They grow up with you, and they will be in your draft class.</div>
+  return`<div class="card"><div class="sh">🎓 <span class="grow">National class rankings</span><b class="gold">${c.rank<=100?'#'+c.rank:'Unranked'}${prev&&prev.me?' '+mv('me',c.rank):''}</b></div><div class="sub">Top of your class: ${[...c.top.slice(0,c.rank-1),...(c.rank<=3?[{name:esc(S.name||'You')+' (you)',pos:S.pos}]:[]),...c.top.slice(c.rank-1)].slice(0,3).map((p,i)=>`<b>${i+1}. ${p.name}</b> ${p.pos}`).join(' · ')}. They grow up with you, and they will be in your draft class.</div>
   <details ${open||UI().clsOpen?'open':''} ontoggle="UI().clsOpen=this.open"><summary>Full rankings · ${c.all.length+1} prospects</summary>
   <div class="seg sm" style="margin-top:8px">${['All','PG','SG','SF','PF','C'].map(x=>`<button class="${fp===x?'on':''}" onclick="UI().clsPos='${x}';UI().clsOpen=true;render()">${x}</button>`).join('')}</div>
   <div class="scroll clslist"><table><tr><th>#</th><th>PLAYER</th><th>POS</th><th>STARS</th><th>MOVE</th></tr>${rows.join('')}</table></div></details></div>`;}
@@ -1694,6 +1696,9 @@ function skillAcc(mode){const u=UI();IMP=impactMap();return ATTRS.map(([c,cl])=>
 function attrRows(mode){return skillAcc(mode);}
 function adj(k,d){if(d>0&&spent()+cost(S.attrs[k])<=START_BUDGET&&S.attrs[k]<BUILD_MAX)S.attrs[k]++;if(d<0&&S.attrs[k]>MIN_A)S.attrs[k]--;render();}
 // auto-assign: each point goes where it raises OVR the most per point spent, leaning toward weak spots
+function buildFill(){let g=0;while(g++<900){const left=START_BUDGET-spent(),o0=ovr();let best=null,bs=-1;
+    for(const k of SUBKEYS){const v=S.attrs[k],c=cost(v);if(v>=BUILD_MAX||c>left)continue;S.attrs[k]=v+1;const d=ovr()-o0;S.attrs[k]=v;const sc=d/c*(1+(75-v)/150);if(sc>bs){bs=sc;best=k;}}
+    if(!best)break;S.attrs[best]++;}render();}
 function smartSpend(){let g=0;while(S.bank>0&&g++<600){const o0=ovr();let best=null,bs=-1;
     for(const k of SUBKEYS){const v=S.attrs[k],c=cost(v);if(v>=99||c>S.bank)continue;S.attrs[k]=v+1;const d=ovr()-o0;S.attrs[k]=v;const s=d/c*(1+(75-v)/150);if(s>bs){bs=s;best=k;}}
     if(!best)break;S.bank-=cost(S.attrs[best]);S.attrs[best]++;}render();}
@@ -1758,11 +1763,11 @@ function seasonTable(rev){if(!S.nba.length)return'';const rows=S.nba.map(s=>`<tr
 // ---------- builder pieces ----------
 function gtpCard(full){const bank=gtpBank(),cost=perkCost();
   if(S.daily)return`<div class="card"><div class="sh">💎 <span class="grow">Generational Talent Points</span><b>${bank}</b></div><div class="sub">Perks are off for the Daily Build so everyone plays on equal terms. You still earn GTP.</div></div>`;
-  if(!bank&&!cost)return`<div class="card"><div class="sh">💎 <span class="grow">Generational Talent Points</span><b>0</b></div><div class="sub">Earn GTP on Pro or Hall of Fame from great seasons, then spend it here on perks for your next player.</div></div>`;
+  if(!bank&&!cost)return`<div class="card"><div class="sh">💎 <span class="grow">Generational Talent Points</span><b>0</b></div><div class="sub">Earn GTP on Pro or Hall of Fame from great seasons, then spend it in the GTP Store on perks for a new player.</div></div>`;
   const canBuy=PERKS_GTP.some(([k,l,d,c,mx])=>c<=bank-cost&&((S.perks&&S.perks[k])||0)<mx);
   return`<details class="card" ${full||cost||canBuy?'open':''}><summary role="button">💎 GTP Shop · <span class="gold">${bank-cost} available</span>${cost?` · ${cost} in cart`:canBuy?' · tap a perk to buy':''}</summary>
-  ${PERKS_GTP.map(([k,l,d,c,mx])=>{const n=(S.perks&&S.perks[k])||0;return`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><div class="grow"><b>${l}</b>${n?` <span class="gold">×${n}</span>`:''}<div class="sub">${d} · ${c} GTP</div></div>
-    <button class="ghost sm" aria-label="Remove ${l}" onclick="buyPerk('${k}',-1)" ${n?'':'disabled'}>−</button><button class="sm" aria-label="Buy ${l}" onclick="buyPerk('${k}',1)" ${n>=mx||bank-cost<c?'disabled':''}>+</button></div>`;}).join('')}</details>`;}
+  ${PERKS_GTP.map(([k,l,d,c,mx])=>{const n=(S.perks&&S.perks[k])||0;return`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><div class="grow"><b>${l}</b>${n?` <span class="gold">×${n}</span>`:''}<div class="sub">${d} · ${c} GTP${k==='spin'&&S.spunEra&&n?' · already used, so it can’t be refunded':''}</div></div>
+    <button class="ghost sm" aria-label="Remove ${l}" onclick="buyPerk('${k}',-1)" ${n&&!(k==='spin'&&S.spunEra)?'':'disabled'}>−</button><button class="sm" aria-label="Buy ${l}" onclick="buyPerk('${k}',1)" ${n>=mx||bank-cost<c?'disabled':''}>+</button></div>`;}).join('')}</details>`;}
 function diffCard(){return`<div class="card"><div class="sh">🎚️ <span class="grow">Difficulty</span></div><div class="seg">${Object.entries(DIFFS).map(([k,v])=>`<button class="${S.diff===k?'on':''}" onclick="setDiff('${k}')" ${S.daily&&k!=='pro'?'disabled':''}>${v.name.replace(/^\S+\s/,'')}</button>`).join('')}</div><div class="note">${diff().d}${S.daily?' The Daily Build is always played on Pro.':''}</div></div>`;}
 function lookEditor(){return`<div class="card"><div class="avwrap">${avatar(S.look,18,150,1)}</div><div class="row" style="margin-bottom:8px"><span class="sh grow" style="margin:0">Customize</span><button class="sm ghost" onclick="S.look=randLook();render()">🎲 Random look</button></div>
   <div class="looks">${LOOKS.map(([k,l,o])=>`<div><span>${l}</span><button class="ghost sm" aria-label="Previous ${l}" onclick="cyc('${k}',-1)">◀</button><b>${o()[(S.look[k]||0)%o().length].replace(EMO_RE,'').trim()}</b><button class="ghost sm" aria-label="Next ${l}" onclick="cyc('${k}',1)">▶</button></div>`).join('')}
@@ -1780,23 +1785,23 @@ function buildHTML(){if(UI().menu&&UI().menu!=='open')return menuHTML();const u=
   if(tab==='setup')h+=`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>Build a <span>GOAT</span></h1>${menuBtn()}</div><div class="sub">Build a raw prospect, survive high school and college, and find out if you become the greatest of all time. Playing on <b>${diff().name.replace(/^\S+\s/,'')}</b> (change it in the menu under Settings).</div>
     <div class="card"><div class="sh">🎰 <span class="grow">League era</span>${S.daily?'<b>Daily</b>':`<button class="ghost sm" onclick="spinEra()" ${S.spins<=0?'disabled':''}>🎲 Re-spin · ${S.spins}</button>`}</div><div style="font-size:1.15rem;font-weight:800">${era().name}</div><div class="sub">${era().d}</div><div class="sub">Teams in this era pay extra for <b>${catName(eraWants())}</b>. It shapes draft buzz and free agency choices.</div>
     <details><summary>📅 Daily Build${S.daily?' · on':''}</summary><div class="sub">Same era and same dice for everyone today. Played on Pro with no perks.</div><button class="${S.daily?'sel':'ghost'} wide" style="margin-top:8px" onclick="toggleDaily()">${S.daily?'Daily Build is on · tap to turn off':'Play today\'s Daily Build'}</button>${S.daily&&dailyBest().length?`<div class="note">Today's best: ${dailyBest().slice(0,3).map(x=>`<b>${esc(x.name)}</b> ${x.score}`).join(' · ')}</div>`:''}</details></div>
-    ${gtpBank()&&!S.daily?`<button class="opt" onclick="openMenu('gtp')"><div class="grow"><div class="t">💎 ${gtpBank()} GTP to spend</div><small>Open the GTP Store to buy perks for this player</small></div></button>`:''}`;
+    ${gtpBank()&&!S.daily?`<button class="opt" onclick="openMenu('gtp')"><div class="grow"><div class="t">💎 ${perkCost()?`${perkCost()} GTP of perks ready for this player`:`${gtpBank()} GTP to spend`}</div><small>${perkCost()?`They apply when you start High School · ${gtpBank()-perkCost()} GTP left`:'Open the GTP Store to buy perks for this player'}</small></div></button>`:''}`;
   if(tab==='look')h+=`${hd('Look')}<div class="card"><div class="sh">✍️ <span class="grow">Name</span></div><input id="nm" type="text" maxlength="24" value="${esc(S.name)}" placeholder="Name your prospect" oninput="S.name=this.value"></div>${lookEditor()}`;
   if(tab==='body')h+=`${hd('Body')}<div class="card"><div class="sh">🏀 <span class="grow">Position</span></div><div class="seg">${Object.keys(POS).map(p=>`<button class="${S.pos===p?'on':''}" onclick="(S.hPos=S.hPos||{})[S.pos]=S.height;S.pos='${p}';S.height=S.hPos['${p}']??POS['${p}'].h;render()">${p}</button>`).join('')}</div></div>
     <div class="card"><div class="sh">📏 <span class="grow">Height</span><b id="hval">${ht(S.height)}</b></div><input type="range" aria-label="Height" min="${POS[S.pos].h-4}" max="${POS[S.pos].h+5+(S.perks&&S.perks.growth?3:0)}" value="${S.height}" oninput="S.height=+this.value;updHeight()" onchange="render()"><div class="sub" id="hnote">${heightText()}</div><div class="note" id="heff">${heightNote()}</div>${dunkCap()}</div>
     <div class="card"><div class="sh">💪 <span class="grow">Frame</span></div><div class="seg">${Object.keys(FRAMES).map(f=>`<button class="${S.frame===f?'on':''}" onclick="setF('frame','${f}')">${f}</button>`).join('')}</div><div class="note">${FRAMES[S.frame].d}</div>${frameFx()}</div>`;
   if(tab==='skills'&&!u.skillsPicked)h+=`${hd('Skills')}<div class="sub">Start from a premade build, or put every point in yourself.</div><div class="card"><div class="sh">⚡ <span class="grow">Quick start</span></div><div class="chips">${ARCH.map((a,i)=>[a,i]).sort((x,y)=>(y[0][1]===S.pos)-(x[0][1]===S.pos)).map(([a,i])=>`<button class="chip ${S.arch===a[0]?'on':''}" onclick="UI().skillsPicked=1;applyArch(${i})">${a[0]}<small>${a[1]===S.pos?'Made for your position':'Classic '+a[1]+' skill set'}</small></button>`).join('')}<button class="chip" onclick="UI().skillsPicked=1;randomBuild()">🎲 Randomize<small>Random skills and traits</small></button></div><div class="note">Premade builds only fill in your skills. Your position, height and frame stay as you picked them. You can still change everything after.</div>
     <button class="ghost wide" style="margin-top:10px" onclick="UI().skillsPicked=1;render()">✍️ Build my own</button></div>`;
-  else if(tab==='skills')h+=`${hd('Skills')}<div class="row" style="margin-bottom:6px"><span class="grow sub" style="margin:0">${S.arch?`Using the <b>${S.arch}</b> build. Tweak anything below.`:'Your own build.'}</span><button class="ghost sm" onclick="UI().skillsPicked=0;render()">⚡ Premade builds</button></div><div class="sub">Tap a group to open it. Skills cost 1 point each up to 70, then 2, then 3 above 85 (the + button shows the price). Max 90 here; grow higher during the career. Numbers shown include your height bonus. OVR weighs every skill for your position.</div>${skillAcc('build')}`;
+  else if(tab==='skills')h+=`${hd('Skills')}<div class="row" style="margin-bottom:6px"><span class="grow sub" style="margin:0">${S.arch?`Using the <b>${S.arch}</b> build. Tweak anything below.`:'Your own build.'}</span>${START_BUDGET-spent()>0?`<button class="sm" aria-label="Auto-fill remaining points" onclick="buildFill()">Auto-fill</button>`:''}<button class="ghost sm" onclick="UI().skillsPicked=0;render()">⚡ Premade builds</button></div><div class="sub">Tap a group to open it. Skills cost 1 point each up to 70, then 2, then 3 above 85 (the + button shows the price). Max 90 here; grow higher during the career. Numbers shown include your height bonus. OVR weighs every skill for your position.</div>${skillAcc('build')}`;
   if(tab==='traits')h+=`${hd('Traits')}<div class="sub">Lock in ${traitLimit()}. The other ${TRAITS.length-traitLimit()} are rolled at random.</div><div class="card"><div class="chips">${TRAITS.map(([k,l,d])=>`<button class="chip ${S.picked.includes(k)?'on':''}" onclick="toggleTrait('${k}')">${l}<small>${d}</small></button>`).join('')}</div></div>`;
   const ready=S.picked.length>=traitLimit(),nxt=TABS[ti+1];if(u.menu==='open')h+=drawerHTML();
   return h+dock(`<div class="meta"><span><b>${left}</b> pts left${left>0&&ready?' <small class="muted">(saved as bonus pts)</small>':''}</span><span>OVR <b>${OV()}</b></span><span>Traits <b>${S.picked.length}/${traitLimit()}</b></span></div>
-    <div class="two">${nxt?`<button class="ghost" onclick="goTab('${nxt[0]}')">Next: ${nxt[1]} ▶</button>`:`<button class="ghost" onclick="goTab('setup')">◀ Back to Setup</button>`}<button onclick="${ready?'startCareer()':"goTab('traits')"}" class="${ready?'':'ghost'}">${ready?'Start High School':`Pick ${traitLimit()-S.picked.length} trait${traitLimit()-S.picked.length===1?'':'s'}`}</button></div>`);}
+    <div class="two">${nxt?`<button class="ghost" onclick="goTab('${nxt[0]}')">Next: ${nxt[1]} ▶</button>`:`<button class="ghost" onclick="goTab('skills')">◀ Back: Skills</button>`}<button onclick="${ready?'startCareer()':"goTab('traits')"}" class="${ready?'':'ghost'}">${ready?'Start High School':`Pick ${traitLimit()-S.picked.length} trait${traitLimit()-S.picked.length===1?'':'s'}`}</button></div>`);}
 
 // ---------- screens ----------
 function render(){const st=S.stage;let h='';const q=UI().seq;if(q&&q.st!==st)UI().seq=null;
   if(st==='build')h=buildHTML();
-  else if(UI().seq)h=seqHTML();
+  else if(UI().seq&&st!=='draft'&&st!=='end')h=seqHTML();
   else if(st==='hs'){const i=S.hs.length;h=`<h1>High School</h1>${playerCard(true)}${classCard()}${S.summerPend?summerCard():resultCard()}${seasonList(S.hs)}`+(S.summerPend?'':dock(`<button onclick="playSeason(simHS)">Play ${YR[i]} Year</button>`));}
   else if(st==='offers'){const n=stars();h=`<h1>Recruiting</h1>${playerCard(true)}<div class="card"><div class="sh">🎓 <span class="grow">Scholarship offers</span><b>${S.offers.length}</b></div><div class="row" style="align-items:baseline"><h2 style="margin:0">${n}-star recruit</h2>${starsHTML(n)}</div>
     <div class="sub">${n>=5?'Every program in the country wants you. Take your pick.':n===4?'Plenty of big-time options.':n===3?'A few solid options.':'Slim pickings. Make the most of it.'}</div>
@@ -1830,8 +1835,9 @@ const isField=e=>e.target&&/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)&&e
 document.addEventListener('focusin',e=>{if(isField(e))document.body.classList.add('kb');});
 document.addEventListener('focusout',e=>{if(!isField(e))return;document.body.classList.remove('kb');setTimeout(()=>{window.scrollTo(window.scrollX,window.scrollY);document.body.style.minHeight='100.1vh';requestAnimationFrame(()=>document.body.style.minHeight='');},60);});
 if(window.visualViewport)visualViewport.addEventListener('resize',()=>{if(visualViewport.height>=innerHeight-1&&!document.activeElement?.matches?.('input[type=text]'))window.scrollTo(window.scrollX,window.scrollY);});
-function simEnd(){let g=0;while(S.stage==='nba'&&g++<120){if(S.pend)choose(S.pend.kind==='summer'?S.pend.opts.length-2:0);else simNBA();}render();scrollTo(0,0);}
-function simAll(){let g=0;while(S.stage==='nba'&&!S.pend&&g++<25)simNBA();render();}
+function autoBank(){if(S.bank>0){const r=render;render=()=>{};try{smartSpend();}finally{render=r;}}}
+function simEnd(){let g=0;while(S.stage==='nba'&&g++<120){if(S.pend)choose(S.pend.kind==='summer'?S.pend.opts.length-2:0);else{autoBank();simNBA();}}autoBank();render();scrollTo(0,0);}
+function simAll(){let g=0;while(S.stage==='nba'&&!S.pend&&g++<25){autoBank();simNBA();}autoBank();render();}
 function endHTML(){const c=career(),sc=goatScore(c),[t,d]=tierOf(sc,c),k=c.cnt,g=x=>k[x]||0,gp=c.gp||1;
   const p=S.pick,sg=grade(S.scoutAtDraft),tc=grade(Math.max(S.ceiling,c.peak));let story;
   const lowT=['Bust','Role Player'].includes(t);if(p<=10&&c.peak<72&&lowT)story='One of the biggest busts of your draft class.';else if(p<=10&&lowT)story='You never lived up to your lottery billing.';else if(p>=31&&c.peak>=84)story='The steal of the draft. 29+ teams passed on a superstar.';
@@ -1848,7 +1854,7 @@ function endHTML(){const c=career(),sc=goatScore(c),[t,d]=tierOf(sc,c),k=c.cnt,g
   <div class="card"><div class="sh">📜 <span class="grow">The story</span></div><div class="gold" style="font-weight:700">${story}</div><div style="margin-top:6px"><span class="pill">Scout grade ${sg}</span><span class="pill">True ceiling <b class="gold">${tc}</b></span><span class="pill">Peak ${grade(c.peak)}</span></div><div class="note">${pickTxt(p)} out of ${S.school} at age ${S.age-c.seasons+1}</div></div>
   ${acc.length?`<div class="card"><div class="sh">🏆 <span class="grow">Accolades</span></div>${acc.map(([x,l])=>`<span class="pill gold">${l} ×${g(x)}</span>`).join('')}</div>`:''}
   ${rv?`<div class="card"><div class="sh">⚔️ <span class="grow">Rivalry</span><b class="${meR>=rvR?'good':'bad'}">${meR>=rvR?'Won':'Lost'}</b></div><table><tr><th></th><th>${esc(S.name)}</th><th>${rv.name}</th></tr><tr><td>Rings</td><td>${g('Champion')}</td><td>${rv.rings}</td></tr><tr><td>MVPs</td><td>${g('MVP')}</td><td>${rv.mvps}</td></tr><tr><td>Points</td><td>${Math.round(c.pts).toLocaleString()}</td><td>${Math.round(rv.pts).toLocaleString()}</td></tr></table><div class="note">${meR>=rvR?'You won the rivalry.':'History remembers '+rv.name+' first.'}</div></div>`:''}
-  <div class="card"><div class="sh">💎 <span class="grow">Generational Talent Points</span><b class="gold">${diff().mult?'+'+(S.gtpRun||0):'—'}</b></div>${diff().mult?`<div class="sub">Earned on ${diff().name.replace(/^\S+\s/,'')} (${diff().mult}×). Your bank: <b>${gtpBank()}</b></div><details><summary>Breakdown</summary><div class="sub">${(S.gtpLog||[]).map(([w,g])=>w+' +'+g).join(' · ')}</div></details>`:'<div class="sub">Rookie earns no GTP and unlocks no achievements. Try Pro or Hall of Fame.</div>'}</div>
+  <div class="card"><div class="sh">💎 <span class="grow">Generational Talent Points</span><b class="gold">${diff().mult?'+'+(S.gtpRun||0):'—'}</b></div>${diff().mult?`<div class="sub">Earned on ${diff().name.replace(/^\S+\s/,'')} (${diff().mult}× bonus already included below). Your bank: <b>${gtpBank()}</b></div><details><summary>Breakdown</summary><div class="sub">${(S.gtpLog||[]).map(([w,g])=>w+' +'+g).join(' · ')}</div></details>`:'<div class="sub">Rookie earns no GTP and unlocks no achievements. Try Pro or Hall of Fame.</div>'}</div>
   <details class="card"><summary>📊 More career numbers</summary><div class="stat3" style="margin-top:10px">${[['SPG',f1(c.stl/gp)],['BPG',f1(c.blk/gp)],['GAMES',c.gp],['TOTAL REB',Math.round(c.reb).toLocaleString()],['TOTAL AST',Math.round(c.ast).toLocaleString()],['PEAK OVR',c.peak]].map(([l,v])=>`<div class="stat"><b>${v}</b>${l}</div>`).join('')}</div></details>
   <details class="card"><summary>🌟 Legend benchmarks · ${bm.filter(x=>x[1]).length}/${bm.length}</summary>${bm.map(([l,ok])=>`<div class="ev ${ok?'good':'muted'}">${ok?'✅':'⬜'} ${l}</div>`).join('')}</details>
   ${(S.log||[]).length?`<details class="card"><summary>📝 Career decisions · ${S.log.length}</summary>${S.log.map(x=>`<div class="ev">${x}</div>`).join('')}</details>`:''}
@@ -1858,7 +1864,7 @@ function hofHTML(full){const h=JSON.parse(localStorage.getItem('bag_hof')||'[]')
   ${h.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.name)} <span class="muted">${x.pos}</span></td><td>${x.diff?DIFFS[x.diff].name.split(' ')[0]+' ':''}${x.tier}</td><td>${x.score}</td><td>${f1(x.ppg)}</td><td>${x.rings}</td><td>${x.mvp}</td><td>${x.pick>=61?'UDFA':'#'+x.pick}</td></tr>`).join('')}</table></div></details>`;}
 function achHTML(fresh,full){const have=JSON.parse(localStorage.getItem('bag_ach')||'{}'),n=Object.keys(have).length;fresh=fresh||[];
   return`<details class="card" ${full||fresh.length?'open':''}><summary>🏅 Achievements · ${n}/${ACH.length}${fresh.length?` · <span class="gold">${fresh.length} new</span>`:''}</summary>${S.diff==='rookie'&&S.stage==='end'?'<div class="note">🔒 Achievements don’t unlock on Rookie.</div>':''}
-  <div class="ach">${ACH.map(([id,l,d])=>`<div class="${have[id]?'got':''} ${fresh.includes(id)?'new':''}"><b>${have[id]?l:'🔒 '+l.replace(EMO_RE,'').trim()}</b><small>${d}${fresh.includes(id)?' · New':''}</small></div>`).join('')}</div></details>`;}
+  <div class="ach">${ACH.map(([id,l,d])=>`<div class="${have[id]?'got':''} ${fresh.includes(id)?'new':''}"><b>${have[id]?l:'🔒 '+l.replace(EMO_RE,'').trim()}</b>${have[id]?'<span class="gotlbl">Unlocked</span>':''}<small>${d}${fresh.includes(id)?' · New':''}</small></div>`).join('')}</div></details>`;}
 
 
 // ---------- sound: every effect is synthesized live (no files); music plays music/1.mp3, 2.mp3 ... if present ----------
@@ -1895,7 +1901,7 @@ const SND=(()=>{let ctx=null,master=null,last={};const pref=k=>{try{return local
   return{play,set,P,M};})();
 // ---------- season story: after you play a season, its pieces arrive one card at a time, then the full screen ----------
 const SEQ_L={season:'Season Results',summer:'Summer Decision',decision:'Big Decision',class:'Class Rankings',league:'Around the League',spend:'Spend Your Points'};
-function seqPiece(k){const st=S.stage;
+function seqPiece(k){const st=S.stage==='offers'?'hs':S.stage;
   if(k==='season'){let v;if(st==='nba'){const n=S.nba[S.nba.length-1];v=[n.ppg,n.rpg,n.apg];}else{const a=st==='hs'?S.hs:S.col,m=(a[a.length-1].line.match(/[\d.]+(?= [PRA]PG)/g)||[]).map(Number);v=m.slice(0,3);}
     const tiles=st!=='nba'&&v.length===3?`<div class="stat3 seqstats">${['PPG','RPG','APG'].map((l,j)=>`<div class="stat"><b class="cu" data-v="${v[j]}">${f1(v[j])}</b>${l}</div>`).join('')}</div>`:'';
     return tiles+(st==='nba'?seasonCard(S.nba[S.nba.length-1]):seasonList(st==='hs'?S.hs:S.col,true));}
@@ -1904,13 +1910,13 @@ function seqPiece(k){const st=S.stage;
   if(k==='class')return classCard(true);
   if(k==='league')return leagueCard();
   if(k==='spend')return playerCard(true);return'';}
-function startSeq(){const st=S.stage;if(!['hs','college','nba'].includes(st))return;const k=['season'];if(S.summerPend)k.push('summer');if(st==='nba'&&S.pend)k.push('decision');k.push(st==='nba'?'league':'class');if(S.bank>0)k.push('spend');
+function startSeq(){const st=S.stage;if(!['hs','offers','college','nba'].includes(st))return;const k=['season'];if(S.summerPend)k.push('summer');if(st==='nba'&&S.pend)k.push('decision');k.push(st==='nba'?'league':'class');if(S.bank>0)k.push('spend');
   UI().seq={st,i:0,k:k.filter(x=>seqPiece(x))};}
 function playSeason(fn){fn();startSeq();render();scrollTo(0,0);}
-function seqHTML(){const q=UI().seq,k=q.k[q.i],nx=q.k[q.i+1],arr=S.stage==='hs'?S.hs:S.col;
+function seqHTML(){const q=UI().seq,k=q.k[q.i],nx=q.k[q.i+1],arr=S.stage==='college'?S.col:S.hs;
   const title=k==='season'?(S.stage==='nba'?`Season ${S.nba.length}`:`${YR[arr.length-1]} Year`):SEQ_L[k];
   return`<div class="seqtop"><div class="dots" aria-label="Step ${q.i+1} of ${q.k.length}">${q.k.map((_,j)=>`<i class="${j<q.i?'done':j===q.i?'on':''}"></i>`).join('')}</div><button class="ghost sm" onclick="seqSkip()">Skip</button></div>
-  <h1 class="seqh">${title}</h1><div class="seqcard">${seqPiece(k)}</div>`+dock(`<button onclick="seqNext()">${nx?'Next: '+SEQ_L[nx]:'See everything'} ▶</button>`);}
+  <h1 class="seqh">${title}</h1><div class="seqcard">${seqPiece(k)}</div>`+dock(`<button onclick="seqNext()">${nx?'Next: '+SEQ_L[nx]:'Continue'} ▶</button>`);}
 function seqNext(){const q=UI().seq;if(!q)return;const c=document.querySelector('.seqcard'),go=()=>{if(UI().seq!==q)return;q.i++;if(q.i>=q.k.length)UI().seq=null;render();scrollTo(0,0);};
   if(c&&!document.documentElement.classList.contains('wt')){c.classList.add('leave');document.querySelector('.seqh')?.classList.add('leave');setTimeout(go,210);}else go();}
 function seqSkip(){UI().seq=null;render();scrollTo(0,0);}
@@ -1921,6 +1927,8 @@ function confetti(n=70){if(matchMedia('(prefers-reduced-motion: reduce)').matche
   for(let i=0;i<n;i++){const e=document.createElement('i');e.style.left=(Math.random()*100)+'vw';e.style.background=col[i%col.length];e.style.setProperty('--dx',(Math.random()*160-80)+'px');e.style.setProperty('--r',(Math.random()*900-450)+'deg');e.style.animationDuration=(1.6+Math.random()*1.6)+'s';e.style.animationDelay=(Math.random()*.5)+'s';if(i%3===0){e.style.width='10px';e.style.height='10px';e.style.borderRadius='50%';}c.appendChild(e);}
   document.body.appendChild(c);setTimeout(()=>c.remove(),4200);}
 function fxAfter(){const p=FXprev,c=FXcur;FXprev=c;if(!p)return;const app=document.getElementById('app');
+  // same screen redrawn (spending a point, opening a group): keep it still instead of replaying entrances
+  app.classList.toggle('still',c.key===p.key&&c.seasons===p.seasons&&c.stage===p.stage);
   if(c.key!==p.key&&!document.documentElement.classList.contains('wt'))app.querySelectorAll('.seqcard .stat b').forEach((b,j)=>{const tx=b.textContent.trim();if(!/^[\d.,]+$/.test(tx))return;const z=+tx.replace(/,/g,''),dec=tx.includes('.'),t0=performance.now()+250+j*120,fmt=x=>dec?f1(x):Math.round(x).toLocaleString();b.textContent=fmt(0);const step=t=>{const k=Math.max(0,Math.min(1,(t-t0)/700)),e=1-Math.pow(1-k,3);b.textContent=k>=1?tx:fmt(z*e);if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);});
   if(c.key!==p.key){app.classList.remove('enter');void app.offsetWidth;app.classList.add('enter');clearTimeout(fxAfter.t);fxAfter.t=setTimeout(()=>app.classList.remove('enter'),1200);}
   if(c.seasons>p.seasons){const s=app.querySelector('.season0');if(s)s.classList.add('newseason');const last=S.nba[S.nba.length-1];if(S.stage==='nba'&&last&&last.aw.some(a=>/MVP|Champion/.test(a)))confetti(90);}

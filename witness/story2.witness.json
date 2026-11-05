@@ -1,0 +1,127 @@
+[
+ {
+  "name": "story: summer result shows in the story; senior year gets a story before recruiting",
+  "seed": 7,
+  "steps": [
+   {
+    "at": 0.3,
+    "evalAs": {
+     "x": "(applyArch(0),toggleTrait('work'),toggleTrait('dur'),startCareer(),render(),1)"
+    }
+   },
+   {
+    "at": 0.4,
+    "call": [
+     "tap",
+     "Play Freshman Year"
+    ]
+   },
+   {
+    "at": 0.45,
+    "evalAs": {
+     "x": "(seqNext(),1)"
+    }
+   },
+   {
+    "at": 0.5,
+    "evalAs": {
+     "x": "(chooseSummer(0),render(),1)"
+    },
+    "expectPage": [
+     "UI().seq&&UI().seq.k[UI().seq.i]==='summer'",
+     "document.querySelector('.seqcard .result')!=null"
+    ]
+   },
+   {
+    "at": 0.55,
+    "evalAs": {
+     "x": "(seqSkip(),simHS(),chooseSummer(0),simHS(),chooseSummer(0),render(),1)"
+    }
+   },
+   {
+    "at": 0.6,
+    "call": [
+     "tap",
+     "Play Senior Year"
+    ]
+   },
+   {
+    "at": 0.65,
+    "expectPage": [
+     "S.stage==='offers'",
+     "UI().seq&&document.querySelector('.seqh').textContent.includes('Senior Year')"
+    ]
+   },
+   {
+    "at": 0.7,
+    "evalAs": {
+     "x": "(seqSkip(),1)"
+    },
+    "expectPage": [
+     "document.getElementById('app').textContent.includes('Scholarship offers')"
+    ]
+   }
+  ]
+ },
+ {
+  "name": "build: auto-fill spends the remaining points",
+  "seed": 2,
+  "steps": [
+   {
+    "at": 0.3,
+    "evalAs": {
+     "x": "(goTab('skills'),UI().skillsPicked=1,render(),1)"
+    }
+   },
+   {
+    "at": 0.4,
+    "call": [
+     "tap",
+     "Auto-fill remaining points"
+    ]
+   },
+   {
+    "at": 0.45,
+    "expectPage": [
+     "START_BUDGET-spent()<3",
+     "ovr()>50"
+    ]
+   }
+  ]
+ },
+ {
+  "name": "spending points in the story does not replay the card animation",
+  "seed": 5,
+  "steps": [
+   {
+    "at": 0.3,
+    "evalAs": {
+     "x": "(applyArch(0),toggleTrait('work'),toggleTrait('dur'),startCareer(),S.bank=20,render(),1)"
+    }
+   },
+   {
+    "at": 0.4,
+    "call": [
+     "tap",
+     "Play Freshman Year"
+    ]
+   },
+   {
+    "at": 0.45,
+    "evalAs": {
+     "x": "(UI().seq.i=UI().seq.k.indexOf('spend'),render(),1)"
+    }
+   },
+   {
+    "at": 0.5,
+    "evalAs": {
+     "x": "(spend('ft',1),1)",
+     "a": "getComputedStyle(document.querySelector('.seqcard')).animationName"
+    },
+    "expect": [
+     "a=='none'"
+    ]
+   }
+  ]
+ }
+]

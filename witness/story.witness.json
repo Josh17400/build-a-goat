@@ -8,7 +8,7 @@
  {"at":0.65,"expectPage":["document.querySelector('.seqh').textContent.includes('Class Rankings')"]},
  {"at":0.7,"call":["tap","Next: Spend Your Points"]},
  {"at":0.75,"expectPage":["document.querySelector('.seqh').textContent.includes('Spend Your Points')","document.querySelector('.seqcard').textContent.includes('bonus points')"]},
- {"at":0.8,"call":["tap","See everything"]},
+ {"at":0.8,"call":["tap","Continue"]},
  {"at":0.85,"expectPage":["!UI().seq","document.getElementById('app').textContent.includes('High School')","document.querySelector('.seqcard')==null"]},
  {"at":0.9,"evalAs":{"x":"(chooseSummer(0),render(),1)"}},
  {"at":0.95,"call":["tap","Play Sophomore Year"]},
