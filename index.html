@@ -375,7 +375,12 @@ function buyPerk(k,d){if(S.daily)return;S.perks=S.perks||{};const p=PERKS_GTP.fi
 function trimToBudget(){let g=0;while(spent()>START_BUDGET&&g++<2000){const k=SUBKEYS.reduce((a,b)=>S.attrs[b]>S.attrs[a]?b:a);S.attrs[k]--;}}
 function setDiff(d){if(S.daily||S.stage!=='build')return;S.diff=d;try{localStorage.setItem('bag_diff',d);}catch{}trimToBudget();render();}
 const traitLimit=()=>S.perks&&S.perks.trait3?3:2;
-const TEAMS=['Harbor City Hawks','Ironvale Forge','Desert Mesa Suns','Lakeport Gulls','Northwood Timber','Bay Bridge Bolts','Copper Canyon Coyotes','Granite Peaks','Midtown Monarchs','Riverside Rafters','Pinecrest Pilots','Cobalt City Comets','Twin Lakes Loons','Steel Valley Smelters','Sunbelt Stingers','Capitol Statesmen','Prairie Thunder','Seabreeze Sharks','Old Mill Millers','Emerald Coast Eels','Redstone Rockets','Frostfield Wolves','Bayou Gators','High Plains Hornets','Crescent Bay Crabs','Union Square Unity','Golden Gate Grizzlies','Lone Pine Lumberjacks','Mountain Air Eagles','Neon City Knights'];
+// every NBA city, with a nickname that is close to but not the real one. Order matters: CONF() puts the first 15 in the East
+const TEAMS=['Atlanta Talons','Boston Clovers','Brooklyn Bridges','Charlotte Stingers','Chicago Bison','Cleveland Cavalry','Detroit Motors','Indiana Speedsters','Miami Blaze','Milwaukee Stags','New York Skyliners','Orlando Illusions','Philadelphia Founders','Toronto Dinos','Washington Warlocks','Dallas Wranglers','Denver Prospectors','Golden State Gladiators','Houston Orbiters','Los Angeles Schooners','Los Angeles Lagoons','Memphis Kodiaks','Minnesota Howlers','New Orleans Herons','Oklahoma City Twisters','Phoenix Scorch','Portland Pathfinders','Sacramento Crowns','San Antonio Rustlers','Utah Rhythm'];
+// the fictional names used before 2026-11-06, index-matched to TEAMS (by position, never by meaning, so a resumed run's
+// replayed dice still pick the same slots and each team keeps its conference): a run saved mid-career is renamed when it is continued
+const OLD_TEAMS=['Harbor City Hawks','Ironvale Forge','Desert Mesa Suns','Lakeport Gulls','Northwood Timber','Bay Bridge Bolts','Copper Canyon Coyotes','Granite Peaks','Midtown Monarchs','Riverside Rafters','Pinecrest Pilots','Cobalt City Comets','Twin Lakes Loons','Steel Valley Smelters','Sunbelt Stingers','Capitol Statesmen','Prairie Thunder','Seabreeze Sharks','Old Mill Millers','Emerald Coast Eels','Redstone Rockets','Frostfield Wolves','Bayou Gators','High Plains Hornets','Crescent Bay Crabs','Union Square Unity','Golden Gate Grizzlies','Lone Pine Lumberjacks','Mountain Air Eagles','Neon City Knights'];
+function teamRename(str){if(!str)return str;for(let i=0;i<OLD_TEAMS.length;i++)if(str.includes(OLD_TEAMS[i]))str=str.split(OLD_TEAMS[i]).join(TEAMS[i]);return str;}
 const SCHOOLS={blue:['Kingsford University','Carolina Pines','Bluegrass State','Royal Oak University','Phoenix Hill University','Lakeshore State','Tobacco Road University'],power:['State Tech','Great Lakes University','Southern Methodical','Western Ridge State','Bayview University','Desert Sun State','Iron Range University'],mid:['Riverbend College','Saint Ambrose','Coastal Christian','Northern Prairie','Valley A&M']};
 const TIER={blue:{lbl:'Blue Blood',str:80,dev:1.12,hype:4,min:-4,d:'National TV every night. Big development, but you fight for minutes.'},power:{lbl:'Power Conference',str:64,dev:1.0,hype:2,min:0,d:'Solid program, solid role, solid exposure.'},mid:{lbl:'Mid-Major',str:46,dev:.94,hype:0,min:6,d:'The keys are yours. Big stats, less hype.'}};
 const INJ={minor:['sprained ankle','hamstring strain','sore knee','bruised hip','back spasms'],mod:['high ankle sprain','broken hand','MCL sprain','torn ligament in thumb','calf strain'],major:['torn ACL','ruptured Achilles','broken foot','torn meniscus','fractured kneecap']};
@@ -2280,7 +2285,7 @@ let SAVE_OFF=false,REPLAY=false,LOGD=0,RUNLOG=[],RUNID=0;
 const canSave=()=>!SAVE_OFF&&!REPLAY&&typeof localStorage!=='undefined'&&typeof location!=='undefined';
 const runSafe=()=>!S.summerPend&&!S.pend&&!(S.queue&&S.queue.length)&&S.stage!=='offers'&&!S.cur;
 function lsSet(k,v){try{localStorage.setItem(k,v);return true;}catch(e){console.warn('save failed',e);return false;}}
-function runMeta(){try{return JSON.parse(localStorage.getItem(SV.meta)||'null');}catch{return null;}}
+function runMeta(){try{return JSON.parse(teamRename(localStorage.getItem(SV.meta))||'null');}catch{return null;}}
 const hasRun=()=>!!runMeta();
 function getS(){return S;} // tests read the live run through this (a reload swaps S for a new object)
 function runSummary(){return{name:S.name,stage:S.stage,age:S.age,ovr:OV(),look:S.look,pos:S.pos,yr:S.nba.length,hs:S.hs.length,col:S.col.length,school:S.school||null,team:S.team||null,diff:S.diff,ts:Date.now()};}
@@ -2299,7 +2304,7 @@ const LOGGED=['simHS','simCol','simNBA','chooseSummer','chooseSchool','declare',
 for(const n of LOGGED){const f=globalThis[n];if(typeof f!=='function')continue;
   globalThis[n]=function(...a){if(REPLAY||LOGD||!S.seed||S.stage==='build')return f.apply(this,a);LOGD++;let r;try{r=f.apply(this,a);}finally{LOGD--;}try{afterAction(n,a);}catch(e){console.warn(e);}return r;};}
 {const f=globalThis.startCareer;if(typeof f==='function')globalThis.startCareer=function(...a){const r=f.apply(this,a);if(!REPLAY&&canSave()){clearRun();writeSnap();}return r;};}
-function resumeRun(){const meta=runMeta();let snap=null,lg=null;try{snap=JSON.parse(localStorage.getItem(SV.snap)||'null',(k,v)=>v&&typeof v==='object'&&Array.isArray(v.__set)?new Set(v.__set):v);lg=JSON.parse(localStorage.getItem(SV.log)||'null');}catch{}
+function resumeRun(){const meta=runMeta();let snap=null,lg=null;try{snap=JSON.parse(teamRename(localStorage.getItem(SV.snap))||'null',(k,v)=>v&&typeof v==='object'&&Array.isArray(v.__set)?new Set(v.__set):v);lg=JSON.parse(localStorage.getItem(SV.log)||'null');}catch{}
   if(!meta||!snap){clearRun();render();return false;}
   const rend=render;render=()=>{};REPLAY=true;
   try{S=Object.assign(newPlayer(),snap);if(S.rival&&S.rival.__ref!=null)S.rival=(S.L&&S.L.P.find(p=>p.id===S.rival.__ref))||null;
