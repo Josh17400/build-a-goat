@@ -19,9 +19,11 @@ distribution certificate, fastlane, and TestFlight builds from GitHub Actions (`
 |---|---|---|
 | **Banner ad** | bottom of every screen | Adaptive banner pinned above the home indicator. The dock and page padding move up by its height (`html.adb`, `--adH`). Gone for good once Remove Ads is owned. |
 | **Double your rewards** | end-of-career screen, gems card | One rewarded ad per career doubles that career's gems **and** GTP. finish() has already paid once; the ad pays `S.gemsRun` and `S.gtpRun` once more, guarded by `S.dbl`. Never on Rookie or the Daily Build. |
-| **Gem shop** | menu > Equipment, under the gear list | Five gem packs and Remove Ads, plus **Restore purchases** (App Review requires it). |
+| **Gem Shop** | its own menu item (after Equipment), shown only when the store is on; Equipment and the GTP Store link to it | Five gem packs and Remove Ads, plus **Restore purchases** (App Review requires it). |
 
-On the web (GitHub Pages) none of this shows. Add `?dev=1` to the URL to play every flow with a
+| **Gems for GTP** | GTP Store, under the perks | Trade 10/30/75 gems for 20/65/170 GTP (`GEM_TRADES`), about 2 GTP per gem; a career pays ~3.7 GTP per gem earned, so trading never beats playing. Works on the web too. |
+
+On the web (GitHub Pages) the banner, the reward ad and the Gem Shop don't show. Add `?dev=1` to the URL to play every flow with a
 simulated `confirm()` sheet and a placeholder banner strip. Under Witness, Plat does nothing.
 
 ## How the game talks to the device
