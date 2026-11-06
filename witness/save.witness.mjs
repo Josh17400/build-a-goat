@@ -16,7 +16,7 @@ const drive = `(()=>{applyArch(1);toggleTrait('work');toggleTrait('dur');startCa
     if(i%3===0||getS().pend||getS().summerPend){const a=dg();resumeRun();const b=dg();checks++;if(a!==b){bad.push(i+':'+st);if(bad.length>3)break;}}}
   return JSON.stringify({checks,bad,stage:getS().stage,seasons:getS().nba.length});})()`;
 export default [
-  { name: 'save: every reload rebuilds the run exactly (stats, open decisions, dice)', seed: 11, steps: [
+  { name: 'save: every reload rebuilds the run exactly (stats, open decisions, dice)', seed: 13, steps: [ // seed 11's career got short after the 2026-11-06 NABL points/clutch changes; 13 runs a full career
     { at: 0.3, evalAs: { res: drive }, expect: ['JSON.parse(res).bad.length===0', 'JSON.parse(res).checks>20', 'JSON.parse(res).seasons>=3'] }] },
   { name: 'save: a second career with a different seed also rebuilds exactly', seed: 29, steps: [
     { at: 0.3, evalAs: { res: drive }, expect: ['JSON.parse(res).bad.length===0', 'JSON.parse(res).checks>8'] }] },
