@@ -303,8 +303,9 @@ html.adb .drawer .pn{padding-bottom:calc(20px + var(--adH) + env(safe-area-inset
 html.adb #adStrip{display:block;position:fixed;left:0;right:0;bottom:0;height:calc(var(--adH) + env(safe-area-inset-bottom));background:#0a0806;z-index:9;pointer-events:none}
 html.adb.adsim #adStrip{display:grid;place-items:center;color:#8a7d70;font-size:.8rem;border-top:1px dashed #4a3d30}
 .bub .ici{margin:0}.mi .bub .ici{color:#1a1005}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}.chips .gtpchip{margin:0}
-.chips .gtpchip.gemchip{background:rgba(255,138,31,.12);border-color:rgba(255,138,31,.45);color:var(--acc)}.gemchip .ic{width:1.05em;height:1.05em}
+.chips{grid-auto-rows:1fr}
+.curchips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}.curchips .gtpchip{margin:0}
+.curchips .gtpchip.gemchip{background:rgba(255,138,31,.12);border-color:rgba(255,138,31,.45);color:var(--acc)}.gemchip .ic{width:1.05em;height:1.05em}
 .platToast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translateX(-50%);z-index:60;max-width:90vw;padding:10px 16px;border-radius:12px;background:#1d1713;border:1px solid rgba(255,138,31,.45);color:#f3e9df;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 </style>
 </head>
@@ -1620,7 +1621,7 @@ function drawerHTML(){const hofN=(()=>{try{return JSON.parse(localStorage.getIte
   const ic={settings:icon('sliders'),gtp:icon('gtp'),gear:icon('shirt'),gems:icon('gem'),how:icon('book'),hof:'🏛️',ach:'🏅',quit:icon('home')};sub.gear=gems()+' gems · permanent gear';sub.gems=gems()+' gems · buy gems, Remove Ads';sub.how='The basics, any time';sub.quit='Your run is saved. Continue it any time';if(S.stage!=='build')sub.settings='Sound and reset';
   return`<div class="drawer ${cls}" role="dialog" aria-label="Menu"><div class="bd" onclick="closeMenu()"></div><div class="pn">
   <div class="row" style="flex-wrap:nowrap"><div class="logo">${BALL}<div>BUILD A <span>GOAT</span></div></div><button class="x" aria-label="Close menu" onclick="closeMenu()"><i></i><i></i></button></div>
-  <div class="chips"><div class="gtpchip">🪙 ${gtpBank()-perkCost()} GTP${perkCost()?` · ${perkCost()} in cart`:''}</div><div class="gtpchip gemchip">${icon('gem','ici')}${gems()} gems</div></div>
+  <div class="curchips"><div class="gtpchip">🪙 ${gtpBank()-perkCost()} GTP${perkCost()?` · ${perkCost()} in cart`:''}</div><div class="gtpchip gemchip">${icon('gem','ici')}${gems()} gems</div></div>
   ${menuItems().map(([k,,l])=>`<button class="mi" onclick="${k==='quit'?'quitRun()':`openMenu('${k}')`}"><span class="bub">${ic[k]}</span><span class="grow"><span class="t">${l}</span><small>${sub[k]}</small></span><span class="chev">›</span></button>`).join('')}
   </div></div>`;}
 function menuHTML(){const k=UI().menu,m=menuAll().find(x=>x[0]===k),hofN=(()=>{try{return JSON.parse(localStorage.getItem('bag_hof')||'[]').length;}catch{return 0;}})(),achN=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('bag_ach')||'{}')).length;}catch{return 0;}})();
@@ -2254,7 +2255,7 @@ function seqSkip(){UI().seq=null;render();scrollTo(0,0);}
 let FXprev=null,FXcur=null;
 let TAPGUARD=0;
 document.addEventListener('click',e=>{if(performance.now()<TAPGUARD&&e.target.closest&&e.target.closest('.opt,.dock button')){e.stopPropagation();e.preventDefault();}},true);
-function fxBefore(){FXcur={key:S.stage+'|'+(S.pend?S.pend.title:'')+'|'+(UI().seq?'q'+UI().seq.i:'')+'|'+(S.stage==='build'?UI().tab+'|'+(UI().menu==='open'?'':UI().menu||''):''),ovr:S.stage==='build'?null:Math.round(ovr()),seasons:S.hs.length+S.col.length+S.nba.length,stage:S.stage};}
+function fxBefore(){FXcur={key:S.stage+'|'+(S.pend?S.pend.title:'')+'|'+(UI().seq?'q'+UI().seq.i:'')+'|'+(S.stage==='build'?UI().tab+'|'+(UI().menu==='open'?'':UI().menu||''):''),ovr:S.stage==='build'?null:OV(),seasons:S.hs.length+S.col.length+S.nba.length,stage:S.stage};}
 function confetti(n=70){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;const c=document.createElement('div');c.className='confetti';const col=['#ff8a1f','#ffc84a','#ffffff','#5fd68a','#ffb15e','#6aa8ff'];
   for(let i=0;i<n;i++){const e=document.createElement('i');e.style.left=(Math.random()*100)+'vw';e.style.background=col[i%col.length];e.style.setProperty('--dx',(Math.random()*160-80)+'px');e.style.setProperty('--r',(Math.random()*900-450)+'deg');e.style.animationDuration=(1.6+Math.random()*1.6)+'s';e.style.animationDelay=(Math.random()*.5)+'s';if(i%3===0){e.style.width='10px';e.style.height='10px';e.style.borderRadius='50%';}c.appendChild(e);}
   document.body.appendChild(c);setTimeout(()=>c.remove(),4200);}
