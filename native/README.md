@@ -19,7 +19,7 @@ distribution certificate, fastlane, and TestFlight builds from GitHub Actions (`
 |---|---|---|
 | **Banner ad** | bottom of every screen | Adaptive banner pinned above the home indicator. The dock and page padding move up by its height (`html.adb`, `--adH`). Gone for good once Remove Ads is owned. |
 | **Double your rewards** | end-of-career screen, gems card | One rewarded ad per career doubles that career's gems **and** GTP. finish() has already paid once; the ad pays `S.gemsRun` and `S.gtpRun` once more, guarded by `S.dbl`. Never on Rookie or the Daily Build. |
-| **Gem shop** | menu > Equipment, under the gear list | Four gem packs and Remove Ads, plus **Restore purchases** (App Review requires it). |
+| **Gem shop** | menu > Equipment, under the gear list | Five gem packs and Remove Ads, plus **Restore purchases** (App Review requires it). |
 
 On the web (GitHub Pages) none of this shows. Add `?dev=1` to the URL to play every flow with a
 simulated `confirm()` sheet and a placeholder banner strip. Under Witness, Plat does nothing.
@@ -119,11 +119,15 @@ Store product ids are unique across a developer account, and Euchre and The Fort
 
 | Product id | Type | Grants | Price |
 |---|---|---|---|
-| `bag_gems_100` | consumable | 100 gems (one Gold item) | $0.99 |
-| `bag_gems_600` | consumable | 600 gems | $4.99 |
-| `bag_gems_1400` | consumable | 1,400 gems | $9.99 |
-| `bag_gems_3200` | consumable | 3,200 gems | $19.99 |
+| `bag_gems_t1` | consumable | 40 gems | $1.99 |
+| `bag_gems_t2` | consumable | 110 gems | $4.99 |
+| `bag_gems_t3` | consumable | 250 gems (tagged Popular) | $9.99 |
+| `bag_gems_t4` | consumable | 550 gems | $19.99 |
+| `bag_gems_t5` | consumable | 1,500 gems (tagged Best value) | $49.99 |
 | `bag_noads` | non-consumable | removes the banner (the reward ad stays optional) | $3.99 |
 
 For scale: a Pro career pays about 5 to 16 gems, a GOAT career 45, Hall of Fame 1.5×, and maxing
-every piece of gear costs 1,700.
+every piece of gear costs 1,700. Each pack gives about 10-14% more gems per dollar than the one
+before it, and the top pack stays under 1,700 so it never buys more than the game can use. Ids are by tier
+(`_t1`..`_t5`), not by amount, because a product id can never be renamed: retune the amounts in
+`SHOP_PACKS` freely.

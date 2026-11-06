@@ -2333,8 +2333,11 @@ const PLAT_IDS={
   testBanner:'ca-app-pub-3940256099942544/2435281174',
   rcKey:'',                                              // PLACEHOLDER: RevenueCat project "Build a GOAT", public App Store SDK key (appl_...)
 };
-const SHOP_PACKS=[{sku:'bag_gems_100',gems:100,usd:.99},{sku:'bag_gems_600',gems:600,usd:4.99,tag:'Popular'},
-  {sku:'bag_gems_1400',gems:1400,usd:9.99},{sku:'bag_gems_3200',gems:3200,usd:19.99,tag:'Best value'}];
+// Gem packs: ids are by tier (an App Store product id can never be renamed), so amounts can be retuned without new products.
+// Each tier is ~10-14% more gems per dollar than the last; the top pack stays under the 1,700 gems that max every gear item.
+const SHOP_PACKS=[{sku:'bag_gems_t1',gems:40,usd:1.99},{sku:'bag_gems_t2',gems:110,usd:4.99},
+  {sku:'bag_gems_t3',gems:250,usd:9.99,tag:'Popular'},{sku:'bag_gems_t4',gems:550,usd:19.99},
+  {sku:'bag_gems_t5',gems:1500,usd:49.99,tag:'Best value'}];
 const SHOP_NOADS={sku:'bag_noads',usd:3.99};
 const SHOP_SKUS=()=>[...SHOP_PACKS.map(p=>p.sku),SHOP_NOADS.sku];
 const noAds=()=>{try{return localStorage.getItem('bag_noads')==='1';}catch{return false;}};

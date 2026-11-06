@@ -35,7 +35,7 @@ appstoreconnect.apple.com > Apps > **+** > New App.
 
 ### 3. App Store Connect: in-app purchases
 The app > Monetization > In-App Purchases > **+**, one per row of the table in `native/README.md`
-("In-app products"): four **Consumable** gem packs and one **Non-Consumable** `bag_noads`. Each needs
+("In-app products"): five **Consumable** gem packs and one **Non-Consumable** `bag_noads`. Each needs
 a price, an English display name and description, and a review screenshot (the Equipment screen
 with the Gem shop is fine).
 

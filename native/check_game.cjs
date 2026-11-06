@@ -87,7 +87,7 @@ function checkGame(html) {
     }
   }
   const skus = [...html.matchAll(/\bsku:'([^']+)'/g)].map((m) => m[1]);
-  if (skus.length !== 5) fails.push('expected 5 store products (4 gem packs, noads), found ' + skus.length + ': ' + skus.join(', '));
+  if (skus.length !== 6) fails.push('expected 6 store products (5 gem packs, noads), found ' + skus.length + ': ' + skus.join(', '));
   // App Store product ids are unique per developer account; Euchre and The Fort already sell remove_ads, coins_*, fort_*
   const bad = skus.filter((s) => !/^bag_[a-z0-9_]+$/.test(s));
   if (bad.length) fails.push('store product ids must be bag_-prefixed: ' + bad.join(', '));
