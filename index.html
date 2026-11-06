@@ -302,6 +302,9 @@ html.adb .drawer .pn{padding-bottom:calc(20px + var(--adH) + env(safe-area-inset
 #adStrip{display:none}
 html.adb #adStrip{display:block;position:fixed;left:0;right:0;bottom:0;height:calc(var(--adH) + env(safe-area-inset-bottom));background:#0a0806;z-index:9;pointer-events:none}
 html.adb.adsim #adStrip{display:grid;place-items:center;color:#8a7d70;font-size:.8rem;border-top:1px dashed #4a3d30}
+.bub .ici{margin:0}.mi .bub .ici{color:#1a1005}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}.chips .gtpchip{margin:0}
+.chips .gtpchip.gemchip{background:rgba(255,138,31,.12);border-color:rgba(255,138,31,.45);color:var(--acc)}.gemchip .ic{width:1.05em;height:1.05em}
 .platToast{position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top));transform:translateX(-50%);z-index:60;max-width:90vw;padding:10px 16px;border-radius:12px;background:#1d1713;border:1px solid rgba(255,138,31,.45);color:#f3e9df;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.5)}
 </style>
 </head>
@@ -532,7 +535,7 @@ function simCol(){const y=S.col.length,T=TIER[S.tier];S.age=18+y;
   let mm=S.banned?'🚫 Postseason ban':'Missed the tournament';if(!S.banned&&(wins>=23||(S.tier!=='mid'&&wins>=20))){const rd=['First Round','Round of 32','Sweet 16','Elite 8','Final Four','Title Game'];let r=0;
     while(r<6&&R()<clamp(.45+(S.teamStr-60)*.012+(o-65)*.015+(wins-24)*.025+(S.traits.clutch-3)*.03-r*.04,.06,.9))r++;
     mm=r===6?'🏆 NATIONAL CHAMPIONS':`Lost in the ${rd[r]}`;if(r===6){S.hype+=8;acc.push('🏆 National Champion');if(!S.badges.includes('Big Shot Maker')){S.badges.push('Big Shot Maker');S.traits.clutch=Math.min(5,S.traits.clutch+2);S.attrs.cons=Math.min(99,S.attrs.cons+6);S.attrs.iq=Math.min(99,S.attrs.iq+3);acc.push('🎯 You earn the BIG SHOT MAKER badge: +2 Clutch, +6 Consistency, +3 IQ. You thrive under pressure for life.');}}else if(r>=4)S.hype+=4;}
-  {const cg=earnGtp((acc.includes('🏅 National Player of the Year')?3:0)+(acc.includes('🎖️ All-American')?1:0)+(acc.includes('🏆 National Champion')?4:0),'College');if(cg>0)acc.push(`💎 +${cg} GTP`);}
+  {const cg=earnGtp((acc.includes('🏅 National Player of the Year')?3:0)+(acc.includes('🎖️ All-American')?1:0)+(acc.includes('🏆 National Champion')?4:0),'College');if(cg>0)acc.push(`🪙 +${cg} GTP`);}
   S.hype=Math.max(0,S.hype);const hm=S.hurt?.6:1,hurtTxt=S.hurt?` · ${ri(3,8)} games (injured)`:'';S.hurt=0;
   S.banned=false;S.col.push({title:`${YR[y]} at ${S.school} · age ${S.age}`,line:`${f1(ppg*hm)} PPG · ${f1(rpg*hm)} RPG · ${f1(apg*hm)} APG · ${f1(spg*hm)} SPG · ${f1(bpg*hm)} BPG · ${wins}-${losses} · ${mm}${hurtTxt}`,ev,acc,proj:projRange()});
   const maxY=S.redshirt?5:4;if(S.col.length>=maxY)S.mustDeclare=true;}
@@ -1595,7 +1598,7 @@ function settingsCard(){const u=UI(),ach=Object.keys((()=>{try{return JSON.parse
     <div class="two" style="margin-top:8px"><button class="danger" onclick="resetProgress()">Yes, erase everything</button><button class="ghost" onclick="UI().confirmReset=false;render()">Cancel</button></div>`
   :`<button class="ghost" style="margin-top:10px;width:100%" onclick="UI().confirmReset=true;UI().resetDone=false;render()">Reset all progress</button>`}</div>`;}
 function resetProgress(){for(const k of[...SAVE_KEYS,...Object.values(SV)])try{localStorage.removeItem(k);}catch{}R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,menu:'settings',resetDone:true};render();scrollTo(0,0);}
-const MENU=[['settings','sliders','Settings','Difficulty and reset'],['gtp','💎','GTP Store','Perks for your next player'],['gear','shirt','Equipment','Permanent gear for every player'],['hof','🏛️','Hall of Builds','Your best careers'],['ach','🏅','Achievements','What you have unlocked']];
+const MENU=[['settings','sliders','Settings','Difficulty and reset'],['gtp','gtp','GTP Store','Perks for your next player'],['gear','shirt','Equipment','Permanent gear for every player'],['hof','🏛️','Hall of Builds','Your best careers'],['ach','🏅','Achievements','What you have unlocked']];
 // the Gem Shop item exists only while the store is on (iOS app with RevenueCat, or ?dev=1); see PLATFORM (Plat)
 const MENU_GEMS=['gems','gem','Gem Shop','Buy gems and Remove Ads'];
 const menuAll=()=>{const m=[...MENU];if(storeOn())m.splice(m.findIndex(x=>x[0]==='gear')+1,0,MENU_GEMS);return m;};
@@ -1609,10 +1612,10 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&typeof S!=='undefin
 const BALL='<svg class="ball" viewBox="0 0 40 40" aria-hidden="true"><defs><radialGradient id="bg1" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffb05a"/><stop offset="1" stop-color="#d9580a"/></radialGradient></defs><circle cx="20" cy="20" r="18" fill="url(#bg1)"/><g fill="none" stroke="#3a1a05" stroke-width="1.6"><path d="M2 20h36M20 2v36"/><path d="M7 7c6 5 6 21 0 26M33 7c-6 5-6 21 0 26"/></g></svg>';
 function drawerHTML(){const hofN=(()=>{try{return JSON.parse(localStorage.getItem('bag_hof')||'[]').length;}catch{return 0;}})(),achN=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('bag_ach')||'{}')).length;}catch{return 0;}})(),cls=drawerAnim?'in':'';drawerAnim=false;
   const sub={settings:diff().name.replace(/^\S+\s/,'')+' · difficulty and reset',gtp:(gtpBank()-perkCost())+' GTP available · perks for this player',hof:hofN+' careers · your best builds',ach:achN+'/'+ACH.length+' unlocked'};
-  const ic={settings:icon('sliders'),gtp:'💎',gear:icon('shirt'),gems:icon('gem'),how:icon('book'),hof:'🏛️',ach:'🏅',quit:icon('home')};sub.gear=gems()+' gems · permanent gear';sub.gems=gems()+' gems · buy gems, Remove Ads';sub.how='The basics, any time';sub.quit='Your run is saved. Continue it any time';if(S.stage!=='build')sub.settings='Sound and reset';
+  const ic={settings:icon('sliders'),gtp:icon('gtp'),gear:icon('shirt'),gems:icon('gem'),how:icon('book'),hof:'🏛️',ach:'🏅',quit:icon('home')};sub.gear=gems()+' gems · permanent gear';sub.gems=gems()+' gems · buy gems, Remove Ads';sub.how='The basics, any time';sub.quit='Your run is saved. Continue it any time';if(S.stage!=='build')sub.settings='Sound and reset';
   return`<div class="drawer ${cls}" role="dialog" aria-label="Menu"><div class="bd" onclick="closeMenu()"></div><div class="pn">
   <div class="row" style="flex-wrap:nowrap"><div class="logo">${BALL}<div>BUILD A <span>GOAT</span></div></div><button class="x" aria-label="Close menu" onclick="closeMenu()"><i></i><i></i></button></div>
-  <div class="gtpchip">💎 ${gtpBank()-perkCost()} GTP${perkCost()?` · ${perkCost()} in cart`:''}</div>
+  <div class="chips"><div class="gtpchip">🪙 ${gtpBank()-perkCost()} GTP${perkCost()?` · ${perkCost()} in cart`:''}</div><div class="gtpchip gemchip">${icon('gem','ici')}${gems()} gems</div></div>
   ${menuItems().map(([k,,l])=>`<button class="mi" onclick="${k==='quit'?'quitRun()':`openMenu('${k}')`}"><span class="bub">${ic[k]}</span><span class="grow"><span class="t">${l}</span><small>${sub[k]}</small></span><span class="chev">›</span></button>`).join('')}
   <div class="foot"><button class="${SND.P.sfx?'':'ghost'} sm" aria-label="Sound effects ${SND.P.sfx?'on':'off'}" onclick="SND.set('sfx',${!SND.P.sfx})">Sound ${SND.P.sfx?'on':'off'}</button><button class="${SND.P.music?'':'ghost'} sm" aria-label="Music ${SND.P.music?'on':'off'}" onclick="SND.set('music',${!SND.P.music})">Music ${SND.P.music?'on':'off'}</button></div></div></div>`;}
 function menuHTML(){const k=UI().menu,m=menuAll().find(x=>x[0]===k),hofN=(()=>{try{return JSON.parse(localStorage.getItem('bag_hof')||'[]').length;}catch{return 0;}})(),achN=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('bag_ach')||'{}')).length;}catch{return 0;}})();
@@ -1683,6 +1686,7 @@ const ICONS={
   shield:'<path d="M12 2.8l7.5 2.8v5.6c0 4.8-3.2 8.4-7.5 10-4.3-1.6-7.5-5.2-7.5-10V5.6z"/><path d="M12 7v10.2"/>',
   flame:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4.1 2-6 .5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
   goat:'<path d="M7.5 8h9c0 3.5-.9 6.6-2 8.7-.5 1-1.4 1.6-2.5 1.6s-2-.6-2.5-1.6C8.4 14.6 7.5 11.5 7.5 8z"/><path d="M11 8C10.6 4.8 8.3 2.8 4.6 2.8c2 1.2 3.4 3 3.9 5.2"/><path d="M13 8c.4-3.2 2.7-5.2 6.4-5.2-2 1.2-3.4 3-3.9 5.2"/><path d="M7.6 9.2c-1.6-.4-3.4 0-4.6 1 1.3.9 3.1 1.1 4.9.8"/><path d="M16.4 9.2c1.6-.4 3.4 0 4.6 1-1.3.9-3.1 1.1-4.9.8"/><path d="M11 18l1 3.5 1-3.5"/><circle cx="10.2" cy="11.7" r="1" fill="currentColor" stroke="none"/><circle cx="13.8" cy="11.7" r="1" fill="currentColor" stroke="none"/>',
+  gtp:'<path d="M12 2.6l8 4.6v9.6l-8 4.6-8-4.6V7.2z"/><path d="M12 7.6l1.3 2.7 2.9.3-2.2 2 .7 2.9L12 14l-2.7 1.5.7-2.9-2.2-2 2.9-.3z"/>',
   gem:'<path d="M6.5 4h11L21 9l-9 11L3 9z"/><path d="M3 9h18"/><path d="M12 20L8.5 9l2-5M12 20l3.5-11-2-5"/>',
   ring:'<path d="M10 3.5h4l1.6 2.2L12 9.4 8.4 5.7z"/><circle cx="12" cy="15.2" r="5.6"/>',
   pillars:'<path d="M3.5 8.5L12 3.5l8.5 5z"/><path d="M5 11h14"/><path d="M6.5 11v6.5M10 11v6.5M14 11v6.5M17.5 11v6.5"/><path d="M4.5 17.5h15M3 20.5h18"/>',
@@ -1781,6 +1785,7 @@ const EMOJI_ICON={
   "🏀":['ball','c-orange'],
   "🏋":'dumbbell',
   "💎":['gem','c-blue'],
+  "🪙":['gtp','c-gold'],
   "🛡":['shield','c-blue'],
   "🤝":'users',
   "🐐":['goat','c-gold'],
@@ -2046,7 +2051,7 @@ function seasonCard(s,lite){const aw=s.aw.filter(x=>x!=='MVP'),role=s.mins>=28?[
   ${aw.length?`<div class="ev gold">🏅 ${aw.join(' · ')}</div>`:''}${s.inj?`<div class="ev bad">${/🚑|🛡/.test(s.inj)?'':'🤕 '}${s.inj}</div>`:''}${s.gp<65?`<div class="ev muted">⚠️ ${s.gp} games: not eligible for MVP, All-NBA or other awards (65-game rule)</div>`:''}
   ${s.path.length?s.path.map(x=>`<div class="ev ${x.includes(': beat')?'good':'bad'}">${x.includes(': beat')?'✅':'❌'} ${x}</div>`).join(''):'<div class="ev muted">🚫 Missed the playoffs</div>'}
   ${s.po.includes('CHAMPION')?'<div class="ev gold">🏆 <b>NBA Champions</b></div>':''}
-  ${s.gtp?`<div class="ev gold">💎 +${s.gtp} GTP</div>`:''}${s.notes.map(x=>`<div class="ev">${x}</div>`).join('')}${s.ovr<61&&S.stage==='nba'?'<div class="ev bad">⚠️ You’re on the roster bubble. Players below ${dsp(61)} OVR can get cut.</div>':''}
+  ${s.gtp?`<div class="ev gold">🪙 +${s.gtp} GTP</div>`:''}${s.notes.map(x=>`<div class="ev">${x}</div>`).join('')}${s.ovr<61&&S.stage==='nba'?'<div class="ev bad">⚠️ You’re on the roster bubble. Players below ${dsp(61)} OVR can get cut.</div>':''}
   ${s.best?`<div class="ev">🔥 <span>Season high: <b>${s.best.pts}</b> pts, ${s.best.reb} reb, ${s.best.ast} ast vs the ${tShort(s.best.opp)}${s.best.ch?' · <span class="gold">career high</span>':''}</span></div>`:''}
   ${!lite&&s.hist&&s.hist.length?s.hist.map(x=>`<div class="ev gold">${x}</div>`).join(''):''}
   ${s.rv?`<div class="note">⚔️ Rival ${s.rv.name}: ${f1(s.rv.ppg)} PPG, ${s.rv.wins} wins${s.h2h?` · season series ${s.h2h[0]}-${s.h2h[1]}`:''}</div>`:''}</div>`;}
@@ -2056,9 +2061,9 @@ function seasonTable(rev){if(!S.nba.length)return'';const rows=S.nba.map(s=>`<tr
 
 // ---------- builder pieces ----------
 function gtpCard(full){const bank=gtpBank(),cost=perkCost();
-  if(S.daily)return`<div class="card"><div class="sh">💎 <span class="grow">Generational Talent Points</span><b>${bank}</b></div><div class="sub">Perks are off for the Daily Build so everyone plays on equal terms. You still earn GTP.</div></div>`;
+  if(S.daily)return`<div class="card"><div class="sh">🪙 <span class="grow">Generational Talent Points</span><b>${bank}</b></div><div class="sub">Perks are off for the Daily Build so everyone plays on equal terms. You still earn GTP.</div></div>`;
   const canBuy=PERKS_GTP.some(([k,l,d,c,mx])=>c<=bank-cost&&((S.perks&&S.perks[k])||0)<mx);
-  return`<details class="card" ${full||cost||canBuy?'open':''}><summary role="button">💎 GTP Shop · <span class="gold">${bank-cost} available</span>${cost?` · ${cost} in cart`:canBuy?' · tap a perk to buy':''}</summary>
+  return`<details class="card" ${full||cost||canBuy?'open':''}><summary role="button">🪙 <span class="grow">GTP Shop · <span class="gold">${bank-cost} available</span>${cost?` · ${cost} in cart`:canBuy?' · tap a perk to buy':''}</span></summary>
   <div class="sub" style="margin-top:6px">${bank?'':'You have no GTP yet. Earn it on Pro or Hall of Fame from great seasons. '}Perks last for one player: they are used up when that career starts.</div>
   ${PERKS_GTP.map(([k,l,d,c,mx])=>{const n=(S.perks&&S.perks[k])||0;return`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><div class="grow"><b>${l}</b>${n?` <span class="gold">×${n}</span>`:''}<div class="sub">${d} · ${c} GTP${k==='spin'&&S.spunEra&&n?' · already used, so it can’t be refunded':''}</div></div>
     <button class="ghost sm" aria-label="Remove ${l}" onclick="buyPerk('${k}',-1)" ${n&&!(k==='spin'&&S.spunEra)?'':'disabled'}>−</button><button class="sm" aria-label="Buy ${l}" onclick="buyPerk('${k}',1)" ${n>=mx||bank-cost<c?'disabled':''}>+</button></div>`;}).join('')}</details>`;}
@@ -2079,7 +2084,7 @@ function buildHTML(){const u=UI(),left=START_BUDGET-spent(),ti=Math.max(0,TABS.f
   if(tab==='setup')h+=`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>Build a <span>GOAT</span></h1>${menuBtn()}</div>${continueCard()}<div class="sub">Build a raw prospect, survive high school and college, and find out if you become the greatest of all time. Playing on <b>${diff().name.replace(/^\S+\s/,'')}</b> (change it in the menu under Settings).</div>
     <div class="card"><div class="sh">🎰 <span class="grow">League era</span>${S.daily?'<b>Daily</b>':`<button class="ghost sm" onclick="spinEra()" ${S.spins<=0?'disabled':''}>🎲 Re-spin · ${S.spins}</button>`}</div><div style="font-size:1.15rem;font-weight:800">${era().name}</div><div class="sub">${era().d}</div><div class="sub">Teams in this era pay extra for <b>${catName(eraWants())}</b>. It shapes draft buzz and free agency choices.</div>
     <details><summary>📅 Daily Build${S.daily?' · on':''}</summary><div class="sub">Same era and same dice for everyone today. Played on Pro with no perks.</div><button class="${S.daily?'sel':'ghost'} wide" style="margin-top:8px" onclick="toggleDaily()">${S.daily?'Daily Build is on · tap to turn off':'Play today\'s Daily Build'}</button>${S.daily&&dailyBest().length?`<div class="note">Today's best: ${dailyBest().slice(0,3).map(x=>`<b>${esc(x.name)}</b> ${x.score}`).join(' · ')}</div>`:''}</details></div>
-    ${gtpBank()&&!S.daily?`<button class="opt" onclick="openMenu('gtp')"><div class="grow"><div class="t">💎 ${perkCost()?`${perkCost()} GTP of perks ready for this player`:`${gtpBank()} GTP to spend`}</div><small>${perkCost()?`They apply when you start High School · ${gtpBank()-perkCost()} GTP left`:'Open the GTP Store to buy perks for this player'}</small></div></button>`:''}`;
+    ${gtpBank()&&!S.daily?`<button class="opt" onclick="openMenu('gtp')"><div class="grow"><div class="t">🪙 ${perkCost()?`${perkCost()} GTP of perks ready for this player`:`${gtpBank()} GTP to spend`}</div><small>${perkCost()?`They apply when you start High School · ${gtpBank()-perkCost()} GTP left`:'Open the GTP Store to buy perks for this player'}</small></div></button>`:''}`;
   if(tab==='look')h+=`${hd('Look')}<div class="card"><div class="sh">✍️ <span class="grow">Name</span></div><input id="nm" type="text" maxlength="24" value="${esc(S.name)}" placeholder="Name your prospect" oninput="S.name=this.value"></div>${lookEditor()}`;
   if(tab==='body')h+=`${hd('Body')}<div class="card"><div class="sh">🏀 <span class="grow">Position</span></div><div class="seg">${Object.keys(POS).map(p=>`<button class="${S.pos===p?'on':''}" onclick="(S.hPos=S.hPos||{})[S.pos]=S.height;S.pos='${p}';S.height=S.hPos['${p}']??POS['${p}'].h;render()">${p}</button>`).join('')}</div></div>
     <div class="card"><div class="sh">📏 <span class="grow">Height</span><b id="hval">${ht(S.height)}</b></div><input type="range" aria-label="Height" min="${POS[S.pos].h-4}" max="${POS[S.pos].h+5+(S.perks&&S.perks.growth?3:0)}" value="${S.height}" oninput="S.height=+this.value;updHeight()" onchange="render()"><div class="sub" id="hnote">${heightText()}</div><div class="note" id="heff">${heightNote()}</div>${dunkCap()}</div>
@@ -2158,7 +2163,7 @@ function endHTML(){const c=career(),sc=goatScore(c),[t,d]=tierOf(sc,c),k=c.cnt,g
   ${acc.length?`<div class="card"><div class="sh">🏆 <span class="grow">Accolades</span></div>${acc.map(([x,l])=>`<span class="pill gold">${l} ×${g(x)}</span>`).join('')}</div>`:''}
   ${inductionHTML(t)}${goatDebateHTML()}${jerseyHTML()}
   ${rv?`<div class="card"><div class="sh">⚔️ <span class="grow">Rivalry</span><b class="${meR>=rvR?'good':'bad'}">${meR>=rvR?'Won':'Lost'}</b></div><table><tr><th></th><th>${esc(S.name)}</th><th>${rv.name}</th></tr><tr><td>Rings</td><td>${g('Champion')}</td><td>${rv.rings}</td></tr><tr><td>MVPs</td><td>${g('MVP')}</td><td>${rv.mvps}</td></tr><tr><td>Points</td><td>${Math.round(c.pts).toLocaleString()}</td><td>${Math.round(rv.pts).toLocaleString()}</td></tr></table><div class="note">${meR>=rvR?'You won the rivalry.':'History remembers '+rv.name+' first.'}${S.rvH2H?` Head-to-head: ${S.rvH2H.w}-${S.rvH2H.l}, and ${S.rvH2H.pw}-${S.rvH2H.pl} in playoff series.`:''}</div></div>`:''}
-  <div class="card"><div class="sh">💎 <span class="grow">Generational Talent Points</span><b class="gold">${diff().mult?'+'+(S.gtpRun||0):'—'}</b></div>${diff().mult?`<div class="sub">Earned on ${diff().name.replace(/^\S+\s/,'')} (${diff().mult}× bonus already included below). Your bank: <b>${gtpBank()}</b></div><details><summary>Breakdown</summary><div class="sub">${(S.gtpLog||[]).map(([w,g])=>w+' +'+g).join(' · ')}</div></details>`:'<div class="sub">Rookie earns no GTP and unlocks no achievements. Try Pro or Hall of Fame.</div>'}</div>
+  <div class="card"><div class="sh">🪙 <span class="grow">Generational Talent Points</span><b class="gold">${diff().mult?'+'+(S.gtpRun||0):'—'}</b></div>${diff().mult?`<div class="sub">Earned on ${diff().name.replace(/^\S+\s/,'')} (${diff().mult}× bonus already included below). Your bank: <b>${gtpBank()}</b></div><details><summary>Breakdown</summary><div class="sub">${(S.gtpLog||[]).map(([w,g])=>w+' +'+g).join(' · ')}</div></details>`:'<div class="sub">Rookie earns no GTP and unlocks no achievements. Try Pro or Hall of Fame.</div>'}</div>
   <details class="card"><summary>📊 More career numbers</summary><div class="stat3" style="margin-top:10px">${[['SPG',f1(c.stl/gp)],['BPG',f1(c.blk/gp)],['GAMES',c.gp],['TOTAL REB',Math.round(c.reb).toLocaleString()],['TOTAL AST',Math.round(c.ast).toLocaleString()],['PEAK OVR',dsp(c.peak)]].map(([l,v])=>`<div class="stat"><b>${v}</b>${l}</div>`).join('')}</div></details>
   <details class="card"><summary>🌟 Legend benchmarks · ${bm.filter(x=>x[1]).length}/${bm.length}</summary>${bm.map(([l,ok])=>`<div class="ev ${ok?'good':'muted'}">${ok?'✅':'⬜'} ${l}</div>`).join('')}</details>
   ${(S.log||[]).length?`<details class="card"><summary>📝 Career decisions · ${S.log.length}</summary>${S.log.map(x=>`<div class="ev">${x}</div>`).join('')}</details>`:''}
@@ -2394,12 +2399,13 @@ const Plat=(()=>{let busy=false,booted=null,mt=null;
   return P;})();
 // hoisted so menu code can ask before Plat's const is initialized (render() runs once before the PLATFORM section loads)
 function storeOn(){try{return Plat.iapOn();}catch(e){return false;}}
-// gems -> GTP: about 2 GTP per gem with a small bulk bonus (a career pays ~3.7 GTP per gem earned, so trading never beats playing)
-const GEM_TRADES=[[10,20],[30,65],[75,170]];
+// gems -> GTP: ~0.5-0.6 GTP per gem. A Pro career pays ~23 GTP (median 19) and ~6.6 gems (600 simulated careers), so the
+// $1.99 pack (40 gems) buys about one career's worth of GTP, and a full set of perks (~370 GTP) costs ~600+ gems.
+const GEM_TRADES=[[20,10],[50,28],[100,60]];
 function tradeGems(i){const t=GEM_TRADES[i];if(!t||gems()<t[0])return;try{localStorage.setItem('bag_gems',gems()-t[0]);}catch{}setGtp(gtpBank()+t[1]);UI().tradeMsg=`+${t[1]} GTP for ${t[0]} gems`;render();}
 function gemTradeCard(){const n=gems(),u=UI();
   return`<div class="card"><div class="sh">${icon('gem')} <span class="grow">Trade gems for GTP</span><b class="gold">${n} gems</b></div><div class="sub">Short on GTP for a perk? Swap some gems. GTP is spent on perks for one player; gems buy permanent gear.</div>
-  ${GEM_TRADES.map(([g,p],i)=>`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><span class="bub">💎</span><div class="grow"><b>+${p} GTP</b></div><button class="sm" aria-label="Trade ${g} gems for ${p} GTP" onclick="tradeGems(${i})" ${n<g?'disabled':''}>${g} gems</button></div>`).join('')}
+  ${GEM_TRADES.map(([g,p],i)=>`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><span class="bub">🪙</span><div class="grow"><b>+${p} GTP</b></div><button class="sm" aria-label="Trade ${g} gems for ${p} GTP" onclick="tradeGems(${i})" ${n<g?'disabled':''}>${g} gems</button></div>`).join('')}
   ${u.tradeMsg?`<div class="ev good" style="margin-top:10px">${esc(u.tradeMsg)}</div>`:''}${storeOn()?`<button class="ghost sm" style="margin-top:12px;width:100%" onclick="openMenu('gems')">${icon('gem')} Get more gems</button>`:''}</div>`;}
 function platToast(msg){const t=document.createElement('div');t.className='platToast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),3200);}
 function grantNoAds(){try{localStorage.setItem('bag_noads','1');}catch{}Plat.banner();}
