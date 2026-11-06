@@ -63,7 +63,7 @@ fonts/              Bebas Neue, Barlow, Barlow Condensed woff2 (OFL), so the app
 ios/                the Xcode project (committed); fastlane/ holds the CI lanes
   App/App/Info.plist          AdMob app id, ATT text, SKAdNetwork ids, portrait only
   App/App/PrivacyInfo.xcprivacy  UserDefaults (CA92.1) for the save mirror
-assets/             art.html draws icon-only.png and splash*.png (@capacitor/assets sources)
+assets/             icon-only.png (the game logo) and splash*.png: the @capacitor/assets sources
 fix_spm_paths.cjs   capacitor:sync:after hook: a sync on Windows writes backslash SPM paths; this fixes them
 test_shell.cjs      shell.js against mocked plugins in plain Node (133 checks, banner included)
 check_game.cjs      ../index.html: scripts compile, PLAT_IDS keys, bag_ product ids, Shell contract
@@ -85,9 +85,12 @@ cd native && npx cap sync ios
 `python native/build_www.py --release` builds with the live AdMob units and refuses to build while
 any id below is still a placeholder.
 
-Icon and splash: edit `assets/art.html` (`?show=1` previews it), then render the PNGs. `python
-assets/render_art.py` uses headless Edge. On this machine Edge printed nothing headless, so the PNGs
-were saved from the browser pane instead. Then run `npx capacitor-assets generate --ios` in `native/`.
+Icon and splash: `assets/icon-only.png` is the game's logo (the same art as `apple-touch-icon.png`),
+rendered at 1024x1024 from the game's own `avatar()`: an orange radial-gradient square, "GOAT" in white
+900-weight type, and the avatar with look `{skin:4,hair:1,hc:0,fh:3,face:4,head:1,arms:0,jew:1,guard:0,jer:0,trim:0,js:0,num:23}`,
+age 24, size 150, via a Playwright element screenshot at deviceScaleFactor 1024/180. `splash.png` / `splash-dark.png`
+(2732x2732) are that icon as a rounded tile on the game's dark background with an orange glow. After
+changing either, run `npx capacitor-assets generate --ios` in `native/`.
 
 ## Ids and where they live
 
