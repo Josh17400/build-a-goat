@@ -1975,7 +1975,7 @@ const EMO_RE=/(?:\p{Extended_Pictographic}|[←-⇿⌀-⏿■-◿☀-➿⬀-⯿]
 function emo(m){if(typeof EMOJI_ICON==='undefined')return m;const v=EMOJI_ICON[m.replace(/️/g,'')]||EMOJI_ICON[m];if(!v)return'';const[nm,cls]=Array.isArray(v)?v:[v,''];return icon(nm,'ici '+(cls||''));}
 // The league is the NABL (National American Basketball League) on screen. Internal strings keep 'NBA' (award keys like
 // 'All-NBA 1st', achievement ids, function names), so saves and checks are untouched: only drawn text, aria-label and title change.
-const LEAGUE_TEXT=[[/\bG League Ignite\b/g,'Development League Select'],[/\bG League\b/g,'Development League'],[/\bNBA\b/g,'NABL']];
+const LEAGUE_TEXT=[[/\bG League Ignite\b/g,'D League Select'],[/\bG League\b/g,'D League'],[/\bNBA\b/g,'NABL']];
 const LEAGUE_RE=/\bNBA\b|\bG League\b/;
 function leagueText(s){for(const[r,t]of LEAGUE_TEXT)s=s.replace(r,t);return s;}
 function leagueize(root){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))if(LEAGUE_RE.test(n.nodeValue))n.nodeValue=leagueText(n.nodeValue);
