@@ -102,7 +102,7 @@ All of them are public by design (they ship inside every build), so they sit in 
 | Banner unit, live | `PLAT_IDS.banner` | `ca-app-pub-8913077727879528/1045473333` ("bottom banner") |
 | Rewarded unit, live | `PLAT_IDS.rewarded` | `ca-app-pub-8913077727879528/5764493725` ("double rewards") |
 | Banner / rewarded, test | `PLAT_IDS.testBanner` / `testRewarded` | Google's public iOS test units |
-| RevenueCat public App Store key | `PLAT_IDS.rcKey` | **PLACEHOLDER**: empty, so the shop is hidden in the app |
+| RevenueCat public App Store key | `PLAT_IDS.rcKey` | `appl_XEEhYKNICJGLfrqKZHlYEOtkBeL` (project "Build a GOAT") |
 | ATT prompt text | `Info.plist` `NSUserTrackingUsageDescription` | written; review it |
 | SKAdNetwork ids | `Info.plist` `SKAdNetworkItems` | Google's list, copied from The Fort (fetched 2026-09-27) |
 | Marketing version | Xcode project `MARKETING_VERSION` | `1.0.0` |
@@ -112,7 +112,9 @@ test units, so nobody taps a live ad by accident. With `--release` it uses the l
 
 ## In-app products
 
-**Not created yet.** Create each one in App Store Connect and in RevenueCat under the same id. App
+Created 2026-11-06 in App Store Connect (through the API, with review screenshot, worldwide availability and a USD
+base price) and imported into RevenueCat project "Build a GOAT" (in-app purchase key and App Store Connect API key
+shared with The Fort/Euchre). App
 Store product ids are unique across a developer account, and Euchre and The Fort already sell
 `remove_ads`, `coins_*` and `fort_*`, so every Build a GOAT id is `bag_`-prefixed. The USD values in
 `index.html` are only the label shown before the store answers.
