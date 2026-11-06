@@ -1,0 +1,6 @@
+[{"name":"intro and equipment: intro pages step through and finish; gear costs gems, levels up and boosts every new player","seed":2,"steps":[
+{"at":0.3,"evalAs":{"x":"(UI().intro=0,render(),[0,1,2,3].forEach(()=>{UI().intro++;}),render(),document.getElementById('app').textContent.includes('don’t fear'))"},"expect":"x==true"},
+{"at":0.35,"evalAs":{"x":"(endIntro(),UI().intro==null&&localStorage.getItem('bag_intro')==='1')"},"expect":"x==true"},
+{"at":0.4,"evalAs":{"x":"(localStorage.setItem('bag_gems','75'),openMenu('gear'),buyGear('band'),buyGear('band'),JSON.stringify([gems(),gear().band]))"},"expect":"x=='[5,2]'"},
+{"at":0.45,"evalAs":{"x":"(buyGear('band'),gear().band)"},"expect":"x==2"},
+{"at":0.5,"evalAs":{"x":"(openMenu(null),S.attrs.cons=40,S.attrs.ft=40,startCareer(),S.attrs.cons+'/'+S.attrs.ft)"},"expect":"x=='42/42'"}]}]
