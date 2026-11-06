@@ -1,0 +1,22 @@
+{
+  "appId": "com.buildagoat.game",
+  "appName": "Build a GOAT",
+  "webDir": "www",
+  "zoomEnabled": false,
+  "backgroundColor": "#0a0806",
+  "ios": {
+    "contentInset": "never",
+    "scrollEnabled": true,
+    "allowsLinkPreview": false,
+    "preferredContentMode": "mobile",
+    "backgroundColor": "#0a0806"
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false,
+      "launchFadeOutDuration": 250,
+      "backgroundColor": "#0a0806",
+      "showSpinner": false
+    }
+  }
+}
