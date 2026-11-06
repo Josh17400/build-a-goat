@@ -2325,10 +2325,10 @@ S=newPlayer();bootSave();render();
 // Google's public test units. Bundle id com.buildagoat.game. Store product ids are bag_-prefixed (App Store ids are unique per
 // developer account, and Euchre Unleashed / The Fort already sell remove_ads, coins_*, fort_*).
 const PLAT_IDS={
-  admobApp:'ca-app-pub-3940256099942544~1458002511',     // PLACEHOLDER: Google's sample app id until AdMob app "Build a GOAT" exists. Must equal
-                                                         //   GADApplicationIdentifier in native/ios/App/App/Info.plist (build_www.py checks)
-  rewarded:'',                                           // PLACEHOLDER: live rewarded unit (release builds only)
-  banner:'',                                             // PLACEHOLDER: live adaptive banner unit (release builds only)
+  admobApp:'ca-app-pub-8913077727879528~5336072139',     // AdMob app "Build a GOAT" (iOS). Must equal GADApplicationIdentifier in
+                                                         //   native/ios/App/App/Info.plist (build_www.py checks)
+  rewarded:'ca-app-pub-8913077727879528/5764493725',     // live rewarded unit "double rewards" (release builds only)
+  banner:'ca-app-pub-8913077727879528/1045473333',       // live banner unit "bottom banner" (release builds only)
   testRewarded:'ca-app-pub-3940256099942544/1712485313', // Google's public iOS test units: every non-release build
   testBanner:'ca-app-pub-3940256099942544/2435281174',
   rcKey:'',                                              // PLACEHOLDER: RevenueCat project "Build a GOAT", public App Store SDK key (appl_...)

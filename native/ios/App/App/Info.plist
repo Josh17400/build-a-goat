@@ -50,7 +50,7 @@
 	<!-- AdMob app "Build a GOAT". index.html PLAT_IDS.admobApp holds the same id (build_www.py refuses
 	     to build when they differ); the ad unit ids are in PLAT_IDS too. -->
 	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-3940256099942544~1458002511</string>
+	<string>ca-app-pub-8913077727879528~5336072139</string>
 	<!-- ATT prompt text; native/shell.js asks at launch, before any ad loads. Declined = non-personalized ads. -->
 	<key>NSUserTrackingUsageDescription</key>
 	<string>Your data will be used to show you more relevant ads. Build a GOAT works the same either way.</string>

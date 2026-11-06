@@ -98,9 +98,9 @@ All of them are public by design (they ship inside every build), so they sit in 
 
 | What | Where | Value |
 |---|---|---|
-| AdMob app id | `index.html` `PLAT_IDS.admobApp` **and** `ios/App/App/Info.plist` `GADApplicationIdentifier` (build_www.py refuses a mismatch) | **PLACEHOLDER**: Google's sample app id `ca-app-pub-3940256099942544~1458002511` |
-| Banner unit, live | `PLAT_IDS.banner` | **PLACEHOLDER**: empty |
-| Rewarded unit, live | `PLAT_IDS.rewarded` | **PLACEHOLDER**: empty |
+| AdMob app id | `index.html` `PLAT_IDS.admobApp` **and** `ios/App/App/Info.plist` `GADApplicationIdentifier` (build_www.py refuses a mismatch) | `ca-app-pub-8913077727879528~5336072139` (AdMob app "Build a GOAT", iOS) |
+| Banner unit, live | `PLAT_IDS.banner` | `ca-app-pub-8913077727879528/1045473333` ("bottom banner") |
+| Rewarded unit, live | `PLAT_IDS.rewarded` | `ca-app-pub-8913077727879528/5764493725` ("double rewards") |
 | Banner / rewarded, test | `PLAT_IDS.testBanner` / `testRewarded` | Google's public iOS test units |
 | RevenueCat public App Store key | `PLAT_IDS.rcKey` | **PLACEHOLDER**: empty, so the shop is hidden in the app |
 | ATT prompt text | `Info.plist` `NSUserTrackingUsageDescription` | written; review it |
