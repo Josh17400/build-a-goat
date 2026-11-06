@@ -338,9 +338,9 @@ const FRAMES={Lean:{speed:6,vert:5,stam:5,str:-9,post:-4,intD:-3,oreb:-3,dreb:-2
 const TRAITS=[['work','Work Ethic','You develop faster and age slower'],['dur','Durability','Fewer and lighter injuries'],['clutch','Clutch Gene','You win more playoff series'],['coach','Coachability','You get more out of college'],['star','Star Power','Hype, All-Star votes, draft buzz'],['motor','Motor','You hustle every possession: more rebounds, steals and minutes'],['lead','Leadership','You make teammates better: more wins and playoff series'],['killer','Killer Instinct','Scorer’s mentality: more shots and points, fewer assists'],['late','Late Bloomer','Raw early, but a higher ceiling and a later peak (a gamble)'],['lock','Lockdown Mindset','You take defense personally: steals, blocks, DPOY votes'],['touch','Shooter’s Touch','Soft hands: better 3P%, FT% and FG%']];
 const MIN_A=40, BUILD_MAX=90;
 // ---------- difficulty & Generational Talent Points (GTP) ----------
-const DIFFS={rookie:{name:'🟢 Rookie',budget:230,mult:0,lg:-4,nbaPts:1.3,d:'230 skill points, start around 55 OVR. Great careers are common and THE GOAT is within reach. Earns no GTP or gems and unlocks no achievements.'},
-  pro:{name:'🟡 Pro',budget:205,mult:1,lg:3,nbaPts:.55,d:'205 skill points, start around 50 OVR. A real challenge: most careers end as role players and THE GOAT is very rare. Earns GTP and gems.'},
-  hof:{name:'🔴 Hall of Fame',budget:120,mult:1.5,lg:3.6,nbaPts:.35,d:'120 skill points, start around 45 OVR. Brutal: many players never stick in the league and THE GOAT almost never happens. Earns 1.5× GTP and gems.'}};
+const DIFFS={rookie:{name:'🟢 Rookie',budget:230,mult:0,lg:-4,nbaPts:1.3,d:'Want a relaxed, less challenging career? Play Rookie: 230 skill points, start around 55 OVR, and great careers are common. You will not earn GTP, gems or achievements.'},
+  pro:{name:'🟡 Pro',budget:205,mult:1,lg:3,nbaPts:.7,d:'The real challenge: 205 skill points, start around 50 OVR. Most careers end as role players and THE GOAT is rare. Earns GTP, gems and achievements.'},
+  hof:{name:'🔴 Hall of Fame',budget:120,mult:1.5,lg:3,nbaPts:1.1,d:'The biggest challenge: 120 skill points, start around 45 OVR. Many players never stick in the league and THE GOAT is a legend-level feat. Earns 1.5× GTP, gems and achievements.'}};
 const diff=()=>DIFFS[S.diff]||DIFFS.pro;
 Object.defineProperty(globalThis,'START_BUDGET',{configurable:true,get:()=>diff().budget+25*((S&&S.perks&&S.perks.pts)||0)});
 const gtpBank=()=>{try{return Math.max(0,parseInt(localStorage.getItem('bag_gtp')||'0',10)||0);}catch{return 0;}};
@@ -431,6 +431,7 @@ function growWhy(o0,st,x){const o1=OV(),d=o1-o0,t=S.traits,age=S.age,r=[];x=x||{
   if(x.hurt)r.push('the injury cost you reps');
   if(st!=='nba'){const room=S.ceiling-ovr()+scoutNoise();r.push(room>8?'scouts see lots of room to grow':room>3?'scouts see some room left':'scouts think you are close to your peak');}
   return[d>0?1:d<0?-1:0,`${d>0?'📈':d<0?'📉':'➖'} OVR ${o0} → ${o1}${d?` (${d>0?'+':''}${d})`:''}: ${r.join(' · ')}`];}
+const nablAgeF=a=>a<=27?1:a===28?.9:a===29?.8:Math.max(.25,.8-(a-29)*.15);
 function addBank(n){n*=3;if(n>=0)S.bank+=n*2;else{const t=S.bank+n;if(t<0){S.bank=0;S.bankShort=-t;declineTo(ovr()+t*0.15);}else S.bank=t;}}
 function starNext(){const s=ovr()+S.hype*0.35,n=[58,65,72].find(x=>s<x);return n?Math.ceil(n-s):0;}
 function stars(){const s=ovr()+S.hype*0.35;return s>=72?5:s>=65?4:s>=58?3:2;}
@@ -755,7 +756,7 @@ function seasonPlayoffs(){const c=S.cur,t=S.traits,L=S.L,z=L.z,{n,a,prevO,o,gp,m
   if(beatRival>=0)bpAdd('beat your rival',3);else if(h2h&&h2h[0]>h2h[1])bpAdd('won the rivalry games',1);
   const msHit=[5000,10000,15000,20000,25000,30000].filter(m=>c0.pts<m&&c0.pts+ppg*gp>=m);
   if(msHit.length){bpAdd('milestone',5*msHit.length);notes.push(`🏅 Career milestone: ${msHit.map(m=>m.toLocaleString()).join(' and ')} points`);}
-  const ageF=a<=27?1:a===28?.9:a===29?.8:Math.max(.25,.8-(a-29)*.15);
+  const ageF=nablAgeF(a);
   let bp=Math.round(bpParts.reduce((x,q)=>x+q[1],0)*(diff().nbaPts??1)*ageF);
   // season goals pay out bonus points and GTP
   const gl=S.goals&&S.goals.yr===n+1?S.goals.list:[],gst={ppg,rpg,apg,tp,gp,wins,rounds,champ,aw,mvpRank,rvppg:rival&&!sameTeam?rival.ppg:null,ptsAfter:c0.pts+ppg*gp};
@@ -792,7 +793,9 @@ function seasonPlayoffs(){const c=S.cur,t=S.traits,L=S.L,z=L.z,{n,a,prevO,o,gp,m
   S.pend=nextQ();}
 function nextQ(){while(S.queue&&S.queue.length){const x=S.queue.shift(),p=x.lazy?eventPend():x;if(p)return p;}return null;}
 
-function choose(i){const p=S.pend;if(!p)return;S.lastResult=null;const yr=S.nba.length+1,msg=p.opts[i].fn();if(msg&&!S.lastResult)S.lastResult={ok:true,text:msg,n:1};if(msg)(S.log=S.log||[]).push(`Year ${yr}: ${msg}`);
+function choose(i){const p=S.pend;if(!p)return;S.lastResult=null;const yr=S.nba.length+1,msg=p.opts[i].fn();
+  // NABL offseason: a summer choice that works out pays bonus points, more for riskier calls (safe 1, coin flips about 5)
+  if(p.kind==='summer'&&S.lastResult&&S.lastResult.ok){const o=p.opts[i],base=o.p0!=null?Math.max(1,Math.round((1-o.p0)*10)):1,b=Math.max(1,Math.round(base*(diff().nbaPts??1)*nablAgeF(S.age)));S.bank+=b;S.lastResult.text+=` · +${b} bonus pts`;}if(msg&&!S.lastResult)S.lastResult={ok:true,text:msg,n:1};if(msg)(S.log=S.log||[]).push(`Year ${yr}: ${msg}`);
   if(msg&&S.stage==='nba'&&!['summer','clutch'].includes(p.kind))(S.offLog=S.offLog||[]).push(msg);
   if(S.pend===p)S.pend=S.stage==='nba'?nextQ():null;
   if(p.kind==='clutch'&&!S.cur&&S.stage==='nba')startSeq();}
@@ -893,7 +896,7 @@ function tierOf(sc,c){const avgMin=c.gp?c.min/c.gp:0,AS=c.cnt['All-Star']||0,RG=
   if(sc>=350){const top=S.L&&S.L.leg?allTime('score')[0]:null;if(!top||top.me)return['🐐 THE GOAT','The greatest to ever do it. Nobody is arguing.'];
     return['Top 10 All-Time',`A GOAT-level résumé, but ${top.name} still ranks ahead of you in the GOAT debate.`];}
   if(sc>=200)return['Top 10 All-Time','Mount Rushmore conversations. Barbershop debates forever.'];
-  if(sc>=120&&AS>=6)return['Hall of Famer','First ballot. Jersey in the rafters.'];
+  if(sc>=85&&AS>=5)return['Hall of Famer','First ballot. Jersey in the rafters.'];
   if(sc>=60&&AS>=4)return['Perennial All-Star','A star for a decade. Hall of Fame on the bubble.'];
   if((c.cnt['All-Star']||0)>=1)return['All-Star','You had your moment in the sun.'];
   if(S.pick<=14&&sc<20)return['Bust','A lottery pick who never lived up to it.'];
@@ -1392,7 +1395,7 @@ function riskFit(label){const f=RISK_FIT.find(([re])=>re.test(label));if(!f)retu
   const parts=f[1].map(k=>k.startsWith('t:')?{n:TRAITS.find(t=>t[0]===k.slice(2))[1],z:((S.traits[k.slice(2)]||3)-3)/2}:{n:sname(k),z:(es(k)-o)/20});
   const z=clamp(parts.reduce((s,x)=>s+x.z,0)/parts.length,-1,1),key=parts.slice().sort((a,b)=>z>=0?b.z-a.z:a.z-b.z)[0];return{z,n:key.n};}
 function gamble(label,desc,p0,good,bad){const pAdj=()=>{const f=riskFit(label);return clamp((f?p0+f.z*.2:p0)+(S.lastBust?.06:0),.2,.93);};
-  return{label,get desc(){const f=riskFit(label),why=f&&f.z>=.25?` (your ${f.n} helps)`:f&&f.z<=-.25?` (your ${f.n} is a weakness)`:'';return`${desc}${why} · ${riskTag(pAdj())}`;},
+  return{label,p0,get desc(){const f=riskFit(label),why=f&&f.z>=.25?` (your ${f.n} helps)`:f&&f.z<=-.25?` (your ${f.n} is a weakness)`:'';return`${desc}${why} · ${riskTag(pAdj())}`;},
     fn:()=>{S.bankShort=0;const ok=R()<pAdj(),msg=shortNote(ok?good():bad());S.lastBust=!ok;S.lastResult={ok,text:msg};return msg;}};}
 function safe(label,desc,fn){return{label,desc:`${desc} · ⚪ Safe`,fn:()=>{const msg=fn();S.lastResult={ok:true,text:msg};return msg;}};}
 function relevant(){const w=weights();const cats=Object.keys(w).sort((a,b)=>w[b]-w[a]).slice(0,3);return pick(SUBS[pick(cats)])[0];}
@@ -2077,7 +2080,7 @@ function resultCard(){const r=S.lastResult;return r?`<div class="card result ${r
 
 // ---------- NBA cards ----------
 function legacyCard(){const c=career(),sc=goatScore(c),[t]=tierOf(sc,c),g=x=>c.cnt[x]||0,last=S.nba[S.nba.length-1];
-  const steps=[[60,'Perennial All-Star'],[120,'Hall of Famer'],[200,'Top 10 All-Time'],[350,'GOAT']],nx=steps.find(s=>sc<s[0]),pace=last?c.pts+last.ppg*70*Math.max(0,34-S.age)*.8:0;
+  const steps=[[60,'Perennial All-Star'],[85,'Hall of Famer'],[200,'Top 10 All-Time'],[350,'GOAT']],nx=steps.find(s=>sc<s[0]),pace=last?c.pts+last.ppg*70*Math.max(0,34-S.age)*.8:0;
   const label=S.nba.length<4?'Early career':t==='Bust'||t==='Role Player'?(last&&last.mins>=28?'Starter on the rise':'Fighting for minutes'):t.replace(EMO_RE,'').trim();
   const std=goatStd(),past=!nx,goal=past&&std&&std.score>sc?std.score:GOAT_LINE;
   return`<div class="card"><div class="sh">📈 <span class="grow">Legacy</span><b class="gold">${label}</b></div>
