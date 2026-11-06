@@ -12,7 +12,13 @@ credentials.
 
 ## Checklist: what you need to set up (in order)
 
-Nothing below exists yet for Build a GOAT. Each step names the id to paste back into the code.
+Done (2026-11-06): steps 1 and 2. Bundle id `com.buildagoat.game` is registered, and the app record
+"Build a GOAT" exists (Apple ID 6831687367, SKU `buildagoat001`). Each remaining step names the id
+to paste back into the code.
+
+Also open: App Store Connect shows a banner saying the account holder must accept the updated
+**Paid Applications Schedule** (Business module) before new in-app purchases can be created or new
+apps submitted. TestFlight builds don't need it.
 
 ### 1. Apple Developer: bundle id
 developer.apple.com > Certificates, Identifiers & Profiles > Identifiers > **+** > App IDs > App.
