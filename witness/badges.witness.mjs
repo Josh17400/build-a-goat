@@ -27,9 +27,9 @@ export default [
   { name: 'badges: every badge at Platinum stays inside the caps, and each boost line reads', seed: 25, steps: [
     { at: 0.3, evalAs: { r: "(()=>{S.bdg=Object.fromEntries(BADGES.map(b=>[b.id,4]));const f=badgeFx();return Object.keys(BCAP).every(k=>f[k]<=BCAP[k]+1e-9&&f[k]>0)&&BADGES.every(b=>fxText(b.fx,4).length>3);})()" },
       expect: ['r===true'] }] },
-  { name: 'badges: a season awards them in the story, with their own window', seed: 26, steps: [
-    { at: 0.3, evalAs: { x: "(applyArch(0),S.height=78,S.frame='Balanced',S.attrs.three=90,toggleTrait('work'),toggleTrait('dur'),startCareer(),render(),1)" } },
-    { at: 0.4, call: ['tap', 'Play Freshman Year'], expectPage: ["S.hs[0].bdg.some(c=>c[0]==='rain')", "UI().seq.k.includes('badges')"] },
+  { name: 'badges: you start with the ones you qualify for, and a season awards new ones in the story, with their own window', seed: 26, steps: [
+    { at: 0.3, evalAs: { x: "(applyArch(0),S.height=78,S.frame='Balanced',S.attrs.three=75,toggleTrait('work'),toggleTrait('dur'),startCareer(),S.attrs.three=85,render(),1)" } },
+    { at: 0.4, call: ['tap', 'Play Freshman Year'], expectPage: ["S.hs[0].bdg.some(c=>c[0]==='rain'&&c[1]===1&&c[2]===2)", "UI().seq.k.includes('badges')"] },
     { at: 0.45, evalAs: { x: "(UI().seq.i=UI().seq.k.indexOf('badges'),render(),1)" }, expectPage: [`document.querySelector('.seqcard').textContent.includes('Rainmaker')`] }] },
   { name: 'points: before the freshman season a point can be taken back, after it cannot', seed: 27, steps: [
     { at: 0.3, evalAs: { x: start } },
@@ -52,4 +52,13 @@ export default [
         resumeRun();const s=getS(),room1=s.ceiling-ovr(),dOv=Math.abs(OV()-dsp(o0));let g=0;while(getS().stage==='hs'&&g++<10){if(getS().summerPend)chooseSummer(0);else simHS();}
         return JSON.stringify({room0,room1,dOv,has:NEW_SK.every(k=>s.attrs[k]>=40),bdg:!!s.bdg,stage:getS().stage});})()` },
       expect: ['Math.abs(JSON.parse(r).room0-JSON.parse(r).room1)<0.01', 'JSON.parse(r).has', 'JSON.parse(r).dOv<=2', "JSON.parse(r).stage==='offers'"] }] },
+  { name: 'spending: a Max can be undone until the next season, and only then', seed: 31, steps: [
+    { at: 0.3, evalAs: { x: start } },
+    { at: 0.4, evalAs: { r: "(()=>{S.bank=60;const v=S.attrs.oreb,b=S.bank;spend('oreb',99);const spent=S.bank<b&&S.attrs.oreb>v;const bar=undoBar().includes('Undo');undoSpend();return spent&&bar&&S.attrs.oreb===v&&S.bank===b&&!canUndoSpend();})()" }, expect: ['r===true'] },
+    { at: 0.5, evalAs: { r: "(()=>{getS().bank=60;spend('oreb',10);simHS();if(getS().summerPend)chooseSummer(0);return !canUndoSpend();})()" }, expect: ['r===true'] }] },
+  { name: 'body: − and + buttons move the height one inch inside the limits', seed: 32, steps: [
+    { at: 0.3, evalAs: { x: "(goTab('body'),1)" } },
+    { at: 0.4, call: ['tap', 'One inch taller'], expectPage: ['S.height===80'] },
+    { at: 0.5, evalAs: { x: "(S.height=H_MIN,render(),1)" } },
+    { at: 0.6, call: ['tap', 'One inch shorter'], expectPage: ['S.height===H_MIN'] }] },
 ];
