@@ -350,9 +350,9 @@ const FRAMES={Lean:{speed:6,vert:5,stam:5,lat:4,hook:-2,str:-9,post:-4,intD:-3,o
 const TRAITS=[['work','Work Ethic','You develop faster and age slower'],['dur','Durability','Fewer and lighter injuries'],['clutch','Clutch Gene','You win more playoff series'],['coach','Coachability','You get more out of college'],['star','Star Power','Hype, All-Star votes, draft buzz'],['motor','Motor','You hustle every possession: more rebounds, steals and minutes'],['lead','Leadership','You make teammates better: more wins and playoff series'],['killer','Killer Instinct','Scorer’s mentality: more shots and points, fewer assists'],['late','Late Bloomer','Raw early, but a higher ceiling and a later peak (a gamble)'],['lock','Lockdown Mindset','You take defense personally: steals, blocks, DPOY votes'],['touch','Shooter’s Touch','Soft hands: better 3P%, FT% and FG%']];
 const MIN_A=40, BUILD_MAX=90, H_MIN=70, H_MAX=87;
 // ---------- difficulty & Generational Talent Points (GTP) ----------
-const DIFFS={rookie:{name:'🟢 Rookie',budget:230,mult:0,lg:-4,nbaPts:1,d:'Want a relaxed, less challenging career? Play Rookie: 230 skill points, start around 55 OVR, and great careers are common. You will not earn GTP, gems or achievements.'},
-  pro:{name:'🟡 Pro',budget:205,mult:1,lg:3,nbaPts:1.5,d:'The real challenge: 205 skill points, start around 50 OVR. Most careers end as role players and THE GOAT is rare. Earns GTP, gems and achievements.'},
-  hof:{name:'🔴 Hall of Fame',budget:120,mult:1.5,lg:3,nbaPts:2,d:'The biggest challenge: 120 skill points, start around 45 OVR. Many players never stick in the league and THE GOAT is a legend-level feat. Earns 1.5× GTP, gems and achievements.'}};
+const DIFFS={rookie:{name:'🟢 Rookie',budget:230,mult:0,lg:-4,nbaPts:.5,d:'Want a relaxed, less challenging career? Play Rookie: 230 skill points, start around 55 OVR, and great careers are common. You will not earn GTP, gems or achievements.'},
+  pro:{name:'🟡 Pro',budget:205,mult:1,lg:3,nbaPts:.65,d:'The real challenge: 205 skill points, start around 50 OVR. Most careers end as role players and THE GOAT is rare. Earns GTP, gems and achievements.'},
+  hof:{name:'🔴 Hall of Fame',budget:120,mult:1.5,lg:3,nbaPts:.9,d:'The biggest challenge: 120 skill points, start around 45 OVR. Many players never stick in the league and THE GOAT is a legend-level feat. Earns 1.5× GTP, gems and achievements.'}};
 const diff=()=>DIFFS[S.diff]||DIFFS.pro;
 Object.defineProperty(globalThis,'START_BUDGET',{configurable:true,get:()=>diff().budget+25*((S&&S.perks&&S.perks.pts)||0)});
 const gtpBank=()=>{try{return Math.max(0,parseInt(localStorage.getItem('bag_gtp')||'0',10)||0);}catch{return 0;}};
@@ -402,7 +402,7 @@ const INJ={minor:['sprained ankle','hamstring strain','sore knee','bruised hip',
 let S;
 function newPlayer(){return{diff:(()=>{try{return localStorage.getItem('bag_diff')||'pro';}catch{return'pro';}})(),perks:{},gtpRun:0,look:randLook(),era:pick(ERAS).id,spins:1,daily:false,stage:'build',name:'',pos:'SF',height:79,frame:'Balanced',attrs:Object.fromEntries(SUBKEYS.map(k=>[k,40])),picked:[],traits:{},bank:0,hype:0,age:14,hs:[],col:[],nba:[],ceiling:0,injuryProne:false,badges:[],bdg:{},redshirt:false,flags:{}};}
 
-const cost=v=>v<80?1:2;
+const cost=v=>v<80?1:v<90?2:3;
 const costTo=v=>{let c=0;for(let x=MIN_A;x<v;x++)c+=cost(x);return c;};
 const spent=()=>SUBKEYS.reduce((s,k)=>s+costTo(S.attrs[k]),0);
 function esD(k,d){const fr=FRAMES[S.frame];let v=S.attrs[k]+(fr[k]||0)+d*(HMOD[k]||0)*(d<0&&(k==='blk'||k==='oreb'||k==='dreb')?1.25:1);
@@ -572,20 +572,24 @@ function growTo(target){const pk=archPick();let g=0;
 function declineTo(target){let g=0;const keys=['speed','speed','vert','vert','stam','perD','str','layup','dunk','oreb','stl','blk'];
   while(ovr()>target&&g++<400){const k=pick(keys);if(S.attrs[k]>30)S.attrs[k]--;}}
 // growth is never applied for you: it turns into bonus points worth exactly what that growth would cost, and you place them
-function growPts(target){const a0={...S.attrs};growTo(target);let p=0;for(const k in S.attrs)for(let v=a0[k];v<S.attrs[k];v++)p+=cost(v);S.attrs=a0;if(p>0){S.bank+=p;S.devPts=(S.devPts||0)+p;}return p;}
-function develop(rate){const o=ovr();if(S.perks&&S.perks.dev&&S.stage!=='nba')rate*=1.4;if(o<S.ceiling)growPts(o+(S.ceiling-o)*rate);}
+// development pays DEVF of the points the growth would cost (tuned with the balance sims)
+const DEVF=.7;
+function growPts(target){const a0={...S.attrs};growTo(target);let p=0;for(const k in S.attrs)for(let v=a0[k];v<S.attrs[k];v++)p+=cost(v);p=Math.round(p*DEVF);S.attrs=a0;if(p>0){S.bank+=p;S.devPts=(S.devPts||0)+p;}return p;}
+// S.natO: where natural growth alone has taken you. Development pays the points for that growth, measured from your current
+// skills, so a player who spent ahead of it keeps developing until natural growth reaches the hidden ceiling
+function develop(rate){if(S.natO==null)S.natO=ovr();const o=S.natO;if(S.perks&&S.perks.dev&&S.stage!=='nba')rate*=1.4;if(o<S.ceiling){const t=o+(S.ceiling-o)*rate;growPts(ovr()+(t-o));S.natO=t;}}
 // why the OVR moved this season, from VISIBLE causes only (age, traits, college program, injuries) plus a deliberately noisy scout
 // read of the remaining room. Never names frame effects or hidden numbers; the true ceiling stays an end-screen reveal.
 function scoutNoise(){return(((S.seed||7)*2654435761>>>0)%11)-5;}
 function growWhy(o0,st,x){const o1=OV(),d=o1-o0,t=S.traits,age=S.age,r=[],dp=S.devPts||0;S.devPts=0;x=x||{};
   if(st==='nba')r.push(age<=23?(dp>0?'young and still improving':'young, but no growth this year'):age<=27?'in your prime years':age<=29?'prime years: you hold steady':age>=34?(dp>0?'still holding off Father Time':'age is catching up fast'):(dp>0?'still playing at your peak':'age starts to catch up'));
   else r.push(st==='hs'?'high school development':`${TIER[S.tier].lbl} program`);if(st!=='nba'&&S.perks&&S.perks.dev)r.push('Elite trainer +40%');
-  const late30=st==='nba'&&age>=30;if(t.work>=4)r.push(late30?`Work Ethic ${t.work}/5 slows the decline`:`Work Ethic ${t.work}/5 speeds you up`);else if(t.work<=2)r.push(late30?`Work Ethic ${t.work}/5 speeds the decline`:`Work Ethic ${t.work}/5 holds you back`);
+  const late30=st==='nba'&&age>=30;if(t.work>=4&&(dp>0||late30))r.push(late30?`Work Ethic ${t.work}/5 slows the decline`:`Work Ethic ${t.work}/5 speeds you up`);else if(t.work<=2)r.push(late30?`Work Ethic ${t.work}/5 speeds the decline`:`Work Ethic ${t.work}/5 holds you back`);
   if(t.late>=4&&age<=23)r.push('Late Bloomer: your jump comes later');
   if(st==='college'&&t.coach>=4)r.push('Coachability pays off');
   if(st==='nba'&&age>=30&&t.dur<=2)r.push('low Durability speeds the decline');
   if(x.hurt)r.push('the injury cost you reps');
-  if(st!=='nba'){const room=S.ceiling-ovr()+scoutNoise();r.push(room>8?'scouts see lots of room to grow':room>3?'scouts see some room left':'scouts think you are close to your peak');}
+  if(st!=='nba'){const room=S.ceiling-(S.natO??ovr())+scoutNoise();r.push(room>8?'scouts see lots of room to grow':room>3?'scouts see some room left':'scouts think you are close to your peak');}
   const a=archetype();let evo='';if(S.archId&&a.id!==S.archId)evo=` · 🔀 Your game has evolved: you now play like a${/^[AEIOU]/.test(a.n)?'n':''} ${a.n}`;S.archId=a.id;
   return[dp>0?1:d<0?-1:0,`${dp>0?`📈 Development: +${dp} pts to spend`:d<0?`📉 OVR ${o0} → ${o1} (${d})`:'➖ No growth this year'}${dp>0&&d<0?` · OVR ${o0} → ${o1} (${d})`:''}: ${r.join(' · ')}${evo}`];}
 const nablAgeF=a=>a<=27?1:a===28?.9:a===29?.8:Math.max(.25,.8-(a-29)*.15);
@@ -870,7 +874,7 @@ function seasonPlayoffs(){const c=S.cur,t=S.traits,L=S.L,z=L.z,{n,a,prevO,o,gp,m
   // awards: voted against every real player in the league
   const C=active(L).filter(p=>p.gp>0).map(p=>({p,name:p.name,team:p.team,ovr:p.ovr,gp:p.gp,ppg:p.ppg,rpg:p.rpg,apg:p.apg,spg:p.spg,bpg:p.bpg,tov:p.tov,fg:p.fg,wins:p.wins,star:p.star,d:p.d,rook:p.yrs===0}));
   const ME={me:1,name:S.name,team:S.team,ovr:o,gp,ppg,rpg,apg,spg,bpg,tov,fg,wins,star:(t.star-3)*1.5+badgeFx().as,d:eff('def')+(t.lock-3)*2+badgeFx().dp,rook:n===0};C.push(ME);
-  for(const c of C){c.pr=prodScore(c);c.mv=c.ovr*.6+c.pr*.5+(c.wins-41)*.15+gauss()*1.2;c.as=c.ovr*.6+c.star+c.pr*.5+gauss()*1.5;c.dp=c.d+gauss()*1.5;c.ry=c.ppg+gauss()*1.5;}
+  for(const c of C){c.pr=prodScore(c);c.mv=c.ovr*.6+c.pr*.5+(c.wins-41)*.15+gauss()*1.2;c.as=c.ovr*.6+c.star+c.pr*.7+(c.wins-41)*.05+gauss()*1.5;c.dp=c.d+gauss()*1.5;c.ry=c.ppg+gauss()*1.5;}
   const top=(k,f,g)=>C.filter(g).sort((x,y)=>y[k]-x[k]).slice(0,f),aw=[],W={},give=(c,x)=>{if(c.me)aw.push(x);else c.p.aw[x]=(c.p.aw[x]||0)+1;(W[x]=W[x]||[]).push(c);};
   const an=top('mv',15,c=>c.gp>=65);an.forEach((c,i)=>give(c,i<5?'All-NBA 1st':i<10?'All-NBA 2nd':'All-NBA 3rd'));
   const mvp=an[0];if(mvp){give(mvp,'MVP');if(!mvp.me)mvp.p.mvps++;}
@@ -1010,7 +1014,7 @@ function eventPend(){const last=S.nba[S.nba.length-1],o=ovr(),a=S.age,rv=S.rival
     {label:'🙅 Not my job',desc:'Keep your touches.',fn:()=>'You ignored the rookie'}]});
   if(o>=72&&!S.shoe)E.push({title:'👟 Signature Shoe Offer',text:'A shoe company wants to build a line around you.',opts:[
     {label:'👟 Sign it',desc:'+1 Star Power, but off-court demands cost focus (−2 Consistency).',fn:()=>{S.shoe=1;S.traits.star=Math.min(5,S.traits.star+1);S.attrs.cons=Math.max(30,S.attrs.cons-2);return 'You got a signature shoe';}},
-    {label:'🏀 Stay focused',desc:'+2 Basketball IQ, +1 Work Ethic.',fn:()=>{S.shoe=-1;up('iq',2);S.traits.work=Math.min(5,S.traits.work+1);return 'You turned down a shoe deal to stay focused';}}]});
+    {label:'🏀 Stay focused',desc:S.traits.work>=5?'+2 Basketball IQ (Work Ethic is already 5/5).':'+2 Basketball IQ, +1 Work Ethic.',fn:()=>{S.shoe=-1;up('iq',2);S.traits.work=Math.min(5,S.traits.work+1);return 'You turned down a shoe deal to stay focused';}}]});
   if(o>=78)E.push({title:'🥇 Olympic Team Invite',text:'The national team wants you this summer.',opts:[
     {label:'🏅 Represent your country',desc:'Chase gold. Big hype, but a tired body next season.',fn:()=>{S.hype+=6;addNext({inj:.04});const gold=R()<.7;return gold?'You won Olympic gold 🥇':'You won Olympic silver 🥈';}},
     {label:'😴 Rest up',desc:'Fresh legs next season.',fn:()=>{addNext({boost:.5,inj:-.03});return 'You skipped the Olympics to rest';}}]});
@@ -1640,7 +1644,7 @@ function summerNBA(){const o=ovr(),a=S.age,
     safe('🏠 Family time back home','Recharge the mind',()=>{up('cons',2);return 'You spent the summer with family. +2 Consistency';}),
     safe('🎯 Shooting reps in an empty gym','500 shots a day',()=>{up('ft',2);up('three',1);return 'You got up thousands of shots. +2 Free Throw, +1 Three-Point';})],'summer');}
 
-function chooseSummer(i){const p=S.summerPend;if(!p)return;const o=p.opts[i]||p.opts[p.opts.length-1];o.fn();S.summerNote=[S.lastResult.ok?1:-1,S.lastResult.text];S.summerPend=null;
+function chooseSummer(i){const p=S.summerPend;if(!p)return;const o=p.opts[i]||p.opts[p.opts.length-1];o.fn();S.summerNote=[S.lastResult.ok?1:-1,'↩ Last summer: '+S.lastResult.text.replace(EMO_RE,'').trim()];S.summerPend=null;
   if(S.stage==='college'&&S.colNext){S.colNext=false;simCol();S.lastResult=null;startSeq();}}
 // ---------- clutch moments: the final possession of a Game 7 or a Finals clincher is your call ----------
 const CL_OFF=[['🎯 Pull-up three','three',.36,'Win it from deep','You rise up from 28 feet and drain it as the horn sounds.','Off the back rim. So close.'],
@@ -1675,7 +1679,7 @@ function clutchPend(x){const c=S.cur,t=S.traits,r2=makeRng(((c.rs0||7)^Math.imul
     return{label:l,desc:`${dsc}${tag} · ${pr>=.55?'Low risk':pr>=.4?'Medium risk':'High risk'}`,fn:()=>{const won=u<pr,res=won?ok:no;
       c.clutch.push({won,shot:!def,fin,label:l,text:res,title});S.lastResult={ok:won,text:res,n:1};seasonPlayoffs();return `${title}: ${won?'you came through':'it slipped away'}`;}};});
   return{kind:'clutch',title,text,ctx:{me,them,my:tShort(S.team),op:tShort(x.opp),secs,sit,fin,g},opts,best};}
-function clutchHTML(){const p=S.pend,x=p.ctx;return`<div class="clutch"><div class="cl-top">${p.title}</div>
+function clutchHTML(){const p=S.pend,x=p.ctx,lp=S.cur&&S.cur.clutch&&S.cur.clutch[S.cur.clutch.length-1];return`${lp?`<div class="ev ${lp.won?'good':'bad'}">${lp.won?'✅':'💔'} Last play (${lp.title}): ${esc(lp.text)}</div>`:''}<div class="clutch"><div class="cl-top">${p.title}</div>
   <div class="board"><div class="tm"><span>${x.my}</span><b>${x.me}</b></div><div class="clock"><b>0:${String(x.secs).padStart(4,'0')}</b><small>4TH</small></div><div class="tm"><span>${x.op}</span><b>${x.them}</b></div></div>
   <div class="cl-sit">${p.text}</div></div><div class="card"><div class="sh">🎯 <span class="grow">${x.sit==='up1'?'Your call on defense':'Your call'}</span></div>${p.opts.map((o,i)=>optBtn(o,`act(choose,${i})`)).join('')}</div>`;}
 
@@ -1787,15 +1791,15 @@ const GEAR=[['band','Headband','flame','Stay locked in',['cons','ft']],['shoes',
   ['arm','Arm band','dumbbell','Play through contact',['str','post']],['wrist','Wristbands','swirl','Quick hands',['stl','pass']],
   ['chip','Player tracking chip','bars','Data on every rep',['iq','stam']],['shirt','Compression undershirt','shirt','Win the glass',['dreb','oreb']],
   ['legs','Leg sleeves','bolt','Explode at the rim',['dunk','close']],['shorts','Compression shorts','shield','Stay low on defense',['perD','intD']]];
-const GEAR_COST=[20,50,100],GEAR_LV=['Bronze','Silver','Gold'],GEM_TIER={'🐐 THE GOAT':60,'Top 10 All-Time':45,'Hall of Famer':35,'Perennial All-Star':25,'All-Star':20,'Champion Role Player':18,'Solid Starter':15,'Role Player':10,'Bust':5},GEM_MULT={rookie:0,pro:1,hof:1.5};
+const GEAR_BOOST=[0,2,4,6],GEAR_COST=[20,50,100],GEAR_LV=['Bronze','Silver','Gold'],GEM_TIER={'🐐 THE GOAT':60,'Top 10 All-Time':45,'Hall of Famer':35,'Perennial All-Star':25,'All-Star':20,'Champion Role Player':18,'Solid Starter':15,'Role Player':10,'Bust':5},GEM_MULT={rookie:0,pro:1,hof:1.5};
 const gems=()=>{try{return +localStorage.getItem('bag_gems')||0;}catch{return 0;}};
 const gear=()=>{try{return JSON.parse(localStorage.getItem('bag_gear')||'{}');}catch{return{};}};
 function buyGear(k){const g=gear(),lv=g[k]||0;if(lv>=3||gems()<GEAR_COST[lv])return;try{localStorage.setItem('bag_gems',gems()-GEAR_COST[lv]);g[k]=lv+1;localStorage.setItem('bag_gear',JSON.stringify(g));}catch{}render();}
-function gearNote(){if(S.daily)return null;const g=gear(),on=GEAR.filter(x=>g[x[0]]).map(x=>`${x[1]} +${g[x[0]]} ${x[4].map(k=>SKN[k]).join(' & ')}`);return on.length?{ok:true,n:1,text:`🎽 Your equipment is on: ${on.join(' · ')}`}:null;}
-function wearGear(){if(S.daily)return;const g=gear();for(const[k,,,,ks]of GEAR)for(const a of ks)S.attrs[a]=Math.min(99,S.attrs[a]+(g[k]||0));}
+function gearNote(){if(S.daily)return null;const g=gear(),on=GEAR.filter(x=>g[x[0]]).map(x=>`${x[1]} +${GEAR_BOOST[g[x[0]]]} ${x[4].map(k=>SKN[k]).join(' & ')}`);return on.length?{ok:true,n:1,text:`🎽 Your equipment is on: ${on.join(' · ')}`}:null;}
+function wearGear(){if(S.daily)return;const g=gear();for(const[k,,,,ks]of GEAR)for(const a of ks)S.attrs[a]=Math.min(99,S.attrs[a]+GEAR_BOOST[g[k]||0]);}
 function gearCard(){const g=gear(),n=gems();
   return`<div class="card"><div class="sh">${icon('sparkle')} <span class="grow">Equipment</span><b class="gold">${n} gems</b></div><div class="sub">Gear is permanent: every future player wears it (not the Daily Build). Earn gems at the end of every career on Pro and Hall of Fame.</div>
-  ${GEAR.map(([k,l,ic,d,ks])=>{const lv=g[k]||0,c=GEAR_COST[lv];return`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><span class="bub">${icon(ic)}</span><div class="grow"><b>${l}</b>${lv?` <span class="gold">${GEAR_LV[lv-1]}</span>`:''}<div class="sub">${d} · ${ks.map(sname).join(' & ')} ${lv?`+${lv}`:'+1'} each${lv&&lv<3?` · next level +${lv+1}`:''}</div></div>
+  ${GEAR.map(([k,l,ic,d,ks])=>{const lv=g[k]||0,c=GEAR_COST[lv];return`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><span class="bub">${icon(ic)}</span><div class="grow"><b>${l}</b>${lv?` <span class="gold">${GEAR_LV[lv-1]}</span>`:''}<div class="sub">${d} · ${ks.map(sname).join(' & ')} ${lv?`+${GEAR_BOOST[lv]}`:`+${GEAR_BOOST[1]}`} each${lv&&lv<3?` · next level +${GEAR_BOOST[lv+1]}`:''}</div></div>
     ${lv>=3?'<b class="gold">Maxed</b>':`<button class="sm" aria-label="Buy ${l}" onclick="buyGear('${k}')" ${n<c?'disabled':''}>${c} gems</button>`}</div>`;}).join('')}
   ${storeOn()?`<button class="ghost sm" style="margin-top:14px;width:100%" onclick="openMenu('gems')">${icon('gem')} Get more gems</button>`:''}</div>`;}
 const SAVE_KEYS=['bag_gtp','bag_ach','bag_hof','bag_recent','bag_daily','bag_diff','bag_rec','bag_goats','bag_gems','bag_gear','bag_intro'];
@@ -2205,10 +2209,10 @@ function dock(inner){return inner?`<div class="dock"><div class="in">${inner}</d
 function skillRow(k,l,mode){const v=S.attrs[k],e=Math.round(es(k));let ctl;
   if(mode==='build'){const off=v>=BUILD_MAX||spent()+cost(v)>START_BUDGET;ctl=`<button class="ghost sm" aria-label="Remove a point from ${l}" onclick="adj('${k}',-1)" ${v<=MIN_A?'disabled':''}>−</button><button class="sm" aria-label="Add a point to ${l}" onclick="adj('${k}',1)" ${off?'disabled':''}>+${cost(v)>1?cost(v):''}</button><button class="ghost sm" aria-label="Add 10 points to ${l}" onclick="adjN('${k}',10)" ${off?'disabled':''}>+10</button><button class="ghost sm" aria-label="Max out ${l}" onclick="adjN('${k}',99)" ${off?'disabled':''}>Max</button>`;}
   else if(mode==='view')ctl='';
-  else{const off=S.bank<cost(v)||v>=99;ctl=`${canUndo(k)?`<button class="ghost sm" aria-label="Take a point back from ${l}" onclick="unspend('${k}')">−</button>`:''}<button class="sm" aria-label="Add a point to ${l}" onclick="spend('${k}')" ${off?'disabled':''}>+${cost(v)>1?cost(v):''}</button><button class="ghost sm" aria-label="Raise ${l} by 10" onclick="spend('${k}',10)" ${off?'disabled':''}>+10</button>${UI().maxArm===k?`<button class="sm" aria-label="Confirm max ${l}" onclick="spend('${k}',99)">Tap again: ${maxCost(k)[0]} pts → ${maxCost(k)[1]}</button>`:`<button class="ghost sm" aria-label="Max out ${l}" onclick="UI().maxArm='${k}';render()" ${off?'disabled':''}>Max</button>`}`;}
+  else{const off=S.bank<cost(v)||v>=99;ctl=`${canUndo(k)?`<button class="ghost sm" aria-label="Take a point back from ${l}" onclick="unspend('${k}')">−</button>`:''}<button class="sm" aria-label="Add a point to ${l}" onclick="spend('${k}')" ${off?'disabled':''}>+${cost(v)>1?cost(v):''}</button><button class="ghost sm" aria-label="Raise ${l} by 10" onclick="spend('${k}',10)" ${off?'disabled':''}>+10</button>${UI().maxArm===k?`<button class="sm" aria-label="Confirm max ${l}" onclick="spend('${k}',99)">Tap again: ${maxCost(k)[0]} pts → ${Math.min(99,Math.round(es(k))+maxCost(k)[1]-S.attrs[k])}</button>`:`<button class="ghost sm" aria-label="Max out ${l}" onclick="UI().maxArm='${k}';render()" ${off?'disabled':''}>Max</button>`}`;}
   return`<div class="attr"><span>${l}${IMP[k]==='hi'?'<small class="imp hi">high impact</small>':IMP[k]==='lo'?'<small class="imp">low impact</small>':''}</span><div class="bar"><i style="width:${e}%"></i></div><b>${e}</b><div class="ctl">${ctl}</div>${badgeHint(k)}</div>`;}
 function impactMap(){const o0=ovr(),d=SUBKEYS.map(k=>{const v=S.attrs[k];S.attrs[k]=v+1;const x=ovr()-o0;S.attrs[k]=v;return[k,x];}).sort((a,b)=>b[1]-a[1]),m={};
-  d.forEach(([k],i)=>m[k]=i<6?'hi':i>=d.length-6?'lo':'');return m;}
+  d.forEach(([k,x],i)=>m[k]=i<6&&x>0?'hi':i>=d.length-6||x<=0?'lo':'');return m;}
 let IMP={};
 function skillAcc(mode){const u=UI();IMP=impactMap();return(mode==='bank'||mode==='view'?undoBar():'')+ATTRS.map(([c,cl])=>{const open=u.open===c,v=Math.round(eff(c));
   return`<div class="acc ${open?'open':''}"><button class="acch" aria-label="${cl} skills" aria-expanded="${open}" onclick="UI().open=UI().open==='${c}'?null:'${c}';render()"><span>${cl}</span><div class="bar"><i style="width:${v}%"></i></div><span class="v">${v}</span><span class="chev">▶</span></button>${open?`<div class="accb">${SUBS[c].map(([k,l])=>skillRow(k,l,mode)).join('')}</div>`:''}</div>`;}).join('');}
@@ -2244,15 +2248,15 @@ function startCareer(){syncPos();S.archId=archetype().id;S.name=(S.name||'').tri
 function hero(tap){const o=OV(),st=S.stage;
   return`<div class="hero${tap?' tap':''}"${tap?` role="button" tabindex="0" aria-label="Open your player profile" onclick="openProfile('over')"`:''}>${avatar(S.look,S.age,60,1)}<div class="grow"><div class="hn">${esc(S.name)}</div><div class="hm">${archetype().name} · ${ht(S.height)} · ${S.frame} · Age ${S.age}</div>
   <div class="hm">${era().name.replace(EMO_RE,'').trim()}${st!=='nba'?` · Hype ${Math.max(0,Math.round(S.hype))}`:''}${st==='hs'||st==='offers'?` · ${starsHTML(stars())}`:''}${S.rival&&st==='nba'?` · ⚔️ ${S.rival.name}${S.rival.retired?' (retired)':S.rival.team===S.team?' (teammate)':''}`:''}</div></div>
-  <div><div class="ovr" style="--p:${o}"><div><b>${o}</b><span>OVR</span></div></div><div class="role">${st==='nba'&&S.nba.length&&o<77?(m=>m>=28?'Starter':m>=18?'Rotation player':'End of the bench')(S.nba[S.nba.length-1].mins):st==='nba'||st==='end'?ovrLabel(o):o<50?'Not NBA-ready yet':'NBA level: '+ovrLabel(o)}</div></div></div>${tap?`<button class="ghost sm wide profbtn" onclick="openProfile('over')">${icon('user','ici')} Profile · skills, badges, stats ›</button>`:''}`;}
+  <div><div class="ovr" style="--p:${o}"><div><b>${o}</b><span>OVR</span></div></div><div class="role">${st==='nba'&&S.nba.length&&o<85?(l=>l.aw.some(x=>/All-NBA/.test(x))?'All-NBA':l.aw.includes('All-Star')?'All-Star':o>=77?ovrLabel(o):l.mins>=28?'Starter':l.mins>=18?'Rotation player':'End of the bench')(S.nba[S.nba.length-1]):st==='nba'||st==='end'?ovrLabel(o):o<50?'Not NBA-ready yet':'NBA level: '+ovrLabel(o)}</div></div></div>${tap?`<button class="ghost sm wide profbtn" onclick="openProfile('over')">${icon('user','ici')} Profile · skills, badges, stats ›</button>`:''}`;}
 function traitsBlock(){const hi=TRAITS.filter(([k])=>S.traits[k]>=4).length,lo=TRAITS.filter(([k])=>S.traits[k]<=1).length;
   return`<details><summary>Traits · ${hi} strength${hi===1?'':'s'}${lo?` · ${lo} weakness${lo===1?'':'es'}`:''}</summary><div>${TRAITS.slice().sort((a,b)=>S.traits[b[0]]-S.traits[a[0]]).map(([k,l])=>`<span class="pill ${S.traits[k]<=1?'bad':''}">${l}${pips(S.traits[k])}</span>`).join('')}${S.badges.map(b=>`<span class="pill gold">🎯 ${b}</span>`).join('')}</div></details>`;}
-function bankBlock(inSeq){const u=UI();if(S.bank<=0)return u.spend?`<div class="bankbar"><div class="grow"><b>All bonus points spent</b></div><button class="sm" onclick="UI().spend=false;render()">Done</button></div>`:'';
+function bankBlock(inSeq){const u=UI();if(S.bank<=0)return(u.spend||canUndoSpend())?`<div class="bankbar"><div class="grow"><b>All bonus points spent</b></div><button class="sm" onclick="UI().spend=false;render()">Done</button></div>${undoBar()}`:'';
   return`<div class="bankbar"><div class="grow"><b>${S.bank} bonus point${S.bank>1?'s':''}</b><div class="sub">They carry over your whole career. Spend them any time.</div></div><button class="sm" onclick="${inSeq?'UI().spend=!UI().spend;render()':"openProfile('skills')"}">${u.spend&&inSeq?'Done':'Spend'}</button></div>${u.spend&&inSeq?`<div style="margin-top:8px">${projCard()}${skillAcc('bank')}</div>`:''}`;}
 function playerCard(mode,inSeq){return`<div class="card">${hero(!inSeq)}${inSeq?traitsBlock():''}${mode?bankBlock(inSeq):''}</div>`;}
 // ---------- player profile: everything about your player, one tap from the career screen ----------
 const PROF_T=[['over','Overview'],['skills','Skills'],['badges','Badges'],['stats','Stats'],['traits','Traits']];
-function openProfile(t){document.activeElement?.blur?.();UI().prof=t||'over';render();scrollTo(0,0);}
+function openProfile(t){document.activeElement?.blur?.();if(UI().prof!==t)UI().open=null;UI().prof=t||'over';render();scrollTo(0,0);}
 function closeProfile(){clearUndo();UI().maxArm=null;UI().prof=null;render();scrollTo(0,0);}
 // shown only, never chosen: from height, the frame's name, Strength and age (rounded to 5 lb). Reads no hidden frame effects
 function weightLb(){const bmi={Lean:23,Balanced:24.7,Strong:26.8}[S.frame]||24.7,b=bmi+(S.attrs.str-60)*.03-Math.max(0,21-S.age)*.45;return Math.round(b*S.height*S.height/703/5)*5;}
@@ -2300,12 +2304,12 @@ function resultCard(){const r=S.lastResult;return r?`<div class="card result ${r
 
 // ---------- NBA cards ----------
 function legacyCard(){const c=career(),sc=goatScore(c),[t]=tierOf(sc,c),g=x=>c.cnt[x]||0,last=S.nba[S.nba.length-1];
-  const steps=[[60,'Perennial All-Star',4],[85,'Hall of Famer',5],[145,'Top 10 All-Time',4],[350,'GOAT',5]],nx=steps.find(s=>sc<s[0]||g('All-Star')<s[2]),pace=last?c.pts+last.ppg*70*Math.max(0,34-S.age)*.8:0;
+  const steps=[[60,'Perennial All-Star',4],[85,'Hall of Famer',5],[145,'Top 10 All-Time',4,1],[350,'GOAT',5]],nx=steps.find(s=>sc<s[0]||g('All-Star')<s[2]),pace=last?c.pts+last.ppg*70*Math.max(0,34-S.age)*.8:0;
   const label=S.nba.length<4?'Early career':t==='Bust'||t==='Role Player'?(last&&last.mins>=28?'Starter on the rise':'Fighting for minutes'):t.replace(EMO_RE,'').trim();
   const std=goatStd(),past=!nx,goal=past&&std&&std.score>sc?std.score:GOAT_LINE;
   return`<div class="card"><div class="sh">📈 <span class="grow">Legacy</span><b class="gold">${label}</b></div>
   <div class="row" style="align-items:baseline;gap:6px"><span class="big">${sc}</span><span class="muted">/ ${goal} ${past&&std&&std.score>sc?'GOAT standard':'GOAT score'}</span></div><div class="meter"><i style="width:${Math.min(100,sc/goal*100)}%"></i></div>
-  <div class="sub">${nx?`Next tier: <b>${nx[1]}</b> at ${nx[0]} score${g('All-Star')<nx[2]?` and ${nx[2]} All-Star seasons (you have made ${g('All-Star')})`:''}${std?` · GOAT standard: <b>${std.score}</b>`:''}`:std&&std.score>sc?`${goatRank()>1?`GOAT score reached, but you are ${ord(goatRank())} in the GOAT debate. Pass ${esc(allTime('score')[0].name)} to be THE GOAT. `:''}GOAT territory. Now chase the GOAT standard: <b>${std.score}</b> by ${esc(std.name)}`:std?`<b class="gold">You hold the GOAT standard.</b> Every point from here raises the record`:goatRank()>1?`GOAT score reached, but you are ${ord(goatRank())} in the GOAT debate. Pass ${esc(allTime('score')[0].name)} to be THE GOAT`:'GOAT territory. Finish strong and your score becomes the GOAT standard'}${last&&S.age<34?` · on pace for ~${(Math.round(pace/1000)*1000).toLocaleString()} pts`:''}</div>
+  <div class="sub">${nx?`Next tier: <b>${nx[1]}</b> at ${nx[0]} score${g('All-Star')<nx[2]?` and ${nx[2]} All-Star seasons (you have made ${g('All-Star')})`:''}${nx[3]?', and a top-10 spot among the legends and retired greats':''}${std?` · GOAT standard: <b>${std.score}</b>`:''}`:std&&std.score>sc?`${goatRank()>1?`GOAT score reached, but you are ${ord(goatRank())} in the GOAT debate. Pass ${esc(allTime('score')[0].name)} to be THE GOAT. `:''}GOAT territory. Now chase the GOAT standard: <b>${std.score}</b> by ${esc(std.name)}`:std?`<b class="gold">You hold the GOAT standard.</b> Every point from here raises the record`:goatRank()>1?`GOAT score reached, but you are ${ord(goatRank())} in the GOAT debate. Pass ${esc(allTime('score')[0].name)} to be THE GOAT`:'GOAT territory. Finish strong and your score becomes the GOAT standard'}${last&&S.age<34?` · on pace for ~${(Math.round(pace/1000)*1000).toLocaleString()} pts`:''}</div>
   <div class="stat4" style="margin-top:10px"><div class="stat"><b>${Math.round(c.pts).toLocaleString()}</b>PTS</div><div class="stat"><b>${g('Champion')}</b>RINGS</div><div class="stat"><b>${g('All-Star')}</b>ALL-STAR</div><div class="stat"><b>${Math.round(S.gtpRun||0)}</b>GTP</div></div>
   <details><summary>Legend benchmarks · ${benchList(c).filter(x=>x[1]).length}/${benchList(c).length}</summary>${benchList(c).map(([l,ok])=>`<div class="ev ${ok?'good':'muted'}">${ok?'✅':'⬜'} ${l}</div>`).join('')}</details></div>`;}
 function seasonCard(s,lite){const aw=s.aw.filter(x=>x!=='MVP'),role=s.mins>=28?['good','Starter']:s.mins>=18?['muted','Bench rotation']:['muted','Deep bench'];
@@ -2363,7 +2367,7 @@ function buildHTML(){const u=UI(),left=START_BUDGET-spent(),ti=Math.max(0,TABS.f
     <div class="card"><div class="sh">💪 <span class="grow">Frame</span></div><div class="seg">${Object.keys(FRAMES).map(f=>`<button class="${S.frame===f?'on':''}" onclick="setF('frame','${f}')">${f}</button>`).join('')}</div><div class="note">${FRAMES[S.frame].d}</div>${frameFx()}</div>`;
   if(tab==='skills'&&!u.skillsPicked)h+=`${hd('Skills')}<div class="sub">Start from a premade build, or put every point in yourself.</div><div class="card"><div class="sh">⚡ <span class="grow">Quick start</span></div><div class="chips">${ARCH.map((a,i)=>[a,i]).sort((x,y)=>Math.abs(S.height-x[0][2])-Math.abs(S.height-y[0][2])).map(([a,i])=>`<button class="chip ${S.arch===a[0]?'on':''}" onclick="UI().skillsPicked=1;applyArch(${i})">${a[0]}<small>${Math.abs(S.height-a[2])<=2?'Fits your size':'Best at '+ht(a[2]-2)+' to '+ht(a[2]+2)}</small></button>`).join('')}<button class="chip" onclick="UI().skillsPicked=1;randomBuild()">🎲 Randomize<small>Random skills and traits</small></button></div><div class="note">Premade builds only fill in your skills. Your height and frame stay as you picked them. You can still change everything after.</div>
     <button class="ghost wide" style="margin-top:10px" onclick="UI().skillsPicked=1;render()">✍️ Build my own</button></div>`;
-  else if(tab==='skills')h+=`${hd('Skills')}<div class="row" style="margin-bottom:6px"><span class="grow sub" style="margin:0">${S.arch?`Using the <b>${S.arch}</b> build. Tweak anything below.`:'Your own build.'}</span><button class="ghost sm" onclick="UI().skillsPicked=0;render()">⚡ Premade builds</button></div><div class="sub">Tap a group to open it. Skills cost 1 point each up to 75, then 2 up to 90, then 3 (the + button shows the price; it goes by the skill's base level, before height and frame). Max 90 here; grow higher during the career. Numbers shown include your height bonus. OVR rates you at the role you fit best, so the skills that matter shift as you build.</div>${projCard()}${skillAcc('build')}`;
+  else if(tab==='skills')h+=`${hd('Skills')}<div class="row" style="margin-bottom:6px"><span class="grow sub" style="margin:0">${S.arch?`Using the <b>${S.arch}</b> build. Tweak anything below.`:'Your own build.'}</span><button class="ghost sm" onclick="UI().skillsPicked=0;render()">⚡ Premade builds</button></div><div class="sub">Tap a group to open it. Skills cost 1 point each up to 80, then 2 up to 90, then 3 (the + button shows the price; it goes by the skill's base level, before height and frame). Max 90 here; grow higher during the career. Numbers shown include your height bonus. OVR rates you at the role you fit best, so the skills that matter shift as you build.</div>${projCard()}${skillAcc('build')}`;
   if(tab==='traits')h+=`${hd('Traits')}<div class="sub">Every player has all ${TRAITS.length} traits, each rated from 1 (weak) to 5 (elite). Lock in ${traitLimit()} you care about most: they start at ${S.perks&&S.perks.maxed?'5':'4 or 5'}. The other ${TRAITS.length-traitLimit()} get a random 1 to 5 rating when your career starts, so you find out what you got in high school.</div><div class="note" style="text-align:center">Locked: <b>${S.picked.length}/${traitLimit()}</b></div><div class="card"><div class="chips">${TRAITS.map(([k,l,d])=>`<button class="chip ${S.picked.includes(k)?'on':''}" onclick="toggleTrait('${k}')">${l}<small>${d}</small></button>`).join('')}</div></div>`;
   const ready=S.picked.length>=traitLimit(),nxt=TABS[ti+1];
   return h+dock(`<div class="meta"><span><b>${left}</b> pts left${left>0&&ready?' <small class="muted">(saved as bonus pts)</small>':''}</span><span>OVR <b>${OV()}</b></span><span>Traits <b>${S.picked.length}/${traitLimit()}</b></span></div>
@@ -2420,13 +2424,12 @@ const BIG=['clutch','fa','retire','farewell'];
 function simEnd(){let g=0;while(S.stage==='nba'&&g++<120){if(S.pend&&BIG.includes(S.pend.kind)&&!SAVE_OFF)break;if(S.pend)choose(S.pend.kind==='summer'?S.pend.opts.length-2:S.pend.kind==='clutch'?S.pend.best:0);else{autoBank();simNBA();}}autoBank();render();scrollTo(0,0);}
 // the Whole Career button: every season plays with its story windows, it stops at every decision (you always make your own calls),
 // then carries on by itself to the career recap. (simEnd stays the silent version the test tools use)
-function wholeCareer(){const u=UI();u.goOn=u.auto&&['cut','points'].includes(u.autoWhy)?1:0;u.auto=1;autoStep();}
-function autoStep(){const u=UI();let g=0;u.autoWhy=null;
-  while(u.auto&&S.stage==='nba'&&g++<30){if(S.pend){u.autoWhy='call';break;}
-    const risk=S.nba.length>=2&&OV()<63&&S.bank>0,pile=S.bank-(u.ptsAt||0)>=40;
-    if(!u.goOn&&(risk||pile)){u.ptsAt=S.bank;u.autoWhy=risk?'cut':'points';break;}
-    u.goOn=0;simNBA();}
-  if(S.stage!=='nba')u.auto=0;u.seq=null;render();scrollTo(0,0);}
+function wholeCareer(){const u=UI();u.goOn=u.auto&&u.autoWhy==='cut'?1:0;u.auto=1;autoStep();}
+function autoStep(){const u=UI();u.autoWhy=null;
+  if(u.auto&&S.stage==='nba'){if(S.pend){u.autoWhy='call';render();scrollTo(0,0);return;}
+    if(!u.goOn&&S.nba.length>=2&&OV()<63&&S.bank>0){u.autoWhy='cut';render();scrollTo(0,0);return;}
+    u.goOn=0;playSeason(simNBA);return;}
+  if(S.stage!=='nba')u.auto=0;render();scrollTo(0,0);}
 function autoCard(){const u=UI();if(!u.auto||!['cut','points'].includes(u.autoWhy))return'';
   return`<div class="card flash"><div class="ev gold">⏸ Career sim paused: ${u.autoWhy==='cut'?`your roster spot is at risk at ${OV()} OVR. Spend your ${S.bank} points to raise it`:`you have ${S.bank} bonus points to spend`}. Then tap Whole Career ⏭ to keep going.</div><button class="wide" style="margin-top:8px" onclick="openProfile('skills')">Spend points</button></div>`;}
 function simAll(){let g=0;while(S.stage==='nba'&&!S.pend&&g++<25){autoBank();simNBA();}autoBank();render();}
@@ -2451,7 +2454,7 @@ function endHTML(){const c=career(),sc=goatScore(c),[t,d]=tierOf(sc,c),k=c.cnt,g
   <details class="card"><summary>📊 More career numbers</summary><div class="stat3" style="margin-top:10px">${[['SPG',f1(c.stl/gp)],['BPG',f1(c.blk/gp)],['GAMES',c.gp],['TOTAL REB',Math.round(c.reb).toLocaleString()],['TOTAL AST',Math.round(c.ast).toLocaleString()],['PEAK OVR',dsp(c.peak)]].map(([l,v])=>`<div class="stat"><b>${v}</b>${l}</div>`).join('')}</div></details>
   <details class="card"><summary>🌟 Legend benchmarks · ${bm.filter(x=>x[1]).length}/${bm.length}</summary>${bm.map(([l,ok])=>`<div class="ev ${ok?'good':'muted'}">${ok?'✅':'⬜'} ${l}</div>`).join('')}</details>
   ${(S.log||[]).length?`<details class="card"><summary>📝 Career decisions · ${S.log.length}</summary>${S.log.map(x=>`<div class="ev">${x}</div>`).join('')}</details>`:''}
-  ${rewardCard()}${eraCard()}<details class="card"><summary>🏀 Season log · ${c.seasons}</summary>${seasonTable(false)}</details>${S.nba.length?`<div class="sh" style="margin:14px 0 6px">${icon('calendar','ici')} <span class="grow">Your final season</span></div>`+seasonCard(S.nba[S.nba.length-1]):''}${achHTML(S.newAch)}${hofHTML()}`+dock(`<button onclick="R=Math.random;S=newPlayer();render();scrollTo(0,0)">Build Another</button>`);}
+  ${rewardCard()}${eraCard()}<details class="card"><summary>🏀 Season log · ${c.seasons}</summary>${seasonTable(false)}</details>${S.nba.length?`<div class="sh" style="margin:14px 0 6px">${icon('calendar','ici')} <span class="grow">Your final season</span></div>`+seasonCard(S.nba[S.nba.length-1])+((S.nba[S.nba.length-1].clutch||[]).length?`<div class="card">${S.nba[S.nba.length-1].clutch.map(x=>`<div class="ev ${x.won?'good':'bad'}">${x.won?'✅':'💔'} ${x.title}: ${esc(x.text)}</div>`).join('')}</div>`:''):''}${achHTML(S.newAch)}${hofHTML()}`+dock(`<button onclick="R=Math.random;S=newPlayer();render();scrollTo(0,0)">Build Another</button>`);}
 function hofHTML(full){const h=JSON.parse(localStorage.getItem('bag_hof')||'[]');if(!h.length)return'';
   return`<details class="card" ${full?'open':''}><summary>🏛️ Your Hall of Builds · ${h.length}</summary><div class="scroll" style="margin-top:8px"><table><tr><th>#</th><th>PLAYER</th><th>TIER</th><th>SCORE</th><th>PPG</th><th>RINGS</th><th>MVP</th><th>PICK</th></tr>
   ${h.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.name)} <span class="muted">${x.arch?esc(x.arch):x.pos}${x.bd?` · ${x.bd} badges`:''}</span></td><td>${x.diff?DIFFS[x.diff].name.split(' ')[0]+' ':''}${x.tier}</td><td>${x.score}</td><td>${f1(x.ppg)}</td><td>${x.rings}</td><td>${x.mvp}</td><td>${x.pick>=61?'UDFA':'#'+x.pick}</td></tr>`).join('')}</table></div></details>`;}
@@ -2540,7 +2543,7 @@ function fxAfter(){const p=FXprev,c=FXcur;FXprev=c;if(!p)return;const app=docume
   if(c.key!==p.key){app.classList.remove('enter');void app.offsetWidth;app.classList.add('enter');clearTimeout(fxAfter.t);fxAfter.t=setTimeout(()=>app.classList.remove('enter'),1200);}
   if(c.seasons>p.seasons){const s=app.querySelector('.season0');if(s)s.classList.add('newseason');const last=S.nba[S.nba.length-1];if(S.stage==='nba'&&last&&last.aw.some(a=>/MVP|Champion/.test(a)))confetti(90);}
   if(c.stage!==p.stage){if(c.stage==='draft')confetti(80);if(c.stage==='end'){const cc=career(),[t]=tierOf(goatScore(cc),cc);if(/GOAT|Top 10|Hall/.test(t))confetti(/GOAT/.test(t)?160:100);}}
-  if(c.ovr!=null&&p.ovr!=null&&c.ovr>p.ovr&&c.stage===p.stage){const o=app.querySelector('.ovr');if(o){o.classList.add('bump');const b=o.querySelector('b');if(b){const a=p.ovr,z=c.ovr,t0=performance.now();const step=t=>{const k=Math.min(1,(t-t0)/600);b.textContent=Math.round(a+(z-a)*k);if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);}}}}
+  if(c.ovr!=null&&p.ovr!=null&&c.ovr>p.ovr&&c.stage===p.stage&&!document.documentElement.classList.contains('wt')){const o=app.querySelector('.ovr');if(o){o.classList.add('bump');const b=o.querySelector('b');if(b){const a=p.ovr,z=c.ovr,t0=performance.now();const step=t=>{const k=Math.min(1,(t-t0)/600);b.textContent=Math.round(a+(z-a)*k);if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);}}}}
 // reacts to what changed since the last screen, so game logic never has to know about sound
 let SNDprev=null;
 function sndReact(){if(typeof SND==='undefined')return;const u=UI(),r=S.lastResult,last=S.nba[S.nba.length-1],
