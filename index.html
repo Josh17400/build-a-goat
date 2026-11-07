@@ -351,26 +351,26 @@ const TRAITS=[['work','Work Ethic','You develop faster and age slower'],['dur','
 const MIN_A=40, BUILD_MAX=90, H_MIN=70, H_MAX=87;
 // ---------- difficulty & Generational Talent Points (GTP) ----------
 const DIFFS={rookie:{name:'🟢 Rookie',budget:230,mult:0,lg:-4,nbaPts:1.5,d:'Want a relaxed, less challenging career? Play Rookie: 230 skill points, start around 55 OVR, and great careers are common. You will not earn GTP, gems or achievements.'},
-  pro:{name:'🟡 Pro',budget:205,mult:1,lg:3,nbaPts:1,d:'The real challenge: 205 skill points, start around 50 OVR. Most careers end as role players and THE GOAT is rare. Earns GTP, gems and achievements.'},
-  hof:{name:'🔴 Hall of Fame',budget:120,mult:1.5,lg:3,nbaPts:1.5,d:'The biggest challenge: 120 skill points, start around 45 OVR. Many players never stick in the league and THE GOAT is a legend-level feat. Earns 1.5× GTP, gems and achievements.'}};
+  pro:{name:'🟡 Pro',budget:205,mult:1,lg:3,nbaPts:.85,d:'The real challenge: 205 skill points, start around 50 OVR. Most careers end as role players and THE GOAT is rare. Earns GTP, gems and achievements.'},
+  hof:{name:'🔴 Hall of Fame',budget:120,mult:1.5,lg:3,nbaPts:1.3,d:'The biggest challenge: 120 skill points, start around 45 OVR. Many players never stick in the league and THE GOAT is a legend-level feat. Earns 1.5× GTP, gems and achievements.'}};
 const diff=()=>DIFFS[S.diff]||DIFFS.pro;
 Object.defineProperty(globalThis,'START_BUDGET',{configurable:true,get:()=>diff().budget+25*((S&&S.perks&&S.perks.pts)||0)});
 const gtpBank=()=>{try{return Math.max(0,parseInt(localStorage.getItem('bag_gtp')||'0',10)||0);}catch{return 0;}};
 const setGtp=n=>{try{localStorage.setItem('bag_gtp',String(Math.max(0,Math.round(n))));}catch{}};
 // what a season / college year / career is worth (before the difficulty multiplier)
 // bonus points earned in the NBA, same currency as high school and college
-const BANK_AW={'Comeback Player':4,'All-Star':3,'All-NBA 1st':8,'All-NBA 2nd':6,'All-NBA 3rd':5,MVP:10,'Finals MVP':6,Champion:6,DPOY:5,ROY:5,'6MOY':3,MIP:3,'Scoring Title':5};
+const BANK_AW={'Comeback Player':4,'All-Star':3,'All-NBA 1st':8,'All-NBA 2nd':6,'All-NBA 3rd':5,MVP:10,'Finals MVP':4,Champion:3,DPOY:5,ROY:5,'6MOY':3,MIP:3,'Scoring Title':5};
 const GTP_AW={'Comeback Player':2,'All-Star':2,'All-NBA 1st':5,'All-NBA 2nd':4,'All-NBA 3rd':3,MVP:8,'Finals MVP':4,Champion:5,DPOY:4,ROY:3,'6MOY':1,MIP:1,'Scoring Title':2};
 const GTP_TIER={'Bust':0,'Role Player':1,'Solid Starter':3,'Champion Role Player':4,'All-Star':5,'Perennial All-Star':8,'Hall of Famer':12,'Top 10 All-Time':20,'🐐 THE GOAT':35};
 const capF=s=>s[0].toUpperCase()+s.slice(1);
 function earnGtp(base,why){const g=Math.round(base*diff().mult*.5);if(g>0){S.gtpRun=(S.gtpRun||0)+g;(S.gtpLog=S.gtpLog||[]).push([why,g]);}return g;}
 // the shop: perks bought for the NEXT player you build (applied when the career starts)
 const PERKS_GTP=[
-  ['pts','➕ +25 skill points','Stack up to 4 times',15,4],
+  ['pts','➕ +25 skill points','Stack up to 3 times',20,3],
   ['trait3','🧬 Third locked trait','Lock in 3 traits instead of 2',45,1],
   ['maxed','⭐ Maxed locked traits','Your locked traits start at 5/5',25,1],
-  ['dna','💎 Generational DNA','Higher and far more reliable hidden potential',35,1],
-  ['dev','🏋️ Elite trainer','You develop 25% faster in high school and college',40,1],
+  ['dna','💎 Generational DNA','Higher and far more reliable hidden potential (revealed on your career recap)',25,1],
+  ['dev','🏋️ Elite trainer','40% more development points in high school and college',30,1],
   ['clutch','❄️ Ice in your veins','+1 Clutch Gene, on top of whatever you roll',20,1],
   ['agent','💼 Super agent','Teams offer you bigger roles in free agency',30,1],
   ['iron','🦴 Iron body','You age slower once you hit your 30s',50,1],
@@ -467,7 +467,7 @@ function seedNewSkills(a,build){for(const k of NEW_SK)if(a[k]==null)a[k]=build?M
 
 // ---------- badges: earned from your skills, never bought. Bronze, Silver, Gold, Platinum ----------
 // sk: skills averaged into the badge rating (an inner list = the best of those), h: size range in inches, fx: boost per tier
-const BT=[72,80,87,94],BTN=['','Bronze','Silver','Gold','Platinum'];
+const BT=[74,82,89,95],BTN=['','Bronze','Silver','Gold','Platinum'];
 const BADGES=[
   {id:'rain',n:'Rainmaker',f:'Shooting',sk:['three'],fx:{tp:.6,pts:.3}},
   {id:'cash',n:'Catch & Cash',f:'Shooting',sk:['three','offb'],fx:{tp:.4,pts:.25}},
@@ -504,11 +504,14 @@ const ARCH_SIG={floor:['table','yoyo','film'],creator:['elbow','yoyo','silk'],sn
   threeD:['cash','velcro','switch'],twoway:['switch','bandit','extra'],pointF:['grab','table','silk'],runner:['air','coast','second'],stretch:['sky','silk','vacuum'],
   post:['surgeon','hook','foul'],glass:['vacuum','second','mgoat'],rim:['nofly','swat','bouncer']};
 // a badge's rating: the average of its skills as shown on screen (height and frame included); null when you are outside its size range
-function badgeRating(b){if(b.h&&(S.height<b.h[0]||S.height>b.h[1]))return null;const r=k=>Math.round(es(k));return b.sk.reduce((s,k)=>s+(Array.isArray(k)?Math.max(...k.map(r)):r(k)),0)/b.sk.length;}
+// a pair or trio badge can't ride on one maxed skill: its rating is at most 6 above its weakest part
+function badgeRating(b){if(b.h&&(S.height<b.h[0]||S.height>b.h[1]))return null;const v=b.sk.map(k=>Array.isArray(k)?Math.max(...k.map(x=>Math.round(es(x)))):Math.round(es(k)));return Math.min(v.reduce((a,x)=>a+x,0)/v.length,Math.min(...v)+6);}
 const tierFor=r=>r==null?0:BT.filter(x=>r>=x).length;
 // tiers open up as the career does: high school up to Silver, college Gold, the NABL Platinum
 const bCap=()=>{const st=S.stage;return st==='nba'||st==='end'?4:st==='college'||st==='draft'?3:2;};
-const badgeQual=()=>{const c=bCap(),q={};for(const b of BADGES)q[b.id]=Math.min(c,tierFor(badgeRating(b)));return q;};
+// Gold needs a 70 OVR player and Platinum an 80, so badges never run far ahead of your rating
+const ovrCap=()=>{const o=OV();return o>=80?4:o>=70?3:2;};
+const badgeQual=()=>{const c=Math.min(bCap(),ovrCap()),q={};for(const b of BADGES)q[b.id]=Math.min(c,tierFor(badgeRating(b)));return q;};
 // the only place badges change: career start/spending ('up': upgrades only), season end ('season': upgrades, and a badge drops one tier
 // when its rating falls 3 below that tier's line), loading an old save ('load': silent). Pure: no dice, never called from drawing
 function updBadges(mode){const q=badgeQual(),ch=[];S.bdg=S.bdg||{};
@@ -542,10 +545,10 @@ function badgesTab(){const B=S.bdg||{},c=bCap(),held=BADGES.filter(b=>B[b.id]).s
   const locked=BADGES.filter(b=>!B[b.id]&&!close.some(x=>x.b===b)),sig=ARCH_SIG[archetype().id];
   return`<div class="card"><div class="sh">${icon('medal','ici')} <span class="grow">Your badges</span><b>${held.length}</b></div>${held.length?held.map(b=>badgeRow(b,B[b.id])).join(''):'<div class="sub">No badges yet. Raise a skill to 72 for your first Bronze.</div>'}
   ${(S.badges||[]).length?`<div class="sh" style="margin-top:12px">${icon('trophy','ici')} <span class="grow">Story badges</span></div>${S.badges.map(x=>`<span class="pill gold">${esc(x)}</span>`).join('')}`:''}</div>
-  ${close.length?`<div class="card"><div class="sh">${icon('target','ici')} <span class="grow">Close to</span></div>${close.map(x=>badgeRow(x.b,x.t,`<div class="note">${BTN[x.t+1]} at ${BT[x.t]}${x.b.sk.length>1?' (average)':''} · you are at ${Math.round(x.r)}${x.t+1>c?` · ${BTN[x.t+1]} opens ${c<3?'in college':'in the NABL'}`:''}</div>`)).join('')}</div>`:''}
+  ${close.length?`<div class="card"><div class="sh">${icon('target','ici')} <span class="grow">Close to</span></div>${close.map(x=>badgeRow(x.b,x.t,`<div class="note">${BTN[x.t+1]} at ${BT[x.t]}${x.b.sk.length>1?' (average)':''} · you are at ${Math.round(x.r)}${x.t+1>c?` · ${BTN[x.t+1]} opens ${c<3?'in college':'in the NABL'}`:x.t+1>ovrCap()?` · ${BTN[x.t+1]} needs ${x.t+1>=4?80:70} OVR`:''}</div>`)).join('')}</div>`:''}
   <div class="card"><div class="sh">${icon('star','ici')} <span class="grow">Signature badges for a ${archetype().n}</span></div><div class="sub">${sig.map(id=>BADGE[id].n).join(' · ')}</div></div>
   ${locked.length?`<details class="card"><summary>Locked · ${locked.length}</summary>${locked.map(b=>badgeRow(b,0,`<div class="note">Bronze at ${BT[0]}${b.sk.length>1?' (average)':''}</div>`)).join('')}</details>`:''}
-  <div class="note">Tiers: Bronze ${BT[0]}, Silver ${BT[1]}, Gold ${BT[2]}, Platinum ${BT[3]}. High school reaches Silver, college Gold, the NABL Platinum. At season end a badge drops one tier if it falls 3 below its line.</div>`;}
+  <div class="note">Tiers: Bronze ${BT[0]}, Silver ${BT[1]}, Gold ${BT[2]}, Platinum ${BT[3]}. High school reaches Silver, college Gold, the NABL Platinum. Gold also needs 70 OVR and Platinum 80 OVR. A pair badge rates at most 6 above its weaker skill. At season end a badge drops one tier if it falls 3 below its line.</div>`;}
 function badgeBookHTML(){const k=bookGet(),n=Object.keys(k).length;
   return`<div class="card"><div class="sh">${icon('book','ici')} <span class="grow">Badge Book</span><b>${n}/${BADGES.length}</b></div><div class="sub">The best tier you have ever reached on each badge, across all your careers.</div>
   ${['Shooting','Finishing','Playmaking','Defense','Rebounding','Body & mind'].map(f=>`<div class="sh" style="margin-top:12px"><span class="grow">${f}</span></div>${BADGES.filter(b=>b.f===f).map(b=>`<div class="brow">${bMed(k[b.id]||0)}<div class="grow"><b class="${k[b.id]?'':'muted'}">${b.n}</b>${k[b.id]?` <span class="muted">${BTN[k[b.id]]}</span>`:''}<div class="sub">${skNames(b)}</div></div></div>`).join('')}`).join('')}</div>`;}
@@ -566,13 +569,13 @@ function declineTo(target){let g=0;const keys=['speed','speed','vert','vert','st
   while(ovr()>target&&g++<400){const k=pick(keys);if(S.attrs[k]>30)S.attrs[k]--;}}
 // growth is never applied for you: it turns into bonus points worth exactly what that growth would cost, and you place them
 function growPts(target){const a0={...S.attrs};growTo(target);let p=0;for(const k in S.attrs)for(let v=a0[k];v<S.attrs[k];v++)p+=cost(v);S.attrs=a0;if(p>0){S.bank+=p;S.devPts=(S.devPts||0)+p;}return p;}
-function develop(rate){const o=ovr();if(S.perks&&S.perks.dev&&S.stage!=='nba')rate*=1.25;if(o<S.ceiling)growPts(o+(S.ceiling-o)*rate);}
+function develop(rate){const o=ovr();if(S.perks&&S.perks.dev&&S.stage!=='nba')rate*=1.4;if(o<S.ceiling)growPts(o+(S.ceiling-o)*rate);}
 // why the OVR moved this season, from VISIBLE causes only (age, traits, college program, injuries) plus a deliberately noisy scout
 // read of the remaining room. Never names frame effects or hidden numbers; the true ceiling stays an end-screen reveal.
 function scoutNoise(){return(((S.seed||7)*2654435761>>>0)%11)-5;}
 function growWhy(o0,st,x){const o1=OV(),d=o1-o0,t=S.traits,age=S.age,r=[],dp=S.devPts||0;S.devPts=0;x=x||{};
   if(st==='nba')r.push(age<=23?(dp>0?'young and still improving':'young, but no growth this year'):age<=27?'in your prime years':age<=29?'prime years: you hold steady':age>=34?(dp>0?'still holding off Father Time':'age is catching up fast'):(dp>0?'still playing at your peak':'age starts to catch up'));
-  else r.push(st==='hs'?'high school development':`${TIER[S.tier].lbl} program`);
+  else r.push(st==='hs'?'high school development':`${TIER[S.tier].lbl} program`);if(st!=='nba'&&S.perks&&S.perks.dev)r.push('Elite trainer +40%');
   const late30=st==='nba'&&age>=30;if(t.work>=4)r.push(late30?`Work Ethic ${t.work}/5 slows the decline`:`Work Ethic ${t.work}/5 speeds you up`);else if(t.work<=2)r.push(late30?`Work Ethic ${t.work}/5 speeds the decline`:`Work Ethic ${t.work}/5 holds you back`);
   if(t.late>=4&&age<=23)r.push('Late Bloomer: your jump comes later');
   if(st==='college'&&t.coach>=4)r.push('Coachability pays off');
@@ -827,7 +830,7 @@ function simNBA(){syncPos();if(!R.get)R=makeRng((Math.random()*4294967296)>>>0);
   let mins=clamp(14.5+(o-55)*1.2+opp+(S.minAdj||0)+(FRAMES[S.frame].mins||0)+(es('stam')-60)*.08+(t.motor-3)*.6+bfx.min,4,36);if(o<52)mins=Math.min(mins,8);
   const mf=mins/36,nf=()=>1+gauss()*.075*(1.25-(es('cons')-40)/120)*(1-bfx.var);
   const ppg=Math.max(0,.86*(8+(o-55)*.45+(eff('sho')+eff('fin')-120)*.1+(S.usage||0)+(X.usage||0)+(FRAMES[S.frame].ppg||0)+(es('offb')-50)*.03+bfx.pts/.86+(t.killer-3)*.9)*mf*nf()*era().pace),
-    rpg=Math.max(0,.64*(2.4+(es('dreb')-40)*.14+(es('oreb')-40)*.07)*mf*nf()*(1+(t.motor-3)*.05)*(1+bfx.reb)),apg=Math.max(0,.6*(1.3+(es('pass')-40)*.13+(es('handle')-40)*.05)*mf*nf()*(1-(t.killer-3)*.04)*(1+bfx.ast)),
+    rpg=Math.max(0,.64*(2.4+(es('dreb')-40)*.14+(es('oreb')-40)*.07+Math.max(0,S.height-74)*.3)*mf*nf()*(1+(t.motor-3)*.05)*(1+bfx.reb)),apg=Math.max(0,.6*(1.3+(es('pass')-40)*.13+(es('handle')-40)*.05)*mf*nf()*(1-(t.killer-3)*.04)*(1+bfx.ast)),
     spg=Math.max(0,(.45+(es('stl')-40)*.028+(es('speed')-50)*.006+(es('lat')-50)*.004)*mf*nf()*(1+(t.motor-3)*.05+(t.lock-3)*.05)*(1+bfx.stl)),bpg=Math.max(0,(.12+(es('blk')-40)*.04+(es('vert')-50)*.005)*mf*nf()*(1+(t.lock-3)*.05)*(1+bfx.blk)),
     fg=clamp(.40+(fin3()-50)*.0017+(es('offb')-50)*.0004+bfx.fg/100+(S.height-78)*.003+(t.touch-3)*.004+gauss()*.012,.36,.68),tp=clamp(.26+(es('three')-40)*.0029+(t.touch-3)*.008+era().tp+bfx.tp/100+gauss()*.015,.18,.48),ft=clamp(.52+(es('ft')-40)*.0068+(t.touch-3)*.015+bfx.ft/100+gauss()*.02,.4,.95),
     tov=Math.max(.2,(.5+ppg*.075+apg*.22)*(1-(es('handle')-60)/250-(es('iq')-60)/350)*(1-bfx.tov)*nf());
@@ -892,14 +895,14 @@ function seasonPlayoffs(){const c=S.cur,t=S.traits,L=S.L,z=L.z,{n,a,prevO,o,gp,m
   if(S.farewell===n+1){notes.push('👋 Farewell tour: standing ovations in every arena');if(champ){S.lastDance=1;notes.push('🏆 You go out a champion. The Last Dance');}}
   let gs=0;for(const x of aw)gs+=GTP_AW[x]||0;if(mins>=28&&gp>=40)gs+=1;let gtp=earnGtp(gs,`Year ${n+1}`);
   const bpParts=[],bpAdd=(l,v)=>{if(v>0)bpParts.push([l,v]);};let aw0=0;for(const x of aw)aw0+=BANK_AW[x]||0;bpAdd('awards',aw0);
-  if(mins>=28&&gp>=40)bpAdd('starter',3);if(rounds>=0)bpAdd('playoffs',2+rounds*2);
+  if(mins>=28&&gp>=40)bpAdd('starter',3);if(rounds>=0)bpAdd('playoffs',1+rounds);
   if(gp>=50)bpAdd('big season',(ppg>=25?4:ppg>=20?2:0)+(rpg>=10?2:0)+(apg>=8?2:0)+(spg+bpg>=3?2:0));
   if(best)bpAdd('signature game',best.pts>=60?4:best.pts>=50?2:0);
   if(a<=24&&gp>=40)bpAdd('young player development',2);
   if(n===0&&gp>=40)bpAdd('rookie season',3);
   if(Math.round(o)-Math.round(prevO)>=3)bpAdd('breakout year',3);
   if(gp>=80)bpAdd('iron man',2);
-  bpAdd('team success',wins>=60?4:wins>=50?2:0);
+  bpAdd('team success',wins>=60?2:wins>=50?1:0);
   if(gp>=50&&ppg>=10&&rpg>=10&&apg>=10)bpAdd('triple-double season',5);
   else if(gp>=50&&ppg>=10&&(rpg>=10||apg>=10))bpAdd('double-double season',2);
   if(gp>=50&&ppg>=10&&tp>=.40)bpAdd('sharpshooting',2);
@@ -1653,7 +1656,7 @@ function clutchPend(x){const c=S.cur,t=S.traits,r2=makeRng(((c.rs0||7)^Math.imul
   const d=x.q+(r2()-.5)*.34,sit=d>=.64?'up1':d>=.52?'tie':d>=.4?'down1':d>=.3?'down2':'down3',secs=(3+r2()*11).toFixed(1),u=r2();
   const gap={up1:1,tie:0,down1:-1,down2:-2,down3:-3}[sit],me=Math.round(92+r2()*24),them=me-gap,def=sit==='up1';
   const sk=keys=>{const ks=keys.split(',');return ks.reduce((a2,k)=>a2+es(k),0)/ks.length;};
-  const score=o2=>clamp(o2[2]+(sk(o2[1])-68)*.008+(t.clutch-3)*.04+(bsm()?.05:0)+(o2[1].startsWith('pass')?(x.q-.5)*.3:0)+(def?(t.lock-3)*.03:0),.08,.82);
+  const score=o2=>clamp(o2[2]+(sk(o2[1])-68)*.006+(t.clutch-3)*.04+(bsm()?.05:0)+(o2[1].startsWith('pass')?(x.q-.5)*.3:0)+(def?(t.lock-3)*.03:0),.08,.72);
   const pool=(def?CL_DEF:sit==='down3'?CL_THREE:CL_OFF.filter(o2=>!(o2[1]==='ft'&&sit==='down2')&&!(o2[1].startsWith('post')&&es('post')<50&&!['PF','C'].includes(S.pos)))).slice();
   // your best look plus two others, shuffled
   const top=pool.slice().sort((p1,p2)=>score(p2)-score(p1))[0],rest=pool.filter(o2=>o2!==top),pk=[top];while(pk.length<3&&rest.length)pk.push(rest.splice(Math.floor(r2()*rest.length),1)[0]);
@@ -1704,7 +1707,7 @@ function goalsResult(l){return`<div class="card"><div class="sh">🎯 <span clas
 // ---------- history: legends from past eras, the all-time lists and the GOAT debate ----------
 // legend legacy scores sit on the same scale as your GOAT score, so climbing the list means passing real thresholds
 function makeLegends(L){const out=[],mi=Math.max(0,ERA_ORDER.indexOf(S.era)),pre=['The 50s','The 60s','The 70s',...ERA_ORDER.slice(0,mi).map(id=>ERAS.find(e=>e.id===id).name.replace(/^\S+\s/,''))];
-  for(let i=0;i<30;i++){const sc=i<10?345-i*14:205-(i-10)*4.5,pos=pick(LPOS),era0=pick(pre);
+  for(let i=0;i<30;i++){const sc=i<10?345-i*16:199-(i-10)*4.4,pos=pick(LPOS),era0=pick(pre);
     const pts=Math.round(17000+sc*58+gauss()*2500),fr=(m,k)=>Math.round(pts*m[pos]*(.85+R()*.3));
     out.push({name:lgName(L),pos,era:era0,score:Math.round(sc),pts,reb:fr({C:.42,PF:.36,SF:.24,SG:.17,PG:.15}),ast:fr({PG:.38,SG:.22,SF:.2,PF:.14,C:.11}),
       rings:clamp(Math.round(sc/70+gauss()*1.1),0,8),mvps:clamp(Math.round((sc-140)/48+gauss()*.8),0,6),as:Math.round(clamp(sc/21+gauss()*1.5,5,19)),leg:1});}
@@ -1779,7 +1782,7 @@ const GEAR=[['band','Headband','flame','Stay locked in',['cons','ft']],['shoes',
   ['arm','Arm band','dumbbell','Play through contact',['str','post']],['wrist','Wristbands','swirl','Quick hands',['stl','pass']],
   ['chip','Player tracking chip','bars','Data on every rep',['iq','stam']],['shirt','Compression undershirt','shirt','Win the glass',['dreb','oreb']],
   ['legs','Leg sleeves','bolt','Explode at the rim',['dunk','close']],['shorts','Compression shorts','shield','Stay low on defense',['perD','intD']]];
-const GEAR_COST=[20,50,100],GEAR_LV=['Bronze','Silver','Gold'],GEM_TIER={'🐐 THE GOAT':45,'Top 10 All-Time':30,'Hall of Famer':22,'Perennial All-Star':16,'All-Star':12,'Champion Role Player':10,'Solid Starter':8,'Role Player':5,'Bust':3},GEM_MULT={rookie:0,pro:1,hof:1.5};
+const GEAR_COST=[20,50,100],GEAR_LV=['Bronze','Silver','Gold'],GEM_TIER={'🐐 THE GOAT':50,'Top 10 All-Time':36,'Hall of Famer':28,'Perennial All-Star':20,'All-Star':16,'Champion Role Player':13,'Solid Starter':11,'Role Player':7,'Bust':4},GEM_MULT={rookie:0,pro:1,hof:1.5};
 const gems=()=>{try{return +localStorage.getItem('bag_gems')||0;}catch{return 0;}};
 const gear=()=>{try{return JSON.parse(localStorage.getItem('bag_gear')||'{}');}catch{return{};}};
 function buyGear(k){const g=gear(),lv=g[k]||0;if(lv>=3||gems()<GEAR_COST[lv])return;try{localStorage.setItem('bag_gems',gems()-GEAR_COST[lv]);g[k]=lv+1;localStorage.setItem('bag_gear',JSON.stringify(g));}catch{}render();}
@@ -2696,7 +2699,7 @@ function shopCard(){if(!Plat.iapOn())return'';const u=UI(),b=Plat.busy()?'disabl
   <button class="ghost sm" style="margin-top:12px;width:100%" onclick="shopRestore()" ${b}>Restore purchases</button></div>`;}
 // end of a career: the gems card, with one rewarded ad that doubles this career's gems and GTP (never Rookie or the Daily Build)
 function rewardCard(){if(!S.gemsRun)return'';const can=!S.dbl&&!S.daily&&S.diff!=='rookie'&&Plat.adsOn();
-  return`<div class="card"><div class="sh">${icon('sparkle')} <span class="grow">+${S.gemsRun} gems${S.dbl?' <span class="gold">· doubled</span>':''}</span><b class="gold">${gems()} total</b></div><div class="sub">Spend them on permanent Equipment from the menu.</div>
+  return`<div class="card"><div class="sh">${icon('sparkle')} <span class="grow">+${S.gemsRun} gems${S.dbl?' <span class="gold">· doubled</span>':''}</span><b class="gold">${gems()} total</b></div><div class="sub">Spend them on permanent Equipment from the menu. Better careers pay more: Role Player 7 · Solid Starter 11 · All-Star 16 · Hall of Famer 28 · THE GOAT 50${S.diff==='hof'?' (×1.5 on Hall of Fame)':''}.</div>
   ${can?`<button class="wide" style="margin-top:12px" onclick="doubleRewards()" ${Plat.busy()?'disabled':''}>${icon('video')} Watch an ad: double to +${S.gemsRun*2} gems${S.gtpRun?` and +${S.gtpRun*2} GTP`:''}</button>`:''}</div>`;}
 function doubleRewards(){if(S.dbl||Plat.busy()||S.stage!=='end')return;const run=S;const go=Plat.ad();render();
   go.then(ok=>{if(!ok||run!==S||S.dbl||S.stage!=='end'){render();return;}S.dbl=true;try{localStorage.setItem('bag_gems',gems()+S.gemsRun);}catch{}S.gemsRun*=2;

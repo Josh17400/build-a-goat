@@ -16,13 +16,13 @@ export default [
     { at: 0.4, evalAs: { x: '(S.bank=10,render(),1)' } },
     { at: 0.45, call: ['tap', 'Spend'], expectPage: ["UI().prof==='skills'"] },
     { at: 0.5, evalAs: { x: "(UI().open='sho',render(),1)" }, expectPage: ["document.querySelectorAll('button[aria-label^=\"Add a point\"]').length>0"] }] },
-  { name: 'badges: earned exactly at the line, Silver at most in high school, Platinum only in the NABL', seed: 23, steps: [
+  { name: 'badges: earned exactly at the line, Silver at most in high school, Platinum only in the NABL (for an 80+ OVR player)', seed: 23, steps: [
     { at: 0.3, evalAs: { x: start } },
-    { at: 0.4, evalAs: { r: "(()=>{S.attrs.three=71;S.bdg={};updBadges('up');const a=S.bdg.rain||0;S.attrs.three=72;updBadges('up');const b=S.bdg.rain;S.attrs.three=99;updBadges('up');const c=S.bdg.rain;S.stage='college';updBadges('up');const d=S.bdg.rain;S.stage='nba';updBadges('up');return [a,b,c,d,S.bdg.rain].join(',');})()" },
+    { at: 0.4, evalAs: { r: "(()=>{S.attrs.three=73;S.bdg={};updBadges('up');const a=S.bdg.rain||0;S.attrs.three=74;updBadges('up');const b=S.bdg.rain;S.attrs.three=99;updBadges('up');const c=S.bdg.rain;for(const k of SUBKEYS)S.attrs[k]=Math.max(S.attrs[k],95);S.stage='college';updBadges('up');const d=S.bdg.rain;S.stage='nba';updBadges('up');return [a,b,c,d,S.bdg.rain].join(',');})()" },
       expect: ["r==='0,1,2,3,4'"] }] },
   { name: 'badges: fade one tier at season end when 3 below the line, never from spending', seed: 24, steps: [
     { at: 0.3, evalAs: { x: start } },
-    { at: 0.4, evalAs: { r: "(()=>{S.stage='nba';S.bdg={rain:3};S.attrs.three=85;updBadges('up');const a=S.bdg.rain;updBadges('season');const b=S.bdg.rain;S.attrs.three=83;updBadges('up');const c=S.bdg.rain;updBadges('season');const d=S.bdg.rain;updBadges('season');return [a,b,c,d,S.bdg.rain].join(',');})()" },
+    { at: 0.4, evalAs: { r: "(()=>{S.stage='nba';S.bdg={rain:3};S.attrs.three=87;updBadges('up');const a=S.bdg.rain;updBadges('season');const b=S.bdg.rain;S.attrs.three=85;updBadges('up');const c=S.bdg.rain;updBadges('season');const d=S.bdg.rain;updBadges('season');return [a,b,c,d,S.bdg.rain].join(',');})()" },
       expect: ["r==='3,3,3,2,2'"] }] },
   { name: 'badges: every badge at Platinum stays inside the caps, and each boost line reads', seed: 25, steps: [
     { at: 0.3, evalAs: { r: "(()=>{S.bdg=Object.fromEntries(BADGES.map(b=>[b.id,4]));const f=badgeFx();return Object.keys(BCAP).every(k=>f[k]<=BCAP[k]+1e-9&&f[k]>0)&&BADGES.every(b=>fxText(b.fx,4).length>3);})()" },
@@ -61,4 +61,7 @@ export default [
     { at: 0.4, call: ['tap', 'One inch taller'], expectPage: ['S.height===80'] },
     { at: 0.5, evalAs: { x: "(S.height=H_MIN,render(),1)" } },
     { at: 0.6, call: ['tap', 'One inch shorter'], expectPage: ['S.height===H_MIN'] }] },
+  { name: 'badges: one maxed skill cannot carry a pair badge, and Gold needs a 70 OVR player', seed: 33, steps: [
+    { at: 0.3, evalAs: { x: start } },
+    { at: 0.4, evalAs: { r: "(()=>{S.stage='nba';S.bdg={};S.attrs.dreb=58;S.attrs.str=95;updBadges('up');const vac=S.bdg.vacuum||0;S.attrs.mid=99;updBadges('up');return [vac,OV()<70?(S.bdg.elbow===2):(S.bdg.elbow>=3)].join(',');})()" }, expect: ["r==='0,true'"] }] },
 ];

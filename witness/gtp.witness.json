@@ -16,7 +16,7 @@
     },
     "expectPage": [
      "gtpBank()===100",
-     "perkCost()===60",
+     "perkCost()===65",
      "START_BUDGET===diff().budget+25",
      "traitLimit()===3"
     ]
@@ -31,7 +31,7 @@
      "x": "(applyArch(0),toggleTrait('work'),toggleTrait('dur'),toggleTrait('clutch'),startCareer(),1)"
     },
     "expectPage": [
-     "gtpBank()===40",
+     "gtpBank()===35",
      "S.picked.length===3"
     ]
    },
@@ -42,7 +42,7 @@
     },
     "expectPage": [
      "S.stage==='end'",
-     "gtpBank()===40+S.gtpRun",
+     "gtpBank()===35+S.gtpRun",
      "S.gtpRun>=0"
     ]
    }
