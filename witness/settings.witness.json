@@ -20,7 +20,7 @@
 {"name":"skills: quick start pops up first, then premade or own","seed":4,"steps":[
  {"at":0.3,"evalAs":{"x":"(goTab('skills'),1)"},"expectPage":["document.getElementById('app').textContent.includes('Quick start')","document.getElementById('app').textContent.includes('Build my own')"]},
  {"at":0.4,"call":["tap","Rim Protector"]},
- {"at":0.45,"expectPage":["S.arch&&S.arch.includes('Rim Protector')","S.pos!=='C'","document.getElementById('app').textContent.includes('Using the')","!document.getElementById('app').textContent.includes('Build my own')"]},
+ {"at":0.45,"expectPage":["S.arch&&S.arch.includes('Rim Protector')","S.height===79","document.getElementById('app').textContent.includes('Using the')","!document.getElementById('app').textContent.includes('Build my own')"]},
  {"at":0.5,"call":["tap","Premade builds"]},
  {"at":0.55,"expectPage":["document.getElementById('app').textContent.includes('Build my own')"]},
  {"at":0.6,"call":["tap","Build my own"]},
