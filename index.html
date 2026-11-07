@@ -86,6 +86,13 @@ body.kb .dock{display:none}
 .attr:last-child{border-bottom:0}
 .attr .ctl{display:flex;gap:6px}
 .attr .imp{display:block;font-size:.68rem;color:var(--tx3);letter-spacing:.2px;margin-top:1px}.attr .imp.hi{color:var(--acc)}
+.hero.tap{cursor:pointer}.profbtn{margin-top:10px}.ptabs{margin:4px 0 10px}.ptabs button{padding:9px 2px;font-size:.84rem}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pgrid small{display:block;color:var(--tx2);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}.pgrid b{font-size:1rem}
+.ptab{width:100%;border-collapse:collapse;font-size:.82rem}.ptab th{color:var(--tx2);font-weight:600;text-align:right;padding:4px 3px}.ptab td{text-align:right;padding:5px 3px;border-top:1px solid rgba(255,255,255,.05)}.ptab th:first-child,.ptab td:first-child{text-align:left}.pscroll{overflow-x:auto}
+.trow{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.bmed{display:inline-flex;width:22px;height:22px;flex:none;color:#4a4f5c}.bmed .ic{width:22px;height:22px}.bmed.t1{color:#d08a4a}.bmed.t2{color:#c9d1dc}.bmed.t3{color:#ffc845}.bmed.t4{color:#9ff0ff}
+.brow{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}.brow .note{margin-top:2px}.note.good{color:#7fdc8f}.note.bad{color:#ff8a7a}
+small.bh{display:flex;align-items:center;gap:3px;color:var(--tx2);font-size:.7rem;margin-top:2px}small.bh .bmed,small.bh .bmed .ic{width:13px;height:13px}.bpill .bmed,.bpill .bmed .ic{width:15px;height:15px}
 .fit{display:grid;grid-template-columns:minmax(0,1fr) 90px 30px;gap:8px;align-items:center;padding:4px 0;font-size:.88rem}.fit b{text-align:right}.pn{font-size:1.3rem;font-weight:800;margin:2px 0 6px}
 .bar{height:8px;background:#262a34;border-radius:6px;overflow:hidden}
 .bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,#f27a0c,#ffc46b)}
@@ -329,19 +336,22 @@ const POS={
   SF:{h:79,w:{sho:.18,fin:.17,pla:.10,def:.16,reb:.07,ath:.22,iq:.10}},
   PF:{h:81,w:{sho:.12,fin:.20,pla:.07,def:.18,reb:.15,ath:.20,iq:.08}},
   C: {h:83,w:{sho:.06,fin:.22,pla:.05,def:.21,reb:.20,ath:.18,iq:.08}}};
-const SUBS={sho:[['close','Close Shot'],['mid','Mid-Range'],['three','Three-Point'],['ft','Free Throw']],fin:[['layup','Layup'],['dunk','Dunk'],['post','Post Moves']],pla:[['pass','Passing'],['handle','Ball Handle']],def:[['perD','Perimeter D'],['intD','Interior D'],['stl','Steal'],['blk','Block']],reb:[['oreb','Off. Rebound'],['dreb','Def. Rebound']],ath:[['speed','Speed'],['vert','Vertical'],['str','Strength'],['stam','Stamina']],iq:[['iq','Basketball IQ'],['cons','Consistency']]};
+// 25 skills. Post Fade, Hook Shot, Lateral Quickness and Off-Ball Movement were added 2026-11-06 for post players and wings/forwards
+const SUBS={sho:[['close','Close Shot'],['mid','Mid-Range'],['three','Three-Point'],['ft','Free Throw'],['fade','Post Fade']],fin:[['layup','Layup'],['dunk','Dunk'],['post','Post Moves'],['hook','Hook Shot']],pla:[['pass','Passing'],['handle','Ball Handle']],def:[['perD','Perimeter D'],['intD','Interior D'],['stl','Steal'],['blk','Block'],['lat','Lateral Quickness']],reb:[['oreb','Off. Rebound'],['dreb','Def. Rebound']],ath:[['speed','Speed'],['vert','Vertical'],['str','Strength'],['stam','Stamina']],iq:[['iq','Basketball IQ'],['cons','Consistency'],['offb','Off-Ball Movement']]};
+// the original 21 skills in their groups: only for the old position rating (legacyOvr)
+const LEGACY_SUBS={sho:[['close','Close Shot'],['mid','Mid-Range'],['three','Three-Point'],['ft','Free Throw']],fin:[['layup','Layup'],['dunk','Dunk'],['post','Post Moves']],pla:[['pass','Passing'],['handle','Ball Handle']],def:[['perD','Perimeter D'],['intD','Interior D'],['stl','Steal'],['blk','Block']],reb:[['oreb','Off. Rebound'],['dreb','Def. Rebound']],ath:[['speed','Speed'],['vert','Vertical'],['str','Strength'],['stam','Stamina']],iq:[['iq','Basketball IQ'],['cons','Consistency']]};
 const SUBKEYS=Object.values(SUBS).flat().map(x=>x[0]);
 // height effect per inch vs 6'6" (78in); shorter players lose more on blocks and boards than tall players gain
-const HMOD={oreb:2,dreb:2,intD:1.5,blk:2.4,dunk:1.8,post:1.2,str:.6,close:.8,layup:.4,perD:-.6,handle:-1.6,pass:-.4,speed:-1.3,vert:-.4,three:-.4,stl:-.4};
-const FRAMES={Lean:{speed:6,vert:5,stam:5,str:-9,post:-4,intD:-3,oreb:-3,dreb:-2,inj:-.03,decl:-.1,mins:1,d:'Quick, bouncy and tireless, but you get pushed around inside',hid:['Healthier','Ages slowly','Extra minutes']},
+const HMOD={hook:1,fade:.5,lat:-.9,oreb:2,dreb:2,intD:1.5,blk:2.4,dunk:1.8,post:1.2,str:.6,close:.8,layup:.4,perD:-.6,handle:-1.6,pass:-.4,speed:-1.3,vert:-.4,three:-.4,stl:-.4};
+const FRAMES={Lean:{speed:6,vert:5,stam:5,lat:4,hook:-2,str:-9,post:-4,intD:-3,oreb:-3,dreb:-2,inj:-.03,decl:-.1,mins:1,d:'Quick, bouncy and tireless, but you get pushed around inside',hid:['Healthier','Ages slowly','Extra minutes']},
   Balanced:{cons:3,iq:2,inj:0,dev:.025,d:'No glaring weakness. Steady and easy to coach',hid:['Faster development','Steadier nights']},
-  Strong:{str:9,post:5,intD:4,oreb:4,dreb:3,close:2,speed:-5,vert:-4,stam:-3,inj:.04,decl:.15,ppg:1,d:'Bully ball inside, but slower and heavier on the joints',hid:['Draws contact (+points)','Ages faster','More injuries']}};
+  Strong:{str:9,post:5,intD:4,oreb:4,dreb:3,close:2,hook:3,speed:-5,vert:-4,stam:-3,lat:-4,inj:.04,decl:.15,ppg:1,d:'Bully ball inside, but slower and heavier on the joints',hid:['Draws contact (+points)','Ages faster','More injuries']}};
 const TRAITS=[['work','Work Ethic','You develop faster and age slower'],['dur','Durability','Fewer and lighter injuries'],['clutch','Clutch Gene','You win more playoff series'],['coach','Coachability','You get more out of college'],['star','Star Power','Hype, All-Star votes, draft buzz'],['motor','Motor','You hustle every possession: more rebounds, steals and minutes'],['lead','Leadership','You make teammates better: more wins and playoff series'],['killer','Killer Instinct','Scorer’s mentality: more shots and points, fewer assists'],['late','Late Bloomer','Raw early, but a higher ceiling and a later peak (a gamble)'],['lock','Lockdown Mindset','You take defense personally: steals, blocks, DPOY votes'],['touch','Shooter’s Touch','Soft hands: better 3P%, FT% and FG%']];
 const MIN_A=40, BUILD_MAX=90, H_MIN=70, H_MAX=87;
 // ---------- difficulty & Generational Talent Points (GTP) ----------
 const DIFFS={rookie:{name:'🟢 Rookie',budget:230,mult:0,lg:-4,nbaPts:1.3,d:'Want a relaxed, less challenging career? Play Rookie: 230 skill points, start around 55 OVR, and great careers are common. You will not earn GTP, gems or achievements.'},
   pro:{name:'🟡 Pro',budget:205,mult:1,lg:3,nbaPts:.85,d:'The real challenge: 205 skill points, start around 50 OVR. Most careers end as role players and THE GOAT is rare. Earns GTP, gems and achievements.'},
-  hof:{name:'🔴 Hall of Fame',budget:120,mult:1.5,lg:3,nbaPts:1.35,d:'The biggest challenge: 120 skill points, start around 45 OVR. Many players never stick in the league and THE GOAT is a legend-level feat. Earns 1.5× GTP, gems and achievements.'}};
+  hof:{name:'🔴 Hall of Fame',budget:120,mult:1.5,lg:3,nbaPts:1.15,d:'The biggest challenge: 120 skill points, start around 45 OVR. Many players never stick in the league and THE GOAT is a legend-level feat. Earns 1.5× GTP, gems and achievements.'}};
 const diff=()=>DIFFS[S.diff]||DIFFS.pro;
 Object.defineProperty(globalThis,'START_BUDGET',{configurable:true,get:()=>diff().budget+25*((S&&S.perks&&S.perks.pts)||0)});
 const gtpBank=()=>{try{return Math.max(0,parseInt(localStorage.getItem('bag_gtp')||'0',10)||0);}catch{return 0;}};
@@ -389,7 +399,7 @@ const INJ={minor:['sprained ankle','hamstring strain','sore knee','bruised hip',
 
 // ---------- state ----------
 let S;
-function newPlayer(){return{diff:(()=>{try{return localStorage.getItem('bag_diff')||'pro';}catch{return'pro';}})(),perks:{},gtpRun:0,look:randLook(),era:pick(ERAS).id,spins:1,daily:false,stage:'build',name:'',pos:'SF',height:79,frame:'Balanced',attrs:Object.fromEntries(SUBKEYS.map(k=>[k,40])),picked:[],traits:{},bank:0,hype:0,age:14,hs:[],col:[],nba:[],ceiling:0,injuryProne:false,badges:[],redshirt:false,flags:{}};}
+function newPlayer(){return{diff:(()=>{try{return localStorage.getItem('bag_diff')||'pro';}catch{return'pro';}})(),perks:{},gtpRun:0,look:randLook(),era:pick(ERAS).id,spins:1,daily:false,stage:'build',name:'',pos:'SF',height:79,frame:'Balanced',attrs:Object.fromEntries(SUBKEYS.map(k=>[k,40])),picked:[],traits:{},bank:0,hype:0,age:14,hs:[],col:[],nba:[],ceiling:0,injuryProne:false,badges:[],bdg:{},redshirt:false,flags:{}};}
 
 const cost=v=>v<70?1:v<85?2:3;
 const costTo=v=>{let c=0;for(let x=MIN_A;x<v;x++)c+=cost(x);return c;};
@@ -400,33 +410,34 @@ function esD(k,d){const fr=FRAMES[S.frame];let v=S.attrs[k]+(fr[k]||0)+d*(HMOD[k
   return clamp(v,25,99);}
 // on-court ratings use real height
 function es(k){return esD(k,S.height-78);}
+const fin3=()=>{const v=['close','layup','dunk','hook'].map(es).sort((a,b)=>b-a);return(v[0]+v[1]+v[2])/3;};
 function eff(c){const L=SUBS[c];return L.reduce((s,[k])=>s+es(k),0)/L.length;}
 // OVR before 2026-11-06 compared you to a chosen position. Kept only to convert old saved careers (legacyOvr)
-function effRel(c,pos){const L=SUBS[c],d=S.height-POS[pos].h;return L.reduce((s,[k])=>s+esD(k,d),0)/L.length;}
+function effRel(c,pos){const L=LEGACY_SUBS[c],d=S.height-POS[pos].h;return L.reduce((s,[k])=>s+esD(k,d),0)/L.length;}
 const POSCAL={PG:-.9,SG:1.5,SF:2.6,PF:1.6,C:-.7};
 function legacyOvr(pos){pos=POS[pos]?pos:'SF';const b=POS[pos].w;let s=0,o=POSCAL[pos];for(const[k]of ATTRS)s+=b[k];for(const[k]of ATTRS)o+=effRel(k,pos)*b[k]/s;return o;}
 // ---------- archetypes: no positions to pick. OVR rates you at the role your skills and size fit best ----------
 // h = the role's reference height (height bonuses are measured from it), fam = skill family (for the two-word name),
 // mod = the word used when this role is your secondary flavor, w = how much each skill counts in this role
 const ARCHS={
-  floor:  {n:'Floor General',fam:'play',mod:'Playmaking',h:74,w:{pass:12,handle:12,iq:8,cons:4,speed:7,three:6,mid:5,close:2,ft:3,layup:4,perD:5,stl:4,stam:3,vert:2,str:1,dreb:1}},
-  creator:{n:'Shot Creator',fam:'shoot',mod:'Shot-Creating',h:75,w:{handle:10,mid:10,three:8,close:6,layup:7,ft:5,speed:7,cons:6,iq:4,pass:4,vert:3,stam:3,perD:3,stl:2,dunk:2}},
-  sniper: {n:'Sharpshooter',fam:'shoot',mod:'Sharpshooting',h:77,w:{three:15,mid:10,ft:6,close:6,cons:7,iq:6,speed:5,handle:4,stam:4,perD:4,layup:3,pass:3,stl:2,vert:2,str:1,dreb:1}},
-  slasher:{n:'Slasher',fam:'fin',mod:'Slashing',h:77,w:{layup:12,dunk:10,speed:10,vert:9,handle:7,ft:5,close:5,str:4,stam:4,iq:3,cons:3,mid:3,pass:2,perD:3}},
-  lock:   {n:'Lockdown Defender',fam:'perD',mod:'Lockdown',h:78,w:{perD:14,stl:10,speed:7,str:5,vert:5,stam:6,iq:6,cons:4,intD:4,blk:3,dreb:3,three:4,close:2,layup:3,handle:2}},
-  threeD: {n:'3-and-D Wing',fam:'perD',mod:'3-and-D',h:79,w:{three:12,perD:11,stl:7,mid:5,close:4,ft:4,speed:6,vert:4,stam:5,iq:5,cons:5,dreb:3,str:3,layup:3,blk:2}},
-  twoway: {n:'Two-Way Wing',fam:'all',mod:'',h:79,w:{three:7,mid:6,close:5,layup:6,dunk:4,handle:5,pass:5,perD:7,stl:5,intD:3,blk:3,dreb:4,oreb:2,speed:6,vert:5,str:4,stam:4,iq:6,cons:5,ft:3,post:2}},
-  pointF: {n:'Point Forward',fam:'play',mod:'Playmaking',h:80,w:{pass:11,handle:9,iq:8,mid:6,three:5,close:5,layup:5,dreb:6,str:5,perD:5,speed:4,stam:4,cons:4,post:3,vert:3,ft:3,stl:2,blk:2}},
-  runner: {n:'Athletic Finisher',fam:'fin',mod:'High-Flying',h:81,w:{dunk:13,vert:11,layup:8,speed:8,oreb:7,stam:6,blk:6,dreb:5,str:5,close:5,intD:4,iq:3,cons:3,perD:2,ft:2}},
-  stretch:{n:'Stretch Big',fam:'shoot',mod:'Floor-Spacing',h:82,w:{three:14,mid:11,ft:6,close:8,dreb:6,intD:4,blk:4,str:2,oreb:2,iq:6,cons:7,post:2,stam:4,speed:4,vert:4,pass:2,layup:4,dunk:3}},
-  post:   {n:'Post Scorer',fam:'fin',mod:'Post-Scoring',h:82,w:{post:14,close:10,str:9,layup:6,dunk:5,ft:5,oreb:6,dreb:5,intD:5,iq:5,cons:5,mid:4,pass:3,stam:4,blk:3,vert:2}},
-  glass:  {n:'Glass Cleaner',fam:'int',mod:'Rebounding',h:82,w:{dreb:13,oreb:12,str:9,vert:7,stam:7,intD:7,blk:6,dunk:5,close:5,layup:3,iq:4,cons:4,speed:3,post:3}},
-  rim:    {n:'Rim Protector',fam:'int',mod:'Rim-Protecting',h:84,w:{blk:14,intD:13,dreb:9,oreb:5,str:8,vert:7,stam:5,iq:5,cons:3,dunk:5,close:4,layup:2,post:3,perD:2,speed:2}}};
+  floor:  {n:'Floor General',fam:'play',mod:'Playmaking',h:74,w:{lat:3,offb:2,pass:12,handle:12,iq:8,cons:4,speed:7,three:6,mid:5,close:2,ft:3,layup:4,perD:5,stl:4,stam:3,vert:2,str:1,dreb:1}},
+  creator:{n:'Shot Creator',fam:'shoot',mod:'Shot-Creating',h:75,w:{fade:4,offb:2,lat:2,handle:10,mid:10,three:8,close:6,layup:7,ft:5,speed:7,cons:6,iq:4,pass:4,vert:3,stam:3,perD:3,stl:2,dunk:2}},
+  sniper: {n:'Sharpshooter',fam:'shoot',mod:'Sharpshooting',h:77,w:{offb:8,fade:2,three:15,mid:10,ft:6,close:6,cons:7,iq:6,speed:5,handle:4,stam:4,perD:4,layup:3,pass:3,stl:2,vert:2,str:1,dreb:1}},
+  slasher:{n:'Slasher',fam:'fin',mod:'Slashing',h:77,w:{offb:5,lat:2,layup:12,dunk:10,speed:10,vert:9,handle:7,ft:5,close:5,str:4,stam:4,iq:3,cons:3,mid:3,pass:2,perD:3}},
+  lock:   {n:'Lockdown Defender',fam:'perD',mod:'Lockdown',h:78,w:{lat:12,offb:2,perD:14,stl:10,speed:7,str:5,vert:5,stam:6,iq:6,cons:4,intD:4,blk:3,dreb:3,three:4,close:2,layup:3,handle:2}},
+  threeD: {n:'3-and-D Wing',fam:'perD',mod:'3-and-D',h:79,w:{lat:8,offb:6,three:12,perD:11,stl:7,mid:5,close:4,ft:4,speed:6,vert:4,stam:5,iq:5,cons:5,dreb:3,str:3,layup:3,blk:2}},
+  twoway: {n:'Two-Way Wing',fam:'all',mod:'',h:79,w:{lat:5,offb:4,fade:2,hook:1,three:7,mid:6,close:5,layup:6,dunk:4,handle:5,pass:5,perD:7,stl:5,intD:3,blk:3,dreb:4,oreb:2,speed:6,vert:5,str:4,stam:4,iq:6,cons:5,ft:3,post:2}},
+  pointF: {n:'Point Forward',fam:'play',mod:'Playmaking',h:80,w:{fade:4,offb:3,lat:3,hook:2,pass:11,handle:9,iq:8,mid:6,three:5,close:5,layup:5,dreb:6,str:5,perD:5,speed:4,stam:4,cons:4,post:3,vert:3,ft:3,stl:2,blk:2}},
+  runner: {n:'Athletic Finisher',fam:'fin',mod:'High-Flying',h:81,w:{offb:5,hook:2,lat:2,dunk:13,vert:11,layup:8,speed:8,oreb:7,stam:6,blk:6,dreb:5,str:5,close:5,intD:4,iq:3,cons:3,perD:2,ft:2}},
+  stretch:{n:'Stretch Big',fam:'shoot',mod:'Floor-Spacing',h:82,w:{fade:6,offb:5,hook:2,three:14,mid:11,ft:6,close:8,dreb:6,intD:4,blk:4,str:2,oreb:2,iq:6,cons:7,post:2,stam:4,speed:4,vert:4,pass:2,layup:4,dunk:3}},
+  post:   {n:'Post Scorer',fam:'fin',mod:'Post-Scoring',h:82,w:{hook:12,fade:8,offb:2,post:14,close:10,str:9,layup:6,dunk:5,ft:5,oreb:6,dreb:5,intD:5,iq:5,cons:5,mid:4,pass:3,stam:4,blk:3,vert:2}},
+  glass:  {n:'Glass Cleaner',fam:'int',mod:'Rebounding',h:82,w:{hook:3,offb:2,dreb:13,oreb:12,str:9,vert:7,stam:7,intD:7,blk:6,dunk:5,close:5,layup:3,iq:4,cons:4,speed:3,post:3}},
+  rim:    {n:'Rim Protector',fam:'int',mod:'Rim-Protecting',h:84,w:{hook:4,lat:1,blk:14,intD:13,dreb:9,oreb:5,str:8,vert:7,stam:5,iq:5,cons:3,dunk:5,close:4,layup:2,post:3,perD:2,speed:2}}};
 const ARCH_IDS=Object.keys(ARCHS);
 for(const a of Object.values(ARCHS)){const s=Object.values(a.w).reduce((x,y)=>x+y,0);a.wn=Object.entries(a.w).map(([k,v])=>[k,v/s]);}
 // per-role calibration (equally good builds rate the same in every role) and one offset that keeps the scale where the
 // league's ratings sit. Measured offline (see docs/archetype-rework-plan.md); pure constants, no dice
-const ARCH_CAL={floor:-1.3,creator:-.07,sniper:-1.71,slasher:-1.86,lock:-1.08,threeD:-.49,twoway:5.19,pointF:2.49,runner:-.38,stretch:1.07,post:.79,glass:-1.05,rim:-1.61},ARCH_OFF=-2.81;
+const ARCH_CAL={floor:-1.54,creator:.17,sniper:-1.65,slasher:-1.66,lock:-1.61,threeD:-.13,twoway:4.68,pointF:2.77,runner:-.1,stretch:1.32,post:1.03,glass:-1.31,rim:-1.97},ARCH_OFF=-1.6;
 // raw fit in every role, pure: depends only on skills, height and frame
 function archRaw(){const memo={},out={};for(const id of ARCH_IDS){const a=ARCHS[id];let m=memo[a.h];if(!m){m=memo[a.h]={};const d=S.height-a.h;for(const k of SUBKEYS)m[k]=esD(k,d);}
   let v=0;for(const[k,w]of a.wn)v+=w*m[k];
@@ -444,6 +455,100 @@ function archetype(){const f=archFits(),id=f[0][0],a=ARCHS[id];let mod='';
 const ARCH_LEAN={floor:-3,creator:-2,sniper:-1,slasher:-1,lock:0,threeD:0,twoway:0,pointF:0,runner:1,stretch:0,post:1.5,glass:1.5,rim:3};
 function listedPos(id){const v=S.height+(ARCH_LEAN[id||archetype().id]||0);return v<76?'PG':v<78.5?'SG':v<80.5?'SF':v<82.5?'PF':'C';}
 function syncPos(){if(S)S.pos=listedPos();}
+// archetype rating before the four new skills (2026.11.06): only to convert runs saved with 21 skills. Same roles, weights and size
+// penalties, minus the new skills, with that version's calibration
+const NEW_SK=['fade','hook','lat','offb'],ARCH_CAL21={floor:-1.3,creator:-.07,sniper:-1.71,slasher:-1.86,lock:-1.08,threeD:-.49,twoway:5.19,pointF:2.49,runner:-.38,stretch:1.07,post:.79,glass:-1.05,rim:-1.61},ARCH_OFF21=-2.81;
+function ovr21(){let b=-1e9;for(const id of ARCH_IDS){const a=ARCHS[id],d=S.height-a.h,w=a.wn.filter(([k])=>!NEW_SK.includes(k)),ws=w.reduce((s,x)=>s+x[1],0);let v=0;for(const[k,x]of w)v+=x/ws*esD(k,d);
+  v=v-Math.max(0,a.h-S.height-2)*.9-Math.max(0,S.height-a.h-3)*.6+ARCH_CAL21[id];if(v>b)b=v;}return b+ARCH_OFF21;}
+// runs saved before the new skills get them from related ones, so nobody's rating drops; a build in progress starts them at the minimum
+const NEW_FROM={hook:['post','close'],fade:['post','mid'],offb:['iq','speed'],lat:['perD','speed']};
+function seedNewSkills(a,build){for(const k of NEW_SK)if(a[k]==null)a[k]=build?MIN_A:Math.round((a[NEW_FROM[k][0]]+a[NEW_FROM[k][1]])/2);}
+
+// ---------- badges: earned from your skills, never bought. Bronze, Silver, Gold, Platinum ----------
+// sk: skills averaged into the badge rating (an inner list = the best of those), h: size range in inches, fx: boost per tier
+const BT=[72,80,87,94],BTN=['','Bronze','Silver','Gold','Platinum'];
+const BADGES=[
+  {id:'rain',n:'Rainmaker',f:'Shooting',sk:['three'],fx:{tp:.6,pts:.3}},
+  {id:'cash',n:'Catch & Cash',f:'Shooting',sk:['three','offb'],fx:{tp:.4,pts:.25}},
+  {id:'elbow',n:'Elbow Operator',f:'Shooting',sk:['mid'],fx:{fg:.5,pts:.3}},
+  {id:'silk',n:'Silk Fade',f:'Shooting',sk:['fade','mid'],fx:{pts:.4,fg:.3}},
+  {id:'sky',n:'Skyline Shooter',f:'Shooting',sk:['three','mid'],h:[81,99],fx:{tp:.4,team:.2}},
+  {id:'money',n:'Free Money',f:'Shooting',sk:['ft'],fx:{ft:1.5,pts:.2}},
+  {id:'contort',n:'Contortionist',f:'Finishing',sk:['layup'],fx:{fg:.5,pts:.2}},
+  {id:'air',n:'Air Raid',f:'Finishing',sk:['dunk','vert'],fx:{fg:.4,as:.3}},
+  {id:'foul',n:'Foul Magnet',f:'Finishing',sk:[['layup','post'],'str'],fx:{pts:.4}},
+  {id:'hook',n:'Hook, Line & Sinker',f:'Finishing',sk:['hook'],fx:{fg:.5,pts:.3}},
+  {id:'surgeon',n:'Low-Post Surgeon',f:'Finishing',sk:['post',['hook','fade']],fx:{pts:.4,ast:.04}},
+  {id:'second',n:'Second Helping',f:'Finishing',sk:['oreb',['dunk','close']],fx:{reb:.03,pts:.3}},
+  {id:'coast',n:'Coast to Coast',f:'Finishing',sk:['speed',['dunk','layup']],fx:{pts:.35}},
+  {id:'table',n:'Table Setter',f:'Playmaking',sk:['pass','iq'],fx:{ast:.05}},
+  {id:'yoyo',n:'Yo-Yo',f:'Playmaking',sk:['handle'],fx:{tov:.05,pts:.2}},
+  {id:'grab',n:'Grab-and-Go',f:'Playmaking',sk:['dreb','handle','pass'],fx:{ast:.04,reb:.02}},
+  {id:'extra',n:'Extra Pass',f:'Playmaking',sk:['pass','offb'],fx:{ast:.03,team:.15}},
+  {id:'velcro',n:'Velcro',f:'Defense',sk:['perD','lat'],fx:{dp:.5,stl:.03,team:.15}},
+  {id:'pirate',n:'Lane Pirate',f:'Defense',sk:['stl','iq'],fx:{stl:.035}},
+  {id:'swat',n:'Swat Team',f:'Defense',sk:['blk','vert'],fx:{blk:.035}},
+  {id:'nofly',n:'No Fly Zone',f:'Defense',sk:['blk','intD'],h:[81,99],fx:{blk:.03,dp:.6,team:.15}},
+  {id:'bouncer',n:'Bouncer',f:'Defense',sk:['intD','str'],fx:{dp:.4,reb:.02,team:.1}},
+  {id:'switch',n:'Switchblade',f:'Defense',sk:['perD','intD','lat'],h:[77,82],fx:{dp:.6,team:.2}},
+  {id:'vacuum',n:'Vacuum',f:'Rebounding',sk:['dreb','str'],fx:{reb:.035}},
+  {id:'mgoat',n:'Mountain Goat',f:'Rebounding',sk:['vert',['oreb','dreb']],fx:{reb:.03}},
+  {id:'tank',n:'Bottomless Tank',f:'Body & mind',sk:['stam'],fx:{min:.5}},
+  {id:'metro',n:'Metronome',f:'Body & mind',sk:['cons'],fx:{var:.15}},
+  {id:'film',n:'Film Junkie',f:'Body & mind',sk:['iq'],fx:{tov:.03,team:.15}},
+  {id:'bandit',n:'Backdoor Bandit',f:'Body & mind',sk:['offb','layup'],fx:{pts:.3,fg:.3}}];
+const BADGE=Object.fromEntries(BADGES.map(b=>[b.id,b]));
+// three badges that fit each role, shown on the projection card and the profile
+const ARCH_SIG={floor:['table','yoyo','film'],creator:['elbow','yoyo','silk'],sniper:['rain','cash','money'],slasher:['contort','air','foul'],lock:['velcro','pirate','tank'],
+  threeD:['cash','velcro','switch'],twoway:['switch','bandit','extra'],pointF:['grab','table','silk'],runner:['air','coast','second'],stretch:['sky','silk','vacuum'],
+  post:['surgeon','hook','foul'],glass:['vacuum','second','mgoat'],rim:['nofly','swat','bouncer']};
+// a badge's rating: the average of its skills as shown on screen (height and frame included); null when you are outside its size range
+function badgeRating(b){if(b.h&&(S.height<b.h[0]||S.height>b.h[1]))return null;return b.sk.reduce((s,k)=>s+(Array.isArray(k)?Math.max(...k.map(es)):es(k)),0)/b.sk.length;}
+const tierFor=r=>r==null?0:BT.filter(x=>r>=x).length;
+// tiers open up as the career does: high school up to Silver, college Gold, the NABL Platinum
+const bCap=()=>{const st=S.stage;return st==='nba'||st==='end'?4:st==='college'||st==='draft'?3:2;};
+const badgeQual=()=>{const c=bCap(),q={};for(const b of BADGES)q[b.id]=Math.min(c,tierFor(badgeRating(b)));return q;};
+// the only place badges change: career start/spending ('up': upgrades only), season end ('season': upgrades, and a badge drops one tier
+// when its rating falls 3 below that tier's line), loading an old save ('load': silent). Pure: no dice, never called from drawing
+function updBadges(mode){const q=badgeQual(),ch=[];S.bdg=S.bdg||{};
+  for(const b of BADGES){const id=b.id,h=S.bdg[id]||0,qt=q[id];
+    if(qt>h){S.bdg[id]=qt;ch.push([id,h,qt]);}
+    else if(mode==='season'&&h>0&&qt<h){const r=badgeRating(b);if(r==null||r<BT[h-1]-3){S.bdg[id]=h-1;ch.push([id,h,h-1]);}}}
+  for(const id in S.bdg)if(!S.bdg[id])delete S.bdg[id];
+  S.bdgMax=Math.max(S.bdgMax||0,Object.keys(S.bdg).length);if(Object.values(S.bdg).some(t=>t>=4))S.bdgPlat=1;bookSave();
+  return mode==='load'?[]:ch;}
+// the total boost from every badge you hold, capped so a player with a dozen badges is better, not broken
+const BCAP={pts:2,fg:2,tp:2.5,ft:6,reb:.1,ast:.15,stl:.15,blk:.15,tov:.15,min:2,dp:4,as:2,team:1.5,var:.6};
+function badgeFx(){const o={};for(const k in BCAP)o[k]=0;const B=S.bdg||{};for(const b of BADGES){const t=B[b.id];if(t)for(const k in b.fx)o[k]+=b.fx[k]*t;}for(const k in BCAP)o[k]=Math.min(o[k],BCAP[k]);return o;}
+const FXL={pts:['PPG',1],fg:['FG%',1],tp:['3P%',1],ft:['FT%',1],reb:['Rebounds',2],ast:['Assists',2],stl:['Steals',2],blk:['Blocks',2],tov:['Turnovers',3],min:['Minutes',1],dp:['DPOY votes',0],as:['All-Star votes',0],team:['Team strength',0],var:['Steadier seasons',4]};
+function fxText(fx,t){return Object.entries(fx).map(([k,v])=>{const[l,m]=FXL[k],x=v*t;return m===1?`${l} +${f1(x)}`:m===2?`${l} +${Math.round(x*100)}%`:m===3?`${l} −${Math.round(x*100)}%`:m===4?`${l}`:`${l} up`;}).join(' · ');}
+function badgeLines(ch){return ch.map(([id,h,t])=>{const n=BADGE[id].n;return t>h?(h?`🏅 ${n} upgraded to ${BTN[t]}`:`🏅 New badge: ${BTN[t]} ${n}`):`📉 ${S.stage==='nba'&&S.age>=30?'Age is catching up: ':''}${n} drops to ${t?BTN[t]:'gone'}`;});}
+// spending can cross a line: the badge comes right away, with a toast (never during a replay or a headless run)
+function spendBadges(){const ch=updBadges('up');if(ch.length&&!REPLAY&&typeof document!=='undefined'&&document.body&&!document.documentElement.classList.contains('wt')&&typeof platToast==='function')platToast(badgeLines(ch).join(' · '));}
+// the Badge Book: the best tier you have ever reached on each badge, across careers (shown on every difficulty, pays nothing)
+function bookGet(){try{return JSON.parse(localStorage.getItem('bag_bbook')||'{}');}catch{return{};}}
+function bookSave(){if(typeof localStorage==='undefined')return;const k=bookGet();let c=0;for(const id in S.bdg||{})if((k[id]||0)<S.bdg[id]){k[id]=S.bdg[id];c=1;}if(c)try{localStorage.setItem('bag_bbook',JSON.stringify(k));}catch{}}
+const bookCount=()=>Object.keys(bookGet()).length;
+const bMed=t=>`<span class="bmed t${t}" title="${BTN[t]}">${icon('medal')}</span>`;
+const skNames=b=>b.sk.map(k=>Array.isArray(k)?k.map(x=>SKN[x]).join(' or '):SKN[k]).join(' + ')+(b.h?` · ${b.h[1]>=99?ht(b.h[0])+' and up':ht(b.h[0])+' to '+ht(b.h[1])}`:'');
+// next badge line for one skill: the closest tier this skill feeds (shown on skill rows when it is within reach)
+function badgeHint(k){let best=null;const c=S.stage==='build'?2:bCap(),B=S.bdg||{};
+  for(const b of BADGES){if(!b.sk.some(x=>Array.isArray(x)?x.includes(k):x===k))continue;const r=badgeRating(b);if(r==null)continue;const t=Math.max(B[b.id]||0,tierFor(r));if(t>=c)continue;const gap=BT[t]-r;if(gap<=6&&(!best||gap<best[1]))best=[b,gap,t+1];}
+  return best?`<small class="bh">${bMed(best[2])}${BTN[best[2]]} ${best[0].n} at ${BT[best[2]-1]}${best[0].sk.length>1?' avg':''}</small>`:'';}
+function badgeRow(b,t,extra){return`<div class="brow">${bMed(t||0)}<div class="grow"><b>${b.n}</b>${t?` <span class="muted">${BTN[t]}</span>`:''}<div class="sub">${skNames(b)}</div>${extra||`<div class="note">${fxText(b.fx,Math.max(1,t))}</div>`}</div></div>`;}
+function badgesTab(){const B=S.bdg||{},c=bCap(),held=BADGES.filter(b=>B[b.id]).sort((x,y)=>B[y.id]-B[x.id]),rest=BADGES.filter(b=>!B[b.id]||B[b.id]<4);
+  const close=rest.map(b=>{const r=badgeRating(b),t=B[b.id]||0;return{b,r,t,gap:r==null?99:BT[t]-r};}).filter(x=>x.gap<=8).sort((x,y)=>x.gap-y.gap);
+  const locked=BADGES.filter(b=>!B[b.id]&&!close.some(x=>x.b===b)),sig=ARCH_SIG[archetype().id];
+  return`<div class="card"><div class="sh">${icon('medal','ici')} <span class="grow">Your badges</span><b>${held.length}</b></div>${held.length?held.map(b=>badgeRow(b,B[b.id])).join(''):'<div class="sub">No badges yet. Raise a skill to 72 for your first Bronze.</div>'}
+  ${(S.badges||[]).length?`<div class="sh" style="margin-top:12px">${icon('trophy','ici')} <span class="grow">Story badges</span></div>${S.badges.map(x=>`<span class="pill gold">${esc(x)}</span>`).join('')}`:''}</div>
+  ${close.length?`<div class="card"><div class="sh">${icon('target','ici')} <span class="grow">Close to</span></div>${close.map(x=>badgeRow(x.b,x.t,`<div class="note">${BTN[x.t+1]} at ${BT[x.t]}${x.b.sk.length>1?' (average)':''} · you are at ${Math.round(x.r)}${x.t+1>c?` · ${BTN[x.t+1]} opens ${c<3?'in college':'in the NABL'}`:''}</div>`)).join('')}</div>`:''}
+  <div class="card"><div class="sh">${icon('star','ici')} <span class="grow">Signature badges for a ${archetype().n}</span></div><div class="sub">${sig.map(id=>BADGE[id].n).join(' · ')}</div></div>
+  ${locked.length?`<details class="card"><summary>Locked · ${locked.length}</summary>${locked.map(b=>badgeRow(b,0,`<div class="note">Bronze at ${BT[0]}${b.sk.length>1?' (average)':''}</div>`)).join('')}</details>`:''}
+  <div class="note">Tiers: Bronze ${BT[0]}, Silver ${BT[1]}, Gold ${BT[2]}, Platinum ${BT[3]}. High school reaches Silver, college Gold, the NABL Platinum. At season end a badge drops one tier if it falls 3 below its line.</div>`;}
+function badgeBookHTML(){const k=bookGet(),n=Object.keys(k).length;
+  return`<div class="card"><div class="sh">${icon('book','ici')} <span class="grow">Badge Book</span><b>${n}/${BADGES.length}</b></div><div class="sub">The best tier you have ever reached on each badge, across all your careers.</div>
+  ${['Shooting','Finishing','Playmaking','Defense','Rebounding','Body & mind'].map(f=>`<div class="sh" style="margin-top:12px"><span class="grow">${f}</span></div>${BADGES.filter(b=>b.f===f).map(b=>`<div class="brow">${bMed(k[b.id]||0)}<div class="grow"><b class="${k[b.id]?'':'muted'}">${b.n}</b>${k[b.id]?` <span class="muted">${BTN[k[b.id]]}</span>`:''}<div class="sub">${skNames(b)}</div></div></div>`).join('')}`).join('')}</div>`;}
+
 function heightNote(){const keys=[['oreb','Rebounding'],['blk','Block'],['dunk','Dunk'],['intD','Interior D'],['handle','Ball Handle'],['speed','Speed']];
   return keys.map(([k,l])=>{const dv=Math.round(es(k)-S.attrs[k]-(FRAMES[S.frame][k]||0));return dv?`${l} ${dv>0?'+':''}${dv}`:null;}).filter(Boolean).join(' · ')||'no height bonuses or penalties';}
 const DSP=[[40,38],[62,60],[69.7,70],[73,77],[80.6,85],[82.1,90],[87.4,95],[93,99]];
@@ -566,14 +671,14 @@ const YR=['Freshman','Sophomore','Junior','Senior','Super Senior'];
 function autoSpend(){const pk=archPick();let n=0,g=0;while(S.bank>0&&g++<2000){const k=pk();const co=cost(S.attrs[k]);if(S.attrs[k]<99&&S.bank>=co){S.bank-=co;S.attrs[k]++;n+=co;}else if(S.bank<2)break;}if(S.bank===1){S.attrs.cons++;S.bank=0;n++;}return n;}
 function hsHype(){S.hype+=(S.traits.star-3)*1.5;}
 function simHS(){syncPos();if(S.summerPend)chooseSummer(S.summerPend.opts.length-1);S.lastResult=null;hsHype();const i=S.hs.length;S.age=14+i;const o0=OV();
-  develop((.13+(FRAMES[S.frame].dev||0)*.4)*(1+(S.traits.work-3)*.15)*(1-(S.traits.late-3)*.18));
+  develop((.13+(FRAMES[S.frame].dev||0)*.4)*(1+(S.traits.work-3)*.15)*(1-(S.traits.late-3)*.18));const bch=updBadges('season'),bfx=badgeFx();
   S.lastTag=null;const ev=[roll(hsEvents())];if(R()<.35)ev.push(roll(hsEvents(),S.lastTag));if(S.summerNote){ev.unshift(S.summerNote);S.summerNote=null;}
-  const o=ovr(),ppg=clamp(6+(o-40)*.75+gauss()*2.5,2,42),rpg=clamp(2+(eff('reb')-40)*.18+Math.max(0,S.height-73)*.35+gauss(),1.5,20),apg=clamp(1+(eff('pla')-40)*.12+gauss()*.6,.3,12),spg=clamp(.5+(es('stl')-40)*.035+(es('speed')-50)*.01+(S.traits.motor-3)*.08+(S.traits.lock-3)*.08+gauss()*.25,.1,5),bpg=clamp(.15+(es('blk')-40)*.045+(S.height-78)*.05+(S.traits.lock-3)*.08+gauss()*.25,0,6);
-  ev.push(growWhy(o0,'hs',{hurt:S.hurt}));if(ppg>=20&&!S.hurt)S.hype+=Math.min(4,(ppg-18)*.35);S.hype=Math.max(0,S.hype);const hm=S.hurt?.6:1,hurtTxt=S.hurt?` · ${ri(4,9)} games (injured)`:'';S.hurt=0;
-  S.hs.push({title:`${YR[i]} Year · age ${S.age}`,line:`${f1(ppg*hm)} PPG · ${f1(rpg*hm)} RPG · ${f1(apg*hm)} APG · ${f1(spg*hm)} SPG · ${f1(bpg*hm)} BPG${hurtTxt}`,ev,stars:stars()});
+  const o=ovr(),ppg=clamp(6+(o-40)*.75+bfx.pts+gauss()*2.5,2,42),rpg=clamp((2+(eff('reb')-40)*.18+Math.max(0,S.height-73)*.35)*(1+bfx.reb)+gauss(),1.5,20),apg=clamp((1+(eff('pla')-40)*.12)*(1+bfx.ast)+gauss()*.6,.3,12),spg=clamp(.5+(es('stl')-40)*.035+(es('speed')-50)*.01+(S.traits.motor-3)*.08+(S.traits.lock-3)*.08+(es('lat')-50)*.004+bfx.stl*1.5+gauss()*.25,.1,5),bpg=clamp(.15+(es('blk')-40)*.045+(S.height-78)*.05+(S.traits.lock-3)*.08+bfx.blk*1.5+gauss()*.25,0,6);
+  ev.push(growWhy(o0,'hs',{hurt:S.hurt}));for(const x of badgeLines(bch))ev.push([x.startsWith('📉')?-1:1,x]);if(ppg>=20&&!S.hurt)S.hype+=Math.min(4,(ppg-18)*.35);S.hype=Math.max(0,S.hype);const hm=S.hurt?.6:1,hurtTxt=S.hurt?` · ${ri(4,9)} games (injured)`:'';S.hurt=0;
+  S.hs.push({bdg:bch,st:{ppg:ppg*hm,rpg:rpg*hm,apg:apg*hm,spg:spg*hm,bpg:bpg*hm},title:`${YR[i]} Year · age ${S.age}`,line:`${f1(ppg*hm)} PPG · ${f1(rpg*hm)} RPG · ${f1(apg*hm)} APG · ${f1(spg*hm)} SPG · ${f1(bpg*hm)} BPG${hurtTxt}`,ev,stars:stars()});
   if(S.hs.length===4){S.stage='offers';makeOffers();}else S.summerPend=summerHS();}
 const bump=(ks,n)=>()=>ks.forEach(k=>S.attrs[k]=Math.min(99,S.attrs[k]+n));
-const PERKS0=[['🏋️ Elite strength program','+4 Strength, Speed & Vertical',bump(['str','speed','vert'],4)],['🎯 Shooting guru on staff','+4 Three-Point, Mid-Range & Free Throw',bump(['three','mid','ft'],4)],['🧱 Big-man camp','+4 Rebounding & Post Moves',bump(['oreb','dreb','post'],4)],['🧠 Film-room head coach','+5 Basketball IQ & Consistency',bump(['iq','cons'],5)],['🛡️ Defense-first system','+4 to every Defense rating',bump(['perD','intD','stl','blk'],4)],['🏀 Point-guard factory','+5 Passing & Ball Handle',bump(['pass','handle'],5)],['📺 Prime-time TV slot','+10 Hype',()=>S.hype+=10],['🎁 Bonus signing points','+18 bonus pts',()=>S.bank+=18]];let PERKS;
+const PERKS0=[['🏋️ Elite strength program','+4 Strength, Speed & Vertical',bump(['str','speed','vert'],4)],['🎯 Shooting guru on staff','+4 Three-Point, Mid-Range & Free Throw',bump(['three','mid','ft'],4)],['🧱 Big-man camp','+4 Rebounding, Post Moves & Hook Shot',bump(['oreb','dreb','post','hook'],4)],['🧠 Film-room head coach','+5 Basketball IQ & Consistency',bump(['iq','cons'],5)],['🛡️ Defense-first system','+4 to every Defense rating',bump(['perD','intD','stl','blk'],4)],['🏀 Point-guard factory','+5 Passing & Ball Handle',bump(['pass','handle'],5)],['📺 Prime-time TV slot','+10 Hype',()=>S.hype+=10],['🎁 Bonus signing points','+18 bonus pts',()=>S.bank+=18]];let PERKS;
 function makeOffers(){PERKS=PERKS0.slice();const st=stars();const tiers={5:['blue','blue','blue','blue','blue','power','power','power'],4:['blue','blue','power','power','power','mid'],3:['power','mid','mid'],2:['mid','mid']}[st];
   const used=new Set();S.offers=tiers.map(t=>{let n;do n=pick(SCHOOLS[t]);while(used.has(n));used.add(n);return{name:n,tier:t,perk:(PERKS.length?PERKS:(PERKS=PERKS0.slice())).splice(ri(0,PERKS.length-1),1)[0]};});}
 
@@ -586,11 +691,11 @@ const pickFor=g=>clamp(Math.round(1+(83-g)*2.4),1,61);
 function projRange(){const p=pickFor(scoutGrade());return[clamp(p-6,1,61),clamp(p+6,1,61)];}
 const pickTxt=p=>p>=61?'Undrafted':p<=30?`1st Rd (#${p})`:`2nd Rd (#${p})`;
 function simCol(){syncPos();const y=S.col.length,T=TIER[S.tier];S.age=18+y;const o0=OV();
-  develop((.17+(FRAMES[S.frame].dev||0)*.6)*T.dev*(1+(S.traits.coach-3)*.1)*(1+(S.traits.work-3)*.15)*(1-(S.traits.late-3)*.16));
+  develop((.17+(FRAMES[S.frame].dev||0)*.6)*T.dev*(1+(S.traits.coach-3)*.1)*(1+(S.traits.work-3)*.15)*(1-(S.traits.late-3)*.16));const bch=updBadges('season'),bfx=badgeFx();
   S.hype+=T.hype*(1+(S.traits.star-3)*.2);
   S.lastTag=null;const ev=[roll(colEvents(y+1))];if(R()<.3)ev.push(roll(colEvents(y+1),S.lastTag));if(S.summerNote){ev.unshift(S.summerNote);S.summerNote=null;}
-  ev.push(growWhy(o0,'college',{hurt:S.hurt}));const o=ovr(),mins=clamp(16+(o-50)*1.0+T.min+y*2,8,36),mf=mins/36*(S.tier==='mid'?1.12:1);
-  const ppg=clamp((6+(o-50)*.6+(eff('sho')+eff('fin')-120)*.08)*mf*1.4+gauss()*1.5,1,35),rpg=clamp((2.5+(eff('reb')-40)*.17+Math.max(0,S.height-73)*.3)*mf+gauss()*.6,1,16),apg=clamp((1+(eff('pla')-40)*.14)*mf+gauss()*.5,.2,10),spg=clamp((.45+(es('stl')-40)*.05+(es('speed')-50)*.01)*mf*(1+(S.traits.motor-3)*.05+(S.traits.lock-3)*.05)+gauss()*.2,.1,4),bpg=clamp((.1+(es('blk')-40)*.05+(S.height-80)*.03)*mf*(1+(S.traits.lock-3)*.05)+gauss()*.2,0,5);
+  ev.push(growWhy(o0,'college',{hurt:S.hurt}));for(const x of badgeLines(bch))ev.push([x.startsWith('📉')?-1:1,x]);const o=ovr(),mins=clamp(16+(o-50)*1.0+T.min+y*2,8,36),mf=mins/36*(S.tier==='mid'?1.12:1);
+  const ppg=clamp((6+(o-50)*.6+(eff('sho')+eff('fin')-120)*.08+(es('offb')-50)*.02+bfx.pts/1.4)*mf*1.4+gauss()*1.5,1,35),rpg=clamp((2.5+(eff('reb')-40)*.17+Math.max(0,S.height-73)*.3)*mf*(1+bfx.reb)+gauss()*.6,1,16),apg=clamp((1+(eff('pla')-40)*.14)*mf*(1+bfx.ast)+gauss()*.5,.2,10),spg=clamp((.45+(es('stl')-40)*.05+(es('speed')-50)*.01)*mf*(1+(S.traits.motor-3)*.05+(S.traits.lock-3)*.05)*(1+bfx.stl)+gauss()*.2,.1,4),bpg=clamp((.1+(es('blk')-40)*.05+(S.height-80)*.03)*mf*(1+(S.traits.lock-3)*.05)*(1+bfx.blk)+gauss()*.2,0,5);
   const wins=clamp(Math.round(17+(S.teamStr-60)*.25+(o-60)*.35+gauss()*4),6,34),losses=35-wins;
   const acc=[];const aa=o+S.hype*.12+gauss()*2+(S.tier==='mid'?-3:0);
   if(aa>=80)acc.push('🏅 National Player of the Year');if(aa>=74)acc.push('🎖️ All-American');
@@ -599,7 +704,7 @@ function simCol(){syncPos();const y=S.col.length,T=TIER[S.tier];S.age=18+y;const
     mm=r===6?'🏆 NATIONAL CHAMPIONS':`Lost in the ${rd[r]}`;if(r===6){S.hype+=8;acc.push('🏆 National Champion');if(!S.badges.includes('Big Shot Maker')){S.badges.push('Big Shot Maker');S.traits.clutch=Math.min(5,S.traits.clutch+2);S.attrs.cons=Math.min(99,S.attrs.cons+6);S.attrs.iq=Math.min(99,S.attrs.iq+3);acc.push('🎯 You earn the BIG SHOT MAKER badge: +2 Clutch, +6 Consistency, +3 IQ. You thrive under pressure for life.');}}else if(r>=4)S.hype+=4;}
   {const cg=earnGtp((acc.includes('🏅 National Player of the Year')?3:0)+(acc.includes('🎖️ All-American')?1:0)+(acc.includes('🏆 National Champion')?4:0),'College');if(cg>0)acc.push(`🪙 +${cg} GTP`);}
   S.hype=Math.max(0,S.hype);const hm=S.hurt?.6:1,hurtTxt=S.hurt?` · ${ri(3,8)} games (injured)`:'';S.hurt=0;
-  S.banned=false;S.col.push({title:`${YR[y]} at ${S.school} · age ${S.age}`,line:`${f1(ppg*hm)} PPG · ${f1(rpg*hm)} RPG · ${f1(apg*hm)} APG · ${f1(spg*hm)} SPG · ${f1(bpg*hm)} BPG · ${wins}-${losses} · ${mm}${hurtTxt}`,ev,acc,proj:projRange()});
+  S.banned=false;S.col.push({bdg:bch,st:{ppg:ppg*hm,rpg:rpg*hm,apg:apg*hm,spg:spg*hm,bpg:bpg*hm},title:`${YR[y]} at ${S.school} · age ${S.age}`,line:`${f1(ppg*hm)} PPG · ${f1(rpg*hm)} RPG · ${f1(apg*hm)} APG · ${f1(spg*hm)} SPG · ${f1(bpg*hm)} BPG · ${wins}-${losses} · ${mm}${hurtTxt}`,ev,acc,proj:projRange()});
   const maxY=S.redshirt?5:4;if(S.col.length>=maxY)S.mustDeclare=true;}
 function declare(){S.lastResult=null;S.summerNote=null;S.projD=projRange();S.combine=runCombine();const miss=gauss()*2.5,g=scoutGrade()+miss+S.combine.adj;S.scoutMiss=gauss()*5;S.ceiling+=gauss()*4-S.scoutMiss*.5;S.scoutAtDraft=g;S.pick=pickFor(g);S.ovrAtDraft=OV();
   S.age=draftAge();leagueDraft();S.stage='draft';render();}
@@ -714,23 +819,23 @@ function simNBA(){syncPos();if(!R.get)R=makeRng((Math.random()*4294967296)>>>0);
     if(r>=majP+modP){const g=ri(4,15);lost+=g;inj=`${capF(pick(INJ.minor))} (${g} games)`;}
     else if(r>=majP){const g=ri(18,40);lost+=g;inj=`${capF(pick(INJ.mod))} (${g} games)`;}
     else if(S.armor){S.armor=false;const g=ri(18,40);lost+=g;inj=`🛡️ Injury insurance! A major injury was downgraded (${g} games)`;}else{const g=ri(45,82);lost+=g;inj=`🚑 ${capF(pick(INJ.major))} (${g} games)`;S.injuryProne=true;S.comeback={yr:n+1,ppg:prev?prev.ppg:0};S.attrs.speed=Math.max(30,S.attrs.speed-ri(4,8));S.attrs.vert=Math.max(30,S.attrs.vert-ri(4,8));S.ceiling-=ri(2,5);}}
-  const gp=clamp(82-lost,0,82);const o=ovr();notes.push(growWhy(dsp(prevO),'nba',{hurt:!!inj&&gp<70})[1]);
+  const gp=clamp(82-lost,0,82);const o=ovr(),bch=updBadges('season'),bfx=badgeFx();notes.push(growWhy(dsp(prevO),'nba',{hurt:!!inj&&gp<70})[1]);for(const x of badgeLines(bch))notes.push(x);
   let opp=0;if(n<2)opp=S.pick<=5?5:S.pick<=14?3:S.pick<=30?0:S.pick<=60?-4:-6;
-  let mins=clamp(14.5+(o-55)*1.2+opp+(S.minAdj||0)+(FRAMES[S.frame].mins||0)+(es('stam')-60)*.08+(t.motor-3)*.6,4,36);if(o<52)mins=Math.min(mins,8);
-  const mf=mins/36,nf=()=>1+gauss()*.075*(1.25-(es('cons')-40)/120);
-  const ppg=Math.max(0,.86*(8+(o-55)*.45+(eff('sho')+eff('fin')-120)*.1+(S.usage||0)+(X.usage||0)+(FRAMES[S.frame].ppg||0)+(t.killer-3)*.9)*mf*nf()*era().pace),
-    rpg=Math.max(0,.64*(2.4+(es('dreb')-40)*.14+(es('oreb')-40)*.07)*mf*nf()*(1+(t.motor-3)*.05)),apg=Math.max(0,.6*(1.3+(es('pass')-40)*.13+(es('handle')-40)*.05)*mf*nf()*(1-(t.killer-3)*.04)),
-    spg=Math.max(0,(.45+(es('stl')-40)*.028+(es('speed')-50)*.006)*mf*nf()*(1+(t.motor-3)*.05+(t.lock-3)*.05)),bpg=Math.max(0,(.12+(es('blk')-40)*.04+(es('vert')-50)*.005)*mf*nf()*(1+(t.lock-3)*.05)),
-    fg=clamp(.40+((es('close')+es('layup')+es('dunk'))/3-50)*.0017+(S.height-78)*.003+(t.touch-3)*.004+gauss()*.012,.36,.68),tp=clamp(.26+(es('three')-40)*.0029+(t.touch-3)*.008+era().tp+gauss()*.015,.18,.47),ft=clamp(.52+(es('ft')-40)*.0068+(t.touch-3)*.015+gauss()*.02,.4,.95),
-    tov=Math.max(.2,(.5+ppg*.075+apg*.22)*(1-(es('handle')-60)/250-(es('iq')-60)/350)*nf());
+  let mins=clamp(14.5+(o-55)*1.2+opp+(S.minAdj||0)+(FRAMES[S.frame].mins||0)+(es('stam')-60)*.08+(t.motor-3)*.6+bfx.min,4,36);if(o<52)mins=Math.min(mins,8);
+  const mf=mins/36,nf=()=>1+gauss()*.075*(1.25-(es('cons')-40)/120)*(1-bfx.var);
+  const ppg=Math.max(0,.86*(8+(o-55)*.45+(eff('sho')+eff('fin')-120)*.1+(S.usage||0)+(X.usage||0)+(FRAMES[S.frame].ppg||0)+(es('offb')-50)*.03+bfx.pts/.86+(t.killer-3)*.9)*mf*nf()*era().pace),
+    rpg=Math.max(0,.64*(2.4+(es('dreb')-40)*.14+(es('oreb')-40)*.07)*mf*nf()*(1+(t.motor-3)*.05)*(1+bfx.reb)),apg=Math.max(0,.6*(1.3+(es('pass')-40)*.13+(es('handle')-40)*.05)*mf*nf()*(1-(t.killer-3)*.04)*(1+bfx.ast)),
+    spg=Math.max(0,(.45+(es('stl')-40)*.028+(es('speed')-50)*.006+(es('lat')-50)*.004)*mf*nf()*(1+(t.motor-3)*.05+(t.lock-3)*.05)*(1+bfx.stl)),bpg=Math.max(0,(.12+(es('blk')-40)*.04+(es('vert')-50)*.005)*mf*nf()*(1+(t.lock-3)*.05)*(1+bfx.blk)),
+    fg=clamp(.40+(fin3()-50)*.0017+(es('offb')-50)*.0004+bfx.fg/100+(S.height-78)*.003+(t.touch-3)*.004+gauss()*.012,.36,.68),tp=clamp(.26+(es('three')-40)*.0029+(t.touch-3)*.008+era().tp+bfx.tp/100+gauss()*.015,.18,.48),ft=clamp(.52+(es('ft')-40)*.0068+(t.touch-3)*.015+bfx.ft/100+gauss()*.02,.4,.95),
+    tov=Math.max(.2,(.5+ppg*.075+apg*.22)*(1-(es('handle')-60)/250-(es('iq')-60)/350)*(1-bfx.tov)*nf());
   const L=S.L;if(n){lgOffseason(L);leagueNews(n,news,notes);}
-  lgPlay(L,{team:S.team,ovr:o,gp,extra:(t.lead-3)*1.5*(gp/82)+(X.team||0)*.9});const z=L.z,wins=L.lastWins[S.team];S.teamStr=50+z[S.team]*14;
+  lgPlay(L,{team:S.team,ovr:o,gp,extra:(t.lead-3)*1.5*(gp/82)+(X.team||0)*.9+bfx.team*(gp/82)});const z=L.z,wins=L.lastWins[S.team];S.teamStr=50+z[S.team]*14;
   const rival=S.rival&&!S.rival.retired?S.rival:null,sameTeam=rival&&rival.team===S.team;if(rival)rival.teamStr=50+z[rival.team]*14;
   const rv=rival?{name:rival.name,ppg:rival.ppg,wins:rival.wins}:null;
   // regular-season head-to-head with your rival
   let h2h=null;if(rival&&!sameTeam){const ng=CONF(rival.team)===CONF(S.team)?4:2,qh=clamp(.5+(z[S.team]-z[rival.team])*.11+(o-rival.ovr)*.004,.15,.85);h2h=[0,0];for(let i=0;i<ng;i++)h2h[R()<qh?0:1]++;}
   // the playoffs can stop for a clutch moment, so everything the rest of the season needs is kept with the run
-  S.cur={n,a,prevO,o,gp,mins:gp?mins:0,ppg:gp?ppg:0,rpg:gp?rpg:0,apg:gp?apg:0,spg:gp?spg:0,bpg:gp?bpg:0,fg,tp,ft,tov:gp?tov:0,wins,inj,notes,news,rv,h2h,rs0:R.get(),clutch:[]};
+  S.cur={bdg:bch,n,a,prevO,o,gp,mins:gp?mins:0,ppg:gp?ppg:0,rpg:gp?rpg:0,apg:gp?apg:0,spg:gp?spg:0,bpg:gp?bpg:0,fg,tp,ft,tov:gp?tov:0,wins,inj,notes,news,rv,h2h,rs0:R.get(),clutch:[]};
   seasonPlayoffs();}
 // the playoffs: the real bracket with your series game by game. Game 7s and the last games of the Finals stop for your call,
 // then the bracket is replayed from the same dice with your result locked in, so nothing else changes
@@ -754,7 +859,7 @@ function seasonPlayoffs(){const c=S.cur,t=S.traits,L=S.L,z=L.z,{n,a,prevO,o,gp,m
   const gwN=c.clutch.filter(x=>x.won&&x.shot).length,fN=c.clutch.filter(x=>x.won&&x.shot&&x.fin).length;if(gwN){S.gw=(S.gw||0)+gwN;S.fgw=(S.fgw||0)+fN;S.hype+=4*gwN;}
   // awards: voted against every real player in the league
   const C=active(L).filter(p=>p.gp>0).map(p=>({p,name:p.name,team:p.team,ovr:p.ovr,gp:p.gp,ppg:p.ppg,rpg:p.rpg,apg:p.apg,spg:p.spg,bpg:p.bpg,tov:p.tov,fg:p.fg,wins:p.wins,star:p.star,d:p.d,rook:p.yrs===0}));
-  const ME={me:1,name:S.name,team:S.team,ovr:o,gp,ppg,rpg,apg,spg,bpg,tov,fg,wins,star:(t.star-3)*1.5,d:eff('def')+(t.lock-3)*2,rook:n===0};C.push(ME);
+  const ME={me:1,name:S.name,team:S.team,ovr:o,gp,ppg,rpg,apg,spg,bpg,tov,fg,wins,star:(t.star-3)*1.5+badgeFx().as,d:eff('def')+(t.lock-3)*2+badgeFx().dp,rook:n===0};C.push(ME);
   for(const c of C){c.pr=prodScore(c);c.mv=c.ovr*.6+c.pr*.5+(c.wins-41)*.15+gauss()*1.2;c.as=c.ovr*.6+c.star+c.pr*.5+gauss()*1.5;c.dp=c.d+gauss()*1.5;c.ry=c.ppg+gauss()*1.5;}
   const top=(k,f,g)=>C.filter(g).sort((x,y)=>y[k]-x[k]).slice(0,f),aw=[],W={},give=(c,x)=>{if(c.me)aw.push(x);else c.p.aw[x]=(c.p.aw[x]||0)+1;(W[x]=W[x]||[]).push(c);};
   const an=top('mv',15,c=>c.gp>=65);an.forEach((c,i)=>give(c,i<5?'All-NBA 1st':i<10?'All-NBA 2nd':'All-NBA 3rd'));
@@ -807,7 +912,7 @@ function seasonPlayoffs(){const c=S.cur,t=S.traits,L=S.L,z=L.z,{n,a,prevO,o,gp,m
   if(gP)bp+=Math.round(gP*ageF);if(gG){gtp+=gG;S.gtpRun=(S.gtpRun||0)+gG;(S.gtpLog=S.gtpLog||[]).push([`Goals Year ${n+1}`,gG]);}
   if(gres.length)notes.push(`🎯 Season goals: ${gres.filter(g=>g.ok).length} of ${gres.length}${gP?` (+${gP} pts${gG?`, +${gG} GTP`:''})`:''}`);
   if(bp>0){S.bank+=bp;notes.push(`💰 +${bp} bonus pts to spend (${[...bpParts.map(q=>q[0]),...(gP?['goals']:[])].join(', ')}${ageF<1?`; age ${a}: ${Math.round(ageF*100)}% as you get older`:''})`);}
-  S.nba.push({gtp,yr:n+1,age:a,team:S.team,gp,mins,ppg,rpg,apg,spg,bpg,fg,tp,ft,tov,wins,po,aw,inj,ovr:Math.round(o),mvpRank,scRank,path,notes,rv,best,goals:gres,h2h,news:c.news,clutch:c.clutch});
+  S.nba.push({bdg:c.bdg||[],gtp,yr:n+1,age:a,team:S.team,gp,mins,ppg,rpg,apg,spg,bpg,fg,tp,ft,tov,wins,po,aw,inj,ovr:Math.round(o),mvpRank,scRank,path,notes,rv,best,goals:gres,h2h,news:c.news,clutch:c.clutch});
   // history: milestones, the all-time lists, the GOAT debate, your rival and your protégé
   const c1=career(),hist=[];
   for(const m of[10000,20000,30000,40000])if(c0.pts<m&&c1.pts>=m)hist.push(`🎉 You pass ${m.toLocaleString()} career points`);
@@ -950,7 +1055,7 @@ function goatStd(){try{return JSON.parse(localStorage.getItem('bag_rec')||'{}')[
 function finish(){const c=career(),sc=goatScore(c),[t]=tierOf(sc,c);
   S.gemsRun=S.daily?0:Math.round((GEM_TIER[t]||3)*(GEM_MULT[S.diff]??1));if(S.gemsRun)try{localStorage.setItem('bag_gems',gems()+S.gemsRun);}catch{}
   if(!S.daily&&t.includes('GOAT')){immortalize(c,sc);const r=goatStd();if(!r||sc>r.score){S.newStd={prev:r};try{const all=JSON.parse(localStorage.getItem('bag_rec')||'{}');all[S.diff]={score:sc,name:S.name};localStorage.setItem('bag_rec',JSON.stringify(all));}catch{}earnGtp(r?40:20,r?'Broke the GOAT standard':'Set the GOAT standard');}}
-  const hof=JSON.parse(localStorage.getItem('bag_hof')||'[]');hof.push({diff:S.diff,name:S.name,pos:S.pos,arch:archetype().name,score:sc,tier:t,pick:S.pick,ppg:c.gp?c.pts/c.gp:0,rings:c.cnt['Champion']||0,mvp:c.cnt['MVP']||0,date:Date.now()});
+  const hof=JSON.parse(localStorage.getItem('bag_hof')||'[]');hof.push({diff:S.diff,name:S.name,pos:S.pos,arch:archetype().name,bd:Object.keys(S.bdg||{}).length,score:sc,tier:t,pick:S.pick,ppg:c.gp?c.pts/c.gp:0,rings:c.cnt['Champion']||0,mvp:c.cnt['MVP']||0,date:Date.now()});
   hof.sort((a,b)=>b.score-a.score);localStorage.setItem('bag_hof',JSON.stringify(hof.slice(0,15)));S.newAch=S.diff==='rookie'?[]:checkAch(c,sc,t);earnGtp(GTP_TIER[t]||0,'Career: '+t);S.gtpRun=Math.round(S.gtpRun||0);setGtp(gtpBank()+S.gtpRun);try{const rec=[...Object.keys(S.seenE||{}),...(S.seenF||[]),...RECENT()];localStorage.setItem('bag_recent',JSON.stringify([...new Set(rec)].slice(0,70)));}catch{}
   if(S.daily){const runs=dailyBest();runs.push({name:S.name,score:sc,tier:t});runs.sort((a,b)=>b.score-a.score);localStorage.setItem('bag_daily',JSON.stringify({date:todayKey(),runs:runs.slice(0,10)}));}
   S.stage='end';}
@@ -1344,12 +1449,12 @@ function avatar(L,age,size,bg){size=size||90;const id='av'+(++AVN),g=(a,i)=>a[(i
   ${hw===5?'':mouth}${bg?'</g>':''}</svg>`;}
 // ---------- archetypes & randomize ----------
 const ARCH=[
-  ['🎯 Sharpshooter','SG',77,'Lean',{three:3,mid:2.5,ft:2,close:1,handle:1,speed:1,iq:1,cons:1.5}],
-  ['🛡️ Rim Protector','C',84,'Strong',{blk:3,intD:3,dreb:2.5,oreb:2,str:2,dunk:1.5,vert:1.5}],
-  ['🦾 Two-Way Wing','SF',79,'Balanced',{perD:2.5,three:2,stl:2,speed:1.5,vert:1.5,layup:1.5,iq:1}],
+  ['🎯 Sharpshooter','SG',77,'Lean',{three:3,mid:2.5,ft:2,close:1,offb:1.5,speed:1,iq:1,cons:1.5}],
+  ['🛡️ Rim Protector','C',84,'Strong',{blk:3,intD:3,dreb:2.5,oreb:2,str:2,dunk:1.5,vert:1.5,hook:1}],
+  ['🦾 Two-Way Wing','SF',79,'Balanced',{perD:2.5,three:2,stl:2,lat:2,speed:1.5,vert:1.5,layup:1.5,iq:1}],
   ['🧠 Floor General','PG',74,'Balanced',{pass:3,handle:3,iq:2.5,three:1.5,mid:1.5,speed:1.5,cons:1}],
-  ['💥 Slasher','SG',77,'Lean',{layup:3,dunk:2.5,speed:2.5,vert:2,handle:1.5,ft:1}],
-  ['🐻 Post Bully','PF',81,'Strong',{post:3,str:3,close:2.5,oreb:2,dreb:2,intD:1.5}]];
+  ['💥 Slasher','SG',77,'Lean',{layup:3,dunk:2.5,speed:2.5,vert:2,handle:1.5,ft:1,offb:1}],
+  ['🐻 Post Bully','PF',81,'Strong',{post:3,hook:2.5,str:3,close:2,fade:1,oreb:2,dreb:2,intD:1.5}]];
 function fillPoints(pk){for(const k of SUBKEYS)S.attrs[k]=MIN_A;let g=0,miss=0;
   while(g++<6000&&miss<60){const k=pk();if(S.attrs[k]>=BUILD_MAX){miss++;continue;}if(spent()+cost(S.attrs[k])>START_BUDGET){miss++;continue;}S.attrs[k]++;miss=0;}}
 function applyArch(i){const[l,pos,h,fr,w]=ARCH[i],keys=Object.keys(w),tot=keys.reduce((s,k)=>s+w[k],0);S.arch=l;
@@ -1401,7 +1506,10 @@ const ACH=[
   ['rushmore','🏛️ Mount Rushmore','Finish top 4 in the all-time GOAT debate',()=>!!S.L&&goatRank()<=4],
   ['rafters','👕 Up in the Rafters','Get your jersey retired by 2 teams',()=>jerseys().length>=2],
   ['trip','🔺 Triple-Double Season','Average a triple-double for a season',()=>S.nba.some(s=>s.ppg>=10&&s.rpg>=10&&s.apg>=10&&s.gp>=40)],
-  ['old','🥊 Old School','Make the Hall of Fame in the 90s',(c,sc,t)=>S.era==='90s'&&big3(t)]];
+  ['old','🥊 Old School','Make the Hall of Fame in the 90s',(c,sc,t)=>S.era==='90s'&&big3(t)],
+  ['bcol','🏅 Badge Collector','Hold 10 badges at once',()=>(S.bdgMax||0)>=10],
+  ['bplat','💠 Platinum Club','Reach Platinum on any badge',()=>!!S.bdgPlat],
+  ['bfull','📖 Full Badge Book','Discover every badge across your careers',()=>bookCount()>=BADGES.length]];
 function checkAch(c,sc,t){const have=JSON.parse(localStorage.getItem('bag_ach')||'{}'),now=[];
   for(const[id,,,f]of ACH)if(!have[id]&&f(c,sc,t)){have[id]=Date.now();now.push(id);}localStorage.setItem('bag_ach',JSON.stringify(have));return now;}
 // ---------- Hall of Fame plaque (made for screenshots) ----------
@@ -1411,6 +1519,7 @@ function plaqueHTML(c,sc,t){const g=x=>c.cnt[x]||0,gp=c.gp||1,top=[['Champion','
   <div class="tier" style="font-size:1.6rem;text-align:left;margin:2px 0">${t}</div>
   <div class="sub">${archetype().name} · ${ht(S.height)} · ${pickTxt(S.pick)} · ${c.seasons} season${c.seasons===1?'':'s'}</div></div></div>
   <div class="grid2" style="margin-top:10px">${[['PPG',f1(c.pts/gp)],['RPG',f1(c.reb/gp)],['APG',f1(c.ast/gp)],['PTS',Math.round(c.pts).toLocaleString()]].map(([l,v])=>`<div class="stat"><b>${v}</b>${l}</div>`).join('')}</div>
+  ${(()=>{const B=S.bdg||{},gb=BADGES.filter(b=>B[b.id]>=3).sort((x,y)=>B[y.id]-B[x.id]);return gb.length?`<div style="margin-top:8px">${gb.slice(0,6).map(b=>`<span class="pill bpill t${B[b.id]}">${bMed(B[b.id])}${b.n}</span>`).join('')}</div>`:'';})()}
   <div style="margin-top:8px">${top.map(([k,e,l])=>`<span class="pill gold">${e} ${g(k)}× ${l}</span>`).join('')||'<span class="muted">'+(S.retired==='Out of the league'?'No hardware. Out of the league, but you made it there.':'No hardware. You still made it to the league.')+'</span>'}</div>
   <div class="sub" style="margin-top:6px">GOAT Score ${sc}${S.daily?` · 📅 Daily Build ${todayKey()}`:''}</div></div>`;}
 
@@ -1483,6 +1592,8 @@ function summerCol(){const P='☀️ ';return summerSet(`☀️ Summer before ${
   gamble('⚡ Speed & agility program','Get quicker, with a small injury risk',.72,()=>{up('speed',3);up('vert',2);return P+'You are faster than ever. +3 Speed, +2 Vertical';},()=>{up('speed',-2);return P+'You tweaked a hamstring. -2 Speed';})],[
   safe('📚 Stay on campus and train','Classes and team workouts',()=>{up('iq',2);const a=relevant();up(a,1);return P+`You stayed on campus to train. +2 IQ, +1 ${sname(a)}`;}),
   safe('🧘 Rest and recover','Fresh legs for the season',()=>{up('stam',2);up('cons',1);return P+'You rested up. +2 Stamina, +1 Consistency';}),
+  safe('🪝 Post camp with a retired center','Old-school footwork and touch around the rim',()=>{up('hook',3);up('fade',2);up('post',1);return P+'The old center taught you his secrets. +3 Hook Shot, +2 Post Fade, +1 Post Moves';}),
+  safe('🧱 Wing defense lab','Slide drills, closeouts and off-ball reads',()=>{up('lat',3);up('offb',2);return P+'You slide better and move smarter. +3 Lateral Quickness, +2 Off-Ball Movement';}),
   safe('🏋️ Team summer workouts','Build chemistry and strength',()=>{const a=relevant();up(a,2);return P+`Team workouts paid off. +2 ${sname(a)}`;}),
   safe('🎯 Shooting reps in an empty gym','500 shots a day',()=>{up('ft',2);up('mid',1);return P+'You got up thousands of shots. +2 Free Throw, +1 Mid-Range';})]);}
 function summerNBA(){const o=ovr(),a=S.age,
@@ -1507,6 +1618,8 @@ function summerNBA(){const o=ovr(),a=S.age,
     MED.push(gamble('🧪 Sports-science makeover','New diet, sleep and recovery tech',.67,()=>{addNext({declAdj:-.6});up('stam',2);return 'The sports-science program worked. You will age slower this year';},()=>{up('cons',-2);up('stam',-2);return 'The new program wrecked your rhythm. -2 Consistency, -2 Stamina';}));}
   return summerSet('☀️ Summer Decision','Every summer matters. What do you do this offseason?',HIGH,MED,[
     ...(a>=31?[safe('🛌 Load management plan','Sit about 15 games, age slower',()=>{addNext({gp:14,declAdj:-.5});return 'You will sit about 15 games to save your legs. You age slower';})]:[]),
+    safe('🪝 Post camp with a retired center','Old-school footwork and touch around the rim',()=>{up('hook',3);up('fade',2);up('post',1);return 'The old center taught you his secrets. +3 Hook Shot, +2 Post Fade, +1 Post Moves';}),
+    safe('🧱 Wing defense lab','Slide drills, closeouts and off-ball reads',()=>{up('lat',3);up('offb',2);return 'You slide better and move smarter. +3 Lateral Quickness, +2 Off-Ball Movement';}),
     safe('🏋️ Regular offseason training','Steady, guaranteed progress',()=>{const x=relevant();let y=relevant(),g=0;while(y===x&&g++<10)y=relevant();up(x,2);up(y,1);return `Normal offseason work. +2 ${sname(x)}, +1 ${sname(y)}`;}),
     safe('🧘 Rest and recover','Fresh legs, slower aging',()=>{up('stam',2);addNext({declAdj:-.25});return 'You rested all summer. +2 Stamina, you age a bit slower';}),
     safe('🏠 Family time back home','Recharge the mind',()=>{up('cons',2);return 'You spent the summer with family. +2 Consistency';}),
@@ -1678,7 +1791,7 @@ function settingsCard(){const u=UI(),ach=Object.keys((()=>{try{return JSON.parse
     <div class="two" style="margin-top:8px"><button class="danger" onclick="resetProgress()">Yes, erase everything</button><button class="ghost" onclick="UI().confirmReset=false;render()">Cancel</button></div>`
   :`<button class="ghost" style="margin-top:10px;width:100%" onclick="UI().confirmReset=true;UI().resetDone=false;render()">Reset all progress</button>`}</div>`;}
 function resetProgress(){for(const k of[...SAVE_KEYS,...Object.values(SV)])try{localStorage.removeItem(k);}catch{}R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,menu:'settings',resetDone:true};render();scrollTo(0,0);}
-const MENU=[['settings','sliders','Settings','Difficulty, sound and reset'],['gtp','gtp','GTP Store','Perks for your next player'],['gear','shirt','Equipment','Permanent gear for every player'],['hof','🏛️','Hall of Builds','Your best careers'],['ach','🏅','Achievements','What you have unlocked']];
+const MENU=[['settings','sliders','Settings','Difficulty, sound and reset'],['gtp','gtp','GTP Store','Perks for your next player'],['gear','shirt','Equipment','Permanent gear for every player'],['hof','🏛️','Hall of Builds','Your best careers'],['ach','🏅','Achievements','What you have unlocked'],['bbook','medal','Badge Book','Every badge you have earned']];
 // the Gem Shop item exists only while the store is on (iOS app with RevenueCat, or ?dev=1); see PLATFORM (Plat)
 const MENU_GEMS=['gems','gem','Gem Shop','Buy gems and Remove Ads'];
 const menuAll=()=>{const m=[...MENU];if(storeOn())m.splice(m.findIndex(x=>x[0]==='gear')+1,0,MENU_GEMS);return m;};
@@ -1692,7 +1805,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&typeof S!=='undefin
 const BALL='<svg class="ball" viewBox="0 0 40 40" aria-hidden="true"><defs><radialGradient id="bg1" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffb05a"/><stop offset="1" stop-color="#d9580a"/></radialGradient></defs><circle cx="20" cy="20" r="18" fill="url(#bg1)"/><g fill="none" stroke="#3a1a05" stroke-width="1.6"><path d="M2 20h36M20 2v36"/><path d="M7 7c6 5 6 21 0 26M33 7c-6 5-6 21 0 26"/></g></svg>';
 function drawerHTML(){const hofN=(()=>{try{return JSON.parse(localStorage.getItem('bag_hof')||'[]').length;}catch{return 0;}})(),achN=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('bag_ach')||'{}')).length;}catch{return 0;}})(),cls=drawerAnim?'in':'';drawerAnim=false;
   const sub={settings:diff().name.replace(/^\S+\s/,'')+' · difficulty, sound, reset',gtp:(gtpBank()-perkCost())+' GTP available · perks for this player',hof:hofN+' careers · your best builds',ach:achN+'/'+ACH.length+' unlocked'};
-  const ic={settings:icon('sliders'),gtp:icon('gtp'),gear:icon('shirt'),gems:icon('gem'),how:icon('book'),hof:'🏛️',ach:'🏅',quit:icon('home')};sub.gear=gems()+' gems · permanent gear';sub.gems=gems()+' gems · buy gems, Remove Ads';sub.how='The basics, any time';sub.quit='Your run is saved. Continue it any time';if(S.stage!=='build')sub.settings='Sound and reset';
+  const ic={bbook:icon('medal'),settings:icon('sliders'),gtp:icon('gtp'),gear:icon('shirt'),gems:icon('gem'),how:icon('book'),hof:'🏛️',ach:'🏅',quit:icon('home')};sub.gear=gems()+' gems · permanent gear';sub.gems=gems()+' gems · buy gems, Remove Ads';sub.how='The basics, any time';sub.bbook=bookCount()+'/'+BADGES.length+' badges discovered';sub.quit='Your run is saved. Continue it any time';if(S.stage!=='build')sub.settings='Sound and reset';
   return`<div class="drawer ${cls}" role="dialog" aria-label="Menu"><div class="bd" onclick="closeMenu()"></div><div class="pn">
   <div class="row" style="flex-wrap:nowrap"><div class="logo">${BALL}<div>BUILD A <span>GOAT</span></div></div><button class="x" aria-label="Close menu" onclick="closeMenu()"><i></i><i></i></button></div>
   <div class="curchips"><div class="gtpchip">🪙 ${gtpBank()-perkCost()} GTP${perkCost()?` · ${perkCost()} in cart`:''}</div><div class="gtpchip gemchip">${icon('gem','ici')}${gems()} gems</div></div>
@@ -1707,6 +1820,7 @@ function menuHTML(){const k=UI().menu,m=menuAll().find(x=>x[0]===k),hofN=(()=>{t
   if(k==='gems')b=shopCard();
   if(k==='hof')b=hofHTML(true)||'<div class="card"><div class="sub">No careers yet. Finish a career and it lands here.</div></div>';
   if(k==='ach')b=achHTML([],true);
+  if(k==='bbook')b=badgeBookHTML();
   return top+b+dock(`<button onclick="openMenu(null)">Back to your ${S.stage==='build'?'build':S.stage==='end'?'career recap':'career'}</button>`);}
 // ---------- the intro: what the game is and how to play ----------
 const INTRO=[['ball','This is Build a GOAT','Create a basketball player from scratch and live their whole career: high school, college, the draft and the NBA. Your goal is to retire as the Greatest Of All Time.'],
@@ -2042,7 +2156,7 @@ const EMOJI_ICON={
 
 // ---------- UI ----------
 const app=document.getElementById('app');
-function act(fn,...a){fn(...a);render();}
+function act(fn,...a){fn(...a);if(fn===choose&&UI().auto&&!UI().seq)autoStep();else render();}
 const UI=()=>S.ui||(S.ui={tab:'setup',open:null,spend:false});
 const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 // every emoji in the game's text is swapped for a custom icon when a screen is drawn
@@ -2067,8 +2181,9 @@ function dock(inner){return inner?`<div class="dock"><div class="in">${inner}</d
 // ---------- skills ----------
 function skillRow(k,l,mode){const v=S.attrs[k],e=Math.round(es(k));let ctl;
   if(mode==='build'){const off=v>=BUILD_MAX||spent()+cost(v)>START_BUDGET;ctl=`<button class="ghost sm" aria-label="Remove a point from ${l}" onclick="adj('${k}',-1)" ${v<=MIN_A?'disabled':''}>−</button><button class="sm" aria-label="Add a point to ${l}" onclick="adj('${k}',1)" ${off?'disabled':''}>+${cost(v)>1?cost(v):''}</button><button class="ghost sm" aria-label="Add 10 points to ${l}" onclick="adjN('${k}',10)" ${off?'disabled':''}>+10</button><button class="ghost sm" aria-label="Max out ${l}" onclick="adjN('${k}',99)" ${off?'disabled':''}>Max</button>`;}
-  else{const off=S.bank<cost(v)||v>=99;ctl=`<button class="sm" aria-label="Add a point to ${l}" onclick="spend('${k}')" ${off?'disabled':''}>+${cost(v)>1?cost(v):''}</button><button class="ghost sm" aria-label="Add 10 points to ${l}" onclick="spend('${k}',10)" ${off?'disabled':''}>+10</button><button class="ghost sm" aria-label="Max out ${l}" onclick="spend('${k}',99)" ${off?'disabled':''}>Max</button>`;}
-  return`<div class="attr"><span>${l}${IMP[k]==='hi'?'<small class="imp hi">high impact</small>':IMP[k]==='lo'?'<small class="imp">low impact</small>':''}</span><div class="bar"><i style="width:${e}%"></i></div><b>${e}</b><div class="ctl">${ctl}</div></div>`;}
+  else if(mode==='view')ctl='';
+  else{const off=S.bank<cost(v)||v>=99;ctl=`${canUndo(k)?`<button class="ghost sm" aria-label="Take a point back from ${l}" onclick="unspend('${k}')">−</button>`:''}<button class="sm" aria-label="Add a point to ${l}" onclick="spend('${k}')" ${off?'disabled':''}>+${cost(v)>1?cost(v):''}</button><button class="ghost sm" aria-label="Add 10 points to ${l}" onclick="spend('${k}',10)" ${off?'disabled':''}>+10</button><button class="ghost sm" aria-label="Max out ${l}" onclick="spend('${k}',99)" ${off?'disabled':''}>Max</button>`;}
+  return`<div class="attr"><span>${l}${badgeHint(k)}${IMP[k]==='hi'?'<small class="imp hi">high impact</small>':IMP[k]==='lo'?'<small class="imp">low impact</small>':''}</span><div class="bar"><i style="width:${e}%"></i></div><b>${e}</b><div class="ctl">${ctl}</div></div>`;}
 function impactMap(){const o0=ovr(),d=SUBKEYS.map(k=>{const v=S.attrs[k];S.attrs[k]=v+1;const x=ovr()-o0;S.attrs[k]=v;return[k,x];}).sort((a,b)=>b[1]-a[1]),m={};
   d.forEach(([k],i)=>m[k]=i<6?'hi':i>=d.length-6?'lo':'');return m;}
 let IMP={};
@@ -2084,24 +2199,56 @@ function buildFill(){let g=0;while(g++<900){const left=START_BUDGET-spent(),o0=o
 const STEP=1,keepGain=o0=>{};
 function smartSpend(){let g=0;const oS=ovr();while(S.bank>0&&g++<600){const o0=ovr();let best=null,bs=-1;
     for(const k of SUBKEYS){const v=S.attrs[k],c=cost(v);if(v>=99||c>S.bank)continue;S.attrs[k]=Math.min(99,v+STEP);const d=ovr()-o0;S.attrs[k]=v;const s=d/c*(1+(75-v)/150);if(s>bs){bs=s;best=k;}}
-    if(!best)break;S.bank-=cost(S.attrs[best]);S.attrs[best]=Math.min(99,S.attrs[best]+STEP);}keepGain(oS);render();}
-function spend(k,n=1){const o0=ovr();for(let i=0;i<n;i++){const c=cost(S.attrs[k]);if(S.bank>=c&&S.attrs[k]<99){S.bank-=c;S.attrs[k]=Math.min(99,S.attrs[k]+STEP);}else break;}keepGain(o0);render();}
+    if(!best)break;S.bank-=cost(S.attrs[best]);S.attrs[best]=Math.min(99,S.attrs[best]+STEP);}keepGain(oS);spendBadges();render();}
+const canUndo=k=>S.stage==='hs'&&!S.hs.length&&S.attrs0&&S.attrs[k]>S.attrs0[k];
+function unspend(k){if(!canUndo(k))return;S.attrs[k]-=STEP;S.bank+=cost(S.attrs[k]);S.bdg={};updBadges('load');render();}
+function spend(k,n=1){const o0=ovr();for(let i=0;i<n;i++){const c=cost(S.attrs[k]);if(S.bank>=c&&S.attrs[k]<99){S.bank-=c;S.attrs[k]=Math.min(99,S.attrs[k]+STEP);}else break;}keepGain(o0);spendBadges();render();}
 function setF(k,v){S[k]=v;render();}
 function toggleTrait(k){const i=S.picked.indexOf(k);if(i>=0)S.picked.splice(i,1);else if(S.picked.length<traitLimit())S.picked.push(k);render();}
 function startCareer(){syncPos();S.archId=archetype().id;S.name=(S.name||'').trim()||'Mystery Prospect';S.cls=null;S.L=null;if(S.daily){S.diff='pro';S.perks={};}const pc=perkCost();if(pc){setGtp(gtpBank()-pc);S.perksBought={...S.perks};}S.seed=S.daily?seedFrom('goat'+todayKey()):(Math.random()*4294967296)>>>0;R=makeRng(S.seed);
   for(const[k]of TRAITS)S.traits[k]=S.picked.includes(k)?(S.perks.maxed?5:ri(4,5)):ri(1,5);
-  S.bank=START_BUDGET-spent();wearGear();S.cls=makeClass();S.ceiling=ovr()+7+gauss()*(S.perks.dna?3.5:8)+(S.traits.work-3)*2.5+(S.traits.late-3)*1.2;if(S.perks.dna)S.ceiling+=4;if(S.perks.clutch)S.traits.clutch=Math.min(5,S.traits.clutch+1);if(S.perks.hype)S.hype+=15;S.armor=!!S.perks.armor;S.startOvr=OV();S.stage='hs';UI().spend=false;render();scrollTo(0,0);}
+  S.bank=START_BUDGET-spent();wearGear();S.cls=makeClass();S.ceiling=ovr()+7+gauss()*(S.perks.dna?3.5:8)+(S.traits.work-3)*2.5+(S.traits.late-3)*1.2;if(S.perks.dna)S.ceiling+=4;if(S.perks.clutch)S.traits.clutch=Math.min(5,S.traits.clutch+1);if(S.perks.hype)S.hype+=15;S.armor=!!S.perks.armor;S.startOvr=OV();S.attrs0={...S.attrs};S.stage='hs';UI().spend=false;render();scrollTo(0,0);}
 
 // ---------- player header ----------
-function hero(){const o=OV(),st=S.stage;
-  return`<div class="hero">${avatar(S.look,S.age,60,1)}<div class="grow"><div class="hn">${esc(S.name)}</div><div class="hm">${archetype().name} · ${ht(S.height)} · ${S.frame} · Age ${S.age}</div>
+function hero(tap){const o=OV(),st=S.stage;
+  return`<div class="hero${tap?' tap':''}"${tap?` role="button" tabindex="0" aria-label="Open your player profile" onclick="openProfile('over')"`:''}>${avatar(S.look,S.age,60,1)}<div class="grow"><div class="hn">${esc(S.name)}</div><div class="hm">${archetype().name} · ${ht(S.height)} · ${S.frame} · Age ${S.age}</div>
   <div class="hm">${era().name.replace(EMO_RE,'').trim()}${st!=='nba'?` · Hype ${Math.max(0,Math.round(S.hype))}`:''}${st==='hs'||st==='offers'?` · ${starsHTML(stars())}`:''}${S.rival&&st==='nba'?` · ⚔️ ${S.rival.name}${S.rival.retired?' (retired)':S.rival.team===S.team?' (teammate)':''}`:''}</div></div>
-  <div><div class="ovr" style="--p:${o}"><div><b>${o}</b><span>OVR</span></div></div><div class="role">${st==='nba'||st==='end'?ovrLabel(o):o<50?'Not NBA-ready yet':'NBA level: '+ovrLabel(o)}</div></div></div>`;}
+  <div><div class="ovr" style="--p:${o}"><div><b>${o}</b><span>OVR</span></div></div><div class="role">${st==='nba'||st==='end'?ovrLabel(o):o<50?'Not NBA-ready yet':'NBA level: '+ovrLabel(o)}</div></div></div>${tap?`<button class="ghost sm wide profbtn" onclick="openProfile('over')">${icon('user','ici')} Profile · skills, badges, stats ›</button>`:''}`;}
 function traitsBlock(){const hi=TRAITS.filter(([k])=>S.traits[k]>=4).length,lo=TRAITS.filter(([k])=>S.traits[k]<=1).length;
   return`<details><summary>Traits · ${hi} strength${hi===1?'':'s'}${lo?` · ${lo} weakness${lo===1?'':'es'}`:''}</summary><div>${TRAITS.slice().sort((a,b)=>S.traits[b[0]]-S.traits[a[0]]).map(([k,l])=>`<span class="pill ${S.traits[k]<=1?'bad':''}">${l}${pips(S.traits[k])}</span>`).join('')}${S.badges.map(b=>`<span class="pill gold">🎯 ${b}</span>`).join('')}</div></details>`;}
-function bankBlock(){const u=UI();if(S.bank<=0)return u.spend?`<div class="bankbar"><div class="grow"><b>All bonus points spent</b></div><button class="sm" onclick="UI().spend=false;render()">Done</button></div>`:'';
-  return`<div class="bankbar"><div class="grow"><b>${S.bank} bonus point${S.bank>1?'s':''}</b><div class="sub">They carry over your whole career. Spend them any time.</div></div><button class="sm" onclick="UI().spend=!UI().spend;render()">${u.spend?'Done':'Spend'}</button></div>${u.spend?`<div style="margin-top:8px">${projCard()}${skillAcc('bank')}</div>`:''}`;}
-function playerCard(mode){return`<div class="card">${hero()}${traitsBlock()}${mode?bankBlock():''}</div>`;}
+function bankBlock(inSeq){const u=UI();if(S.bank<=0)return u.spend?`<div class="bankbar"><div class="grow"><b>All bonus points spent</b></div><button class="sm" onclick="UI().spend=false;render()">Done</button></div>`:'';
+  return`<div class="bankbar"><div class="grow"><b>${S.bank} bonus point${S.bank>1?'s':''}</b><div class="sub">They carry over your whole career. Spend them any time.</div></div><button class="sm" onclick="${inSeq?'UI().spend=!UI().spend;render()':"openProfile('skills')"}">${u.spend&&inSeq?'Done':'Spend'}</button></div>${u.spend&&inSeq?`<div style="margin-top:8px">${projCard()}${skillAcc('bank')}</div>`:''}`;}
+function playerCard(mode,inSeq){return`<div class="card">${hero(!inSeq)}${inSeq?traitsBlock():''}${mode?bankBlock(inSeq):''}</div>`;}
+// ---------- player profile: everything about your player, one tap from the career screen ----------
+const PROF_T=[['over','Overview'],['skills','Skills'],['badges','Badges'],['stats','Stats'],['traits','Traits']];
+function openProfile(t){document.activeElement?.blur?.();UI().prof=t||'over';render();scrollTo(0,0);}
+function closeProfile(){UI().prof=null;render();scrollTo(0,0);}
+// shown only, never chosen: from height, the frame's name, Strength and age (rounded to 5 lb). Reads no hidden frame effects
+function weightLb(){const bmi={Lean:23,Balanced:24.7,Strong:26.8}[S.frame]||24.7,b=bmi+(S.attrs.str-60)*.03-Math.max(0,21-S.age)*.45;return Math.round(b*S.height*S.height/703/5)*5;}
+// high school and college seasons keep their numbers in st; older saves only have the text line, read back here
+const lvlRows=a=>a.map(x=>x.st||(()=>{const m=(x.line.match(/[\d.]+(?= [PRASB]PG)/g)||[]).map(Number);return m.length>=5?{ppg:m[0],rpg:m[1],apg:m[2],spg:m[3],bpg:m[4]}:null;})()).filter(Boolean);
+function lvlAvg(rows){if(!rows.length)return null;const o={};for(const k of['ppg','rpg','apg','spg','bpg'])o[k]=rows.reduce((s,r)=>s+r[k],0)/rows.length;return o;}
+function profOver(){const a=archetype(),c=S.nba.length?career():null,st=S.stage,pro=st==='nba'||st==='end';
+  const info=[['Height',ht(S.height)],['Weight',weightLb()+' lb'],['Frame',S.frame],['Age',S.age],['Listed',S.pos],['Era',era().name.replace(EMO_RE,'').trim()],
+    [pro?'Team':'School',pro?(S.team||'-'):(S.school||'High school')],...(S.pick?[['Drafted',pickTxt(S.pick)]]:[]),...(st==='hs'||st==='offers'?[['Recruit',stars()+'-star']]:[]),
+    ...(!pro?[['Hype',Math.max(0,Math.round(S.hype))]]:[]),...(S.rival?[['Rival',S.rival.name]]:[]),...(c?[['NABL seasons',c.seasons]]:[])];
+  return`<div class="card"><div class="sh">${icon('user','ici')} <span class="grow">You play like</span><b>OVR ${OV()}</b></div><div class="pn">${a.name}</div>${a.fits.slice(0,3).map(([id,v])=>`<div class="fit"><span>${ARCHS[id].n}</span><div class="bar"><i style="width:${clamp(dsp(v),0,99)}%"></i></div><b>${dsp(v)}</b></div>`).join('')}</div>
+  <div class="card"><div class="pgrid">${info.map(([k,v])=>`<div><small>${k}</small><b>${esc(String(v))}</b></div>`).join('')}</div></div>`;}
+function profSkills(){const can=S.bank>0;
+  return`${can?`<div class="bankbar"><div class="grow"><b>${S.bank} bonus point${S.bank>1?'s':''} to spend</b><div class="sub">Tap + on any skill. Points carry over your whole career.</div></div></div>`:''}${projCard()}<div class="sub">Tap a group to open it. Numbers include your height and frame.</div>${skillAcc(can?'bank':'view')}`;}
+function profStats(){const c=S.nba.length?career():null;
+  const lv=[['High school',lvlAvg(lvlRows(S.hs))],['College',lvlAvg(lvlRows(S.col))],['NABL',c?(()=>{const g=c.gp||1;return{ppg:c.pts/g,rpg:c.reb/g,apg:c.ast/g,spg:c.stl/g,bpg:c.blk/g};})():null]].filter(x=>x[1]);
+  if(!lv.length)return`<div class="card"><div class="sub">No games yet. Your averages show up here after your first season.</div></div>`;
+  const aw=c?Object.entries(c.cnt).sort((x,y)=>y[1]-x[1]):[],pc=x=>x==null?'-':(x*100).toFixed(1);
+  return`<div class="card"><div class="sh">${icon('bars','ici')} <span class="grow">Per-game averages</span></div><table class="ptab"><tr><th></th><th>PPG</th><th>RPG</th><th>APG</th><th>SPG</th><th>BPG</th></tr>${lv.map(([l,o])=>`<tr><td>${l}</td>${['ppg','rpg','apg','spg','bpg'].map(k=>`<td>${f1(o[k])}</td>`).join('')}</tr>`).join('')}</table></div>
+  ${c?`<div class="card"><div class="sh">${icon('calendar','ici')} <span class="grow">NABL seasons</span><b>${c.gp} games</b></div><div class="pscroll"><table class="ptab"><tr><th>Yr</th><th>Age</th><th>Team</th><th>GP</th><th>PPG</th><th>RPG</th><th>APG</th><th>FG%</th><th>3P%</th><th>FT%</th></tr>${S.nba.map(y=>`<tr><td>${y.yr}</td><td>${y.age}</td><td>${esc(tShort(y.team||''))}</td><td>${y.gp}</td><td>${f1(y.ppg)}</td><td>${f1(y.rpg)}</td><td>${f1(y.apg)}</td><td>${pc(y.fg)}</td><td>${pc(y.tp)}</td><td>${pc(y.ft)}</td></tr>`).join('')}</table></div>
+  <div class="pgrid" style="margin-top:10px">${[['Points',c.pts],['Rebounds',c.reb],['Assists',c.ast],['Steals',c.stl],['Blocks',c.blk]].map(([k,v])=>`<div><small>${k}</small><b>${Math.round(v).toLocaleString('en-US')}</b></div>`).join('')}</div></div>`:''}
+  ${aw.length?`<div class="card"><div class="sh">${icon('trophy','ici')} <span class="grow">Awards</span></div>${aw.map(([k,n])=>`<span class="pill gold">${k}${n>1?' ×'+n:''}</span>`).join('')}</div>`:''}`;}
+function profTraits(){return`<div class="card">${TRAITS.slice().sort((a,b)=>(S.traits[b[0]]||0)-(S.traits[a[0]]||0)).map(([k,l,d])=>`<div class="trow"><div class="grow"><b>${l}</b><div class="sub">${d}</div></div>${pips(S.traits[k]||0)}</div>`).join('')}</div>`;}
+function profileHTML(){const t=UI().prof;let b='';
+  if(t==='over')b=profOver();if(t==='skills')b=profSkills();if(t==='badges')b=typeof badgesTab==='function'?badgesTab():'';if(t==='stats')b=profStats();if(t==='traits')b=profTraits();
+  return`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>Profile</h1><button class="ghost sm" onclick="closeProfile()">◀ Back</button></div><div class="card">${hero(false)}</div>
+  <div class="seg ptabs" role="tablist">${PROF_T.map(([k,l])=>`<button role="tab" aria-selected="${t===k}" class="${t===k?'on':''}" onclick="openProfile('${k}')">${l}</button>`).join('')}</div>${b}`+dock(`<button onclick="closeProfile()">Back to your ${S.stage==='end'?'career recap':'career'}</button>`);}
 function evList(ev){return ev.map(([g,t])=>`<div class="ev ${g>0?'good':g<0?'bad':''}">${t}</div>`).join('');}
 function seasonList(arr,latest){if(!arr.length)return'';const rev=arr.slice().reverse();
   const one=s=>`<div class="season"><b>${s.title}</b>${s.stars?starsHTML(s.stars):''}</div><div class="line">${s.line}</div>${(s.acc||[]).map(a=>`<div class="ev gold">${a}</div>`).join('')}${evList(s.ev)}`;
@@ -2162,7 +2309,10 @@ const SKN=Object.fromEntries(Object.values(SUBS).flat());
 // live "You project as" card: best role, its OVR, the top three fits, and what to raise to lean into the next one (OVR math only)
 function projCard(){const a=archetype(),f=a.fits.slice(0,3),nx=f[1][0],base=archRaw()[nx];
   const tips=SUBKEYS.filter(k=>S.attrs[k]<99).map(k=>{const v=S.attrs[k];S.attrs[k]=Math.min(99,v+5);const x=archRaw()[nx]-base;S.attrs[k]=v;return[k,x];}).sort((x,y)=>y[1]-x[1]).slice(0,3).map(x=>SKN[x[0]]);
-  return`<div class="card"><div class="sh">🧬 <span class="grow">You project as</span><b>OVR ${OV()}</b></div><div class="pn">${a.name}</div>${f.map(([id,v])=>`<div class="fit"><span>${ARCHS[id].n}</span><div class="bar"><i style="width:${clamp(dsp(v),0,99)}%"></i></div><b>${dsp(v)}</b></div>`).join('')}<div class="note">OVR rates you at your best fit. To lean into <b>${ARCHS[nx].n}</b>, raise ${tips.join(', ')}.</div></div>`;}
+  return`<div class="card"><div class="sh">🧬 <span class="grow">You project as</span><b>OVR ${OV()}</b></div><div class="pn">${a.name}</div>${f.map(([id,v])=>`<div class="fit"><span>${ARCHS[id].n}</span><div class="bar"><i style="width:${clamp(dsp(v),0,99)}%"></i></div><b>${dsp(v)}</b></div>`).join('')}<div class="note">OVR rates you at your best fit. To lean into <b>${ARCHS[nx].n}</b>, raise ${tips.join(', ')}.</div>${projBadges(a)}</div>`;}
+function projBadges(a){const sig=ARCH_SIG[a.id].map(id=>BADGE[id].n).join(' · ');let start='';
+  if(S.stage==='build'){const q=badgeQual(),got=BADGES.filter(b=>q[b.id]).sort((x,y)=>q[y.id]-q[x.id]);start=`<div class="note">${got.length?`Badges you start with: ${got.map(b=>`${BTN[q[b.id]]} ${b.n}`).join(' · ')}`:'No badges yet: a skill at 72 earns your first Bronze.'}</div>`;}
+  return`${start}<div class="note">Signature badges: ${sig}</div>`;}
 function frameFx(){const f=FRAMES[S.frame],ks=Object.keys(f).filter(k=>SKN[k]),up=ks.filter(k=>f[k]>0),dn=ks.filter(k=>f[k]<0);
   return`<div class="fx">${up.map(k=>`<span class="good">${SKN[k]} +${f[k]}</span>`).join('')}${dn.map(k=>`<span class="bad">${SKN[k]} ${f[k]}</span>`).join('')}</div>`;}
 function heightText(){const h=S.height;return h<74?'Guard size: quick and shifty with a tight handle, but rebounding, blocks and dunks are hard':h<78?'Guard-wing size: handle and speed still strong, a little help on the boards':h<81?'Wing size: a bit of everything, fits almost any role':h<84?'Big-man size: rebounding, blocking and finishing up, handle and speed down (a little more injury risk)':'Giant: you own the paint, but handle and speed take a big hit (more injury risk)';}
@@ -2197,6 +2347,7 @@ function drawScreen(){const st=S.stage;let h='';const q=UI().seq;if(q&&q.st!==st
   if(UI().intro!=null)h=introHTML();
   else if(UI().menu&&UI().menu!=='open')h=menuHTML();
   else if(st==='build')h=buildHTML();
+  else if(UI().prof&&st!=='build')h=profileHTML();
   else if(UI().seq&&st!=='draft'&&st!=='end')h=seqHTML();
   else if(st==='hs'){const i=S.hs.length;h=`${hdr('High School')}${playerCard(true)}${classCard()}${S.summerPend?summerCard():resultCard()}${seasonList(S.hs)}`+(S.summerPend?'':dock(`<button onclick="playSeason(simHS)">Play ${YR[i]} Year</button>`));}
   else if(st==='offers'){const n=stars();h=`${hdr('Recruiting')}${playerCard(true)}<div class="card"><div class="sh">🎓 <span class="grow">Scholarship offers</span><b>${S.offers.length}</b></div><div class="row" style="align-items:baseline"><h2 style="margin:0">${n}-star recruit</h2>${starsHTML(n)}</div>
@@ -2222,7 +2373,7 @@ function drawScreen(){const st=S.stage;let h='';const q=UI().seq;if(q&&q.st!==st
     <div class="card reveal" style="animation-delay:${d0+.7}s"><div class="ev">⚔️ <span>Also in this class: <b>${S.rival.name}</b>, taken by the ${S.rival.team}. The media is already calling him your rival.</span></div></div>`+dock(`<button onclick="startNBA()">Start NBA Career</button>`);}
   else if(st==='nba'&&S.pend&&S.pend.kind==='clutch')h=hdr('Playoffs')+clutchHTML();
   else if(st==='nba'){let dk='';h=`${hdr('NBA Career')}${playerCard(true)}${legacyCard()}${resultCard()}`;
-    if(S.pend)h+=decisionCard();else{h+=goalsCard();dk=`<button onclick="playSeason(simNBA)">Sim Season ${S.nba.length+1}</button><div class="two"><button class="ghost" onclick="simAll()">Next Decision ⏩</button><button class="ghost" onclick="simEnd()">Whole Career ⏭</button></div>`;}
+    if(S.pend)h+=decisionCard();else{h+=goalsCard();dk=`<button onclick="playSeason(simNBA)">Sim Season ${S.nba.length+1}</button><div class="two"><button class="ghost" onclick="simAll()">Next Decision ⏩</button><button class="ghost" onclick="wholeCareer()">Whole Career ⏭</button></div>`;}
     if(S.nba.length)h+=seasonCard(S.nba[S.nba.length-1]);
     h+=rivalryCard()+allTimeCard()+leagueCard();if(S.nba.length>1)h+=`<details class="card"><summary>📊 Season log · ${S.nba.length} season${S.nba.length===1?'':'s'}</summary>${seasonTable(true)}</details>`;
     h+=dock(dk);}
@@ -2236,6 +2387,13 @@ if(window.visualViewport)visualViewport.addEventListener('resize',()=>{if(visual
 function autoBank(){if(false){const r=render;render=()=>{};try{smartSpend();}finally{render=r;}}}
 const BIG=['clutch','fa','retire','farewell'];
 function simEnd(){let g=0;while(S.stage==='nba'&&g++<120){if(S.pend&&BIG.includes(S.pend.kind)&&!SAVE_OFF)break;if(S.pend)choose(S.pend.kind==='summer'?S.pend.opts.length-2:S.pend.kind==='clutch'?S.pend.best:0);else{autoBank();simNBA();}}autoBank();render();scrollTo(0,0);}
+// the Whole Career button: every season plays with its story windows, small calls are made for you, and it stops for free agency,
+// Game 7s and retirement, then carries on by itself to the career recap. (simEnd stays the silent version the test tools use)
+function wholeCareer(){UI().auto=1;autoStep();}
+function autoStep(){const u=UI();let g=0;
+  while(u.auto&&S.stage==='nba'&&g++<12){if(S.pend){if(BIG.includes(S.pend.kind)){render();scrollTo(0,0);return;}choose(S.pend.kind==='summer'?S.pend.opts.length-2:0);continue;}
+    playSeason(simNBA);return;}
+  u.auto=0;render();scrollTo(0,0);}
 function simAll(){let g=0;while(S.stage==='nba'&&!S.pend&&g++<25){autoBank();simNBA();}autoBank();render();}
 function endHTML(){const c=career(),sc=goatScore(c),[t,d]=tierOf(sc,c),k=c.cnt,g=x=>k[x]||0,gp=c.gp||1;
   const p=S.pick,sg=grade(S.scoutAtDraft),tc=grade(Math.max(S.ceiling,c.peak));let story;
@@ -2261,7 +2419,7 @@ function endHTML(){const c=career(),sc=goatScore(c),[t,d]=tierOf(sc,c),k=c.cnt,g
   ${rewardCard()}${eraCard()}<details class="card"><summary>🏀 Season log · ${c.seasons}</summary>${seasonTable(false)}</details>${achHTML(S.newAch)}${hofHTML()}`+dock(`<button onclick="R=Math.random;S=newPlayer();render();scrollTo(0,0)">Build Another</button>`);}
 function hofHTML(full){const h=JSON.parse(localStorage.getItem('bag_hof')||'[]');if(!h.length)return'';
   return`<details class="card" ${full?'open':''}><summary>🏛️ Your Hall of Builds · ${h.length}</summary><div class="scroll" style="margin-top:8px"><table><tr><th>#</th><th>PLAYER</th><th>TIER</th><th>SCORE</th><th>PPG</th><th>RINGS</th><th>MVP</th><th>PICK</th></tr>
-  ${h.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.name)} <span class="muted">${x.arch?esc(x.arch):x.pos}</span></td><td>${x.diff?DIFFS[x.diff].name.split(' ')[0]+' ':''}${x.tier}</td><td>${x.score}</td><td>${f1(x.ppg)}</td><td>${x.rings}</td><td>${x.mvp}</td><td>${x.pick>=61?'UDFA':'#'+x.pick}</td></tr>`).join('')}</table></div></details>`;}
+  ${h.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.name)} <span class="muted">${x.arch?esc(x.arch):x.pos}${x.bd?` · ${x.bd} badges`:''}</span></td><td>${x.diff?DIFFS[x.diff].name.split(' ')[0]+' ':''}${x.tier}</td><td>${x.score}</td><td>${f1(x.ppg)}</td><td>${x.rings}</td><td>${x.mvp}</td><td>${x.pick>=61?'UDFA':'#'+x.pick}</td></tr>`).join('')}</table></div></details>`;}
 function achHTML(fresh,full){const have=JSON.parse(localStorage.getItem('bag_ach')||'{}'),n=Object.keys(have).length;fresh=fresh||[];
   return`<details class="card" ${full||fresh.length?'open':''}><summary>🏅 Achievements · ${n}/${ACH.length}${fresh.length?` · <span class="gold">${fresh.length} new</span>`:''}</summary>${S.diff==='rookie'&&S.stage==='end'?'<div class="note">🔒 Achievements don’t unlock on Rookie.</div>':''}
   <div class="ach">${ACH.map(([id,l,d])=>`<div class="${have[id]?'got':''} ${fresh.includes(id)?'new':''}"><b>${have[id]?l:'🔒 '+l.replace(EMO_RE,'').trim()}</b>${have[id]?'<span class="gotlbl">Unlocked</span>':''}<small>${d}${fresh.includes(id)?' · New':''}</small></div>`).join('')}</div></details>`;}
@@ -2300,7 +2458,7 @@ const SND=(()=>{let ctx=null,master=null,last={};const pref=k=>{try{return local
   function set(k,v){P[k]=v;try{localStorage.setItem('bag_'+k,v?'1':'0');}catch{}if(k==='music'){if(v){M.none=false;M.start();}else M.stop();}if(k==='sfx'&&v){unlock();play('good');}render();}
   return{play,set,P,M};})();
 // ---------- season story: after you play a season, its pieces arrive one card at a time, then the full screen ----------
-const SEQ_L={draft:'Draft Projection',clutch:'The Final Play',goals:'Season Goals',history:'History',season:'Season Results',summer:'Summer Decision',decision:'Big Decision',class:'Class Rankings',league:'Around the League',spend:'Spend Your Points'};
+const SEQ_L={badges:'Badges',draft:'Draft Projection',clutch:'The Final Play',goals:'Season Goals',history:'History',season:'Season Results',summer:'Summer Decision',decision:'Big Decision',class:'Class Rankings',league:'Around the League',spend:'Spend Your Points'};
 function seqPiece(k){const st=S.stage==='offers'?'hs':S.stage;
   if(k==='season'){let v;if(st==='nba'){const n=S.nba[S.nba.length-1];v=[n.ppg,n.rpg,n.apg];}else{const a=st==='hs'?S.hs:S.col,m=(a[a.length-1].line.match(/[\d.]+(?= [PRA]PG)/g)||[]).map(Number);v=m.slice(0,3);}
     const tiles=st!=='nba'&&v.length===3?`<div class="stat3 seqstats">${['PPG','RPG','APG'].map((l,j)=>`<div class="stat"><b class="cu" data-v="${v[j]}">${f1(v[j])}</b>${l}</div>`).join('')}</div>`:'';
@@ -2314,21 +2472,22 @@ function seqPiece(k){const st=S.stage==='offers'?'hs':S.stage;
   if(k==='draft'){const a=S.col,c=a[a.length-1],pv=a[a.length-2];if(st!=='college'||!c||!c.proj)return'';const[x,y]=c.proj,mid=(x+y)/2,m0=pv&&pv.proj?(pv.proj[0]+pv.proj[1])/2:null,dv=m0==null?0:Math.round(m0-mid);
     return`<div class="card"><div class="sh">📋 <span class="grow">Draft projection</span><b>Age ${draftAge()} on draft night</b></div><div style="font-size:1.25rem;font-weight:800">${pickTxt(x)} – ${pickTxt(y)}</div>
     <div class="sub">${m0==null?'Where scouts have you after your first season':dv>0?`<span class="good">Up about ${dv} spot${dv>1?'s':''}</span> since last season`:dv<0?`<span class="bad">Down about ${-dv} spot${dv<-1?'s':''}</span> since last season`:'About the same as last season'}${x>30?'. Outside the first round right now':''}</div></div>`;}
+  if(k==='badges'){const r=st==='nba'?ls:(st==='college'?S.col:S.hs).slice(-1)[0],ch=r&&r.bdg||[];return ch.length?`<div class="card">${ch.map(([id,h,t])=>badgeRow(BADGE[id],t,`<div class="note ${t>h?'good':'bad'}">${t>h?(h?'Upgraded from '+BTN[h]:'New badge'):'Dropped from '+BTN[h]}${t?' · '+fxText(BADGE[id].fx,t):''}</div>`)).join('')}</div>`:'';}
   if(k==='class')return classCard(true);
   if(k==='league')return leagueCard(true);
-  if(k==='spend')return playerCard(true);return'';}
+  if(k==='spend')return playerCard(true,1);return'';}
 function startSeq(){const st=S.stage;if(!['hs','offers','college','nba'].includes(st)||(S.pend&&S.pend.kind==='clutch'))return;const l=st==='nba'?S.nba[S.nba.length-1]:null,k=[];
-  if(l&&l.clutch&&l.clutch.length)k.push('clutch');k.push('season');if(st==='college')k.push('draft');if(l&&l.goals&&l.goals.length)k.push('goals');if(l&&l.hist&&l.hist.length)k.push('history');
+  if(l&&l.clutch&&l.clutch.length)k.push('clutch');k.push('season');k.push('badges');if(st==='college')k.push('draft');if(l&&l.goals&&l.goals.length)k.push('goals');if(l&&l.hist&&l.hist.length)k.push('history');
   if(S.summerPend)k.push('summer');if(st==='nba'&&S.pend)k.push('decision');k.push(st==='nba'?'league':'class');if(S.bank>0)k.push('spend');
   UI().seq={st,i:0,k:k.filter(x=>seqPiece(x))};}
-function playSeason(fn){fn();startSeq();render();scrollTo(0,0);}
+function playSeason(fn){fn();if(S.stage!=='nba')UI().auto=0;startSeq();render();scrollTo(0,0);}
 function seqHTML(){const q=UI().seq,k=q.k[q.i],nx=q.k[q.i+1],arr=S.stage==='college'?S.col:S.hs;
   const title=k==='season'?(S.stage==='nba'?`Season ${S.nba.length}`:`${YR[arr.length-1]} Year`):SEQ_L[k];
   return`<div class="seqtop"><div class="dots" aria-label="Step ${q.i+1} of ${q.k.length}">${q.k.map((_,j)=>`<i class="${j<q.i?'done':j===q.i?'on':''}"></i>`).join('')}</div><button class="ghost sm" onclick="seqSkip()">Skip</button></div>
-  <h1 class="seqh">${title}</h1><div class="seqcard">${seqPiece(k)}</div>`+dock(`<button onclick="seqNext()">${nx?'Next: '+SEQ_L[nx]:'Continue'} ▶</button>`);}
-function seqNext(){const q=UI().seq;if(!q)return;const c=document.querySelector('.seqcard'),go=()=>{if(UI().seq!==q)return;q.i++;if(q.i>=q.k.length)UI().seq=null;render();scrollTo(0,0);};
+  <h1 class="seqh">${title}</h1><div class="seqcard">${seqPiece(k)}</div>`+dock(`<button onclick="seqNext()">${nx?'Next: '+SEQ_L[nx]:UI().auto&&S.stage==='nba'?'Next season':'Continue'} ▶</button>${UI().auto?'<button class="ghost" onclick="UI().auto=0;render()">⏹ Stop the career sim</button>':''}`);}
+function seqNext(){const q=UI().seq;if(!q)return;const c=document.querySelector('.seqcard'),go=()=>{if(UI().seq!==q)return;q.i++;if(q.i>=q.k.length){UI().seq=null;if(UI().auto)return autoStep();}render();scrollTo(0,0);};
   if(c&&!document.documentElement.classList.contains('wt')){c.classList.add('leave');document.querySelector('.seqh')?.classList.add('leave');setTimeout(go,210);}else go();}
-function seqSkip(){UI().seq=null;render();scrollTo(0,0);}
+function seqSkip(){UI().seq=null;if(UI().auto)return autoStep();render();scrollTo(0,0);}
 // ---------- motion: entrance on new screens, OVR bump, new-season glow, confetti for big moments ----------
 let FXprev=null,FXcur=null;
 let TAPGUARD=0;
@@ -2365,10 +2524,13 @@ function soundCard(){const P=SND.P,M=SND.M,tg=(k,l,d)=>`<div class="toggle"><div
 // ---------- save & continue: a run survives closing the app ----------
 // A snapshot of the whole run is stored whenever no decision is waiting, plus the few actions taken since.
 // Replaying those actions with the same dice rebuilds any open decision exactly, so reloading can't reroll anything.
-const GAME_V='2026.11.06';
+const GAME_V='2026.11.06b';
 // runs saved before archetypes (2026.11.06) rated you by a chosen position: keep their growth room when converting
 const ARCH_V='2026.11.06';
-function convertRun(meta){if(meta&&meta.v&&meta.v>=ARCH_V)return;const was=legacyOvr(S.pos),now=ovr();S.ceiling+=now-was;S.archId=archetype().id;syncPos();}
+// runs saved before the 25 skills (2026.11.06b) also get the four new skills, started from related ones, and their badges
+const SKILL_V='2026.11.06b';
+function convertRun(meta){const v=(meta&&meta.v)||'';if(v>=SKILL_V)return;const was=v>=ARCH_V?ovr21():legacyOvr(S.pos);seedNewSkills(S.attrs,false);S.bdg=S.bdg||{};
+  S.ceiling+=ovr()-was;S.archId=archetype().id;syncPos();updBadges('load');}
 const SV={snap:'bag_run',meta:'bag_run_meta',log:'bag_run_log',ui:'bag_run_ui',build:'bag_build'};
 let SAVE_OFF=false,REPLAY=false,LOGD=0,RUNLOG=[],RUNID=0;
 const canSave=()=>!SAVE_OFF&&!REPLAY&&typeof localStorage!=='undefined'&&typeof location!=='undefined';
@@ -2387,9 +2549,9 @@ function writeLog(){if(canSave())lsSet(SV.log,JSON.stringify({id:RUNID,log:RUNLO
 function clearRun(){for(const k of[SV.snap,SV.meta,SV.log,SV.ui])try{localStorage.removeItem(k);}catch{}RUNLOG=[];}
 function afterAction(n,a){if(!canSave())return;if(S.stage==='end'||S.stage==='build'){clearRun();return;}
   // spending points is a cheap log entry; anything bigger folds into a fresh snapshot once nothing is waiting
-  if(runSafe()&&n!=='spend'&&n!=='smartSpend')writeSnap();else{RUNLOG.push([n,...a]);if(runSafe()&&RUNLOG.length>=40)writeSnap();else writeLog();}}
+  if(runSafe()&&n!=='spend'&&n!=='smartSpend'&&n!=='unspend')writeSnap();else{RUNLOG.push([n,...a]);if(runSafe()&&RUNLOG.length>=40)writeSnap();else writeLog();}}
 function autosave(){if(!canSave())return;if(S.stage==='build')lsSet(SV.build,JSON.stringify(S));else if(S.stage!=='end'&&RUNID)lsSet(SV.ui,JSON.stringify(S.ui||{}));}
-const LOGGED=['simHS','simCol','simNBA','chooseSummer','chooseSchool','declare','returnSchool','choose','simAll','simEnd','spend','smartSpend','startNBA'];
+const LOGGED=['simHS','simCol','simNBA','chooseSummer','chooseSchool','declare','returnSchool','choose','simAll','simEnd','spend','smartSpend','startNBA','unspend'];
 for(const n of LOGGED){const f=globalThis[n];if(typeof f!=='function')continue;
   globalThis[n]=function(...a){if(REPLAY||LOGD||!S.seed||S.stage==='build')return f.apply(this,a);LOGD++;let r;try{r=f.apply(this,a);}finally{LOGD--;}try{afterAction(n,a);}catch(e){console.warn(e);}return r;};}
 {const f=globalThis.startCareer;if(typeof f==='function')globalThis.startCareer=function(...a){const r=f.apply(this,a);if(!REPLAY&&canSave()){clearRun();writeSnap();}return r;};}
@@ -2407,7 +2569,7 @@ function quitRun(){if(S.stage!=='build'&&S.stage!=='end'&&canSave())lsSet(SV.ui,
 function continueCard(){const m=runMeta();if(!m||!m.sum)return'';const s=m.sum,where=s.stage==='nba'?`NBA · Season ${s.yr+1}${s.team?' · '+s.team:''}`:s.stage==='draft'?'Draft night':s.stage==='college'?(s.school||'College'):s.stage==='offers'?'Recruiting':`High School · ${YR[Math.min(s.hs,3)]} Year`;
   return`<div class="card resume"><div class="hero">${avatar(s.look,s.age,60,1)}<div class="grow"><div class="sh" style="margin:0 0 4px">💾 <span class="grow">Saved run</span></div><div class="hn">${esc(s.name)}</div><div class="hm">${esc(s.arch||s.pos)} · Age ${s.age} · OVR ${s.ovr} · ${where}</div></div></div><button class="wide" style="margin-top:12px" onclick="resumeRun()">Continue run ▶</button></div>`;}
 // on launch: put a half-finished build back, and point to a saved run if there is one
-function bootSave(){if(!canSave())return;try{const b=JSON.parse(localStorage.getItem(SV.build)||'null');if(b&&b.stage==='build'){S=Object.assign(newPlayer(),b);S.ui=Object.assign({tab:'setup',open:null,spend:false},b.ui||{},{menu:null,replaceOk:0});}}catch{}
+function bootSave(){if(!canSave())return;try{const b=JSON.parse(localStorage.getItem(SV.build)||'null');if(b&&b.stage==='build'){S=Object.assign(newPlayer(),b);seedNewSkills(S.attrs,true);S.ui=Object.assign({tab:'setup',open:null,spend:false},b.ui||{},{menu:null,replaceOk:0});}}catch{}
   if(hasRun())UI().tab='setup';}
 S=newPlayer();bootSave();render();
 // ================= PLATFORM (Plat) =================

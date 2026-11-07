@@ -1,6 +1,6 @@
 // No positions: you pick size and frame, build skills, and OVR rates you at the role (archetype) you fit best.
 const setAttrs = (o) => `(()=>{for(const k of SUBKEYS)S.attrs[k]=40;Object.assign(S.attrs,${JSON.stringify(o)});render();return 1;})()`;
-const WIFE = { three: 99, mid: 99, close: 99, ft: 85, layup: 85, dunk: 85, speed: 90, vert: 90, stam: 75, iq: 65, cons: 70, pass: 45, handle: 45, str: 40, post: 45, perD: 55, intD: 50, stl: 50, blk: 55, oreb: 55, dreb: 60 };
+const WIFE = { offb: 70, lat: 60, three: 99, mid: 99, close: 99, ft: 85, layup: 85, dunk: 85, speed: 90, vert: 90, stam: 75, iq: 65, cons: 70, pass: 45, handle: 45, str: 40, post: 45, perD: 55, intD: 50, stl: 50, blk: 55, oreb: 55, dreb: 60 };
 const RIM = { three: 40, mid: 45, close: 70, ft: 55, layup: 65, dunk: 85, speed: 55, vert: 80, stam: 80, iq: 70, cons: 70, pass: 45, handle: 40, str: 95, post: 60, perD: 50, intD: 99, stl: 50, blk: 99, oreb: 90, dreb: 99 };
 const app = "document.getElementById('app').textContent";
 export default [

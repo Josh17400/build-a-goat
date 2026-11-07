@@ -19,7 +19,7 @@
    {
     "at": 0.45,
     "evalAs": {
-     "x": "(seqNext(),1)"
+     "x": "(UI().seq.i=UI().seq.k.indexOf('summer')-1,seqNext(),1)"
     }
    },
    {
