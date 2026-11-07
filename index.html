@@ -350,9 +350,9 @@ const FRAMES={Lean:{speed:6,vert:5,stam:5,lat:4,hook:-2,str:-9,post:-4,intD:-3,o
 const TRAITS=[['work','Work Ethic','You develop faster and age slower'],['dur','Durability','Fewer and lighter injuries'],['clutch','Clutch Gene','You win more playoff series'],['coach','Coachability','You get more out of college'],['star','Star Power','Hype, All-Star votes, draft buzz'],['motor','Motor','You hustle every possession: more rebounds, steals and minutes'],['lead','Leadership','You make teammates better: more wins and playoff series'],['killer','Killer Instinct','Scorer’s mentality: more shots and points, fewer assists'],['late','Late Bloomer','Raw early, but a higher ceiling and a later peak (a gamble)'],['lock','Lockdown Mindset','You take defense personally: steals, blocks, DPOY votes'],['touch','Shooter’s Touch','Soft hands: better 3P%, FT% and FG%']];
 const MIN_A=40, BUILD_MAX=90, H_MIN=70, H_MAX=87;
 // ---------- difficulty & Generational Talent Points (GTP) ----------
-const DIFFS={rookie:{name:'🟢 Rookie',budget:230,mult:0,lg:-4,nbaPts:1.3,d:'Want a relaxed, less challenging career? Play Rookie: 230 skill points, start around 55 OVR, and great careers are common. You will not earn GTP, gems or achievements.'},
-  pro:{name:'🟡 Pro',budget:205,mult:1,lg:3,nbaPts:.85,d:'The real challenge: 205 skill points, start around 50 OVR. Most careers end as role players and THE GOAT is rare. Earns GTP, gems and achievements.'},
-  hof:{name:'🔴 Hall of Fame',budget:120,mult:1.5,lg:3,nbaPts:1.15,d:'The biggest challenge: 120 skill points, start around 45 OVR. Many players never stick in the league and THE GOAT is a legend-level feat. Earns 1.5× GTP, gems and achievements.'}};
+const DIFFS={rookie:{name:'🟢 Rookie',budget:230,mult:0,lg:-4,nbaPts:1.5,d:'Want a relaxed, less challenging career? Play Rookie: 230 skill points, start around 55 OVR, and great careers are common. You will not earn GTP, gems or achievements.'},
+  pro:{name:'🟡 Pro',budget:205,mult:1,lg:3,nbaPts:1,d:'The real challenge: 205 skill points, start around 50 OVR. Most careers end as role players and THE GOAT is rare. Earns GTP, gems and achievements.'},
+  hof:{name:'🔴 Hall of Fame',budget:120,mult:1.5,lg:3,nbaPts:1.5,d:'The biggest challenge: 120 skill points, start around 45 OVR. Many players never stick in the league and THE GOAT is a legend-level feat. Earns 1.5× GTP, gems and achievements.'}};
 const diff=()=>DIFFS[S.diff]||DIFFS.pro;
 Object.defineProperty(globalThis,'START_BUDGET',{configurable:true,get:()=>diff().budget+25*((S&&S.perks&&S.perks.pts)||0)});
 const gtpBank=()=>{try{return Math.max(0,parseInt(localStorage.getItem('bag_gtp')||'0',10)||0);}catch{return 0;}};
@@ -564,12 +564,14 @@ function growTo(target){const pk=archPick();let g=0;
   while(ovr()<target&&g++<400){const sk=pk();if(S.attrs[sk]<99)S.attrs[sk]++;}}
 function declineTo(target){let g=0;const keys=['speed','speed','vert','vert','stam','perD','str','layup','dunk','oreb','stl','blk'];
   while(ovr()>target&&g++<400){const k=pick(keys);if(S.attrs[k]>30)S.attrs[k]--;}}
-function develop(rate){const o=ovr();if(S.perks&&S.perks.dev&&S.stage!=='nba')rate*=1.25;if(o<S.ceiling)growTo(o+(S.ceiling-o)*rate);}
+// growth is never applied for you: it turns into bonus points worth exactly what that growth would cost, and you place them
+function growPts(target){const a0={...S.attrs};growTo(target);let p=0;for(const k in S.attrs)for(let v=a0[k];v<S.attrs[k];v++)p+=cost(v);S.attrs=a0;if(p>0){S.bank+=p;S.devPts=(S.devPts||0)+p;}return p;}
+function develop(rate){const o=ovr();if(S.perks&&S.perks.dev&&S.stage!=='nba')rate*=1.25;if(o<S.ceiling)growPts(o+(S.ceiling-o)*rate);}
 // why the OVR moved this season, from VISIBLE causes only (age, traits, college program, injuries) plus a deliberately noisy scout
 // read of the remaining room. Never names frame effects or hidden numbers; the true ceiling stays an end-screen reveal.
 function scoutNoise(){return(((S.seed||7)*2654435761>>>0)%11)-5;}
-function growWhy(o0,st,x){const o1=OV(),d=o1-o0,t=S.traits,age=S.age,r=[];x=x||{};
-  if(st==='nba')r.push(age<=23?(d>0?'young and still improving':'young, but no growth this year'):age<=27?'in your prime years':age<=29?'prime years: you hold steady':age>=34?'age is catching up fast':'age starts to catch up');
+function growWhy(o0,st,x){const o1=OV(),d=o1-o0,t=S.traits,age=S.age,r=[],dp=S.devPts||0;S.devPts=0;x=x||{};
+  if(st==='nba')r.push(age<=23?(dp>0?'young and still improving':'young, but no growth this year'):age<=27?'in your prime years':age<=29?'prime years: you hold steady':age>=34?'age is catching up fast':'age starts to catch up');
   else r.push(st==='hs'?'high school development':`${TIER[S.tier].lbl} program`);
   const late30=st==='nba'&&age>=30;if(t.work>=4)r.push(late30?`Work Ethic ${t.work}/5 slows the decline`:`Work Ethic ${t.work}/5 speeds you up`);else if(t.work<=2)r.push(late30?`Work Ethic ${t.work}/5 speeds the decline`:`Work Ethic ${t.work}/5 holds you back`);
   if(t.late>=4&&age<=23)r.push('Late Bloomer: your jump comes later');
@@ -578,7 +580,7 @@ function growWhy(o0,st,x){const o1=OV(),d=o1-o0,t=S.traits,age=S.age,r=[];x=x||{
   if(x.hurt)r.push('the injury cost you reps');
   if(st!=='nba'){const room=S.ceiling-ovr()+scoutNoise();r.push(room>8?'scouts see lots of room to grow':room>3?'scouts see some room left':'scouts think you are close to your peak');}
   const a=archetype();let evo='';if(S.archId&&a.id!==S.archId)evo=` · 🔀 Your game has evolved: you now play like a${/^[AEIOU3]/.test(a.n)?'n':''} ${a.n}`;S.archId=a.id;
-  return[d>0?1:d<0?-1:0,`${d>0?'📈':d<0?'📉':'➖'} OVR ${o0} → ${o1}${d?` (${d>0?'+':''}${d})`:''}: ${r.join(' · ')}${evo}`];}
+  return[dp>0?1:d<0?-1:0,`${dp>0?`📈 Development: +${dp} pts to spend`:d<0?`📉 OVR ${o0} → ${o1} (${d})`:'➖ No growth this year'}${dp>0&&d<0?` · OVR ${o0} → ${o1} (${d})`:''}: ${r.join(' · ')}${evo}`];}
 const nablAgeF=a=>a<=27?1:a===28?.9:a===29?.8:Math.max(.25,.8-(a-29)*.15);
 function addBank(n){n*=3;if(n>=0)S.bank+=n*2;else{const t=S.bank+n;if(t<0){S.bank=0;S.bankShort=-t;declineTo(ovr()+t*0.15);}else S.bank=t;}}
 function starNext(){const s=ovr()+S.hype*0.35,n=[58,65,72].find(x=>s<x);return n?Math.ceil(n-s):0;}
@@ -590,7 +592,7 @@ function hsEvents(){const t=S.traits;return[
   {tag:'perf',w:9,f:()=>{S.hype+=5;addBank(3);return[1,'📈 Breakout season — coaches across the state take notice. +18 pts']}},
   {w:4+t.work*2,f:()=>{addBank(2);S.ceiling+=1;return[1,'💪 You live in the gym all summer. +12 pts, ceiling up']}},
   {w:6,f:()=>{S.hype+=7;addBank(1);return[1,'⭐ You torch an elite national camp. +6 pts, big hype']}},
-  {w:7,f:()=>{const g=ri(1,3);S.height+=g;let m=`📏 Growth spurt! You shoot up ${g}" (now ${ht(S.height)})`;if(R()<.5){S.attrs.handle=Math.max(MIN_A,S.attrs.handle-4);S.attrs.three=Math.max(MIN_A,S.attrs.three-3);S.attrs.oreb+=2;S.attrs.blk+=2;m+=' — but your handle and jumper get clunky';return[0,m];}return[1,m+' and keep your coordination']}},
+  {w:7,f:()=>{const g=ri(1,3);S.height+=g;let m=`📏 Growth spurt! You shoot up ${g}" (now ${ht(S.height)})`;if(R()<.5){S.attrs.handle=Math.max(MIN_A,S.attrs.handle-4);S.attrs.three=Math.max(MIN_A,S.attrs.three-3);up('oreb',2);up('blk',2);m+=' — but your handle and jumper get clunky';return[0,m];}return[1,m+' and keep your coordination']}},
   {w:9-t.dur,f:()=>injuryHS()},
   {w:4,f:()=>{S.hype-=6;addBank(-1);return[-1,'📚 Your grades slip and you sit out three games. -3 pts']}},
   {w:3+(5-t.coach),f:()=>{S.hype-=3;addBank(-1);return[-1,'😤 You clash with your coach, and your minutes get cut. -3 pts']}},
@@ -600,27 +602,27 @@ function hsEvents(){const t=S.traits;return[
   {w:6-t.work,f:()=>{addBank(-1);return[-1,'🎮 You spend the whole summer playing video games. -3 pts']}},
   {w:4,f:()=>{if(R()<.5){S.hype+=5;addBank(1);return[1,'🏫 You transfer to a hoops powerhouse and start right away. +6 pts']}S.hype-=2;return[0,'🏫 You transfer to a powerhouse, but sit behind a senior all year']}},
   {w:ovr()>58?4:1,f:()=>{S.hype+=9;addBank(2);return[1,'🌎 You make the U17 national team and win gold. +12 pts']}},
-  {w:5,f:()=>{S.attrs.iq=Math.min(99,S.attrs.iq+2);addBank(1);return[1,'👨‍👦 Your dad rebounds for you every morning at 5 AM. +2 IQ, +6 pts']}},
+  {w:5,f:()=>{up('iq',2);addBank(1);return[1,'👨‍👦 Your dad rebounds for you every morning at 5 AM. +2 IQ, +6 pts']}},
   {tag:'perf',w:S.hs.length===1?7:0,f:()=>{S.hype-=4;return[-1,'📉 A sophomore slump. The hype train slows down']}},
   {w:3,f:()=>{S.ceiling+=1.5;S.hype+=2;return[1,'👟 Your shoe size jumps three sizes. Doctors expect more growth. Ceiling up']}},
   {w:4,f:()=>{S.hype-=3;return[-1,'📹 You get posterized in a clip with 10 million views. Brutal']}},
   {w:5,f:()=>{S.hype+=5;addBank(1);return[1,'🏆 You win the summer AAU circuit. +6 pts']}},
-  {w:4,f:()=>{if(R()<.5){S.attrs.three=Math.min(99,S.attrs.three+4);return[1,'🧪 You rebuild your jump shot form, and it works! +4 Three-Point']}S.attrs.three=Math.max(MIN_A,S.attrs.three-3);return[-1,'🧪 You try a new jump shot form. It is a disaster. -3 Three-Point']}},
+  {w:4,f:()=>{if(R()<.5){up('three',4);return[1,'🧪 You rebuild your jump shot form, and it works! +4 Three-Point']}S.attrs.three=Math.max(MIN_A,S.attrs.three-3);return[-1,'🧪 You try a new jump shot form. It is a disaster. -3 Three-Point']}},
   {w:3,f:()=>{S.hype+=4;return[1,'📰 You land on the cover of a national high school magazine']}},
-  {w:3,f:()=>{S.attrs.str=Math.min(99,S.attrs.str+3);S.attrs.speed=Math.max(MIN_A,S.attrs.speed-1);return[0,'🏈 You play football in the fall. +3 Strength, -1 Speed']}},
+  {w:3,f:()=>{up('str',3);S.attrs.speed=Math.max(MIN_A,S.attrs.speed-1);return[0,'🏈 You play football in the fall. +3 Strength, -1 Speed']}},
   {tag:'perf',w:4,f:()=>{S.hype+=5;addBank(1);return[1,'🚨 You hit a buzzer-beater to win the regional final. +6 pts']}},
   {w:3,f:()=>{addBank(-1);S.hype-=2;return[-1,'🤒 Mono knocks you out for six weeks. -3 pts']}},
-  {w:3,f:()=>{S.attrs.iq=Math.min(99,S.attrs.iq+3);return[1,'🧠 A retired college coach starts mentoring you. +3 IQ']}},
+  {w:3,f:()=>{up('iq',3);return[1,'🧠 A retired college coach starts mentoring you. +3 IQ']}},
   {w:3,f:()=>{addBank(-1);return[-1,'🏫 Your school cuts the basketball budget. No trainer, no film. -3 pts']}},
   {w:ovr()>=60?4:0,f:()=>{S.hype+=8;return[1,'🌟 You get invited to the national high school all-star game']}},
   {tag:'perf',w:3,f:()=>{S.hype-=4;S.attrs.cons=Math.max(MIN_A,S.attrs.cons-1);return[-1,'😬 You get ejected from the state semifinal for taunting. -1 Consistency']}},
-  {w:4,f:()=>{S.attrs.str=Math.min(99,S.attrs.str+3);return[1,'🏋️ You bench 225 for the first time. +3 Strength']}},
+  {w:4,f:()=>{up('str',3);return[1,'🏋️ You bench 225 for the first time. +3 Strength']}},
   {w:3,f:()=>{S.hype-=1;addBank(1);return[0,'🏠 Your family moves across the country. New school, fresh start. +6 pts']}},
   {w:2+(5-t.work),f:()=>{S.hype-=2;addBank(-1);return[-1,'📵 You get benched for skipping practice. -3 pts']}},
   {w:3,f:()=>{S.hype+=4;return[1,'🎤 The local news runs a feature on you']}},
   {w:3,f:()=>{S.attrs.speed=Math.max(MIN_A,S.attrs.speed-2);return[-1,'🦵 You get shin splints from overtraining. -2 Speed']}},
   {tag:'perf',w:4,f:()=>{S.hype+=2;addBank(1);return[1,'🤝 You team up with a future D1 point guard. Easy buckets all year. +6 pts']}},
-  {w:es('three')>=55?4:1,f:()=>{S.attrs.three=Math.min(99,S.attrs.three+3);S.hype+=2;return[1,'🎯 You win the state 3-point contest. +3 Three-Point']}},
+  {w:es('three')>=55?4:1,f:()=>{up('three',3);S.hype+=2;return[1,'🎯 You win the state 3-point contest. +3 Three-Point']}},
 ];}
 function injuryHS(){const r=R()*(1+(3-S.traits.dur)*.15);
   if(r>.92){S.injuryProne=true;S.ceiling-=3;S.attrs.speed=Math.max(MIN_A,S.attrs.speed-5);S.attrs.vert=Math.max(MIN_A,S.attrs.vert-5);S.hype-=8;S.hurt=1;addBank(-2);return[-1,`🚑 ${capF(pick(INJ.major))} — you miss most of the season. Your ceiling drops, -6 pts`];}
@@ -629,31 +631,31 @@ function colEvents(y){const t=S.traits;return[
   {w:['10s','20s'].includes(S.era)?7+t.star:0,f:()=>{S.hype+=6;addBank(1);return[1,'💰 You land a huge NIL deal — your face is on billboards. +6 pts']}},
   {tag:'perf',w:ovr()>=62?8:0,f:()=>{S.hype+=6;addBank(3);return[1,'📈 You put up a 40-point game on national TV. +18 pts']}},
   {w:4+t.work*2,f:()=>{addBank(2);S.ceiling+=1.5;return[1,'💪 You rebuild your jumper over the summer. +12 pts, ceiling up']}},
-  {w:4+t.coach,f:()=>{S.attrs.iq=Math.min(99,S.attrs.iq+4);addBank(1);return[1,'🧠 Coach turns you into a film junkie. +4 IQ, +6 pts']}},
+  {w:4+t.coach,f:()=>{up('iq',4);addBank(1);return[1,'🧠 Coach turns you into a film junkie. +4 IQ, +6 pts']}},
   {w:9-t.dur,f:()=>injuryCol()},
   {w:3+(5-t.coach),f:()=>{S.hype-=4;addBank(-1);return[-1,'😤 You get benched for two games after a blowup with the staff. -3 pts']}},
   {w:y>=3?8:1,f:()=>{S.hype-=6;return[-1,'🧓 Scouts start whispering: "What more is there to develop?"']}},
   {tag:'perf',w:6,f:()=>{addBank(1);return[0,'🏀 Steady, efficient year. +6 pts']}},
   {w:4,f:()=>{S.hype+=4;return[1,'🎤 Your press conference goes viral for all the right reasons']}},
-  {tag:'perf',w:5,f:()=>{S.hype+=6;S.attrs.cons=Math.min(99,S.attrs.cons+2);addBank(1);return[1,'🧊 You hit a buzzer-beater against the rival school! +2 Consistency, +6 pts']}},
+  {tag:'perf',w:5,f:()=>{S.hype+=6;up('cons',2);addBank(1);return[1,'🧊 You hit a buzzer-beater against the rival school! +2 Consistency, +6 pts']}},
   {tag:'perf',w:ovr()>=60?5:0,f:()=>{S.hype+=5;addBank(1);return[1,'🌴 You win MVP of a big holiday tournament. +6 pts']}},
   {tag:'perf',w:4,f:()=>{S.attrs.three=Math.max(MIN_A,S.attrs.three-2);S.hype-=3;return[-1,'🥶 You hit a shooting slump all of January. -2 Three-Point']}},
-  {w:3,f:()=>{S.attrs.iq=Math.min(99,S.attrs.iq+2);S.hype+=1;return[1,'📚 You are named Academic All-American. +2 IQ']}},
-  {w:4,f:()=>{S.attrs.str=Math.min(99,S.attrs.str+4);S.attrs.speed=Math.max(MIN_A,S.attrs.speed-1);return[0,'🏋️ The strength coach adds 15 pounds of muscle. +4 Strength, -1 Speed']}},
+  {w:3,f:()=>{up('iq',2);S.hype+=1;return[1,'📚 You are named Academic All-American. +2 IQ']}},
+  {w:4,f:()=>{up('str',4);S.attrs.speed=Math.max(MIN_A,S.attrs.speed-1);return[0,'🏋️ The strength coach adds 15 pounds of muscle. +4 Strength, -1 Speed']}},
   {tag:'perf',w:4,f:()=>{S.hype-=3;return[-1,'🧑‍🤝‍🧑 A five-star freshman joins the team and takes your shots']}},
-  {tag:'perf',w:es('three')>=60&&ovr()>=56?5:0,f:()=>{S.attrs.three=Math.min(99,S.attrs.three+3);S.hype+=2;return[1,'🎯 You lead the conference in 3-point percentage. +3 Three-Point']}},
+  {tag:'perf',w:es('three')>=60&&ovr()>=56?5:0,f:()=>{up('three',3);S.hype+=2;return[1,'🎯 You lead the conference in 3-point percentage. +3 Three-Point']}},
   {w:2,f:()=>{S.banned=true;S.hype-=4;return[-1,'🚨 NCAA sanctions hit the program. No postseason this year']}},
   {w:3,f:()=>{addBank(2);S.hype+=3;return[1,'🎥 You spend the summer working out with NBA pros. +12 pts']}},
   {w:3,f:()=>{S.hype-=2;S.attrs.cons=Math.max(30,S.attrs.cons-2);return[-1,'📱 You get into an online beef with a rival fan base. -2 Consistency']}},
   {tag:'perf',w:4,f:()=>{S.hype+=6;addBank(1);return[1,'📺 You hit a game-winner on Saturday-night national TV. +6 pts']}},
   {w:3,f:()=>{S.attrs.cons=Math.max(30,S.attrs.cons-1);return[-1,'🤕 You break your nose and play in a mask for a month. -1 Consistency']}},
-  {w:4,f:()=>{S.attrs.post=Math.min(99,S.attrs.post+3);return[1,'🧑‍🏫 An assistant coach rebuilds your footwork. +3 Post Moves']}},
+  {w:4,f:()=>{up('post',3);return[1,'🧑‍🏫 An assistant coach rebuilds your footwork. +3 Post Moves']}},
   {tag:'perf',w:3,f:()=>{S.hype-=4;return[-1,'📉 You get benched for three games during conference play']}},
   {tag:'perf',w:ovr()>=60?4:0,f:()=>{S.hype+=6;addBank(1);return[1,'🏆 You are named conference tournament MVP. +6 pts']}},
   {w:2+(5-t.work)*.5,f:()=>{S.hype-=3;addBank(-1);return[-1,'🎓 You land on academic probation and miss three games. -3 pts']}},
   {w:3,f:()=>{S.hype+=4;S.traits.lead=Math.min(5,S.traits.lead+1);return[1,'🎤 Your locker-room speech after a tough loss goes viral. +1 Leadership']}},
   {tag:'perf',w:3,f:()=>{S.hype-=3;S.attrs.cons=Math.max(30,S.attrs.cons-2);return[-1,'🧊 You miss two free throws that would have won the rivalry game. -2 Consistency']}},
-  {w:4,f:()=>{S.attrs.vert=Math.min(99,S.attrs.vert+3);return[1,'🦘 You add two inches to your vertical in the weight room. +3 Vertical']}},
+  {w:4,f:()=>{up('vert',3);return[1,'🦘 You add two inches to your vertical in the weight room. +3 Vertical']}},
   {w:3,f:()=>{S.hype-=2;S.attrs.cons=Math.max(30,S.attrs.cons-2);return[-1,'🔄 Your head coach leaves for the NBA. New system, rough adjustment. -2 Consistency']}},
   {w:y>=2?4:0,f:()=>{S.hype+=5;addBank(1);return[1,'📋 NBA scouts pack the gym every night. Draft buzz grows. +6 pts']}},
   {w:3,f:()=>{S.hype-=2;return[-1,'😷 You get food poisoning the night before the big tournament game']}},
@@ -678,7 +680,7 @@ function simHS(){syncPos();if(S.summerPend)chooseSummer(S.summerPend.opts.length
   ev.push(growWhy(o0,'hs',{hurt:S.hurt}));for(const x of badgeLines(bch))ev.push([x.startsWith('📉')?-1:1,x]);if(ppg>=20&&!S.hurt)S.hype+=Math.min(4,(ppg-18)*.35);S.hype=Math.max(0,S.hype);const hm=S.hurt?.6:1,hurtTxt=S.hurt?` · ${ri(4,9)} games (injured)`:'';S.hurt=0;
   S.hs.push({bdg:bch,st:{ppg:ppg*hm,rpg:rpg*hm,apg:apg*hm,spg:spg*hm,bpg:bpg*hm},title:`${YR[i]} Year · age ${S.age}`,line:`${f1(ppg*hm)} PPG · ${f1(rpg*hm)} RPG · ${f1(apg*hm)} APG · ${f1(spg*hm)} SPG · ${f1(bpg*hm)} BPG${hurtTxt}`,ev,stars:stars()});
   if(S.hs.length===4){S.stage='offers';makeOffers();}else S.summerPend=summerHS();}
-const bump=(ks,n)=>()=>ks.forEach(k=>S.attrs[k]=Math.min(99,S.attrs[k]+n));
+const bump=(ks,n)=>()=>ks.forEach(k=>up(k,n));
 const PERKS0=[['🏋️ Elite strength program','+4 Strength, Speed & Vertical',bump(['str','speed','vert'],4)],['🎯 Shooting guru on staff','+4 Three-Point, Mid-Range & Free Throw',bump(['three','mid','ft'],4)],['🧱 Big-man camp','+4 Rebounding, Post Moves & Hook Shot',bump(['oreb','dreb','post','hook'],4)],['🧠 Film-room head coach','+5 Basketball IQ & Consistency',bump(['iq','cons'],5)],['🛡️ Defense-first system','+4 to every Defense rating',bump(['perD','intD','stl','blk'],4)],['🏀 Point-guard factory','+5 Passing & Ball Handle',bump(['pass','handle'],5)],['📺 Prime-time TV slot','+10 Hype',()=>S.hype+=10],['🎁 Bonus signing points','+18 bonus pts',()=>S.bank+=18]];let PERKS;
 function makeOffers(){PERKS=PERKS0.slice();const st=stars();const tiers={5:['blue','blue','blue','blue','blue','power','power','power'],4:['blue','blue','power','power','power','mid'],3:['power','mid','mid'],2:['mid','mid']}[st];
   const used=new Set();S.offers=tiers.map(t=>{let n;do n=pick(SCHOOLS[t]);while(used.has(n));used.add(n);return{name:n,tier:t,perk:(PERKS.length?PERKS:(PERKS=PERKS0.slice())).splice(ri(0,PERKS.length-1),1)[0]};});}
@@ -702,7 +704,7 @@ function simCol(){syncPos();const y=S.col.length,T=TIER[S.tier];S.age=18+y;const
   if(aa>=80)acc.push('🏅 National Player of the Year');if(aa>=74)acc.push('🎖️ All-American');
   let mm=S.banned?'🚫 Postseason ban':'Missed the tournament';if(!S.banned&&(wins>=23||(S.tier!=='mid'&&wins>=20))){const rd=['First Round','Round of 32','Sweet 16','Elite 8','Final Four','Title Game'];let r=0;
     while(r<6&&R()<clamp(.45+(S.teamStr-60)*.012+(o-65)*.015+(wins-24)*.025+(S.traits.clutch-3)*.03-r*.04,.06,.9))r++;
-    mm=r===6?'🏆 NATIONAL CHAMPIONS':`Lost in the ${rd[r]}`;if(r===6){S.hype+=8;acc.push('🏆 National Champion');if(!S.badges.includes('Big Shot Maker')){S.badges.push('Big Shot Maker');S.traits.clutch=Math.min(5,S.traits.clutch+2);S.attrs.cons=Math.min(99,S.attrs.cons+6);S.attrs.iq=Math.min(99,S.attrs.iq+3);acc.push('🎯 You earn the BIG SHOT MAKER badge: +2 Clutch, +6 Consistency, +3 IQ. You thrive under pressure for life.');}}else if(r>=4)S.hype+=4;}
+    mm=r===6?'🏆 NATIONAL CHAMPIONS':`Lost in the ${rd[r]}`;if(r===6){S.hype+=8;acc.push('🏆 National Champion');if(!S.badges.includes('Big Shot Maker')){S.badges.push('Big Shot Maker');S.traits.clutch=Math.min(5,S.traits.clutch+2);up('cons',6);up('iq',3);acc.push('🎯 You earn the BIG SHOT MAKER badge: +2 Clutch, +6 Consistency, +3 IQ. You thrive under pressure for life.');}}else if(r>=4)S.hype+=4;}
   {const cg=earnGtp((acc.includes('🏅 National Player of the Year')?3:0)+(acc.includes('🎖️ All-American')?1:0)+(acc.includes('🏆 National Champion')?4:0),'College');if(cg>0)acc.push(`🪙 +${cg} GTP`);}
   S.hype=Math.max(0,S.hype);const hm=S.hurt?.6:1,hurtTxt=S.hurt?` · ${ri(3,8)} games (injured)`:'';S.hurt=0;
   S.banned=false;S.col.push({bdg:bch,st:{ppg:ppg*hm,rpg:rpg*hm,apg:apg*hm,spg:spg*hm,bpg:bpg*hm},title:`${YR[y]} at ${S.school} · age ${S.age}`,line:`${f1(ppg*hm)} PPG · ${f1(rpg*hm)} RPG · ${f1(apg*hm)} APG · ${f1(spg*hm)} SPG · ${f1(bpg*hm)} BPG · ${wins}-${losses} · ${mm}${hurtTxt}`,ev,acc,proj:projRange()});
@@ -809,10 +811,10 @@ const bsm=()=>S.badges.includes('Big Shot Maker');
 function simNBA(){syncPos();if(!R.get)R=makeRng((Math.random()*4294967296)>>>0);const n=S.nba.length,prev=n?S.nba[n-1]:null;if(n)S.age++;
   const t=S.traits,a=S.age,X=S.next||{};S.next={};const prevO=ovr(),notes=[],news=[];if(S.lastResult&&!S.lastResult.n)notes.push((S.lastResult.ok?'✅ Summer: ':'❌ Summer: ')+S.lastResult.text);S.lastResult=null;for(const m of S.offLog||[])notes.push('✍️ Offseason: '+m.replace(EMO_RE,'').trim());S.offLog=[];
   if(n)eraShift(n,news,notes);
-  if(X.boost)growTo(ovr()+X.boost);
+  if(X.boost)growPts(ovr()+X.boost);
   if(a<=27+(t.late>=4?2:0)){develop(clamp((.22+(FRAMES[S.frame].dev||0)+(t.work-3)*.03)*(a<=23?1-(t.late-3)*.15:.8+(t.late-3)*.08),.05,.4));}
   else if(a>=30){const d=(S.perks&&S.perks.iron?.8:1)*(a-29)*.55*(1+(3-t.dur)*.12)*(1-(t.work-3)*.08)*(a>=34?1.8:1)*(1+(X.declAdj||0)+(FRAMES[S.frame].decl||0))+gauss()*.4;declineTo(ovr()-Math.max(0,d));}
-  growTo(ovr()+clamp(gauss()*.8,-1,1.5));
+  growPts(ovr()+clamp(gauss()*.8,-1,1.5));
   S.teamStr=clamp(S.teamStr+gauss()*4+(n<4&&S.pick<=10?2:0)+(50-S.teamStr)*.12+(X.team||0),20,85);
   // injury
   let lost=ri(0,4)+(X.gp||0),inj=null;if(X.gp)notes.push(`🩹 You miss ${Math.round(X.gp)} games recovering from the offseason`);const pI=.11+(S.height-80)*.012+(3-t.dur)*.04+Math.max(0,a-30)*.015+FRAMES[S.frame].inj+(S.injuryProne?.06:0)+(X.inj||0);
@@ -978,7 +980,7 @@ function faPend(){const last=S.nba[S.nba.length-1],rv=S.rival&&!S.rival.retired&
 const TRAIN=[['🦘 Plyometrics','+3 Vertical, +2 Speed',{vert:3,speed:2}],['🫁 Conditioning camp','+4 Stamina, +1 Speed',{stam:4,speed:1}],['🧤 Hands & steals','+3 Steal, +2 Perimeter D',{stl:3,perD:2}],['🧱 Rim protection school','+3 Block, +2 Interior D',{blk:3,intD:2}],['🎯 Mid-range mastery','+4 Mid-Range, +1 Close Shot',{mid:4,close:1}],['🏀 Pick-and-roll reads','+3 Passing, +2 Basketball IQ',{pass:3,iq:2}],['🎯 Extend your range','+3 Three-Point, +2 Mid-Range',{three:3,mid:2}],['🏋️ Bulk up','+4 Strength, +2 Post Moves, −1 Speed',{str:4,post:2,speed:-1}],['🛡️ Lock in on defense','+2 Perimeter D, +2 Interior D, +1 Steal, +1 Block',{perD:2,intD:2,stl:1,blk:1}],['🏀 Tighten the handle','+3 Ball Handle, +3 Passing',{handle:3,pass:3}],['💥 Finishing package','+3 Layup, +2 Dunk, +2 Close Shot',{layup:3,dunk:2,close:2}],['🧱 Glass cleaner','+3 Off. Rebound, +3 Def. Rebound',{oreb:3,dreb:3}],['🧠 Film study','+3 Basketball IQ, +2 Consistency',{iq:3,cons:2}],['🎯 Free throw grind','+5 Free Throw',{ft:5}]];
 const VET=[['🧘 Recovery & longevity','You age slower next season, +2 Stamina',{stam:2},{declAdj:-.5}],['🔄 Reinvent as a shooter','+4 Three-Point, +3 Mid-Range, −2 Speed',{three:4,mid:3,speed:-2}],['👴 Old-man game','+4 Post Moves, +3 Basketball IQ',{post:4,iq:3}]];
 function trainPend(){const useful=o=>Object.entries(o[2]).some(([k,v])=>v>0&&S.attrs[k]<95);const pool=TRAIN.filter(useful),opts=[];if(pool.length<3)pool.push(...TRAIN.filter(x=>!pool.includes(x)));if(S.age>=29)opts.push(pick(VET.filter(useful).length?VET.filter(useful):VET));while(opts.length<3)opts.push(pool.splice(ri(0,pool.length-1),1)[0]);
-  return{kind:'train',title:'☀️ Summer Training',text:'What do you work on this offseason?',opts:opts.map(([l,d,b,x])=>({label:l,desc:d,fn:()=>{for(const k in b)S.attrs[k]=clamp(S.attrs[k]+b[k],30,99);if(x)addNext(x);return `Summer: ${l.replace(/^\S+\s/,'')}`;}}))};}
+  return{kind:'train',title:'☀️ Summer Training',text:'What do you work on this offseason?',opts:opts.map(([l,d,b,x])=>({label:l,desc:d,fn:()=>{for(const k in b)up(k,b[k]);if(x)addNext(x);return `Summer: ${l.replace(/^\S+\s/,'')}`;}}))};}
 function eventPend(){const last=S.nba[S.nba.length-1],o=ovr(),a=S.age,rv=S.rival&&!S.rival.retired?S.rival:null,E=[];
   if(last.wins<35&&o>=72)E.push({title:'📞 Trade Demand?',text:`The ${S.team} won ${last.wins} games. Your agent says you could force your way out.`,opts:[
     {label:'🧱 Stay and grind',desc:'The front office promises upgrades. Fans love you for it.',fn:()=>{addNext({team:6});S.hype+=3;return 'You stayed loyal through the rebuild';}},
@@ -993,15 +995,15 @@ function eventPend(){const last=S.nba[S.nba.length-1],o=ovr(),a=S.age,rv=S.rival
     {label:'🏠 Stay put',desc:'Do it your way.',fn:()=>{addNext({boost:.5});return 'You turned down a superteam';}},
     {label:'🤝 Join them',desc:'Instant contender, but you share the ball.',fn:()=>{S.team=st;lgStack(st,2);S.teamStr=teamStrOf(st);S.usage=(S.usage||0)-4;S.hype-=4;return `You formed a superteam with the ${S.team}`;}}]});}
   if(rv&&rv.team!==S.team&&o>=70)E.push({title:'🎙️ Called Out',text:`${rv.name} says on a podcast that you're "overrated."`,opts:[
-    {label:'🤐 Let your game talk',desc:'+2 Consistency.',fn:()=>{S.attrs.cons=Math.min(99,S.attrs.cons+2);return `You ignored ${rv.name}'s trash talk`;}},
+    {label:'🤐 Let your game talk',desc:'+2 Consistency.',fn:()=>{up('cons',2);return `You ignored ${rv.name}'s trash talk`;}},
     {label:'🔥 Fire back',desc:'Extra motivation next season, but more pressure.',fn:()=>{addNext({boost:1.5,usage:1});S.hype+=5;return `You started a beef with ${rv.name}`;}}]});
   const rk=a>=30&&S.L?active(S.L).filter(p=>p.team===S.team&&p.yrs===0).sort((x,y)=>y.ceil-x.ceil)[0]:null;
   if(rk)E.push({title:'🧑‍🏫 Mentor the Rookie?',text:`${rk.name}, a rookie ${rk.pos}, is the future of the franchise. He wants to learn from you.`,opts:[
-    {label:'🤝 Take him under your wing',desc:'+3 Basketball IQ, slightly fewer shots. He gets a lot better.',fn:()=>{S.attrs.iq=Math.min(99,S.attrs.iq+3);addNext({usage:-1.5});rk.ceil+=5;S.mentee=rk.id;S.menteeAS=rk.aw['All-Star']||0;return `You took ${rk.name} under your wing`;}},
+    {label:'🤝 Take him under your wing',desc:'+3 Basketball IQ, slightly fewer shots. He gets a lot better.',fn:()=>{up('iq',3);addNext({usage:-1.5});rk.ceil+=5;S.mentee=rk.id;S.menteeAS=rk.aw['All-Star']||0;return `You took ${rk.name} under your wing`;}},
     {label:'🙅 Not my job',desc:'Keep your touches.',fn:()=>'You ignored the rookie'}]});
   if(o>=72&&!S.shoe)E.push({title:'👟 Signature Shoe Offer',text:'A shoe company wants to build a line around you.',opts:[
     {label:'👟 Sign it',desc:'+1 Star Power, but off-court demands cost focus (−2 Consistency).',fn:()=>{S.shoe=1;S.traits.star=Math.min(5,S.traits.star+1);S.attrs.cons=Math.max(30,S.attrs.cons-2);return 'You got a signature shoe';}},
-    {label:'🏀 Stay focused',desc:'+2 Basketball IQ, +1 Work Ethic.',fn:()=>{S.shoe=-1;S.attrs.iq=Math.min(99,S.attrs.iq+2);S.traits.work=Math.min(5,S.traits.work+1);return 'You turned down a shoe deal to stay focused';}}]});
+    {label:'🏀 Stay focused',desc:'+2 Basketball IQ, +1 Work Ethic.',fn:()=>{S.shoe=-1;up('iq',2);S.traits.work=Math.min(5,S.traits.work+1);return 'You turned down a shoe deal to stay focused';}}]});
   if(o>=78)E.push({title:'🥇 Olympic Team Invite',text:'The national team wants you this summer.',opts:[
     {label:'🏅 Represent your country',desc:'Chase gold. Big hype, but a tired body next season.',fn:()=>{S.hype+=6;addNext({inj:.04});const gold=R()<.7;return gold?'You won Olympic gold 🥇':'You won Olympic silver 🥈';}},
     {label:'😴 Rest up',desc:'Fresh legs next season.',fn:()=>{addNext({boost:.5,inj:-.03});return 'You skipped the Olympics to rest';}}]});
@@ -1009,21 +1011,21 @@ function eventPend(){const last=S.nba[S.nba.length-1],o=ovr(),a=S.age,rv=S.rival
     {label:'🙌 Enter',desc:'Could be iconic. Small injury risk.',fn:()=>{S.hype+=5;addNext({inj:.03});return R()<.4?'🏆 You won the Dunk Contest with a 360 between-the-legs':'You entered the Dunk Contest and finished 3rd';}},
     {label:'🙅 Pass',desc:'Save the legs.',fn:()=>'You passed on the Dunk Contest'}]});
   if(S.nba.length>=3)E.push({title:'🧑‍💼 New Head Coach',text:`The ${S.team} hired a new coach with a very different system.`,opts:[
-    {label:'🤝 Buy in',desc:'+2 Basketball IQ, +2 Consistency.',fn:()=>{S.attrs.iq=Math.min(99,S.attrs.iq+2);S.attrs.cons=Math.min(99,S.attrs.cons+2);return 'You bought into the new coach’s system';}},
+    {label:'🤝 Buy in',desc:'+2 Basketball IQ, +2 Consistency.',fn:()=>{up('iq',2);up('cons',2);return 'You bought into the new coach’s system';}},
     {label:'😒 Push back',desc:'Keep doing what works. The team suffers a little.',fn:()=>{addNext({team:-3,usage:1});return 'You clashed with the new coach';}}]});
   if(last.wins<30&&a>=27)E.push({title:'🏚️ Tank Season?',text:'Management wants to shut you down early to land a better draft pick.',opts:[
     {label:'🛋️ Sit the rest of the year',desc:'Fewer games, but a top prospect joins next year.',fn:()=>{addNext({gp:18,team:9});return 'You sat out the end of a tank season';}},
     {label:'💪 Play every game',desc:'Competitors compete.',fn:()=>{S.hype+=2;return 'You refused to tank';}}]});
   E.push({title:'📱 Social Media Storm',text:'An old clip of you resurfaces, and the internet is going crazy.',opts:[
-    {label:'📵 Log off',desc:'+2 Consistency, but the clip defines you for a while.',fn:()=>{S.attrs.cons=Math.min(99,S.attrs.cons+2);S.hype-=3;return 'You logged off social media';}},
+    {label:'📵 Log off',desc:'+2 Consistency, but the clip defines you for a while.',fn:()=>{up('cons',2);S.hype-=3;return 'You logged off social media';}},
     {label:'😂 Clap back',desc:'The fans love it. Focus slips a bit.',fn:()=>{S.hype+=3;S.attrs.cons=Math.max(30,S.attrs.cons-1);return 'You clapped back online';}}]});
   const fa=o>=75&&S.L?active(S.L).filter(p=>p.team!==S.team&&p!==S.rival&&p.ovr>=76&&p.age<=32).sort((x,y)=>y.ovr-x.ovr).slice(0,5):[],star=fa.length?pick(fa):null;
   if(star)E.push({title:`📲 Recruit ${star.name}?`,text:`${star.name} (${star.pos}, ${dsp(star.ovr)} OVR) is a free agent deciding between the ${S.team} and the ${star.team}.`,opts:[
     {label:'📞 Recruit him hard',desc:'If it works, he joins your team.',fn:()=>{const ch=clamp(.35+(S.traits.star-3)*.08+(S.hype-20)/250,.15,.7);if(R()<ch){const old=star.team,sw=roster(S.L,S.team).sort((x,y)=>x.ovr-y.ovr)[0];if(sw)sw.team=old;star.team=S.team;S.teamStr=teamStrOf(S.team);return `${star.name} signs with the ${S.team}!`;}S.hype-=2;return `${star.name} stays with the ${star.team}`;}},
     {label:'🤷 Let the front office handle it',desc:'Stay out of it.',fn:()=>'You stayed out of the free agency drama'}]});
   if(a>=25&&a<=32)E.push({title:'🥋 Train With a Legend',text:'A retired legend offers to train you this summer.',opts:[
-    {label:'🍑 Learn the post game',desc:'+4 Post Moves, +1 IQ.',fn:()=>{S.attrs.post=Math.min(99,S.attrs.post+4);S.attrs.iq=Math.min(99,S.attrs.iq+1);return 'You learned the post game from a legend';}},
-    {label:'🌀 Learn the fadeaway',desc:'+4 Mid-Range, +1 Consistency.',fn:()=>{S.attrs.mid=Math.min(99,S.attrs.mid+4);S.attrs.cons=Math.min(99,S.attrs.cons+1);return 'You learned the fadeaway from a legend';}}]});
+    {label:'🍑 Learn the post game',desc:'+4 Post Moves, +1 IQ.',fn:()=>{up('post',4);up('iq',1);return 'You learned the post game from a legend';}},
+    {label:'🌀 Learn the fadeaway',desc:'+4 Mid-Range, +1 Consistency.',fn:()=>{up('mid',4);up('cons',1);return 'You learned the fadeaway from a legend';}}]});
   const L=E.filter(e=>!(S.seenT||[]).includes(e.title));if(!L.length)return null;
   const e=pick(L);(S.seenT=S.seenT||[]).push(e.title);return{kind:'event',...e};}
 function retirePend(){const c=career(),sc=goatScore(c),[t]=tierOf(sc,c);
@@ -1534,7 +1536,7 @@ function flavor(s){const o=[],opp=()=>pick(TEAMS.filter(x=>x!==S.team));
   S.recent=S.recent||new Set(RECENT());const fresh=o.filter(x=>!(S.seenF||[]).includes(x.replace(/\d+/g,'#'))&&!S.recent.has(x.replace(/\d+/g,'#')));const f=pick(fresh.length?fresh:o);(S.seenF=S.seenF||[]).push(f.replace(/\d+/g,'#'));return f;}
 
 // ---------- summers: one decision every offseason, gambles can pay off or backfire ----------
-const up=(k,n)=>{S.attrs[k]=clamp(S.attrs[k]+n,30,99);};
+const up=(k,n)=>{if(n>0)S.bank+=n;else S.attrs[k]=clamp(S.attrs[k]+n,30,99);};
 const riskTag=p=>p>=.85?'🟢 Low risk':p>=.6?'🟡 Medium risk':'🔴 High risk';
 // what each gamble leans on: good at it = safer, weak at it = riskier ('t:' = a trait)
 const RISK_FIT=[[/ball handler/i,['handle','pass']],[/slasher/i,['layup','str']],[/jump shot|shooting coach/i,['three','mid']],
@@ -1780,7 +1782,7 @@ function buyGear(k){const g=gear(),lv=g[k]||0;if(lv>=3||gems()<GEAR_COST[lv])ret
 function wearGear(){if(S.daily)return;const g=gear();for(const[k,,,,ks]of GEAR)for(const a of ks)S.attrs[a]=Math.min(99,S.attrs[a]+(g[k]||0));}
 function gearCard(){const g=gear(),n=gems();
   return`<div class="card"><div class="sh">${icon('sparkle')} <span class="grow">Equipment</span><b class="gold">${n} gems</b></div><div class="sub">Gear is permanent: every future player wears it (not the Daily Build). Earn gems at the end of every career on Pro and Hall of Fame.</div>
-  ${GEAR.map(([k,l,ic,d,ks])=>{const lv=g[k]||0,c=GEAR_COST[lv];return`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><span class="bub">${icon(ic)}</span><div class="grow"><b>${l}</b>${lv?` <span class="gold">${GEAR_LV[lv-1]}</span>`:''}<div class="sub">${d} · ${lv?`+${lv}`:'+1'} ${ks.map(sname).join(' & ')}${lv&&lv<3?` · next level +${lv+1}`:''}</div></div>
+  ${GEAR.map(([k,l,ic,d,ks])=>{const lv=g[k]||0,c=GEAR_COST[lv];return`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><span class="bub">${icon(ic)}</span><div class="grow"><b>${l}</b>${lv?` <span class="gold">${GEAR_LV[lv-1]}</span>`:''}<div class="sub">${d} · ${ks.map(sname).join(' & ')} ${lv?`+${lv}`:'+1'} each${lv&&lv<3?` · next level +${lv+1}`:''}</div></div>
     ${lv>=3?'<b class="gold">Maxed</b>':`<button class="sm" aria-label="Buy ${l}" onclick="buyGear('${k}')" ${n<c?'disabled':''}>${c} gems</button>`}</div>`;}).join('')}
   ${storeOn()?`<button class="ghost sm" style="margin-top:14px;width:100%" onclick="openMenu('gems')">${icon('gem')} Get more gems</button>`:''}</div>`;}
 const SAVE_KEYS=['bag_gtp','bag_ach','bag_hof','bag_recent','bag_daily','bag_diff','bag_rec','bag_goats','bag_gems','bag_gear','bag_intro'];
@@ -2167,8 +2169,14 @@ function emo(m){if(typeof EMOJI_ICON==='undefined')return m;const v=EMOJI_ICON[m
 // 'All-NBA 1st', achievement ids, function names), so saves and checks are untouched: only drawn text, aria-label and title change.
 const LEAGUE_TEXT=[[/\bG League Ignite\b/g,'Minor League Select'],[/\bG League\b/g,'Minor League'],[/\bNBA\b/g,'NABL']];
 const LEAGUE_RE=/\bNBA\b|\bG League\b/;
-function leagueText(s){for(const[r,t]of LEAGUE_TEXT)s=s.replace(r,t);return s;}
-function leagueize(root){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))if(LEAGUE_RE.test(n.nodeValue))n.nodeValue=leagueText(n.nodeValue);
+function leagueText(s){for(const[r,t]of LEAGUE_TEXT)s=s.replace(r,t);return ptsText(s);}
+// skill rewards are paid as bonus points now, so "+4 Post Moves, +1 IQ" reads "+5 pts"
+let PTS_RE=null;
+function ptsText(s){if(s.indexOf('+')<0)return s;if(!PTS_RE){const L=[...new Set([...Object.values(SUBS).flat().map(x=>x[1]),'Basketball IQ','IQ','Rebounding','every Defense rating'])].sort((a,b)=>b.length-a.length).map(x=>x.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|'),one=`(?:to )?(?:${L})`;
+    PTS_RE=new RegExp(`\\+(\\d+) (${one}(?:(?:, | & | and )${one})*)(?![\\w-])`,'g');}
+  s=s.replace(PTS_RE,(m,n,l)=>`+${+n*(l.split(/, | & | and /).length)} pts`);
+  return s.replace(/\+(\d+) pts(?:, | and )\+(\d+) pts/g,(m,a,b)=>`+${+a+ +b} pts`).replace(/\+(\d+) pts(?:, | and )\+(\d+) pts/g,(m,a,b)=>`+${+a+ +b} pts`);}
+function leagueize(root){const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);let n;while((n=w.nextNode()))if(LEAGUE_RE.test(n.nodeValue)||n.nodeValue.indexOf('+')>=0)n.nodeValue=leagueText(n.nodeValue);
   for(const el of root.querySelectorAll('[aria-label],[title]'))for(const a of['aria-label','title']){const v=el.getAttribute(a);if(v&&LEAGUE_RE.test(v))el.setAttribute(a,leagueText(v));}}
 function iconize(root){leagueize(root);if(typeof EMOJI_ICON==='undefined')return;const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),todo=[];let n;
   while((n=w.nextNode())){EMO_RE.lastIndex=0;if(EMO_RE.test(n.nodeValue))todo.push(n);}
@@ -2720,11 +2728,11 @@ if(globalThis.__witnessApi){document.documentElement.classList.add('wt');const W
   reset({scene}={}){try{localStorage.setItem('bag_intro','1');}catch{}['bag_hof','bag_ach','bag_daily','bag_recent','bag_gtp','bag_diff','bag_rec','bag_goats','bag_gems','bag_gear',...Object.values(SV)].forEach(k=>localStorage.removeItem(k));RUNLOG=[];R=Math.random;S=newPlayer();render();
     // test scenes: jump straight to a screen (witness --scene hs|offers|college|draft|nba|decision|end)
     const order=['build','hs','offers','college','draft','nba','decision','end'],at=order.indexOf(scene||'build');if(at<=0)return;
-    S.name='Test Prospect';applyArch(2);for(const k of SUBKEYS)S.attrs[k]=Math.min(90,S.attrs[k]+14);S.picked=['work','dur'];startCareer();if(at===1){simHS();UI().seq=null;render();return;}
-    for(let i=0;i<4;i++)simHS();if(at===2){UI().seq=null;render();return;}
-    chooseSchool(0);simCol();if(at===3){UI().seq=null;render();return;}
+    S.name='Test Prospect';applyArch(2);for(const k of SUBKEYS)S.attrs[k]=Math.min(90,S.attrs[k]+14);S.picked=['work','dur'];startCareer();S.bank=Math.max(0,S.bank);const sp=()=>{if(S.bank>0)smartSpend();};if(at===1){simHS();UI().seq=null;render();return;}
+    for(let i=0;i<4;i++){simHS();sp();}if(at===2){UI().seq=null;render();return;}
+    chooseSchool(0);simCol();sp();if(at===3){UI().seq=null;render();return;}
     declare();if(at===4){UI().seq=null;render();return;}
-    S.stage='nba';let g=0;while(g++<6){if(S.pend)choose(S.pend.kind==='summer'?S.pend.opts.length-1:0);else simNBA();}
+    S.stage='nba';let g=0;while(g++<6){if(S.pend)choose(S.pend.kind==='summer'?S.pend.opts.length-1:0);else{sp();simNBA();}}
     if(at===6){while(!S.pend&&S.stage==='nba'&&g++<30)simNBA();UI().seq=null;render();return;}
     if(at===5){if(S.pend)choose(0);UI().seq=null;render();return;}
     simEnd();UI().seq=null;render();},

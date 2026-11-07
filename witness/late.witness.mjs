@@ -1,5 +1,5 @@
 // Late-career systems: clutch moments, season goals, history, and saving in the middle of a playoff moment.
-const toClutch = `(()=>{const G=getS;let g=0;while(G().stage==='nba'&&g++<400){const p=G().pend;if(p&&p.kind==='clutch')break;if(p)choose(p.kind==='retire'?1:0);else simNBA();}
+const toClutch = `(()=>{const G=getS;let g=0;while(G().stage==='nba'&&g++<400){const p=G().pend;if(p&&p.kind==='clutch')break;if(p)choose(p.kind==='retire'?1:0);else{if(G().bank>0)smartSpend();simNBA();}}
   UI().seq=null;render();return G().pend&&G().pend.kind==='clutch'?'clutch':'none:'+G().stage+':'+G().nba.length;})()`;
 export default [
   { name: 'clutch: the final play takes over the screen, your call decides the series, and the story opens on it', seed: 8, scene: 'nba', steps: [

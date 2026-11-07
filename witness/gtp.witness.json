@@ -38,7 +38,7 @@
    {
     "at": 0.7,
     "evalAs": {
-     "x": "(simEnd&&(()=>{for(let i=0;i<4;i++){simHS();}chooseSchool(0);simCol();declare();S.stage='nba';while(S.stage==='nba'){simEnd();if(S.pend)choose(S.pend.kind==='clutch'?S.pend.best:0);}})(),window.scrollTo(0,0),1)"
+     "x": "(simEnd&&(()=>{for(let i=0;i<4;i++){simHS();smartSpend();}chooseSchool(0);simCol();smartSpend();declare();S.stage='nba';while(S.stage==='nba'){if(S.bank>0)smartSpend();if(S.pend)choose(S.pend.kind==='clutch'?S.pend.best:0);else simNBA();}})(),window.scrollTo(0,0),1)"
     },
     "expectPage": [
      "S.stage==='end'",
