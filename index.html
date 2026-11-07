@@ -85,6 +85,7 @@ body.kb .dock{display:none}
 .attr{display:grid;grid-template-columns:minmax(0,1fr) 64px 30px auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:.9rem}
 .attr:last-child{border-bottom:0}
 .attr .ctl{display:flex;gap:6px}
+.attr>small.bh{grid-column:1/-1;margin:-2px 0 2px}.attr>small.bh b{color:var(--tx1,#eceef3);font-weight:700}
 .attr .imp{display:block;font-size:.68rem;color:var(--tx3);letter-spacing:.2px;margin-top:1px}.attr .imp.hi{color:var(--acc)}
 .hero.tap{cursor:pointer}.profbtn{margin-top:10px}.ptabs{margin:4px 0 10px}.ptabs button{padding:9px 2px;font-size:.84rem}
 .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pgrid small{display:block;color:var(--tx2);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}.pgrid b{font-size:1rem}
@@ -503,7 +504,7 @@ const ARCH_SIG={floor:['table','yoyo','film'],creator:['elbow','yoyo','silk'],sn
   threeD:['cash','velcro','switch'],twoway:['switch','bandit','extra'],pointF:['grab','table','silk'],runner:['air','coast','second'],stretch:['sky','silk','vacuum'],
   post:['surgeon','hook','foul'],glass:['vacuum','second','mgoat'],rim:['nofly','swat','bouncer']};
 // a badge's rating: the average of its skills as shown on screen (height and frame included); null when you are outside its size range
-function badgeRating(b){if(b.h&&(S.height<b.h[0]||S.height>b.h[1]))return null;return b.sk.reduce((s,k)=>s+(Array.isArray(k)?Math.max(...k.map(es)):es(k)),0)/b.sk.length;}
+function badgeRating(b){if(b.h&&(S.height<b.h[0]||S.height>b.h[1]))return null;const r=k=>Math.round(es(k));return b.sk.reduce((s,k)=>s+(Array.isArray(k)?Math.max(...k.map(r)):r(k)),0)/b.sk.length;}
 const tierFor=r=>r==null?0:BT.filter(x=>r>=x).length;
 // tiers open up as the career does: high school up to Silver, college Gold, the NABL Platinum
 const bCap=()=>{const st=S.stage;return st==='nba'||st==='end'?4:st==='college'||st==='draft'?3:2;};
@@ -534,7 +535,7 @@ const skNames=b=>b.sk.map(k=>Array.isArray(k)?k.map(x=>SKN[x]).join(' or '):SKN[
 // next badge line for one skill: the closest tier this skill feeds (shown on skill rows when it is within reach)
 function badgeHint(k){let best=null;const c=S.stage==='build'?2:bCap(),B=S.bdg||{};
   for(const b of BADGES){if(!b.sk.some(x=>Array.isArray(x)?x.includes(k):x===k))continue;const r=badgeRating(b);if(r==null)continue;const t=Math.max(B[b.id]||0,tierFor(r));if(t>=c)continue;const gap=BT[t]-r;if(gap<=6&&(!best||gap<best[1]))best=[b,gap,t+1];}
-  return best?`<small class="bh">${bMed(best[2])}${BTN[best[2]]} ${best[0].n} at ${BT[best[2]-1]}${best[0].sk.length>1?' avg':''}</small>`:'';}
+  return best?`<small class="bh">${bMed(best[2])}<span><b>${BTN[best[2]]} ${best[0].n}</b> at ${BT[best[2]-1]}${best[0].sk.length>1?' avg':''} · ${Math.max(1,Math.ceil(best[1]))} to go</span></small>`:'';}
 function badgeRow(b,t,extra){return`<div class="brow">${bMed(t||0)}<div class="grow"><b>${b.n}</b>${t?` <span class="muted">${BTN[t]}</span>`:''}<div class="sub">${skNames(b)}</div>${extra||`<div class="note">${fxText(b.fx,Math.max(1,t))}</div>`}</div></div>`;}
 function badgesTab(){const B=S.bdg||{},c=bCap(),held=BADGES.filter(b=>B[b.id]).sort((x,y)=>B[y.id]-B[x.id]),rest=BADGES.filter(b=>!B[b.id]||B[b.id]<4);
   const close=rest.map(b=>{const r=badgeRating(b),t=B[b.id]||0;return{b,r,t,gap:r==null?99:BT[t]-r};}).filter(x=>x.gap<=8).sort((x,y)=>x.gap-y.gap);
@@ -2183,7 +2184,7 @@ function skillRow(k,l,mode){const v=S.attrs[k],e=Math.round(es(k));let ctl;
   if(mode==='build'){const off=v>=BUILD_MAX||spent()+cost(v)>START_BUDGET;ctl=`<button class="ghost sm" aria-label="Remove a point from ${l}" onclick="adj('${k}',-1)" ${v<=MIN_A?'disabled':''}>−</button><button class="sm" aria-label="Add a point to ${l}" onclick="adj('${k}',1)" ${off?'disabled':''}>+${cost(v)>1?cost(v):''}</button><button class="ghost sm" aria-label="Add 10 points to ${l}" onclick="adjN('${k}',10)" ${off?'disabled':''}>+10</button><button class="ghost sm" aria-label="Max out ${l}" onclick="adjN('${k}',99)" ${off?'disabled':''}>Max</button>`;}
   else if(mode==='view')ctl='';
   else{const off=S.bank<cost(v)||v>=99;ctl=`${canUndo(k)?`<button class="ghost sm" aria-label="Take a point back from ${l}" onclick="unspend('${k}')">−</button>`:''}<button class="sm" aria-label="Add a point to ${l}" onclick="spend('${k}')" ${off?'disabled':''}>+${cost(v)>1?cost(v):''}</button><button class="ghost sm" aria-label="Add 10 points to ${l}" onclick="spend('${k}',10)" ${off?'disabled':''}>+10</button><button class="ghost sm" aria-label="Max out ${l}" onclick="spend('${k}',99)" ${off?'disabled':''}>Max</button>`;}
-  return`<div class="attr"><span>${l}${badgeHint(k)}${IMP[k]==='hi'?'<small class="imp hi">high impact</small>':IMP[k]==='lo'?'<small class="imp">low impact</small>':''}</span><div class="bar"><i style="width:${e}%"></i></div><b>${e}</b><div class="ctl">${ctl}</div></div>`;}
+  return`<div class="attr"><span>${l}${IMP[k]==='hi'?'<small class="imp hi">high impact</small>':IMP[k]==='lo'?'<small class="imp">low impact</small>':''}</span><div class="bar"><i style="width:${e}%"></i></div><b>${e}</b><div class="ctl">${ctl}</div>${badgeHint(k)}</div>`;}
 function impactMap(){const o0=ovr(),d=SUBKEYS.map(k=>{const v=S.attrs[k];S.attrs[k]=v+1;const x=ovr()-o0;S.attrs[k]=v;return[k,x];}).sort((a,b)=>b[1]-a[1]),m={};
   d.forEach(([k],i)=>m[k]=i<6?'hi':i>=d.length-6?'lo':'');return m;}
 let IMP={};
