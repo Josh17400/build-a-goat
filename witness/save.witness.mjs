@@ -7,16 +7,16 @@ const drive = `(()=>{applyArch(1);toggleTrait('work');toggleTrait('dur');startCa
     rv:getS().rival&&[getS().rival.name,Math.round(getS().rival.pts),getS().rival===getS().L.P.find(p=>p.id===getS().rival.id)]});
   const bad=[];let checks=0;
   for(let i=0;i<160&&getS().stage!=='end';i++){const st=getS().stage;
-    if(st==='hs'){if(getS().summerPend)chooseSummer(rnd(getS().summerPend.opts.length));else if(getS().bank>0&&rnd(3)===0)spend(SUBKEYS[rnd(SUBKEYS.length)],rnd(3)+1);else simHS();}
+    if(st==='hs'){if(getS().summerPend)chooseSummer(rnd(getS().summerPend.opts.length));else if(getS().bank>0&&rnd(3)===0)spend(SUBKEYS[rnd(SUBKEYS.length)],rnd(3)+1);else if(getS().bank>40&&rnd(2)===0)smartSpend();else simHS();}
     else if(st==='offers')chooseSchool(rnd(getS().offers.length));
     else if(st==='college'){if(getS().summerPend)chooseSummer(rnd(getS().summerPend.opts.length));else if(!getS().col.length)simCol();else if(getS().mustDeclare||rnd(5)<2)declare();else returnSchool();}
     else if(st==='draft')startNBA();
-    else if(st==='nba'){if(getS().pend)choose(rnd(getS().pend.opts.length));else if(getS().bank>0&&rnd(3)===0)smartSpend();else simNBA();}
+    else if(st==='nba'){if(getS().pend)choose(rnd(getS().pend.opts.length));else if(getS().bank>0&&rnd(3)>0)smartSpend();else simNBA();}
     if(getS().stage==='end')break;
     if(i%3===0||getS().pend||getS().summerPend){const a=dg();resumeRun();const b=dg();checks++;if(a!==b){bad.push(i+':'+st);if(bad.length>3)break;}}}
   return JSON.stringify({checks,bad,stage:getS().stage,seasons:getS().nba.length});})()`;
 export default [
-  { name: 'save: every reload rebuilds the run exactly (stats, open decisions, dice)', seed: 13, steps: [ // seed 11's career got short after the 2026-11-06 NABL points/clutch changes; 13 runs a full career
+  { name: 'save: every reload rebuilds the run exactly (stats, open decisions, dice)', seed: 17, steps: [ // a seed whose career runs long (seeds 11 and 13 got short after balance changes)
     { at: 0.3, evalAs: { res: drive }, expect: ['JSON.parse(res).bad.length===0', 'JSON.parse(res).checks>20', 'JSON.parse(res).seasons>=3'] }] },
   { name: 'save: a second career with a different seed also rebuilds exactly', seed: 29, steps: [
     { at: 0.3, evalAs: { res: drive }, expect: ['JSON.parse(res).bad.length===0', 'JSON.parse(res).checks>8'] }] },

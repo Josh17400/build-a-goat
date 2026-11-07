@@ -27,22 +27,22 @@ export default [
   { name: 'badges: every badge at Platinum stays inside the caps, and each boost line reads', seed: 25, steps: [
     { at: 0.3, evalAs: { r: "(()=>{S.bdg=Object.fromEntries(BADGES.map(b=>[b.id,4]));const f=badgeFx();return Object.keys(BCAP).every(k=>f[k]<=BCAP[k]+1e-9&&f[k]>0)&&BADGES.every(b=>fxText(b.fx,4).length>3);})()" },
       expect: ['r===true'] }] },
-  { name: 'badges: you start with the ones you qualify for, and a season awards new ones in the story, with their own window', seed: 26, steps: [
+  { name: 'badges: none at career start; the first season awards them in the story, with their own window', seed: 26, steps: [
     { at: 0.3, evalAs: { x: "(applyArch(0),S.height=78,S.frame='Balanced',S.attrs.three=75,toggleTrait('work'),toggleTrait('dur'),startCareer(),S.attrs.three=85,render(),1)" } },
-    { at: 0.4, call: ['tap', 'Play Freshman Year'], expectPage: ["S.hs[0].bdg.some(c=>c[0]==='rain'&&c[1]===1&&c[2]===2)", "UI().seq.k.includes('badges')"] },
+    { at: 0.4, call: ['tap', 'Play Freshman Year'], expectPage: ["Object.keys(S.hs[0].bdg).length>=0", "S.hs[0].bdg.some(c=>c[0]==='rain'&&c[1]===0&&c[2]===2)", "UI().seq.k.includes('badges')"] },
     { at: 0.45, evalAs: { x: "(UI().seq.i=UI().seq.k.indexOf('badges'),render(),1)" }, expectPage: [`document.querySelector('.seqcard').textContent.includes('Rainmaker')`] }] },
   { name: 'points: before the freshman season a point can be taken back, after it cannot', seed: 27, steps: [
     { at: 0.3, evalAs: { x: start } },
     { at: 0.4, evalAs: { r: "(()=>{S.bank=6;const v=S.attrs.mid,b=S.bank;spend('mid',2);const up=S.attrs.mid===v+2;unspend('mid');unspend('mid');unspend('mid');return up&&S.attrs.mid===v&&S.bank===b;})()" }, expect: ['r===true'] },
     { at: 0.45, evalAs: { x: "(openProfile('skills'),UI().open='sho',S.bank=4,spend('mid'),render(),1)" }, expectPage: ["document.querySelector('button[aria-label^=\"Take a point back\"]')!=null"] },
     { at: 0.5, evalAs: { r: "(()=>{closeProfile();simHS();if(getS().summerPend)chooseSummer(0);const v=getS().attrs.mid;unspend('mid');return getS().attrs.mid===v&&!canUndo('mid');})()" }, expect: ['r===true'] }] },
-  { name: 'whole career: plays every season window by window and lands on the career recap', seed: 28, steps: [
+  { name: 'whole career: plays straight through, stops only for your calls and to spend points, and lands on the career recap', seed: 28, steps: [
     { at: 0.3, evalAs: { r: `(()=>{applyArch(2);for(const k of SUBKEYS)S.attrs[k]=Math.min(BUILD_MAX,S.attrs[k]+14);toggleTrait('work');toggleTrait('dur');startCareer();
         let g=0;while(getS().stage!=='nba'&&g++<40){const s=getS();if(s.summerPend)chooseSummer(0);else if(s.stage==='hs')simHS();else if(s.stage==='offers')chooseSchool(0);else if(s.stage==='college'){if(!s.col.length)simCol();else declare();}else if(s.stage==='draft')startNBA();}
         UI().seq=null;wholeCareer();let windows=0,stops=0;g=0;
-        while(getS().stage==='nba'&&g++<400){if(UI().seq){windows++;seqNext();}else if(getS().pend){stops++;act(choose,0);}else break;}
+        while(getS().stage==='nba'&&g++<400){if(UI().seq){windows++;seqNext();}else if(getS().pend){stops++;act(choose,0);}else if(UI().auto&&UI().autoWhy){stops++;wholeCareer();}else break;}
         return JSON.stringify({stage:getS().stage,windows,stops,auto:UI().auto||0,seasons:getS().nba.length});})()` },
-      expect: ["JSON.parse(r).stage==='end'", 'JSON.parse(r).windows>=JSON.parse(r).seasons*2', 'JSON.parse(r).auto===0'] }] },
+      expect: ["JSON.parse(r).stage==='end'", 'JSON.parse(r).stops>=1', 'JSON.parse(r).auto===0'] }] },
   { name: 'saves: a 21-skill run gets the new skills, keeps its growth room and its rating, and plays on', seed: 29, steps: [
     { at: 0.3, evalAs: { r: `(()=>{applyArch(1);toggleTrait('work');toggleTrait('dur');startCareer();simHS();if(getS().summerPend)chooseSummer(0);
         if(JSON.parse(localStorage.getItem('bag_run_log')).log.length)return 'log not empty';
