@@ -24,6 +24,6 @@ export default [
   { name: 'class rankings: MOVE compares with your rank right before the season, points spent included', seed: 34, steps: [
     { at: 0.3, evalAs: { x: start } },
     { at: 0.4, evalAs: { r0: '(UI().seq=null,render(),classRank().rank)' } },
-    { at: 0.5, evalAs: { p: '(S.summerPend&&chooseSummer(0),simHS(),UI().seq=null,render(),S.clsPrevSnap.me)' }, expect: ['p===r0'] },
-    { at: 0.6, evalAs: { q: '(S.bank=200,smartSpend(),UI().seq=null,render(),S.clsPrevSnap.me)' }, expect: ['q===r0'] }] },
+    { at: 0.5, evalAs: { p: '(S.summerPend&&chooseSummer(0),simHS(),UI().seq=null,render(),S.clsStart.me)' }, expect: ['p===r0'] },
+    { at: 0.6, evalAs: { q: '(S.bank=200,smartSpend(),UI().seq=null,render(),S.clsStart.me)' }, expect: ['q===r0'] }] },
 ];
