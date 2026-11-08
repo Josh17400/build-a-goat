@@ -105,6 +105,29 @@ Testers kept playing careers until they reached THE GOAT, and listed every bug, 
 - The Legacy card has a second bar: progress to the next tier ("Next: Perennial All-Star · 51 to go"). The GOAT step now matches the real tier rule.
 - Haptics on iPhone: a light buzz on draft night, a heavy one for rings and MVPs, success and error buzzes on gambles and final plays. Never on plain taps or point spending. A Vibration switch sits in Sound settings (iPhone only).
 
+### Round G6 (3 testers)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Art director, fifth pass (plus the career ending) | Rookie career to the plaque | 4/5 |
+| Hall of Fame center | **THE GOAT on career 2** (6 MVPs, 3 rings, score 389); career 1 Top 10 All-Time | 4/5 |
+| First-time player on Rookie | All-Star tier; first ten minutes rated 7/10 for clarity | 4/5 |
+
+**Fixed after G6**
+- DPOY, final tune: the player's defense rating tops out at 99 like everyone else's, and voters tire of repeat winners (each past DPOY costs a little, for league stars too). The G6 center won 11 before this. Measured over 30 careers each: an all-in rim protector averages 2 a career (most 0 to 4, rarely up to 9), a balanced build about 0.4, and nobody wins in their first two seasons.
+- Every MVP gets a banner ("MVP #3"), and a title plus MVP season says both ("Ring #2 and MVP").
+- The menu no longer shows "-203 GTP, 210 in cart" after perks were paid for.
+- Graying is even across hair colors (black hair now shows salt-and-pepper at 36, auburn no longer goes fully silver), and headwear keeps the color it had when young.
+- The Final Buzzer card is a full card: big aged portrait, age and seasons, why it ended, and points, rings, All-Stars and MVPs. The Final Season window says up front that it is your last season.
+- The plaque wears your main team's colors (most seasons, title years count double), not your last team's.
+- A jersey is retired for stars, not for a 5-point bench player who caught one ring.
+- Whole Career pauses before your final season if you have 10+ points banked, and the hub shows "This is your final season: spend your points now".
+- The college-title highlight comes from the season you actually won it (it used to trust a badge and say "age 18").
+- A 30-minute starter is no longer described as "in a small role".
+- The Stopper Job event only goes to players who can defend.
+- No two classmates share a last name.
+- How to play explains that Rookie earns no GTP or gems.
+
 ## Phase 2: Characters and creator
 
 **New creator (Look step)**

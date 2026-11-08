@@ -24,6 +24,6 @@ export default [
       expect: ['JSON.parse(r)[2]===0', 'JSON.parse(r)[0]===0||JSON.parse(r)[1]>=JSON.parse(r)[0]-1'] }] },
   { name: 'Whole Career pauses before a final season with points banked, and the hub says spend them', seed: 86, steps: [
     { at: 0.3, evalAs: { x: start } },
-    { at: 0.4, evalAs: { r: `(()=>{${toPros}let g=0;while(S.nba.length<2&&g++<30){if(S.pend)choose(S.pend.kind==='clutch'?S.pend.best:0);else simNBA();}S.pend=null;S.queue=[];UI().seq=null;S.farewell=S.nba.length+1;S.bank=40;const u=UI();u.auto=1;u.goOn=0;autoStep();const h=document.getElementById('app').textContent;const ok=u.autoWhy==='points'&&S.nba.length===2;u.auto=0;return ok&&(ovr()<63||/final season/.test(h));})()` },
+    { at: 0.4, evalAs: { r: `(()=>{${toPros}let g=0;while(S.nba.length<2&&g++<30){if(S.pend)choose(S.pend.kind==='clutch'?S.pend.best:0);else simNBA();}S.pend=null;S.queue=[];UI().seq=null;S.farewell=S.nba.length+1;S.bank=40;const u=UI();u.auto=1;u.goOn=0;autoStep();const h=document.getElementById('app').textContent;const ok=u.autoWhy==='points'&&S.nba.length===2;u.auto=0;return ok&&(ovr()<63||/points to spend/.test(h))&&(h.match(/Spend points/g)||[]).length<=1;})()` },
       expect: ['r===true'] }] },
 ];
