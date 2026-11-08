@@ -649,3 +649,61 @@ Three high-effort agents each wrote a proposal (UI and beauty, content and expan
 - **iOS save safety:** the in-progress career is not copied to the phone's native storage, so an iOS storage purge would wipe a 30-minute career. The save is also 710 to 830 KB by career end, mostly 1,000 retired league players kept in full. Recommended: mirror the run at each season end and slim retired players. Not changed tonight because it touches the native save path.
 - **The meter and tier code disagreed** on whether THE GOAT needs 5 All-Stars. *Fixed tonight* (the meter now follows the tier rule).
 
+
+## Afternoon: OVR rework (Nov 8)
+
+You asked for two things: any build can reach 99, and players start low and climb. Both are in. They are committed locally and not pushed.
+
+### What changed
+- **Any style can reach 99.** OVR is now the better of two ratings: the old all-around rating, and a new core rating built on your style's 7 most important skills. Get those 7 to 99 and the rest of your game to about 72, and you are a 99 in that style. This holds for all 13 styles, and a test checks it. Below the top, nothing changes.
+- **Your style can change as you spend.** OVR rates you at your best-fitting style. Lean into new skills and the label follows once you have a clear edge, with a message when it happens.
+- **You start at 25.** Every skill starts at 25 (it was 40), so you are a 25 before you place a point. Budgets are now 350 (Rookie), 310 (Pro) and 260 (Hall of Fame), which puts average starts at about 50, 45 and 40.
+- **The climb makes up the gap.** The hidden ceiling sits higher, and high school and college add a share of the lower start each season. By the draft, players are back where they were on the old build.
+- **The projection card has a Road to 99 note.** It lists your 7 core skills with their current values, marks the ones that are as high as they go ("max"), and shows where the rest of your game stands against the 72 bar. Once your core is maxed, it tells you to raise the rest.
+
+### GOAT odds (sims, 2,500 careers each)
+| Difficulty | Casual | Smart | Target |
+|---|---|---|---|
+| Rookie | 9.1% | 33% | ~9–10% casual |
+| Pro | 0.4% | 4.9% | ~1% / 4.3–5% |
+| Hall of Fame | 0.2% | 2.0% | ~0.5% / 2–2.5% |
+
+Pro casual is a little under target. Raising it would also push Pro smart over 5%.
+
+How often careers reach 99 (600 sims each):
+
+| Difficulty | Reach 99: casual / smart | Reach 90+: casual / smart |
+|---|---|---|
+| Rookie | 5% / 31% | 55% / 98% |
+| Pro | 0.3% / 5.5% | 3% / 27% |
+| Hall of Fame | 0% / 3.3% | 1.5% / 12.5% |
+
+### Bugs found and fixed along the way
+- New players were created with every skill at 40, whatever the floor was, so the weaker start did nothing at first.
+- Penalty floors of 30 would have *raised* a skill sitting at 25. They now stop at 25.
+- **Found by the playtesters:** skills could not read below 25 on court. With the new start, any size penalty froze a skill at "Maxed for your build": a guard's Block, a center's Three-Point, a wing's Ball Handle. The floor is now 1, and a test covers the shortest and tallest heights.
+- The creator's Max button could push a skill past 99 and waste points. It now stops at 99.
+
+### Playtest round 1 (before the frozen-skill fix)
+- **Pro point guard:** went 25 → 57 in the creator → 69 at the draft (#8). Peaked at 78, held back by the frozen skills.
+- **Rookie center:** went 25 → 61 → 82 at the draft (#1). Peaked at 97 with 4 rings and 3 MVPs.
+- **Hall of Fame wing:** went 25 → 48 → 64 at the draft (#39). Peaked at 77.
+- **What all three said:** the creator with +10 and Max felt great, and the style change in the creator was well explained. All three rated it fun 4/5.
+
+### Playtest round 2 (after the fixes)
+- **Rookie center:** went 25 → 65 → 95 at the draft (#1). Reached 99 at age 21 and held it, with 4 rings and 5 MVPs. The tester called Rookie far too easy for a min-maxer.
+- **Pro point guard:** went 25 → 55 → 67 at the draft (#13). Peaked at 79. The core was maxed by age 23, but the rest of his game sat at about 30 against the 72 bar, and growth stops in the prime years.
+- **Hall of Fame wing:** went 25 → 49 → 63 at the draft (#29). Peaked at 80.
+- **Confirmed fixed:** frozen skills, the "now" values, and the creator stopping at 99.
+- **Found and fixed after this round:**
+  - The ✓ tick never showed, because the emoji renderer has no icon for it. The note now says "max".
+  - The note said "get these to 99" even for core skills a body tops out below 99, and even after all 7 were done.
+  - The creator's lean hint named skills that were already at 99.
+
+### Still open
+- At the same OVR, players still score about 3 points a game more than NPCs. This was true before today, and the new build is slightly closer.
+- When a summer penalty hits a skill already at 25, the message still says "-3 Three-Point".
+- Free agency cards can show your OVR from before you spent that offseason's points.
+- A high school growth spurt can cut a skill you already paid to max (Ball Handle 98 → 92).
+- One freshman recap said +29 points while 33 arrived in the bank.
+- **Your call:** on Pro, 99 is rare (5.5% of smart careers, 0.3% of casual ones). The main block is the "rest of your game at 72" bar, because those skills now start at 25. Making 99 easier to reach would also raise the GOAT odds unless something else tightens.
