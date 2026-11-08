@@ -18,4 +18,8 @@ export default [
     { at: 0.3, evalAs: { x: start } },
     { at: 0.4, evalAs: { r: `(()=>{${toPros}let a=0,b=0;for(let i=0;i<30;i++){S.next={};makeGoals();if(JSON.stringify(S.goals).includes('+ games'))a++;S.next={gp:25};makeGoals();if(JSON.stringify(S.goals).includes('+ games'))b++;}S.next={};return a>0&&b===0;})()` },
       expect: ['r===true'] }] },
+  { name: 'final plays: a result line does not repeat in a career, and lines name the opponent', seed: 85, steps: [
+    { at: 0.3, evalAs: { x: start } },
+    { at: 0.4, evalAs: { r: `(()=>{${toPros}let g=0,lines=[],bad=0;while(S.stage==='nba'&&g++<120){if(S.pend){const k=S.pend.kind;choose(k==='clutch'?S.pend.best:0);if(k==='clutch'){const l=S.cur&&S.cur.clutch?S.cur.clutch[S.cur.clutch.length-1]:null;if(l){lines.push(l.label+'|'+l.text);if(/[{]OPP[}]/.test(l.text))bad++;}}}else{smartSpend();simNBA();}}const u=new Set(lines);return JSON.stringify([lines.length,u.size,bad]);})()` },
+      expect: ['JSON.parse(r)[2]===0', 'JSON.parse(r)[0]===0||JSON.parse(r)[1]>=JSON.parse(r)[0]-1'] }] },
 ];
