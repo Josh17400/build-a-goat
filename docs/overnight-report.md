@@ -5,7 +5,7 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 ## Read this first
 
 **What happened overnight**
-- 14 rounds of 3 Witness playtesters (42 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (88 automated tests, all passing) and committed locally.
+- 15 rounds of 3 Witness playtesters (45 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (88 automated tests, all passing) and committed locally.
 - Testers reached THE GOAT on Rookie (five times, usually on the first or second career), Pro (a rim protector on career 3) and Hall of Fame (a center on career 2, with perks). Most Pro and Hall of Fame careers ended at Hall of Famer or Top 10 All-Time, which is where you want them.
 - Phase 2 rebuilt the character creator and polished the character art (aging, team colors, portraits on banners and the Final Buzzer card).
 - Phase 3: three high-effort leads proposed and debated what to add next. Their joint top 10 is below, and the full documents are in `docs/phase3/`.
@@ -343,6 +343,28 @@ So point guards and bigs hit a lower ceiling for the same effort. That explains 
 - League award tiles show "M. Duvall" instead of "DUVALL" (several players shared a surname).
 - No Request-a-trade card right after a trade.
 - A stale "you have 0 points" message from college no longer shows on the pro spend screen.
+
+### Round G15 (3 testers)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Daily Build | Perennial All-Star (5 rings); Daily rules "mostly clear" | n/a |
+| Pro Post Bully | Hall of Famer (33,036 points, ROY, 3 rings, 7 All-Stars) | 4/5 |
+| Art director, ninth pass | 16-season Rookie career to the plaque; gentle graying, stable headwear and the Final Buzzer confirmed | 4/5 |
+
+**Fixed after G15**
+- The creator preview shrinks as soon as it pins to the top (it only shrank near the bottom of the page).
+- A new rival never shares your last name.
+- The plaque story only blames injuries when there were some (a career that ended for lack of a contract said "injuries and bad luck").
+- With the Daily on, the difficulty card says "Earns GTP and achievements" (it still said gems).
+- Final-play skill tags name every skill that feeds the odds ("your Dunk and Vertical are low", not "your Dunk is low" with Dunk at 86). Post-ups use Post Moves and Strength together, which is why a 99 post scorer with low Strength still saw "Fair odds".
+- How to play, opened mid-career, ends with "Back to your career" instead of "Let's build".
+
+**Seen, not changed**
+- All-Star voting still lags for high scorers outside the top 5 (28.2 points, 9th in scoring, voted 37th).
+- Trades and midseason moments can be absent for many seasons in a row, then cluster.
+- The league's surname pool is small (four players with the same surname in one top 10).
+- A few story lines repeat in back-to-back seasons (badge "fades away"), and the season-high line sat at exactly 38 points for several early seasons.
 
 ## GOAT odds (checked overnight)
 
