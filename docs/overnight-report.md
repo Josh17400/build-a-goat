@@ -5,7 +5,7 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 ## Read this first
 
 **What happened overnight**
-- 22 rounds of 3 Witness playtesters (66 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (89 automated tests, all passing) and committed locally.
+- 23 rounds of 3 Witness playtesters (69 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (89 automated tests, all passing) and committed locally.
 - Testers reached THE GOAT on Rookie (seven times, on the first or second career), Pro (a rim protector on career 3) and Hall of Fame (a center on career 2, with perks). Most Pro and Hall of Fame careers ended at Hall of Famer or Top 10 All-Time, which is where you want them.
 - Phase 2 rebuilt the character creator and polished the character art (aging, team colors, portraits on banners and the Final Buzzer card).
 - Phase 3: three high-effort leads proposed and debated what to add next. Their joint top 10 is below, and the full documents are in `docs/phase3/`.
@@ -35,7 +35,7 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 10. **Ship it?** If you're happy, push and start TestFlight. Nothing has been pushed.
 
 **Where things are**
-- 41 local commits on `feat/ios-monetization` since last night's push (none pushed).
+- About 45 local commits on `feat/ios-monetization` since last night's push (none pushed).
 - Every playtest report is in `witness/playtests/<name>/report.md` (g1a through g18c), with replays and screenshots.
 - The phase 3 proposals and critiques are in `docs/phase3/`.
 - To ship when you're ready: `git push origin HEAD:main`, then `gh workflow run ios.yml --ref main --repo Josh17400/build-a-goat`.
@@ -503,6 +503,22 @@ So point guards and bigs hit a lower ceiling for the same effort. That explains 
 - When you finish top 8 in DPOY voting and lose, the season card names the winner.
 
 **Checked, not a game bug:** "Close menu left the menu open" comes from the close animation's 230 ms timer, which the test harness's frame-stepped clock may not advance; it closes normally on a device.
+
+### Round G23 (3 testers, last round of the night)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Pro Slasher | 1 ring by 28 after a trade and a free-agent recruit | n/a |
+| Rookie rim protector | 80 OVR at 27; the GOAT race line and spend screen read clearly | n/a |
+| Creator final check | Every creator fix confirmed in game; Rookie career to Hall of Famer | 4/5 |
+
+**Fixed after G23**
+- **Creator strip, last bug:** shrinking the preview at the very bottom of the Uniform tab made the page shorter than the scroll position, so the app jumped and a black band appeared. The strip now keeps the page height the same, and it keeps the At 18 / At 36 toggle visible.
+- The Final Buzzer portrait smiles instead of keeping a shouting expression.
+- The Final Season card hides "points to spend" lines once the career is over.
+- "Stay an Athletic Finisher" (was "Stay a Athletic Finisher").
+- The bonus line says "defensive stats" when steals and blocks earned it (it said "big season" for a 7-point bench year).
+- When you finish top 8 in DPOY voting and lose, the season card names the winner (from G22).
 
 ## GOAT odds (checked overnight)
 
