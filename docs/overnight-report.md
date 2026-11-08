@@ -151,7 +151,7 @@ Testers kept playing careers until they reached THE GOAT, and listed every bug, 
 - Team colors work, but nobody notices them when the team color happens to match your own creator kit. The team identity proposal (fixed colors plus a tag and crest) would fix this.
 - Pacing: Whole Career takes 3 to 5 taps a season. One tester said that felt right; others wanted fewer. The phase 3 "stop budget" proposal covers this.
 - Position labels follow height (a 6'4" Sharpshooter is listed PG).
-- The Rim Protector premade projects as "Glass Cleaner" on some bodies.
+- The Rim Protector premade projected as "Glass Cleaner" at its own default body. *Fixed:* its skill mix now leans on blocks and interior defense, and it reads as Rim Protector on every body 6'8" and up.
 
 ## Phase 2: Characters and creator
 
