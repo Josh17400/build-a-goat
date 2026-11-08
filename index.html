@@ -1004,7 +1004,7 @@ function seasonPlayoffs(){const c=S.cur,t=S.traits,L=S.L,z=L.z,{n,a,prevO,o,gp,m
   let gs=0;for(const x of aw)gs+=GTP_AW[x]||0;if(mins>=28&&gp>=40)gs+=1;let gtp=earnGtp(gs,`Year ${n+1}`);
   const bpParts=[],bpAdd=(l,v)=>{if(v>0)bpParts.push([l,v]);};let aw0=0;for(const x of aw)aw0+=BANK_AW[x]||0;bpAdd(aw.filter(x=>BANK_AW[x]).map(x=>x==='Champion'?'title':x).join(', '),aw0);
   if(mins>=28&&gp>=40)bpAdd('starter',3);if(rounds>=0)bpAdd('playoffs',1+rounds);
-  if(gp>=50)bpAdd('big season',(ppg>=25?4:ppg>=20?2:0)+(rpg>=10?2:0)+(apg>=8?2:0)+(spg+bpg>=3?2:0));
+  if(gp>=50)bpAdd(ppg>=20||rpg>=10||apg>=8?'big season':'defensive stats',(ppg>=25?4:ppg>=20?2:0)+(rpg>=10?2:0)+(apg>=8?2:0)+(spg+bpg>=3?2:0));
   if(best)bpAdd('signature game',best.pts>=60?4:best.pts>=50?2:0);
   if(a<=24&&gp>=40)bpAdd('young player development',2);
   if(n===0&&gp>=40)bpAdd('rookie season',3);
