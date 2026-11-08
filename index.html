@@ -621,7 +621,7 @@ function growWhy(o0,st,x){const o1=OV(),d=o1-o0,t=S.traits,age=S.age,r=[],dp=S.d
   if(st==='nba'&&age>=30&&t.dur<=2)r.push('low Durability speeds the decline');
   if(x.hurt)r.push('the injury cost you reps');
   if(st!=='nba'){const room=S.ceiling-(S.natO??ovr())+scoutNoise();r.push(room>8?'scouts see lots of room to grow':room>3?'scouts see some room left':st==='hs'||age<=20?'scouts say the rest is up to your work':'scouts think you are close to your peak');}
-  const a=archetype();let evo='';if(S.archId&&a.id!==S.archId){const pair=S.archId+'>'+a.id,lockId=S.idLock&&Object.keys(ARCHS).find(k=>ARCHS[k].n===S.idLock);if(lockId===a.id)S.idLock=null;if(st==='nba'&&lockId!==a.id&&!(S.evoDone||[]).includes(pair)&&S.nba.length-(S.evoAt??-9)>=4){(S.evoDone=S.evoDone||[]).push(pair);S.evoAt=S.nba.length;S.evoPend={from:S.archId,to:a.id};evo=` · 🔄 Your game is changing: you now play like a${/^[AEIOU]/.test(a.n)?'n':''} ${a.n}. Your call this summer`;}else evo=` · 🔄 Your game has evolved: you now play like a${/^[AEIOU]/.test(a.n)?'n':''} ${a.n}`;}S.archId=a.id;
+  const a=archetype();let evo='';if(S.archId&&a.id!==S.archId){const pair=S.archId+'>'+a.id,lockId=S.idLock&&Object.keys(ARCHS).find(k=>ARCHS[k].n===S.idLock);if(lockId===a.id)S.idLock=null;if(st==='nba'&&lockId!==a.id&&!(S.evoDone||[]).includes(pair)&&S.nba.length-(S.evoAt??-9)>=4){(S.evoDone=S.evoDone||[]).push(pair);S.evoAt=S.nba.length;S.evoPend={from:lockId||S.archId,to:a.id};evo=` · 🔄 Your game is changing: you now play like a${/^[AEIOU]/.test(a.n)?'n':''} ${a.n}. Your call this summer`;}else evo=` · 🔄 Your game has evolved: you now play like a${/^[AEIOU]/.test(a.n)?'n':''} ${a.n}`;}S.archId=a.id;
   return[dp>0?1:d<0?-1:0,`${dp>0?`📈 Development: +${dp} pt${dp===1?'':'s'} to spend`:d<0?`📉 OVR ${o0} to ${o1} (${d})`:'➖ No growth this year'}${dp>0&&d<0?` · OVR ${o0} to ${o1} (${d})`:''}: ${r.join(' · ')}${evo}`];}
 const nablAgeF=a=>a<=27?1:a===28?.9:a===29?.8:Math.max(.25,.8-(a-29)*.15);
 function addBank(n){n*=3;if(n>=0)S.bank+=n*2;else{const t=S.bank+n;if(t<0){S.bank=0;S.bankShort=-t;declineTo(ovr()+t*0.15);}else S.bank=t;}}
@@ -758,7 +758,7 @@ function simCol(){syncPos();S.clsStart=clsSnap();S.colNext=false;S.lastResult=nu
   const maxY=S.redshirt?5:4;if(S.col.length>=maxY)S.mustDeclare=true;}
 function declare(){S.lastResult=null;S.summerNote=null;S.projD=projRange();S.combine=runCombine();const miss=gauss()*2.5,g=scoutGrade()+miss+S.combine.adj;S.scoutMiss=gauss()*5;S.ceiling+=gauss()*4-S.scoutMiss*.5;S.scoutAtDraft=g;S.pick=pickFor(g);S.ovrAtDraft=OV();
   S.age=draftAge();leagueDraft();S.stage='draft';render();}
-function startNBA(){S.stage='nba';makeGoals();render();scrollTo(0,0);}
+function startNBA(){S.stage='nba';UI().spMsg=null;makeGoals();render();scrollTo(0,0);}
 function returnSchool(){S.summerPend=summerCol();S.colNext=true;render();}
 
 // ---------- NBA ----------
@@ -1064,7 +1064,7 @@ function nextQ(){while(S.queue&&S.queue.length){const x=S.queue.shift(),p=x.lazy
 function choose(i){const p=S.pend;if(!p)return;const nx0={...(S.next||{})},tm0=S.team,tag0=(p.opts[i]&&p.opts[i].desc)||'';S.lastResult=null;const yr=S.nba.length+1,bk0=S.bank,msg=p.opts[i].fn();
   // NABL offseason: a summer choice that works out pays bonus points, more for riskier calls (safe 1, coin flips about 5)
   if(p.kind==='summer'&&S.lastResult)S.sumRes=S.lastResult;if(p.kind==='summer'&&S.lastResult&&S.lastResult.ok){const o=p.opts[i],base=o.p0!=null?Math.max(1,Math.round((1-o.p0)*(o.p0<.5?14:10))):1,b=Math.max(1,Math.round((/High/.test(tag0)?5:/Medium/.test(tag0)?3:1)*nablAgeF(S.age)));S.bank+=b;{const tot=S.bank-bk0;S.lastResult.text=ptsText(S.lastResult.text).replace(/\s*[·.,]?\s*\+\d+ pts?\b/g,'').replace(/[\s·.,:]+$/,'')+`. +${tot} pt${tot===1?'':'s'}`;}}if(msg&&!S.lastResult)S.lastResult={ok:true,text:msg,n:1};if(msg)(S.log=S.log||[]).push(`Year ${yr}: ${msg}`);
-  if(msg&&S.stage==='nba'&&p.kind==='mid')S.midNote=msg;else if(msg&&S.stage==='nba'&&!['summer','clutch'].includes(p.kind))(S.offLog=S.offLog||[]).push(msg);if(S.stage==='nba'&&S.team!==tm0&&p.kind!=='mid'&&typeof makeGoals==='function'){makeGoals();if(S.goals)S.goals.moved=tShort(S.team);}
+  if(msg&&S.stage==='nba'&&p.kind==='mid')S.midNote=msg;else if(msg&&S.stage==='nba'&&!['summer','clutch'].includes(p.kind))(S.offLog=S.offLog||[]).push(msg);if(S.stage==='nba'&&S.team!==tm0&&p.kind!=='mid'&&typeof makeGoals==='function'){if(p.kind==='trade')S.tradeAskAt=S.nba.length;makeGoals();if(S.goals)S.goals.moved=tShort(S.team);}
   if(S.goals&&S.rival&&S.rival.team===S.team)S.goals.list=S.goals.list.filter(g=>g.k!=='rvppg');
   if(S.pend===p)S.pend=S.stage==='nba'?nextQ():null;
   if(p.kind==='clutch'&&!S.cur&&['nba','end'].includes(S.stage))startSeq();
@@ -1094,13 +1094,13 @@ function faPend(){const last=S.nba[S.nba.length-1],rv=S.rival&&!S.rival.retired&
     if(o>=80)pro.push(`You are a star (${OV()} OVR)`);else if(o>=72)pro.push(`You are a proven starter (${OV()} OVR)`);else if(o<64)con.push(`Your ${OV()} OVR is below what they want`);
     if(last.ppg>=20)pro.push(`You scored ${f1(last.ppg)} a game last year`);else if(last.ppg<8)con.push(`Only ${f1(last.ppg)} points a game last year`);
     if(ev>=.4&&gStr(want)>=o+2&&eff(want)>=o-3)pro.push(`This era pays for ${catName(want)}, and that is your game`);else if(ev<=-.4&&gStr(want)<=o-4)con.push(`Teams right now want ${catName(want)}, not your strength`);
-    if(fit==='Great')pro.push(`You fill their biggest need: ${catName(need)}`);else if(fit==='Poor')con.push(`They need ${catName(need)}, and yours trails the rest of your game`);
+    if(fit==='Great'&&eff(need)>=o-4)pro.push(`You fill their biggest need: ${catName(need)}`);else if(fit==='Great')pro.push(`They need ${catName(need)}, and your best ${catName(need).toLowerCase()} skills help`);else if(fit==='Poor'&&eff(need)<o-6)con.push(`They need ${catName(need)}, and yours trails the rest of your game`);
     if(S.age<=26)pro.push(`At ${S.age}, your prime is ahead of you`);else if(S.age>=31)con.push(`At ${S.age}, they worry about decline`);
     if(S.injuryProne)con.push('Your injury history worries them');
     if(stay)pro.push('Loyalty: they know you and want to keep you');
     if(str>=62&&!stay)con.push('Contenders are picky about who they sign');
     if(kind==='Rebuilding'&&/Featured|Co-star|Starter/.test(role))pro.push('A rebuilding team can hand you a big role');
-    return{why:{pro,con},label:`${stay?'🤝':'🏀'} ${stay?'Re-sign with the ':''}${team}`,desc:`${kind} · Interest: ${lvl} · ${fit} fit (they need ${catName(need)}) · ${role}`,
+    return{why:{pro,con},label:`${stay?'🤝':'🏀'} ${stay?'Re-sign with the ':''}${team}`,desc:`${kind}${lw!=null?` (${lw}-${82-lw} last season)`:''} · Interest: ${lvl} · ${fit} fit (they need ${catName(need)}) · ${role}`,
       fn:()=>{S.team=team;S.teamStr=str;S.usage=u;S.minAdj=m;S.roleMax=0;S.roleMin=/Featured|Max money/.test(role)?32:/Co-star/.test(role)?30:/Starter/.test(role)?28:/Rotation/.test(role)?18:0;return stay?`You re-signed with the ${team}`:`You signed with the ${team}`;}};};
   const used=new Set([S.team,S.rival?.team]),nt=()=>{let t,g=0;do t=pick(TEAMS);while(used.has(t)&&g++<50);used.add(t);return t;};
   const opts=[offer(S.team,S.teamStr,true),...['top','mid','bot'].map(k=>{const tm=lgTeam(k,used);return offer(tm,teamStrOf(tm));})];
@@ -1211,6 +1211,7 @@ const ERAS=[
   {id:'30s',name:'🚀 The 2030s',d:'Positionless ball. Everyone handles, everyone shoots, and basketball IQ rules.',w:{iq:.05,pla:.04,sho:.03,ath:.01,fin:-.04,reb:-.05,def:-.04},pace:1.05,tp:.02},
   {id:'20s',name:'🎯 The 2020s',d:'Let it fly. Shooters are kings and slow bigs get played off the floor.',w:{sho:.07,pla:.02,fin:-.03,reb:-.04,def:-.02},pace:1.08,tp:.015}];
 const era=()=>ERAS.find(e=>e.id===S.era)||ERAS[3];
+const shortNm=n=>{if(!n)return'—';const w=n.split(' ');return w.length>1?w[0][0]+'. '+w.slice(-1)[0]:n;};
 const mileNote=()=>{const p=Math.round(career().pts||0),m=[10000,20000,30000,40000].find(x=>x>p);return m&&m-p<=3000?` You are ${(m-p).toLocaleString()} points from ${m.toLocaleString()}.`:'';};
 const onlineEra=()=>['10s','20s','30s'].includes(S.era);
 // era taste: what teams of this era pay for. Changes interest (draft buzz, free agency), never OVR
@@ -2007,7 +2008,7 @@ function leagueCard(open){const L=S.L;if(!L||!S.nba.length)return'';const last=S
   const hs=L.hist[L.hist.length-1],cls=L.P.filter(p=>p.dyr===L.myClassYr&&p.pick).map(p=>({name:p.name,team:p.team,pick:p.pick,ovr:dsp(p.ovr),pts:p.car.pts,ret:p.retired,rv:p===S.rival}));
   cls.push({name:S.name+' (you)',team:S.team,pick:S.pick,ovr:OV(),pts:career().pts,me:1});cls.sort((a,b)=>b.pts-a.pts);
   return`<details class="card" ${open?'open':''}><summary>🏟️ The League · Year ${S.nba.length}</summary>${(last.news||[]).length?`<div style="margin-top:8px">${last.news.map(x=>`<div class="ev">${x}</div>`).join('')}</div>`:''}
-  ${hs?`<div class="stat3" style="margin-top:10px">${[['CHAMPION',tShort(hs.champ)],['MVP',hs.mvp===S.name?'You':hs.mvp&&hs.mvp.split(' ').slice(-1)[0]===(S.name||'').split(' ').slice(-1)[0]?hs.mvp:hs.mvp?.split(' ').slice(-1)[0]||'—'],['SCORING',(hs.sc||'—').split(' ').slice(-2).join(' ')]].map(([l,v])=>`<div class="stat"><b>${esc(v)}</b>${l}</div>`).join('')}</div>
+  ${hs?`<div class="stat3" style="margin-top:10px">${[['CHAMPION',tShort(hs.champ)],['MVP',hs.mvp===S.name?'You':shortNm(hs.mvp)],['SCORING',hs.sc?shortNm(hs.sc.replace(/\s*\(.*$/,''))+(hs.sc.match(/\(.*\)/)||[''])[0].replace(/^/,' '):'—']].map(([l,v])=>`<div class="stat"><b>${esc(v)}</b>${l}</div>`).join('')}</div>
   <div class="sub" style="margin-top:6px">Finals MVP: ${hs.fmvp===S.name?'you':hs.fmvp||'—'} · DPOY: ${hs.dpoy===S.name?'you':hs.dpoy||'—'} · Rookie of the Year: ${hs.roy===S.name?'you':hs.roy||'—'}</div>`:''}
   <details><summary>Scoring leaders</summary><div class="sub">Players with 65+ games (the scoring title rule)</div>${list(byP,'<th>PPG</th><th>RPG</th><th>APG</th>',x=>`<td>${f1(x.ppg)}</td><td>${f1(x.rpg)}</td><td>${f1(x.apg)}</td>`)}</details>
   <details><summary>Top players (OVR)</summary>${list(byO,'<th>OVR</th><th>MVP</th><th>💍</th>',x=>`<td>${x.ovr}</td><td>${x.me?career().cnt.MVP||0:x.mvps}</td><td>${x.me?career().cnt.Champion||0:x.rings}</td>`)}</details>
@@ -2526,7 +2527,7 @@ const SKN=Object.fromEntries(Object.values(SUBS).flat());
 // live "You project as" card: best role, its OVR, the top three fits, and what to raise to lean into the next one (OVR math only)
 function projCard(){const a=archetype(),f=a.fits.slice(0,3),nx=(f.find(([id])=>id!==a.id)||f[1])[0],base=archRaw()[nx];
   const tips=SUBKEYS.filter(k=>S.stage==='build'?S.attrs[k]<BUILD_MAX:!atCap(k)).map(k=>{const v=S.attrs[k];S.attrs[k]=Math.min(99,v+5);const x=archRaw()[nx]-base;S.attrs[k]=v;return[k,x];}).sort((x,y)=>y[1]-x[1]).slice(0,3).map(x=>SKN[x[0]]);
-  return`<div class="card"><div class="sh">🧬 <span class="grow">You project as</span><b>OVR ${OV()}</b></div><div class="pn">${a.name}</div>${a.fits[0][0]!==a.id?`<div class="note" style="margin:2px 0 6px">Leaning toward ${ARCHS[a.fits[0][0]].n}: it takes a clear edge to switch styles</div>`:''}${f.map(([id,v])=>`<div class="fit"><span>${ARCHS[id].n}</span><div class="bar"><i style="width:${clamp(dsp(v),0,99)}%"></i></div><b>${dsp(v)}</b></div>`).join('')}<div class="note">OVR rates you at your best fit. To lean into <b>${ARCHS[nx].n}</b>, raise ${tips.join(', ')} (this shapes your playstyle more than your OVR).</div>${projBadges(a)}</div>`;}
+  return`<div class="card"><div class="sh">🧬 <span class="grow">${S.idLock?'Your style':'You project as'}</span><b>OVR ${OV()}</b></div><div class="pn">${S.idLock?esc(S.idLock):a.name}</div>${S.idLock&&S.idLock!==a.name?`<div class="note" style="margin:2px 0 6px">You chose to keep this style. Your skills currently lean ${a.name}.</div>`:''}${a.fits[0][0]!==a.id?`<div class="note" style="margin:2px 0 6px">Leaning toward ${ARCHS[a.fits[0][0]].n}: it takes a clear edge to switch styles</div>`:''}${f.map(([id,v])=>`<div class="fit"><span>${ARCHS[id].n}</span><div class="bar"><i style="width:${clamp(dsp(v),0,99)}%"></i></div><b>${dsp(v)}</b></div>`).join('')}<div class="note">OVR rates you at your best fit. To lean into <b>${ARCHS[nx].n}</b>, raise ${tips.join(', ')} (this shapes your playstyle more than your OVR).</div>${projBadges(a)}</div>`;}
 function projBadges(a){const sig=ARCH_SIG[a.id].map(id=>BADGE[id].n).join(' · ');let start='';
   if(S.stage==='build'){const q=badgeQual(),got=BADGES.filter(b=>q[b.id]).sort((x,y)=>q[y.id]-q[x.id]);start=`<div class="note">${got.length?`Badges you can earn in your first season: ${got.map(b=>`${BTN[q[b.id]]} ${b.n}`).join(' · ')}`:`No badges in reach yet: a skill at ${BT[0]} earns your first Bronze.`}</div>`;}
   return`${start}<div class="note">Signature badges: ${sig}</div>`;}

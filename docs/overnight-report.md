@@ -5,7 +5,7 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 ## Read this first
 
 **What happened overnight**
-- 12 rounds of 3 Witness playtesters (36 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (87 automated tests, all passing) and committed locally.
+- 13 rounds of 3 Witness playtesters (39 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (87 automated tests, all passing) and committed locally.
 - Testers reached THE GOAT on Rookie (several), Pro (a rim protector on career 3) and Hall of Fame (a center on career 2, with perks). Most Pro and Hall of Fame careers ended at Hall of Famer or Top 10 All-Time, which is where you want them.
 - Phase 2 rebuilt the character creator and polished the character art (aging, team colors, portraits on banners and the Final Buzzer card).
 - Phase 3: three high-effort leads proposed and debated what to add next. Their joint top 10 is below, and the full documents are in `docs/phase3/`.
@@ -307,6 +307,25 @@ So point guards and bigs hit a lower ceiling for the same effort. That explains 
 **Needs your call**
 - **Reset all progress erases purchased gems and equipment.** The warning now says so, but you may prefer to keep bought gems through a reset (App Store reviewers and players can treat losing purchases as a problem).
 - A late-career ring as a 12-minute bench player counts in full toward the GOAT score; one tester suggested ring credit scale with role.
+
+### Round G13 (3 testers)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Rookie point guard, tap-guard check | Perennial All-Star (4 All-Stars, no rings); the tap guard never misfired | 3/5 |
+| Pro pure scorers (two careers) | Hall of Famer (6 scoring titles), then Top 10 All-Time (7 rings, 8 scoring titles, score 318), **0 MVPs** | n/a |
+| Creator and menus, final pass | Every menu plus a 16-season Pro career | 4/5 |
+
+**Fixed after G13**
+- **Tie-game final plays:** one of tonight's new free-throw lines said "You split the free throws. Not enough." in a tied game, where a split wins; it is replaced. A missed final shot with the score tied now says the game goes to overtime and the other team pulls away, instead of reading like an outright loss.
+- **Daily Build and the perk cart:** turning the Daily on sets your cart aside, and turning it off gives it back (it used to empty the cart silently).
+- "Ask Out?" fires at most once every three seasons (it came up in back-to-back seasons with the same text).
+- "You maxed out your tools" no longer appears when you retire with 40+ unspent points.
+- Achievements uses the trophy icon on its own page too.
+- The GTP Store entry on the career recap says it leaves the recap.
+- Undo clears the old "raised X" message on the spend screen.
+
+**The pure-scorer MVP wall, confirmed again:** 14 scoring titles across two careers, several on 63- to 70-win teams, and no MVP. In one career the player finished 2nd four times behind a teammate with 8 MVPs. This is the single biggest balance question for the next pass.
 
 ## GOAT odds (checked overnight)
 
