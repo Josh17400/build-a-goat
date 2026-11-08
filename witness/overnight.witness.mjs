@@ -26,4 +26,8 @@ export default [
     { at: 0.3, evalAs: { x: start } },
     { at: 0.4, evalAs: { r: `(()=>{${toPros}let g=0;while(S.nba.length<2&&g++<30){if(S.pend)choose(S.pend.kind==='clutch'?S.pend.best:0);else simNBA();}S.pend=null;S.queue=[];UI().seq=null;S.farewell=S.nba.length+1;S.bank=40;const u=UI();u.auto=1;u.goOn=0;autoStep();const h=document.getElementById('app').textContent;const ok=u.autoWhy==='points'&&S.nba.length===2;u.auto=0;return ok&&(ovr()<63||/points to spend/.test(h))&&(h.match(/Spend points/g)||[]).length<=1;})()` },
       expect: ['r===true'] }] },
+  { name: 'Next Decision: a quiet stretch leaves a While you simmed summary; a title or MVP season opens its story', seed: 87, steps: [
+    { at: 0.3, evalAs: { x: start } },
+    { at: 0.4, evalAs: { r: `(()=>{${toPros}let g=0,quiet=0,big=0;while(S.stage==='nba'&&g++<40&&S.nba.length<14){if(S.pend){choose(S.pend.kind==='clutch'?S.pend.best:0);continue;}UI().seq=null;const n0=S.nba.length;simAll();const l=S.nba[S.nba.length-1];if(S.nba.length>n0){if(l.aw.some(x=>/Champion|^MVP$/.test(x))){if(UI().seq)big++;}else if(UI().simmed&&/While you simmed/.test(document.getElementById('app').textContent))quiet++;}}return quiet+'/'+big;})()` },
+      expect: ["+r.split('/')[0]>=1"] }] },
 ];

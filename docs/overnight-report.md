@@ -153,6 +153,32 @@ Testers kept playing careers until they reached THE GOAT, and listed every bug, 
 - Position labels follow height (a 6'4" Sharpshooter is listed PG).
 - The Rim Protector premade projected as "Glass Cleaner" at its own default body. *Fixed:* its skill mix now leans on blocks and interior defense, and it reads as Rim Protector on every body 6'8" and up.
 
+### Round G8 (3 testers)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Art director, seventh pass | Rookie career (3 rings) to the plaque | 4/5 |
+| Pro scorer (Sharpshooter) | Hall of Famer (3 rings, 6 All-Stars); career 2 had 6 scoring titles by 31 | n/a |
+| Hall of Fame two-way wing | Solid Starter (1 ring); "no hard bugs" | 4/5 |
+
+**Confirmed working:** the top-5 scorer All-Star rule (every top-5 season made it, labeled "in as a top-5 scorer"), the creator layout fixes, At 18 / At 36, headbands on gray hair, Next Decision stopping on a title season.
+
+**Fixed after G8**
+- Recruiting stars are now drawn as small gold vector stars with a readable label ("3 of 5 stars"). Two testers reported a dangling dot after "Hype"; the stars were showing as icons, but screen readers and text views saw nothing there.
+- Fans weigh scoring in All-Star votes (a scoring champion on a 58-win team was voted 18th; a +1 Star Power shoe deal moved him to 4th). Zero-sum across the league; odds rechecked.
+- Season cards show your Defensive Player of the Year voting rank when you are top 8 and did not win.
+- Steals and blocks never read a flat 0.0 for a rotation player (an aging big showed 0.0 BPG).
+- Retire now warns that your unspent points are lost.
+- The Final Buzzer card and the plaque show the same jersey (your main team).
+- Headwear stays visible against both your natural and your graying hair.
+- Sixth Man of the Year only goes to players labeled as coming off the bench.
+- The spend hint names the right button ("Tap the button below").
+
+**Design notes from G8 (not changed)**
+- A pure scorer stalls well below 350 without MVPs and rings (6 scoring titles by 31, best MVP finish 5th at 37.8 points a game). Worth discussing in the balance pass: more weight for scoring titles, or MVP voting that rewards a scoring champion on a winning team.
+- "True ceiling" only appears at retirement, so a player can't tell early that GOAT is out of reach for a build. That is by design (hidden stats stay hidden); flagging only because testers keep asking.
+- Free-agency cards show the OVR from when the offers were made, even if you spend points before choosing.
+
 ## GOAT odds (checked overnight)
 
 Simulated 1,500 careers per row with the balance harness. "Casual" spends points at random; "smart" spends them well.
