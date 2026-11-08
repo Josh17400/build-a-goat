@@ -63,6 +63,48 @@ Testers kept playing careers until they reached THE GOAT, and listed every bug, 
 - Midseason moments come a little more often (45% of seasons, up to 4 stops a career).
 - Text: "+1 · 1 pt" (not pts), "Stay out of it" says what it does, the mixtape result says what it did to your hype, two more post-move endings, and the lob and post-camp lines have proper icons.
 
+### Round G4 (3 testers)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Art director, third pass | Notes below (phase 2) | 3/5 |
+| Hall of Fame guard | Hall of Famer (3 rings, 7 All-Stars), not GOAT | 4/5 |
+| Pro center | Perennial All-Star (2 rings, 14 DPOYs) | 3/5 |
+
+**Fixed after G4**
+- The last season of a career now plays out on screen ("Final Season": final plays, season card, badges, goals, history), then the plaque. It used to jump straight to the plaque (also flagged in 9 older reports).
+- Defensive Player of the Year: my G3 change overshot (a 65 OVR bench rookie won it). The player is now rated on the same scale as league players, plus a capped bonus for defensive specialists. Measured over 12 careers each: a rim protector wins about 1.6 a career, a two-way wing about 0.5, a shooter almost never, and nobody wins in their first two seasons.
+- Choosing "Stay a Rim Protector" now keeps that role on every team (it used to snap back to the new style).
+- The "lean into" hint points at a different style, not the one you already have.
+- The All-Star line no longer says "top 24 make it" when you made it from 25th or lower (it says you were a coaches pick).
+- No "Play 75+ games" goal when you already know you will miss part of the season.
+- The Retire now option shows your legacy score and how far the next tier is.
+- Plaque era line never breaks in the middle of "2000S".
+- A summer result you already read in the story is not repeated on the hub.
+- Whole Career checks your roster risk from your first pro season (it waited a season too long).
+- Final plays: the "up 1, on defense" situation is a bit rarer, so offense-minded players (bigs included) get more shots.
+
+### Round G5 (3 testers)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Art director, fourth pass | Notes below (phase 2) | 3/5 |
+| Rookie point guard (Whole Career) | Top 10 All-Time (4 rings, 10 All-Stars), not GOAT | n/a |
+| Pro two-way wing | Top 10 All-Time (3 rings, 8 All-Stars, 3 DPOYs), not GOAT | n/a |
+
+**Fixed after G5**
+- **Clutch 2.0 (text):** every final play has 2 to 3 more result lines, some naming the opponent, and no line repeats within a career until all are used. Game 6 and Game 7 can no longer share a line. Odds unchanged.
+- "Next Decision" stops on any title or MVP season and shows its story. It used to sim straight past a title.
+- The last story window of a career is "The Final Buzzer": your portrait and why it ended (farewell tour done, age, no contract at N OVR).
+- Finals MVP goes to the champion who produced, not the biggest name on the bench.
+- Class news no longer says a classmate "has a ring before you" when you already have one.
+- The ring-chase offer says it means a bench role (about 20 to 26 minutes).
+- No Request a trade card right after a title.
+- The All-Star banner says "The coaches picked you" or "The fans and players voted you in", matching your voting rank.
+- The difficulty card on a locked run describes your difficulty instead of pitching it.
+- The Legacy card has a second bar: progress to the next tier ("Next: Perennial All-Star · 51 to go"). The GOAT step now matches the real tier rule.
+- Haptics on iPhone: a light buzz on draft night, a heavy one for rings and MVPs, success and error buzzes on gambles and final plays. Never on plain taps or point spending. A Vibration switch sits in Sound settings (iPhone only).
+
 ## Phase 2: Characters and creator
 
 **New creator (Look step)**
@@ -85,6 +127,47 @@ Testers kept playing careers until they reached THE GOAT, and listed every bug, 
 - You wear your school's colors in college and your team's colors as a pro (header, season cards, draft card, plaque). The creator keeps your own kit for high school.
 - Random look never picks a trim that matches the jersey.
 - Creator: no scroll box inside the hair grid, a bigger preview, uniform pictures for the jersey styles, hair pictures shown without hats, mouthguards or shades, "Preview at 36", a typed jersey number box styled for the dark screens, and your player shown on the Body step.
+
+**After the art director reviews (G4 and G5)**
+- Title, MVP and first All-Star banners show your player grinning (or fired up for MVP) in that season's team colors and age.
+- Pro teams never wear a plain white kit (it read as an unstyled default).
+- Gentler graying: 36 now reads salt-and-pepper, not 60. A white headband on gray hair takes the jersey color so it never disappears.
+- Goggles and the face mask never stack with "Too cool" shades.
+- Arm and uniform pictures are wide strips, three to a row, so sleeves and ink read. Mouthguard pictures hide the beard so the four options differ.
+- The ten jersey colors sit in two even rows of five. Swatches keep their size but have a 44 px tap area. No browser spinner arrows on the number box.
+- The creator says facial hair grows in at 17 (it shows as stubble in high school).
+
+## Phase 3: three leads discuss what to add next
+
+Three high-effort agents each wrote a proposal (UI and beauty, content and expansions, systems and improvements), then read each other's and argued it out. Full documents are in `docs/phase3/`.
+
+**Where all three agree (joint top 10, most fun per hour first)**
+1. **Clutch 2.0, text half.** More lines, no repeats, Game 6 and 7 always different. *Shipped tonight.* The other half (free-throw, inbound, overtime and road Game 7 situations, big-man plays everywhere) is next.
+2. **Legacy card with near goals.** A bar to the next tier, a ladder ending in "350 and #1 in the debate", a named legend to pass next. *The next-tier bar shipped tonight;* the ladder and "man to beat" chip are left.
+3. **No silent endings.** *The final season story and the Final Buzzer card shipped tonight.* Left: a warning one season ahead ("next season could be your last, spend your 87 points"), and an "Is it time?" prompt instead of the silent 30% chance of retiring when OVR drops below 61.
+4. **Spend screen previews.** Every +, +10 and Max shows what it does ("OVR +1", "Post Scorer fit +3") before you tap; Max always takes two taps. Fixes the most common complaint ("my points vanished"). About 4 hours.
+5. **Big Moment screens.** One full-screen celebration per peak season (ring, MVP, game-winner, draft pick, GOAT crowned), built on tonight's banner portrait and haptics, skippable, never an extra tap in Whole Career.
+6. **One stop budget for pacing.** Whole Career testers count 3 to 6 taps a season. Cap optional stops per offseason, let extra moments wait a year, and add a "While you simmed" row of season tiles.
+7. **Final Chapter, the rest.** A "How do you go out?" last home game, a Hall of Fame presenter, a one-tap life-after-basketball epilogue, jersey banners, highlights in order.
+8. **Daily Build 2.0.** A daily twist that only adds limits (never free stats or a draft slot), a streak with cosmetic rewards, a Wordle-style share line.
+9. **Choices show what they did.** The season card prints the real size of each choice ("36 to 32 MPG, about 2 fewer points a night"). Never shows hidden injury or aging numbers.
+10. **A plaque worth sharing.** Frames by tier (wood to diamond, earned only, never sold), a big GOAT score, the final-team uniform, and a Share button.
+
+**Next in line:** team identity (fixed colors, a three-letter tag and a simple original crest for all 30 teams). It's big, but it's the largest step toward looking like a real sports game.
+
+**Bigger expansions (paid-pack candidates):** Dynasty Mode (your son enters the league 20 years later, story only, nothing passes down), Scenario Challenges with a weekly challenge, Era Packs, Legends Mode, and a coaching career after retirement.
+
+**What they argued against**
+- **"Clutch prep" with points:** all three dropped it. Buying better odds on final plays takes the magic out of the favorite moment.
+- **Selling plaque frames:** dropped. The frame must show the tier you earned, so a bought gold or diamond look would cheapen THE GOAT. Backgrounds and celebration styles can still be sold for gems.
+- **Odds as "3 in 10":** reads like a casino and edges toward revealing hidden stats. Keep word labels, but give each one fixed meaning and show both outcomes.
+- **Career screen tabs:** ship the hero header first and skip the tabs; tabs would hide the rival and league news.
+
+**Rules for all of it:** anything that changes GOAT odds (MVP voter fatigue, contract roles, veteran points, clutch odds, honest risk labels) goes into one balance pass, checked once against your targets. Before any balance or refactor work, record 200 fixed-seed careers per difficulty as a regression baseline.
+
+**Two risks no tester would find (systems lead)**
+- **iOS save safety:** the in-progress career is not copied to the phone's native storage, so an iOS storage purge would wipe a 30-minute career. The save is also 710 to 830 KB by career end, mostly 1,000 retired league players kept in full. Recommended: mirror the run at each season end and slim retired players. Not changed tonight because it touches the native save path.
+- **The meter and tier code disagreed** on whether THE GOAT needs 5 All-Stars. *Fixed tonight* (the meter now follows the tier rule).
 
 ## Still to come tonight
 - Round G2 playtests (art director review of the creator, plus two more GOAT chases), then fixes.
