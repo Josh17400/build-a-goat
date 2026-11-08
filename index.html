@@ -717,7 +717,7 @@ function roll(list,avoid){S.seenE=S.seenE||{};S.recent=S.recent||new Set(RECENT(
 const YR=['Freshman','Sophomore','Junior','Senior','Super Senior'];
 function autoSpend(){const pk=archPick();let n=0,g=0;while(S.bank>0&&g++<2000){const k=pk();const co=cost(S.attrs[k]);if(S.attrs[k]<99&&S.bank>=co){S.bank-=co;S.attrs[k]++;n+=co;}else if(S.bank<2)break;}if(S.bank===1){S.attrs.cons++;S.bank=0;n++;}return n;}
 function hsHype(){S.hype+=(S.traits.star-3)*1.5;}
-function simHS(){syncPos();if(S.summerPend)chooseSummer(S.summerPend.opts.length-1);S.lastResult=null;S.clsStart=clsSnap();const r0=classRank()?.rank;hsHype();const i=S.hs.length;S.age=14+i;const o0=OV(),p0=i?S.hs[i-1].st.ppg:0;
+function simHS(){syncPos();if(S.summerPend)chooseSummer(safeIdx(S.summerPend));S.lastResult=null;S.clsStart=clsSnap();const r0=classRank()?.rank;hsHype();const i=S.hs.length;S.age=14+i;const o0=OV(),p0=i?S.hs[i-1].st.ppg:0;
   develop((.10+(FRAMES[S.frame].dev||0)*.4)*(1+(S.traits.work-3)*.15)*(1-(S.traits.late-3)*.18),HS_FL*(1+(S.traits.work-3)*.1));const bch=updBadges('season'),bfx=badgeFx();
   S.lastTag=null;const ev=[roll(hsEvents())];if(R()<.35)ev.push(roll(hsEvents(),S.lastTag));if(S.summerNote){ev.unshift(S.summerNote);S.summerNote=null;}
   const o=ovr(),ppg=clamp(6+(o-40)*.75+i*1.5+bfx.pts+gauss()*1.2,2,42),rpg=clamp((3+(eff('reb')-40)*.13+Math.max(0,S.height-72)*.35+i*.25)*(1+bfx.reb)+gauss()*.45,1.2,20),apg=clamp((1+(eff('pla')-40)*.12)*(1+bfx.ast)+gauss()*.6,.3,12),spg=clamp(.5+(es('stl')-40)*.035+(es('speed')-50)*.01+(S.traits.motor-3)*.08+(S.traits.lock-3)*.08+(es('lat')-50)*.004+bfx.stl*1.5+gauss()*.25,.1,5),bpg=clamp(.15+(es('blk')-40)*.045+(S.height-78)*.05+(S.traits.lock-3)*.08+bfx.blk*1.5+gauss()*.25,.1,6);
@@ -1213,6 +1213,8 @@ const ERAS=[
   {id:'20s',name:'🎯 The 2020s',d:'Let it fly. Shooters are kings and slow bigs get played off the floor.',w:{sho:.07,pla:.02,fin:-.03,reb:-.04,def:-.02},pace:1.08,tp:.015}];
 const era=()=>ERAS.find(e=>e.id===S.era)||ERAS[3];
 const shortNm=n=>{if(!n)return'—';const w=n.split(' ');return w.length>1?w[0][0]+'. '+w.slice(-1)[0]:n;};
+// a skipped summer always takes a safe option (they are listed first)
+const safeIdx=p=>{const i=p.opts.findIndex(o=>/Safe/.test(o.desc||''));return i>=0?i:p.opts.length-1;};
 const mileNote=()=>{const p=Math.round(career().pts||0),m=[10000,20000,30000,40000].find(x=>x>p);return m&&m-p<=3000?` You are ${(m-p).toLocaleString()} points from ${m.toLocaleString()}.`:'';};
 const onlineEra=()=>['10s','20s','30s'].includes(S.era);
 // era taste: what teams of this era pay for. Changes interest (draft buzz, free agency), never OVR

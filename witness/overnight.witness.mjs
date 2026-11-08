@@ -33,4 +33,8 @@ export default [
   { name: 'Daily Build sets the perk cart aside and gives it back when turned off', seed: 88, steps: [
     { at: 0.3, evalAs: { r: "(()=>{S.daily=false;S.perksHeld=null;S.perks={pts:1};const before=JSON.stringify(S.perks);toggleDaily();const off=Object.keys(S.perks).length===0,held=JSON.stringify(S.perksHeld)===before;const r0=render;render=()=>{};toggleDaily();render=r0;const back=JSON.stringify(S.perks)===before;S.perks={};render();return off&&held&&back;})()" },
       expect: ['r===true'] }] },
+  { name: 'summers: safe options come first, and a skipped summer takes a safe one', seed: 89, steps: [
+    { at: 0.3, evalAs: { x: start } },
+    { at: 0.4, evalAs: { r: "(()=>{const p=S.summerPend;if(!p)return 'nopend';const first=/Safe/.test(p.opts[0].desc),last=/High risk|Medium risk/.test(p.opts[p.opts.length-1].desc);return first&&last&&/Safe/.test(p.opts[safeIdx(p)].desc);})()" },
+      expect: ["r===true||r==='nopend'"] }] },
 ];

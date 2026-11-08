@@ -5,8 +5,8 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 ## Read this first
 
 **What happened overnight**
-- 17 rounds of 3 Witness playtesters (51 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (88 automated tests, all passing) and committed locally.
-- Testers reached THE GOAT on Rookie (five times, usually on the first or second career), Pro (a rim protector on career 3) and Hall of Fame (a center on career 2, with perks). Most Pro and Hall of Fame careers ended at Hall of Famer or Top 10 All-Time, which is where you want them.
+- 18 rounds of 3 Witness playtesters (54 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (88 automated tests, all passing) and committed locally.
+- Testers reached THE GOAT on Rookie (six times, on the first or second career), Pro (a rim protector on career 3) and Hall of Fame (a center on career 2, with perks). Most Pro and Hall of Fame careers ended at Hall of Famer or Top 10 All-Time, which is where you want them.
 - Phase 2 rebuilt the character creator and polished the character art (aging, team colors, portraits on banners and the Final Buzzer card).
 - Phase 3: three high-effort leads proposed and debated what to add next. Their joint top 10 is below, and the full documents are in `docs/phase3/`.
 - GOAT odds were rechecked after every balance change and retuned once (Rookie .45 to .40, Hall of Fame .75 to .77).
@@ -17,19 +17,28 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 3. Clutch final plays have about twice as many result lines, never repeat within a career, and name the opponent.
 4. Next Decision stops for title and MVP seasons, and otherwise leaves a "While you simmed" summary.
 5. Fairer awards: top-5 scorers and the DPOY (10+ points) make the All-Star team; DPOY works for real defenders without being automatic; Finals MVP and Rookie of the Year look at production.
-6. Choices that just appeared ignore taps for half a second (no more accidental risky picks).
-7. Haptics on iPhone for big moments, with a Vibration switch.
-8. The creator: grouped tabs, picture thumbnails, a preview that shrinks while you scroll, realistic aging, and team colors as a pro.
+6. No more accidental risky picks: newly shown choices ignore taps for half a second, and summer options are listed safe first.
+7. Whole Career and Next Decision pace better: a pause before your final season and when 60+ points pile up, a milestone watch ("1,240 points from 30,000") on retire and farewell, and a cleaner menu (Your profile, How to play, Escape to close).
+8. Haptics on iPhone for big moments, with a Vibration switch.
+9. The creator: grouped tabs, picture thumbnails, a preview that shrinks while you scroll, realistic aging, and team colors as a pro.
 
 **Decisions for you** (details in each round below)
 1. **OVR ceilings differ by style** (wings and slashers reach about 90 with their key skills maxed; point guards and bigs about 84). Fixing it means changing the OVR formula and retuning odds.
 2. **Reset all progress erases bought gems.** Keep purchases through a reset?
 3. **Pro odds spread:** a 5,000-career run gives casual 0.7% and smart 5.5% (targets ~1% and 4.3–5%). The gap between casual and smart players is a little wider than you want; narrowing it is a design question, not a single number to tweak.
-4. **Pure scorers rarely win MVP**, so they stall below 350 (6 to 7 scoring titles and no MVP).
+4. **Pure scorers rarely win MVP**, so they stall below 350 (one tester won 14 scoring titles over two careers, several on 63- to 70-win teams, and no MVP). The most-repeated balance complaint of the night.
 5. **Bench-role rings** at 37 count in full toward the GOAT score; scale ring credit by role?
-6. **Phase 3 priorities:** which of the joint top 10 to build next (spend-screen previews and a stop budget for pacing were the most requested by testers).
-7. **Ship it?** If you're happy, push and start TestFlight. Nothing has been pushed.
+6. **Whole Career pacing:** it still stops 3 to 4 times a season; nearly every tester said it plays like Next Decision. The phase 3 "stop budget" proposal (cap optional stops per offseason) is the fix, but it changes how often you see moments, so it is your call.
+7. **Final plays per playoff run:** late in a career a Game 7 last shot comes up almost every year. Capping them at 2 per playoffs keeps them special but changes series win rates, so it belongs in the balance pass.
+8. **iOS save safety:** the in-progress career isn't mirrored to the phone's native storage (an iOS storage purge would wipe it) and grows to 700–800 KB. Worth fixing before a wide release.
+9. **Phase 3 priorities:** which of the joint top 10 to build next (spend-screen previews and the stop budget were the most requested by testers).
+10. **Ship it?** If you're happy, push and start TestFlight. Nothing has been pushed.
 
+**Where things are**
+- 35 local commits on `feat/ios-monetization` since last night's push (none pushed).
+- Every playtest report is in `witness/playtests/<name>/report.md` (g1a through g18c), with replays and screenshots.
+- The phase 3 proposals and critiques are in `docs/phase3/`.
+- To ship when you're ready: `git push origin HEAD:main`, then `gh workflow run ios.yml --ref main --repo Josh17400/build-a-goat`.
 
 ## Phase 1: GOAT-chase playtests
 
@@ -403,6 +412,27 @@ So point guards and bigs hit a lower ceiling for the same effort. That explains 
 - Final plays come up in nearly every playoff run late in a career and stop feeling special. The content lead's "at most 2 final plays per playoffs" idea fits, but it changes how often you win series, so it belongs in the balance pass.
 - The pure-scorer MVP wall again (two scoring titles at 34 and 35 PPG on 56- and 57-win teams, best MVP finish 4th).
 - Every random name used the same surname in this tester's runs. That comes from the test harness's fixed random seed, not real play.
+
+### Round G18 (3 testers, final round)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Rookie Slasher, Whole Career pacing | **THE GOAT on career 1** (score 436, 6 rings, 4 MVPs, 37,998 points); the new 60-point pause worked | 4/5 |
+| Hall of Fame Two-Way Wing | 4 rings by 29; Next Decision stopped for every title season | 4/5 |
+| Art and menus, very last pass | Profile and How to play in the career menu and the new reset warning confirmed | n/a |
+
+**Fixed after G18**
+- **Accidental risky summers:** testers kept committing to a risky summer by tapping through, because the high-risk option sat where Next usually is. Summer options are now listed safe first, risky last (same dice, so the same options appear).
+- The difficulty note starts with the difficulty's name ("Hall of Fame: The biggest challenge..."). Three testers read the Pro text before tapping Hall of Fame and reported the wrong numbers.
+- The "Is It Time?" prompt shows your current OVR after you spend points (it kept the old number).
+- The Whole Career pause card says "Points spent" once you are below 10, and shows a single Spend button.
+- Achievements say they unlock when your career ends (a tester hit a Game 7 winner and saw it still locked mid-career).
+- Achievements uses the trophy on its own page; Ice in your veins and Iron body perks have icons; locked difficulty buttons look disabled during the Daily Build.
+
+**Seen, not changed**
+- Whole Career still stops 3 to 4 times a season (recap, summer, career moment, midseason, free agency). Testers consistently say it plays like Next Decision. The phase 3 "stop budget" proposal is the fix.
+- Free-agency offers show your OVR from when the offers were made (you can raise it before choosing).
+- Teaming up with your rival can push him to #1 in the GOAT debate, with no warning.
 
 ## GOAT odds (checked overnight)
 
