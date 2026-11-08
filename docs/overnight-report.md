@@ -2,6 +2,35 @@
 
 Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight until you say so.
 
+## Read this first
+
+**What happened overnight**
+- 12 rounds of 3 Witness playtesters (36 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (87 automated tests, all passing) and committed locally.
+- Testers reached THE GOAT on Rookie (several), Pro (a rim protector on career 3) and Hall of Fame (a center on career 2, with perks). Most Pro and Hall of Fame careers ended at Hall of Famer or Top 10 All-Time, which is where you want them.
+- Phase 2 rebuilt the character creator and polished the character art (aging, team colors, portraits on banners and the Final Buzzer card).
+- Phase 3: three high-effort leads proposed and debated what to add next. Their joint top 10 is below, and the full documents are in `docs/phase3/`.
+- GOAT odds were rechecked after every balance change and retuned once (Rookie .45 to .40, Hall of Fame .75 to .77).
+
+**Biggest changes you will notice**
+1. The last season of a career plays out on screen (Final Season), then a Final Buzzer card says why it ended.
+2. Banners with your grinning portrait for rings, MVPs, first All-Star, Rookie of the Year, first scoring title and first DPOY.
+3. Clutch final plays have about twice as many result lines, never repeat within a career, and name the opponent.
+4. Next Decision stops for title and MVP seasons, and otherwise leaves a "While you simmed" summary.
+5. Fairer awards: top-5 scorers and the DPOY (10+ points) make the All-Star team; DPOY works for real defenders without being automatic; Finals MVP and Rookie of the Year look at production.
+6. Choices that just appeared ignore taps for half a second (no more accidental risky picks).
+7. Haptics on iPhone for big moments, with a Vibration switch.
+8. The creator: grouped tabs, picture thumbnails, a preview that shrinks while you scroll, realistic aging, and team colors as a pro.
+
+**Decisions for you** (details in each round below)
+1. **OVR ceilings differ by style** (wings and slashers reach about 90 with their key skills maxed; point guards and bigs about 84). Fixing it means changing the OVR formula and retuning odds.
+2. **Reset all progress erases bought gems.** Keep purchases through a reset?
+3. **Pro casual GOAT odds** sit slightly under 1% (0.6 to 0.9% across four runs) while smart is at the top of its range (4.9 to 5.3%).
+4. **Pure scorers rarely win MVP**, so they stall below 350 (6 to 7 scoring titles and no MVP).
+5. **Bench-role rings** at 37 count in full toward the GOAT score; scale ring credit by role?
+6. **Phase 3 priorities:** which of the joint top 10 to build next (spend-screen previews and a stop budget for pacing were the most requested by testers).
+7. **Ship it?** If you're happy, push and start TestFlight. Nothing has been pushed.
+
+
 ## Phase 1: GOAT-chase playtests
 
 Testers kept playing careers until they reached THE GOAT, and listed every bug, UI issue and fun idea.
@@ -224,7 +253,7 @@ So point guards and bigs hit a lower ceiling for the same effort. That explains 
 - The creator's preview card shrinks to a small strip once you scroll into the options, so it no longer hides the grid.
 - The plaque labels its badges "Best badges of your career" (it showed Gold for a badge that later dropped to Silver).
 - While you simmed shows each season's OVR change.
-- MVP voters rarely reward a losing team (MVPs had gone to 41-41, 37-45 and 34-48 teams).
+- ~~MVP voters rarely reward a losing team~~ (tried, then reverted after the odds check: it pushed Pro casual down to 0.5% and smart up to 6.6%). Left for the balance pass.
 - The "Is It Time?" prompt shows the milestone note and your unspent points.
 
 **Seen, not changed**
@@ -257,19 +286,41 @@ So point guards and bigs hit a lower ceiling for the same effort. That explains 
 - The Daily Build can be replayed any number of times a day; turning it on hides perks already in your cart without a message.
 - Pacing in Whole Career is still 4 to 7 taps a season (one offseason stopped 4 times in a row).
 
+### Round G12 (3 testers)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Pro rim protector, Whole Career | **THE GOAT on career 3** (5 rings, 3 MVPs, several DPOYs, score 350); earlier careers Hall of Famer and Top 10 | 4/5 |
+| First-time player on Rookie | Top 10 All-Time (3 rings, 11 All-Stars, 3 scoring titles) | 4/5 |
+| Menus explorer, second pass | All four menu fixes confirmed | 3/5 |
+
+**Fixed after G12**
+- **Accidental choices, part 2:** in Whole Career a new decision could pop up right where Next was (it turned down a superteam offer by accident). Every newly shown decision now ignores taps for half a second, not only story steps.
+- The side menu during a career has "Your profile" and "How to play".
+- Rookie of the Year looks at the whole stat line, not points alone (a #1 pick who was already an All-Star and DPOY lost to a 15-point scorer).
+- DPOY only carries a player onto the All-Star team if he also scores 10+ a game (a 6.8-point big made it from 43rd in voting).
+- The Daily Build card says your cart went back to your GTP; the difficulty card says the Daily earns no gems.
+- The reset warning lists gems (including bought gems) and equipment; its two buttons no longer touch.
+- Achievements and the Badge Book have different icons.
+- Only one spend prompt on the Whole Career cut-risk pause.
+
+**Needs your call**
+- **Reset all progress erases purchased gems and equipment.** The warning now says so, but you may prefer to keep bought gems through a reset (App Store reviewers and players can treat losing purchases as a problem).
+- A late-career ring as a 12-minute bench player counts in full toward the GOAT score; one tester suggested ring credit scale with role.
+
 ## GOAT odds (checked overnight)
 
 Simulated 1,500 careers per row with the balance harness. "Casual" spends points at random; "smart" spends them well.
 
-Latest run (final settings, after the G8 All-Star vote change):
+Latest runs (final settings, after round G12):
 
 | Difficulty | Casual GOAT | Smart GOAT | Your target |
 |---|---|---|---|
-| Rookie | 8.8% | 36.8% | ~9–10% casual |
-| Pro | 0.6% | 4.9% | ~1% casual, 4.3–5% smart |
-| Hall of Fame | 0.4% | 2.7% | ~0.5% casual, 2–2.5% smart |
+| Rookie | 9.3% | 38.3% | ~9–10% casual |
+| Pro | 0.7–0.9% (two runs) | 4.8–6.4% (two runs) | ~1% casual, 4.3–5% smart |
+| Hall of Fame | 0.4% | 2.6% | ~0.5% casual, 2–2.5% smart |
 
-The run before it (same difficulty settings, before fans weighed scoring) had Rookie 9.2%, Pro 1.0% / 5.3%, Hall of Fame 0.5% / 2.7%. Two more Pro runs on the next build gave 0.7% and 0.9% casual (4.9% and 5.2% smart), so Pro casual sits slightly under 1% and smart at the top of its range. Raising casual would also raise smart, so I left Pro alone.
+Identical runs swing by about ±0.8 points on the smart column, so Pro smart is somewhere around 5.5% and Hall of Fame smart around 2.6%: both slightly above target, casual slightly below. A larger run (5,000 careers) in the daytime would pin it down before any retune.
 
 - The All-Star changes (top-5 scorers and the DPOY always make the team) pushed Rookie casual up to 11%. To compensate, Rookie pro-season points went from .45 to .40, and Hall of Fame from .75 to .77 (between the two settings tested). Pro is unchanged.
 - Run-to-run noise is about ±0.5 points at these sample sizes.
@@ -338,6 +389,3 @@ Three high-effort agents each wrote a proposal (UI and beauty, content and expan
 - **iOS save safety:** the in-progress career is not copied to the phone's native storage, so an iOS storage purge would wipe a 30-minute career. The save is also 710 to 830 KB by career end, mostly 1,000 retired league players kept in full. Recommended: mirror the run at each season end and slim retired players. Not changed tonight because it touches the native save path.
 - **The meter and tier code disagreed** on whether THE GOAT needs 5 All-Stars. *Fixed tonight* (the meter now follows the tier rule).
 
-## Still to come tonight
-- Round G2 playtests (art director review of the creator, plus two more GOAT chases), then fixes.
-- Phase 3: three high-effort agents discuss UI beauty, content and expansions, and improvements.
