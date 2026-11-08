@@ -5,8 +5,8 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 ## Read this first
 
 **What happened overnight**
-- 19 rounds of 3 Witness playtesters (57 sessions), plus a final round still finishing at 8 AM: GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (89 automated tests, all passing) and committed locally.
-- Testers reached THE GOAT on Rookie (six times, on the first or second career), Pro (a rim protector on career 3) and Hall of Fame (a center on career 2, with perks). Most Pro and Hall of Fame careers ended at Hall of Famer or Top 10 All-Time, which is where you want them.
+- 20 rounds of 3 Witness playtesters (60 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (89 automated tests, all passing) and committed locally.
+- Testers reached THE GOAT on Rookie (seven times, on the first or second career), Pro (a rim protector on career 3) and Hall of Fame (a center on career 2, with perks). Most Pro and Hall of Fame careers ended at Hall of Famer or Top 10 All-Time, which is where you want them.
 - Phase 2 rebuilt the character creator and polished the character art (aging, team colors, portraits on banners and the Final Buzzer card).
 - Phase 3: three high-effort leads proposed and debated what to add next. Their joint top 10 is below, and the full documents are in `docs/phase3/`.
 - GOAT odds were rechecked after every balance change and retuned once (Rookie .45 to .40, Hall of Fame .75 to .77).
@@ -453,6 +453,22 @@ So point guards and bigs hit a lower ceiling for the same effort. That explains 
 - Teaming up with your rival can push him past you in the GOAT debate (it cost this tester THE GOAT by 8 points), and late ring chases win titles easily. The team-up card now warns "Every ring you win together counts for his legacy too"; the balance side is for the balance pass.
 - Low-usage seasons can still win MVP on a great team (12.3 points in 26 minutes).
 - "Top 10 All-Time" undersells finishing 2nd ever; a "#2 all-time" line on the plaque would land better.
+
+### Round G20 (3 testers, last round)
+
+| Tester | Result | Fun |
+|---|---|---|
+| First-time player on Pro | Drafted #6, starter at 29; "the highlight was draft night" | 4/5 |
+| Hall of Fame center | 2 DPOYs, 2 All-Stars by 29 after four years on the bench | 4/5 |
+| Rookie Slasher, Whole Career | **THE GOAT on career 1** (score 439, 10 rings, 3 MVPs, 14 All-Stars); the 60-point pause worked | 4/5 |
+
+**Fixed after G20**
+- No "Ask Out?" trade moment in the same offseason as free agency (it came right after a re-signing).
+- A GOAT career's highlights say "#1 in the all-time GOAT debate" instead of an older "top 5 (3rd)" line, and only the latest GOAT-debate milestone is kept.
+
+**Seen, not changed**
+- Joining your rival can let him win MVP most years and lead the GOAT debate (the team-up card now warns about the legacy side).
+- "Carry the load" cut minutes in one case (36 to 26); free-agency cards show the OVR from when offers were made.
 
 ## GOAT odds (checked overnight)
 
