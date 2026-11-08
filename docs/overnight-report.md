@@ -35,7 +35,7 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 10. **Ship it?** If you're happy, push and start TestFlight. Nothing has been pushed.
 
 **Where things are**
-- About 45 local commits on `feat/ios-monetization` since last night's push (none pushed).
+- 48 local commits on `feat/ios-monetization` since last night's push (none pushed).
 - Every playtest report is in `witness/playtests/<name>/report.md` (g1a through g18c), with replays and screenshots.
 - The phase 3 proposals and critiques are in `docs/phase3/`.
 - To ship when you're ready: `git push origin HEAD:main`, then `gh workflow run ios.yml --ref main --repo Josh17400/build-a-goat`.
