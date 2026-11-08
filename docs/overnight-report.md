@@ -438,13 +438,15 @@ So point guards and bigs hit a lower ceiling for the same effort. That explains 
 
 Simulated 1,500 careers per row with the balance harness. "Casual" spends points at random; "smart" spends them well.
 
-Latest runs (final settings, after round G12):
+Final build (after round G18, 1,500 careers per row):
 
 | Difficulty | Casual GOAT | Smart GOAT | Your target |
 |---|---|---|---|
-| Rookie | 9.3% | 38.3% | ~9–10% casual |
-| Pro | 0.7–0.9% (two runs) | 4.8–6.4% (two runs) | ~1% casual, 4.3–5% smart |
-| Hall of Fame | 0.4% | 2.6% | ~0.5% casual, 2–2.5% smart |
+| Rookie | 9.5% | 38.0% | ~9–10% casual |
+| Pro | 0.6% | 5.1% | ~1% casual, 4.3–5% smart |
+| Hall of Fame | 0.3% | 2.7% | ~0.5% casual, 2–2.5% smart |
+
+One last catch from this check: after the safe-first summer reorder, a skipped high-school summer would have auto-picked the risky option (it used to take the last one, which had been safe). That pushed Rookie casual to 11.1% in the first final run. It now always takes a safe option, and Rookie came back to 9.5%.
 
 Identical runs swing by about ±0.8 points on the smart column, so Pro smart is somewhere around 5.5% and Hall of Fame smart around 2.6%: both slightly above target, casual slightly below. A larger Pro run (5,000 careers each way) then pinned it down: **casual 0.7% (±0.1), smart 5.5% (±0.3)**. Both are just outside your targets, in opposite directions, so no single setting fixes both: the casual/smart gap itself would need a design change (for example, making smart spending matter a little less, or giving casual players more help from the spend screen).
 

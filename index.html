@@ -390,7 +390,7 @@ const PERKS_GTP=[
   ['maxed','⭐ Maxed locked traits','Your locked traits start at 5/5',25,1],
   ['dna','💎 Generational DNA','Higher and far more reliable hidden potential (revealed on your career recap)',25,1],
   ['dev','🏋️ Elite trainer','40% more development points in high school and college',30,1],
-  ['clutch','🧊 Ice in your veins','+1 Clutch Gene, on top of whatever you roll',20,1],
+  ['clutch','🧊 Cold-blooded','+1 Clutch Gene, on top of whatever you roll',20,1],
   ['agent','💼 Super agent','Teams offer you bigger roles in free agency',30,1],
   ['iron','🛡 Iron body','You age slower once you hit your 30s',50,1],
   ['hype','📣 Early buzz','Start high school with +15 hype',10,1],
@@ -1938,7 +1938,7 @@ function settingsCard(){const u=UI(),ach=Object.keys((()=>{try{return JSON.parse
   return`${diffCard()}<div class="card"><div class="sh">🏅 <span class="grow">Your progress</span></div>
   <div class="sub">Saved on this device: <b>${gtpBank()} GTP</b> · <b>${ach}</b> achievements · <b>${hof}</b> career${hof===1?'':'s'} in your Hall of Builds.</div>
   ${u.resetDone?'<div class="ev good" style="margin-top:10px">Progress reset. Fresh start.</div>':''}
-  ${u.confirmReset?`<div class="ev bad" style="margin-top:10px">This erases your GTP, gems (including bought gems), equipment, perks, achievements, Hall of Builds, daily results${hasRun()?' and your saved run':''}. It can’t be undone.</div>
+  ${u.confirmReset?`<div class="ev bad" style="margin-top:10px">This erases your GTP, gems (including bought gems), equipment, perks, achievements, Badge Book, Hall of Builds${hasRun()?', daily results and your saved run':' and daily results'}. It can’t be undone.</div>
     <div class="two" style="margin-top:8px;gap:10px"><button class="danger" onclick="resetProgress()">Yes, erase everything</button><button class="ghost" onclick="UI().confirmReset=false;render()">Cancel</button></div>`
   :`<button class="ghost" style="margin-top:10px;width:100%;color:#ff6b6b;border-color:rgba(255,107,107,.45)" onclick="UI().confirmReset=true;UI().resetDone=false;render()">Reset all progress</button>`}</div>`;}
 function resetProgress(){for(const k of[...SAVE_KEYS,...Object.values(SV)])try{localStorage.removeItem(k);}catch{}R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,menu:'settings',resetDone:true};render();scrollTo(0,0);}
@@ -2545,7 +2545,7 @@ function buildHTML(){const u=UI(),left=START_BUDGET-spent(),ti=Math.max(0,TABS.f
   const hd=hdr;
   if(tab==='setup')h+=`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>Build a <span>GOAT</span></h1>${menuBtn()}</div>${continueCard()}<div class="sub">Build a raw prospect, survive high school and college, and find out if you become the greatest of all time. Pick how hard your career will be below.</div>${diffCard()}
     <div class="card"><div class="sh">🎰 <span class="grow">League era</span>${S.daily?'<b>Daily</b>':`<button class="ghost sm" onclick="spinEra()" ${S.spins<=0?'disabled':''}>🎲 Re-spin · ${S.spins}</button>`}</div><div style="font-size:1.15rem;font-weight:800">${era().name}</div><div class="sub">${era().d}</div><div class="sub">Teams in this era pay extra for <b>${catName(eraWants())}</b>. It shapes draft buzz and free agency choices.</div>
-    <details open><summary>📅 Daily Build${S.daily?' · on':''}</summary><div class="sub">Same era and same dice for everyone today. Played on Pro with no perks. Earns GTP, but no gems.</div><button class="${S.daily?'sel':'ghost'} wide" style="margin-top:8px" onclick="toggleDaily()">${S.daily?'Daily Build is on · tap to turn off':'Play today\'s Daily Build'}</button>${S.daily&&dailyBest().length?`<div class="note">Today's best: ${dailyBest().slice(0,3).map(x=>`<b>${esc(x.name)}</b> ${x.score}`).join(' · ')}</div>`:''}</details></div>
+    <details open><summary>📅 Daily Build${S.daily?' · on':''}</summary><div class="sub">Same era and same dice for everyone today (today: ${ERAS[seedFrom('era'+todayKey())%ERAS.length].name.replace(/^\S+\s/,'')}). Played on Pro with no perks. Earns GTP, but no gems.</div><button class="${S.daily?'sel':'ghost'} wide" style="margin-top:8px" onclick="toggleDaily()">${S.daily?'Daily Build is on · tap to turn off':'Play today\'s Daily Build'}</button>${S.daily&&dailyBest().length?`<div class="note">Today's best: ${dailyBest().slice(0,3).map(x=>`<b>${esc(x.name)}</b> ${x.score}`).join(' · ')}</div>`:''}</details></div>
     ${gtpBank()&&!S.daily?`<button class="opt" onclick="openMenu('gtp')"><div class="grow"><div class="t">🪙 ${perkCost()?`${perkCost()} GTP of perks ready for this player`:`${gtpBank()} GTP to spend`}</div><small>${perkCost()?`They apply when you start High School · ${gtpBank()-perkCost()} GTP left`:'Open the GTP Store to buy perks for this player'}</small></div></button>`:''}`;
   if(tab==='look')h+=`${hd('Look')}<div class="card"><div class="sh">✍️ <span class="grow">Name</span></div><input id="nm" type="text" maxlength="24" value="${esc(S.name)}" placeholder="Name your prospect" oninput="S.name=this.value" onchange="S.name=this.value"></div>${lookEditor()}`;
   if(tab==='body')h+=`${hd('Body')}<div class="avwrap" style="margin-top:4px">${avatar(S.look,18,120,1)}</div><div class="sub">No positions to pick. Choose your size and frame, then build your skills: the game tells you what kind of player you are turning into.</div>
