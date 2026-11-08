@@ -128,6 +128,31 @@ Testers kept playing careers until they reached THE GOAT, and listed every bug, 
 - No two classmates share a last name.
 - How to play explains that Rookie earns no GTP or gems.
 
+### Round G7 (3 testers)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Art director, sixth pass | Rookie career to the plaque | 3/5 |
+| Pro rim protector, all-in defense | All-Star tier (6 DPOYs, 2 rings) | n/a |
+| Pro shooting guard, Whole Career pacing | Champion Role Player (4 rings, 25,855 points, **zero All-Stars**) | 4/5 |
+
+**Fixed after G7**
+- **All-Star wall:** a 25-point scorer (4th in the league, 54 wins) finished 27th in voting because the vote leans on rebounds and assists. Now the league's top 5 scorers and the Defensive Player of the Year always make the team (the same rules for league players). The card says how you got in ("in as a top-5 scorer"). This lets scorers and defensive bigs reach the tiers that need All-Star seasons; odds are being rechecked.
+- Ninja headband and pre-wrap keep their colors at every age (they are picked against your natural hair color).
+- Graying softened a little more at 32 to 37 (testers went back and forth: one said too little on black hair, the next too much; this is the middle).
+- The creator toggle says "At 18" and "At 36" (the "Now" label made people expect age 14).
+- Only one spend prompt shows at a time (the final-season nudge doubled up with the Whole Career pause).
+- No stray dot after "Hype 0" in high school.
+- "Sit a couple of weeks" warns that awards need 65 games.
+- Rookie of the Year gets its own banner.
+- The season card's role label (Starter / Bench rotation) now matches the role line.
+
+**Seen but not changed (noted for you)**
+- Team colors work, but nobody notices them when the team color happens to match your own creator kit. The team identity proposal (fixed colors plus a tag and crest) would fix this.
+- Pacing: Whole Career takes 3 to 5 taps a season. One tester said that felt right; others wanted fewer. The phase 3 "stop budget" proposal covers this.
+- Position labels follow height (a 6'4" Sharpshooter is listed PG).
+- The Rim Protector premade projects as "Glass Cleaner" on some bodies.
+
 ## Phase 2: Characters and creator
 
 **New creator (Look step)**
