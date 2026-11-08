@@ -30,4 +30,7 @@ export default [
     { at: 0.3, evalAs: { x: start } },
     { at: 0.4, evalAs: { r: `(()=>{${toPros}let g=0,quiet=0,big=0;while(S.stage==='nba'&&g++<40&&S.nba.length<14){if(S.pend){choose(S.pend.kind==='clutch'?S.pend.best:0);continue;}UI().seq=null;const n0=S.nba.length;simAll();const l=S.nba[S.nba.length-1];if(S.nba.length>n0){if(l.aw.some(x=>/Champion|^MVP$/.test(x))){if(UI().seq)big++;}else if(UI().simmed&&/While you simmed/.test(document.getElementById('app').textContent))quiet++;}}return quiet+'/'+big;})()` },
       expect: ["+r.split('/')[0]>=1"] }] },
+  { name: 'Daily Build sets the perk cart aside and gives it back when turned off', seed: 88, steps: [
+    { at: 0.3, evalAs: { r: "(()=>{S.daily=false;S.perksHeld=null;S.perks={pts:1};const before=JSON.stringify(S.perks);toggleDaily();const off=Object.keys(S.perks).length===0,held=JSON.stringify(S.perksHeld)===before;const r0=render;render=()=>{};toggleDaily();render=r0;const back=JSON.stringify(S.perks)===before;S.perks={};render();return off&&held&&back;})()" },
+      expect: ['r===true'] }] },
 ];
