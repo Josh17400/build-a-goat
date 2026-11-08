@@ -1055,7 +1055,7 @@ function seasonPlayoffs(){const c=S.cur,t=S.traits,L=S.L,z=L.z,{n,a,prevO,o,gp,m
   if(S.comeback&&S.comeback.yr===n+1)S.queue.push(rehabPend());
   if((a>=33&&oo<66&&R()<.5)||(a>=36&&R()<.3))S.queue.push({ret:1});
   else if(a>=34&&!S.farewell&&!S.fwAsked&&R()<.5){S.fwAsked=1;S.queue.push(farewellPend());}
-  if(S.faAt==null)S.faAt=S.pick<=30?4:S.pick<=60?2:1;if(sea===S.faAt){const nx=sea+(a>=33?1:a>=30?2:a>=27?3:ri(3,5));S.faLen=nx-sea;S.queue.push({fa:1});S.faAt=nx;}if(S.evoPend)S.queue.push({evo:1});if(oo>=64&&a>=23&&S.nba[sea-1].wins<41&&sea!==S.faAt&&(S.faAt||0)>sea&&!S.farewell&&R()<.45)S.queue.push({talk:1});S.queue.push({sum:1});
+  if(S.faAt==null)S.faAt=S.pick<=30?4:S.pick<=60?2:1;if(sea===S.faAt){const nx=sea+(a>=33?1:a>=30?2:a>=27?3:ri(3,5));S.faLen=nx-sea;S.queue.push({fa:1});S.faAt=nx;}if(S.evoPend)S.queue.push({evo:1});if(oo>=64&&a>=23&&S.nba[sea-1].wins<41&&sea!==S.faAt&&(S.faAt||0)>sea&&!S.farewell&&sea-(S.talkAt??-9)>=3&&R()<.45){S.queue.push({talk:1});S.talkAt=sea;}S.queue.push({sum:1});
   if(R()<.35)S.queue.push({lazy:1});
   makeGoals();
   S.pend=nextQ();}
@@ -1224,7 +1224,7 @@ function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1
 function makeRng(a){a>>>=0;const f=()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};f.get=()=>a>>>0;f.set=v=>{a=v>>>0;};return f;}
 const todayKey=()=>new Date().toISOString().slice(0,10);
 function seedFrom(s){let h=1779033703;for(const c of s){h=Math.imul(h^c.charCodeAt(0),3432918353);h=h<<13|h>>>19;}return h>>>0;}
-function toggleDaily(){S.daily=!S.daily;if(S.daily){S.diff='pro';if(S.perks&&S.perks.spin)S.spins=Math.max(0,S.spins-2);S.perks={};trimToBudget();S.era=ERAS[seedFrom('era'+todayKey())%ERAS.length].id;}render();}
+function toggleDaily(){S.daily=!S.daily;if(!S.daily&&S.perksHeld){S.perks=S.perksHeld;S.perksHeld=null;if(S.perks.spin)S.spins+=2;trimToBudget();}if(S.daily){S.diff='pro';S.perksHeld=Object.keys(S.perks||{}).length?{...S.perks}:null;if(S.perks&&S.perks.spin)S.spins=Math.max(0,S.spins-2);S.perks={};trimToBudget();S.era=ERAS[seedFrom('era'+todayKey())%ERAS.length].id;}render();}
 const dailyBest=()=>{const d=JSON.parse(localStorage.getItem('bag_daily')||'{}');return d.date===todayKey()?d.runs||[]:[];};
 
 // ---------- looks ----------
@@ -1938,7 +1938,7 @@ function settingsCard(){const u=UI(),ach=Object.keys((()=>{try{return JSON.parse
     <div class="two" style="margin-top:8px;gap:10px"><button class="danger" onclick="resetProgress()">Yes, erase everything</button><button class="ghost" onclick="UI().confirmReset=false;render()">Cancel</button></div>`
   :`<button class="ghost" style="margin-top:10px;width:100%;color:#ff6b6b;border-color:rgba(255,107,107,.45)" onclick="UI().confirmReset=true;UI().resetDone=false;render()">Reset all progress</button>`}</div>`;}
 function resetProgress(){for(const k of[...SAVE_KEYS,...Object.values(SV)])try{localStorage.removeItem(k);}catch{}R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,menu:'settings',resetDone:true};render();scrollTo(0,0);}
-const MENU=[['settings','sliders','Settings','Difficulty, sound and reset'],['gtp','gtp','GTP Store','Perks for your next player'],['gear','shirt','Equipment','Permanent gear for every player'],['hof','🏛️','Hall of Builds','Your best careers'],['ach','🏅','Achievements','What you have unlocked'],['bbook','medal','Badge Book','Every badge you have earned']];
+const MENU=[['settings','sliders','Settings','Difficulty, sound and reset'],['gtp','gtp','GTP Store','Perks for your next player'],['gear','shirt','Equipment','Permanent gear for every player'],['hof','🏛️','Hall of Builds','Your best careers'],['ach','trophy','Achievements','What you have unlocked'],['bbook','medal','Badge Book','Every badge you have earned']];
 // the Gem Shop item exists only while the store is on (iOS app with RevenueCat, or ?dev=1); see PLATFORM (Plat)
 const MENU_GEMS=['gems','gem','Gem Shop','Buy gems and Remove Ads'];
 const menuAll=()=>{const m=[...MENU];if(storeOn())m.splice(m.findIndex(x=>x[0]==='gear')+1,0,MENU_GEMS);return m;};
@@ -1953,7 +1953,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&typeof S!=='undefin
 const BALL='<svg class="ball" viewBox="0 0 40 40" aria-hidden="true"><defs><radialGradient id="bg1" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffb05a"/><stop offset="1" stop-color="#d9580a"/></radialGradient></defs><circle cx="20" cy="20" r="18" fill="url(#bg1)"/><g fill="none" stroke="#3a1a05" stroke-width="1.6"><path d="M2 20h36M20 2v36"/><path d="M7 7c6 5 6 21 0 26M33 7c-6 5-6 21 0 26"/></g></svg>';
 function drawerHTML(){const hofN=(()=>{try{return JSON.parse(localStorage.getItem('bag_hof')||'[]').length;}catch{return 0;}})(),achN=(()=>{try{return Object.keys(JSON.parse(localStorage.getItem('bag_ach')||'{}')).length;}catch{return 0;}})(),cls=drawerAnim?'in':'';drawerAnim=false;
   const sub={settings:diff().name.replace(/^\S+\s/,'')+' · difficulty, sound, reset',gtp:(gtpBank()-cartCost())+' GTP available · perks for this player',hof:hofN+(hofN===1?' career':' careers')+' · your best builds',ach:achN+'/'+ACH.length+' unlocked'};
-  const ic={gtpnext:icon('gtp'),bbook:icon('medal'),settings:icon('sliders'),gtp:icon('gtp'),gear:icon('shirt'),gems:icon('gem'),how:icon('book'),hof:'🏛️',ach:icon('trophy'),quit:icon('home'),prof:icon('user')};sub.prof='Skills, badges, stats and timeline';sub.gear=gems()+' gems · permanent gear';sub.gems=gems()+' gems · buy gems, Remove Ads';sub.how='The basics, any time';sub.gtpnext=gtpBank()+' GTP · starts your next player';sub.bbook=bookCount()+'/'+BADGES.length+' badges discovered';sub.quit='Your run is saved. Continue it any time';if(S.stage!=='build')sub.settings='Sound and reset';
+  const ic={gtpnext:icon('gtp'),bbook:icon('medal'),settings:icon('sliders'),gtp:icon('gtp'),gear:icon('shirt'),gems:icon('gem'),how:icon('book'),hof:'🏛️',ach:icon('trophy'),quit:icon('home'),prof:icon('user')};sub.prof='Skills, badges, stats and timeline';sub.gear=gems()+' gems · permanent gear';sub.gems=gems()+' gems · buy gems, Remove Ads';sub.how='The basics, any time';sub.gtpnext=gtpBank()+' GTP · starts your next player (leaves this recap)';sub.bbook=bookCount()+'/'+BADGES.length+' badges discovered';sub.quit='Your run is saved. Continue it any time';if(S.stage!=='build')sub.settings='Sound and reset';
   return`<div class="drawer ${cls}" role="dialog" aria-label="Menu"><div class="bd" onclick="closeMenu()"></div><div class="pn">
   <div class="row" style="flex-wrap:nowrap"><div class="logo">${BALL}<div>BUILD A <span>GOAT</span></div></div><button class="x" aria-label="Close menu" onclick="closeMenu()"><i></i><i></i></button></div>
   <div class="curchips"><div class="gtpchip">🪙 ${gtpBank()-cartCost()} GTP${cartCost()?` · ${cartCost()} in cart`:''}</div><div class="gtpchip gemchip">${icon('gem','ici')}${gems()} gems</div></div>
@@ -2367,7 +2367,7 @@ const canUndo=k=>S.stage==='hs'&&!S.hs.length&&S.attrs0&&S.attrs[k]>S.attrs0[k];
 function unspend(k){UI().spMsg=null;if(!canUndo(k))return;S.attrs[k]-=STEP;S.bank+=cost(S.attrs[k]);S.bdg={};render();}
 const seasonsPlayed=()=>S.hs.length+S.col.length+S.nba.length;
 const canUndoSpend=()=>!!(S.spendLog&&S.spendLog.length&&S.spendLog[S.spendLog.length-1].at===seasonsPlayed());
-function undoSpend(){if(!canUndoSpend())return;const u=S.spendLog.pop();S.attrs[u.k]=u.v;S.bank+=u.c;S.bdg={...u.bdg};render();}
+function undoSpend(){if(!canUndoSpend())return;const u=S.spendLog.pop();S.attrs[u.k]=u.v;S.bank+=u.c;S.bdg={...u.bdg};UI().spMsg=null;render();}
 function clearUndo(){if(S.spendLog&&S.spendLog.length)S.spendLog=[];}
 function undoBar(){if(!canUndoSpend())return'';const u=S.spendLog[S.spendLog.length-1];return`<button class="ghost wide" style="margin:6px 0" onclick="undoSpend()">↩ Undo: ${SKN[u.k]} back to ${u.shown} (+${u.c} pt${u.c===1?'':'s'} back)${S.spendLog.length>1?` · ${S.spendLog.length} steps`:''}</button>`;}
 const maxCost=k=>{const v0=S.attrs[k];let v=v0,c=0;while(v<99&&c+cost(v)<=S.bank&&!atCap(k)){c+=cost(v);v++;S.attrs[k]=v;}S.attrs[k]=v0;return[c,v];};
@@ -2495,7 +2495,7 @@ function seasonTable(rev){if(!S.nba.length)return'';const rows=S.nba.map(s=>`<tr
 
 // ---------- builder pieces ----------
 function gtpCard(full){const bank=gtpBank(),cost=perkCost();
-  if(S.daily)return`<div class="card"><div class="sh">🪙 <span class="grow">Generational Talent Points</span><b>${bank}</b></div><div class="sub">Perks are off for the Daily Build so everyone plays on equal terms (anything in your cart went back to your GTP). You still earn GTP, but no gems.</div></div>`;
+  if(S.daily)return`<div class="card"><div class="sh">🪙 <span class="grow">Generational Talent Points</span><b>${bank}</b></div><div class="sub">Perks are off for the Daily Build so everyone plays on equal terms (your cart is set aside and comes back when you turn the Daily off). You still earn GTP, but no gems.</div></div>`;
   const canBuy=PERKS_GTP.some(([k,l,d,c,mx])=>c<=bank-cost&&((S.perks&&S.perks[k])||0)<mx);
   return`<details class="card" ${full||cost||canBuy?'open':''}><summary role="button">🪙 <span class="grow">GTP Store · <span class="gold">${bank-cost} available</span>${cost?` · ${cost} in cart`:canBuy?' · tap a perk to buy':''}</span></summary>
   <div class="sub" style="margin-top:6px">${bank?'':'You have no GTP yet. Earn it on Pro or Hall of Fame from great seasons. '}Perks last for one player: they are used up when that career starts.</div>
@@ -2631,7 +2631,7 @@ function endHTML(){const c=career(),sc=goatScore(c),[t,d]=tierOf(sc,c),k=c.cnt,g
     if(t==='Bust'||t==='Journeyman')story=v(['It just never came together.','The league figured you out fast.','Some guys just aren’t built for the league.']);
     else if(S.nba.length<=6)story=v(['A short window, but you made it to the league.','In and out of the league before you could settle in.','Your body and your luck never gave you a real run.']);
     else if(gs>=3&&!['GOAT','Top 10 All-Time'].some(x=>t.includes(x)))story=v(['A winner first. The rings speak for themselves.','Wherever you went, banners followed.']);
-    else if(c.peak>=S.ceiling-1)story=['THE GOAT','Top 10 All-Time','Hall of Famer'].some(x=>t.includes(x))?v(['You squeezed every drop out of your talent.','You maxed out every gift you had, and then some.','You reached your ceiling and lived there for a decade.']):v(['You made the most of what you had.','You got everything out of your game. No regrets.','A pro’s pro. You maxed out your tools.']);
+    else if(c.peak>=S.ceiling-1&&S.bank<40)story=['THE GOAT','Top 10 All-Time','Hall of Famer'].some(x=>t.includes(x))?v(['You squeezed every drop out of your talent.','You maxed out every gift you had, and then some.','You reached your ceiling and lived there for a decade.']):v(['You made the most of what you had.','You got everything out of your game. No regrets.','A pro’s pro. You maxed out your tools.']);
     else story=v(['You left some potential on the table.','There was more in the tank. Injuries and bad luck took it.','Good career. You wonder what could have been.']);}
   const acc=[['Comeback Player','💪 Comeback Player'],['Champion','🏆 Champion'],['MVP','👑 MVP'],['Finals MVP','🏅 Finals MVP'],['All-NBA 1st','🥇 All-NBA 1st'],['All-NBA 2nd','🥈 All-NBA 2nd'],['All-NBA 3rd','🎖️ All-NBA 3rd'],['All-Star','⭐ All-Star'],['DPOY','🛡️ DPOY'],['Scoring Title','🔥 Scoring title'],['ROY','🌟 Rookie of the Year'],['6MOY','🪑 6th Man'],['MIP','📈 Most Improved']].filter(([x])=>g(x));
   const bm=benchList(c),rv=S.rival,meR=S.nba.filter(s=>s.aw.includes('Champion')&&s.mins>=20).length*5+g('MVP')*3+g('All-Star')*.8+c.pts/2500,rvR=rv?rv.rings*5+rv.mvps*3+((rv.aw&&rv.aw['All-Star'])||0)*.8+rv.pts/2500:0;

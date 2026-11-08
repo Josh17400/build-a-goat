@@ -24,7 +24,7 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 **Decisions for you** (details in each round below)
 1. **OVR ceilings differ by style** (wings and slashers reach about 90 with their key skills maxed; point guards and bigs about 84). Fixing it means changing the OVR formula and retuning odds.
 2. **Reset all progress erases bought gems.** Keep purchases through a reset?
-3. **Pro casual GOAT odds** sit slightly under 1% (0.6 to 0.9% across four runs) while smart is at the top of its range (4.9 to 5.3%).
+3. **Pro odds spread:** casual sits slightly under 1% (0.5 to 0.9% across runs) while smart sits at or a bit above the top of its range (4.8 to 6.6%). Narrowing the casual/smart gap is a design question (it rewards smart building), not a single number to tweak.
 4. **Pure scorers rarely win MVP**, so they stall below 350 (6 to 7 scoring titles and no MVP).
 5. **Bench-role rings** at 37 count in full toward the GOAT score; scale ring credit by role?
 6. **Phase 3 priorities:** which of the joint top 10 to build next (spend-screen previews and a stop budget for pacing were the most requested by testers).
