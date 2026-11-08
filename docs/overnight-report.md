@@ -208,6 +208,29 @@ So point guards and bigs hit a lower ceiling for the same effort. That explains 
 - Contenders still sometimes collapse the year you join (a 52-30 Finals team went 33-49), and a 62-20 team lost in round 1 twice. This was already on the open list.
 - The rival won MVP while your teammate; pure scorers rarely win MVP.
 
+### Round G10 (3 testers)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Rookie wing, Next Decision pacing | **THE GOAT on career 2** (score 506, 10 MVPs, 3 rings, 38,055 points) | 4/5 |
+| Pro Slasher | Top 10 All-Time (5 rings, 1 MVP, 35,843 points) | n/a |
+| Art director, eighth pass | 17-season Rookie career to the plaque | 4/5 |
+
+**Confirmed working:** Next Decision plus the While you simmed card ("a good loop"), the milestone note on Retire now, drawn recruiting stars, same main-team jersey on the Final Buzzer and plaque, beards growing in at 17.
+
+**Fixed after G10**
+- **Accidental choices:** two testers tapped Next and hit the risky first summer option that appeared under their finger. Choices now ignore taps for half a second after a story step changes.
+- **Headwear color, final call:** testers disagreed (color changes with age vs. disappears on gray). It now keeps one color for life, picked against your natural hair, and its outline keeps it visible on gray.
+- The creator's preview card shrinks to a small strip once you scroll into the options, so it no longer hides the grid.
+- The plaque labels its badges "Best badges of your career" (it showed Gold for a badge that later dropped to Silver).
+- While you simmed shows each season's OVR change.
+- MVP voters rarely reward a losing team (MVPs had gone to 41-41, 37-45 and 34-48 teams).
+- The "Is It Time?" prompt shows the milestone note and your unspent points.
+
+**Seen, not changed**
+- MVP for pure scorers is the main wall on Pro (7 scoring titles, usually 2nd to 5th in MVP). This pulls the other way from the losing-team fix above; both belong in the balance pass.
+- Season goals change after a trade; "Cut your minutes" did not visibly change minutes; one game-winner listed twice on the plaque; OVR stalls at 93 for years with hundreds of points banked.
+
 ## GOAT odds (checked overnight)
 
 Simulated 1,500 careers per row with the balance harness. "Casual" spends points at random; "smart" spends them well.

@@ -3,7 +3,7 @@
  {"at":0.35,"call":["tap","Menu"]},
  {"at":0.38,"expectPage":["document.getElementById('app').textContent.includes('GTP Store')","document.getElementById('app').textContent.includes('Hall of Builds')","document.getElementById('app').textContent.includes('Achievements')"]},
  {"at":0.4,"call":["tap","GTP Store"]},
- {"at":0.43,"expectPage":["document.getElementById('app').textContent.includes('GTP Shop')","document.querySelector('#app details[open]')!=null"]},
+ {"at":0.43,"expectPage":["document.getElementById('app').textContent.includes('GTP Store')","document.querySelector('#app details[open]')!=null"]},
  {"at":0.45,"call":["tap","Menu"]},
  {"at":0.5,"call":["tap","Achievements"]},
  {"at":0.53,"expectPage":["document.querySelector('#app details[open] .ach')!=null"]},
