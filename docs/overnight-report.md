@@ -5,7 +5,7 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 ## Read this first
 
 **What happened overnight**
-- 18 rounds of 3 Witness playtesters (54 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (88 automated tests, all passing) and committed locally.
+- 19 rounds of 3 Witness playtesters (57 sessions), plus a final round still finishing at 8 AM: GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (89 automated tests, all passing) and committed locally.
 - Testers reached THE GOAT on Rookie (six times, on the first or second career), Pro (a rim protector on career 3) and Hall of Fame (a center on career 2, with perks). Most Pro and Hall of Fame careers ended at Hall of Famer or Top 10 All-Time, which is where you want them.
 - Phase 2 rebuilt the character creator and polished the character art (aging, team colors, portraits on banners and the Final Buzzer card).
 - Phase 3: three high-effort leads proposed and debated what to add next. Their joint top 10 is below, and the full documents are in `docs/phase3/`.
@@ -434,6 +434,26 @@ So point guards and bigs hit a lower ceiling for the same effort. That explains 
 - Free-agency offers show your OVR from when the offers were made (you can raise it before choosing).
 - Teaming up with your rival can push him to #1 in the GOAT debate, with no warning.
 
+### Round G19 (3 testers)
+
+| Tester | Result | Fun |
+|---|---|---|
+| First-time player on Rookie | 2nd all-time (score 482, 11 rings, 4 MVPs), 8 points behind the retired rival | 4/5 |
+| Pro Sharpshooter | 86 OVR and 3 All-Stars by season 6 (OVR does keep climbing past 84 for wings) | 4/5 |
+| Art and menus | No crashes; menus, Profile, Badge Book and timeline "look clean" | n/a |
+
+**Fixed after G19**
+- The reset warning lists the Badge Book too, and reads as a proper list.
+- The GTP perk "Ice in your veins" is renamed "Cold-blooded" (it sounded like the "Ice in the Veins" achievement).
+- The Daily Build card names today's era.
+
+**Not a bug (checked):** testers in four rounds said the Rivalry, GOAT debate and League sections "can't be opened". I checked in a browser: every main section header is tappable. The test harness was also listing the sub-sections inside closed sections as tappable, and those are hidden until you open the parent.
+
+**Seen, not changed**
+- Teaming up with your rival can push him past you in the GOAT debate (it cost this tester THE GOAT by 8 points), and late ring chases win titles easily. The team-up card now warns "Every ring you win together counts for his legacy too"; the balance side is for the balance pass.
+- Low-usage seasons can still win MVP on a great team (12.3 points in 26 minutes).
+- "Top 10 All-Time" undersells finishing 2nd ever; a "#2 all-time" line on the plaque would land better.
+
 ## GOAT odds (checked overnight)
 
 Simulated 1,500 careers per row with the balance harness. "Casual" spends points at random; "smart" spends them well.
@@ -456,7 +476,7 @@ Identical runs swing by about ±0.8 points on the smart column, so Pro smart is 
 ## Phase 2: Characters and creator
 
 **New creator (Look step)**
-- A live preview card at the top: your player, name, number and look, with a Now / At 36 toggle to see how you will age.
+- A live preview card at the top: your player, name, number and look, with an At 18 / At 36 toggle to see how you will age; it shrinks to a small strip while you scroll the options.
 - Options grouped into Face, Hair, Gear and Uniform tabs.
 - Color swatches for skin, hair color, jersey and trim.
 - Picture thumbnails of YOUR player for hairstyles, facial hair, expressions, headwear, arms, jewelry and mouthguards.
@@ -484,6 +504,20 @@ Identical runs swing by about ±0.8 points on the smart column, so Pro smart is 
 - Arm and uniform pictures are wide strips, three to a row, so sleeves and ink read. Mouthguard pictures hide the beard so the four options differ.
 - The ten jersey colors sit in two even rows of five. Swatches keep their size but have a 44 px tap area. No browser spinner arrows on the number box.
 - The creator says facial hair grows in at 17 (it shows as stubble in high school).
+
+**After the later reviews (G6 to G19)**
+- Graying tuned three times to land in the middle: 36 reads salt-and-pepper on every hair color (black hair shows silver, auburn no longer goes fully gray), full gray from 38.
+- Headwear keeps one color for life (testers disagreed on whether it should change with age); its outline keeps it visible on gray hair.
+- The Final Buzzer card: a big aged portrait in your main team's colors, age and seasons, why it ended, and your four career numbers. The plaque wears the same main-team jersey.
+- The creator preview shrinks to a small strip as soon as it pins to the top while you scroll.
+- The toggle reads "At 18" and "At 36"; ten jersey colors sit in two rows of five; arm and uniform pictures are three to a row; mouthguard pictures hide the beard.
+- Recruiting stars are drawn as vector stars with a readable label.
+- The Rim Protector premade reads as a Rim Protector on every 7-foot body.
+
+**Still open for the art pass**
+- Season cards have no portrait (testers asked in nearly every art round).
+- Team identity: team colors only show on your jersey, so nobody notices them when they match your own kit. Fixed team kits, a three-letter tag and a simple original crest are the phase 3 proposal for this.
+- The darkest skin tone loses some contrast on brows and mouth lines in small thumbnails.
 
 ## Phase 3: three leads discuss what to add next
 
