@@ -5,7 +5,7 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 ## Read this first
 
 **What happened overnight**
-- 15 rounds of 3 Witness playtesters (45 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (88 automated tests, all passing) and committed locally.
+- 16 rounds of 3 Witness playtesters (48 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (88 automated tests, all passing) and committed locally.
 - Testers reached THE GOAT on Rookie (five times, usually on the first or second career), Pro (a rim protector on career 3) and Hall of Fame (a center on career 2, with perks). Most Pro and Hall of Fame careers ended at Hall of Famer or Top 10 All-Time, which is where you want them.
 - Phase 2 rebuilt the character creator and polished the character art (aging, team colors, portraits on banners and the Final Buzzer card).
 - Phase 3: three high-effort leads proposed and debated what to add next. Their joint top 10 is below, and the full documents are in `docs/phase3/`.
@@ -24,7 +24,7 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 **Decisions for you** (details in each round below)
 1. **OVR ceilings differ by style** (wings and slashers reach about 90 with their key skills maxed; point guards and bigs about 84). Fixing it means changing the OVR formula and retuning odds.
 2. **Reset all progress erases bought gems.** Keep purchases through a reset?
-3. **Pro odds spread:** casual sits slightly under 1% (0.5 to 0.9% across runs) while smart sits at or a bit above the top of its range (4.8 to 6.6%). Narrowing the casual/smart gap is a design question (it rewards smart building), not a single number to tweak.
+3. **Pro odds spread:** a 5,000-career run gives casual 0.7% and smart 5.5% (targets ~1% and 4.3–5%). The gap between casual and smart players is a little wider than you want; narrowing it is a design question, not a single number to tweak.
 4. **Pure scorers rarely win MVP**, so they stall below 350 (6 to 7 scoring titles and no MVP).
 5. **Bench-role rings** at 37 count in full toward the GOAT score; scale ring credit by role?
 6. **Phase 3 priorities:** which of the joint top 10 to build next (spend-screen previews and a stop budget for pacing were the most requested by testers).
@@ -366,6 +366,23 @@ So point guards and bigs hit a lower ceiling for the same effort. That explains 
 - The league's surname pool is small (four players with the same surname in one top 10).
 - A few story lines repeat in back-to-back seasons (badge "fades away"), and the season-high line sat at exactly 38 points for several early seasons.
 
+### Round G16 (3 testers)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Rookie wing explorer | Top 10 All-Time (4 rings, 8 All-Stars, 1 DPOY, 2 scoring titles, no MVP) | n/a |
+| Pro Slasher | First-ballot Hall of Famer (4 rings, 1 Finals MVP, 7 All-Stars) | n/a |
+| Hall of Fame rim protector | Top 10 All-Time (3 rings, 2 Finals MVPs, 7 DPOYs, no MVP); Next Decision "worked as intended" | n/a |
+
+**Fixed after G16**
+- Escape closes the side menu, a menu page, the How to play guide, or the profile.
+- The Legacy card's last step reads "THE GOAT (and #1 in the GOAT debate)", so the second condition is no longer small print.
+- The plaque shows a scoring-title chip (up to five chips now).
+
+**Explained, not changed**
+- "OVR 69 to 68" in a season recap while the header shows 69 (reported three times): the recap records your OVR at the end of the season, and summer choices and training change it before you look at the header. A one-line "after the summer" note on the header would remove the confusion.
+- The #1 legend in the GOAT debate is always exactly 345: the 10 legends are a fixed ladder (345, 323, 301 ...), so the bar is identical every career. A little random spread (say 335 to 355) would make each league's GOAT debate feel different without changing the odds much.
+
 ## GOAT odds (checked overnight)
 
 Simulated 1,500 careers per row with the balance harness. "Casual" spends points at random; "smart" spends them well.
@@ -378,7 +395,7 @@ Latest runs (final settings, after round G12):
 | Pro | 0.7–0.9% (two runs) | 4.8–6.4% (two runs) | ~1% casual, 4.3–5% smart |
 | Hall of Fame | 0.4% | 2.6% | ~0.5% casual, 2–2.5% smart |
 
-Identical runs swing by about ±0.8 points on the smart column, so Pro smart is somewhere around 5.5% and Hall of Fame smart around 2.6%: both slightly above target, casual slightly below. A larger run (5,000 careers) in the daytime would pin it down before any retune.
+Identical runs swing by about ±0.8 points on the smart column, so Pro smart is somewhere around 5.5% and Hall of Fame smart around 2.6%: both slightly above target, casual slightly below. A larger Pro run (5,000 careers each way) then pinned it down: **casual 0.7% (±0.1), smart 5.5% (±0.3)**. Both are just outside your targets, in opposite directions, so no single setting fixes both: the casual/smart gap itself would need a design change (for example, making smart spending matter a little less, or giving casual players more help from the spend screen).
 
 - The All-Star changes (top-5 scorers and the DPOY always make the team) pushed Rookie casual up to 11%. To compensate, Rookie pro-season points went from .45 to .40, and Hall of Fame from .75 to .77 (between the two settings tested). Pro is unchanged.
 - Run-to-run noise is about ±0.5 points at these sample sizes.
