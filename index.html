@@ -969,7 +969,7 @@ function seasonPlayoffs(){const c=S.cur,t=S.traits,L=S.L,z=L.z,{n,a,prevO,o,gp,m
   // awards: voted against every real player in the league
   const C=active(L).filter(p=>p.gp>0).map(p=>({p,name:p.name,team:p.team,ovr:p.ovr,gp:p.gp,ppg:p.ppg,rpg:p.rpg,apg:p.apg,spg:p.spg,bpg:p.bpg,tov:p.tov,fg:p.fg,wins:p.wins,star:p.star,d:p.d,dw:(p.aw&&p.aw.DPOY)||0,rook:p.yrs===0}));
   const ME={me:1,name:S.name,team:S.team,ovr:o,gp,ppg,rpg,apg,spg,bpg,tov,fg,wins,star:(t.star-3)*1.5+badgeFx().as,d:clamp(o*.85+6+(['PF','C'].includes(S.pos)?4:0)+clamp((Math.max(eff('def'),(es('intD')+es('blk'))/2,(es('perD')+es('stl'))/2-2)-o)*1.1,0,18)+(t.lock-3)*2+badgeFx().dp,35,99),dw:S.nba.filter(x=>x.aw.includes('DPOY')).length,rook:n===0};C.push(ME);
-  for(const c of C){c.pr=prodScore(c);c.mv=c.ovr*.6+c.pr*.5+(c.wins-41)*.25+gauss()*1.2;c.as=c.ovr*.6+c.star+c.pr*.7+c.ppg*.25+(c.wins-41)*.05+gauss()*1.5;c.dp=c.d-Math.min(4,c.dw||0)*1.6+gauss()*2;c.ry=c.ppg+gauss()*1.5;}
+  for(const c of C){c.pr=prodScore(c);c.mv=c.ovr*.6+c.pr*.5+(c.wins-41)*.25-Math.max(0,41-c.wins)*.3+gauss()*1.2;c.as=c.ovr*.6+c.star+c.pr*.7+c.ppg*.25+(c.wins-41)*.05+gauss()*1.5;c.dp=c.d-Math.min(4,c.dw||0)*1.6+gauss()*2;c.ry=c.ppg+gauss()*1.5;}
   const top=(k,f,g)=>C.filter(g).sort((x,y)=>y[k]-x[k]).slice(0,f),aw=[],W={},give=(c,x)=>{if(c.me)aw.push(x);else c.p.aw[x]=(c.p.aw[x]||0)+1;(W[x]=W[x]||[]).push(c);};
   const an=top('mv',15,c=>c.gp>=65);an.forEach((c,i)=>give(c,i<5?'All-NBA 1st':i<10?'All-NBA 2nd':'All-NBA 3rd'));
   const mvp=an[0];if(mvp){give(mvp,'MVP');if(!mvp.me)mvp.p.mvps++;}
@@ -1162,7 +1162,7 @@ function eventPend(){const last=S.nba[S.nba.length-1],o=ovr(),a=S.age,rv=S.rival
   const L=E.filter(e=>!(S.seenT||[]).includes(e.title));if(!L.length)return null;
   const e=pick(L);(S.seenT=S.seenT||[]).push(e.title);return{kind:'event',...e};}
 function retirePend(){const c=career(),sc=goatScore(c),[t]=tierOf(sc,c);
-  return{kind:'retire',title:'🕰️ Is It Time?',text:`Age ${S.age}, OVR ${OV()}. Your body is telling you it might be time. Legacy right now: ${t} (GOAT Score ${sc}).`,opts:[
+  return{kind:'retire',title:'🕰️ Is It Time?',text:`Age ${S.age}, OVR ${OV()}. Your body is telling you it might be time. Legacy right now: ${t} (GOAT Score ${sc}).${mileNote()}${S.bank>0?` You have ${S.bank} unspent points.`:''}`,opts:[
     {label:'👋 Retire',desc:'Walk away on your own terms.',fn:()=>{S.retired='Retires';S.queue=[];finish();return null;}},
     {label:'🔁 One more year',desc:'Chase one more milestone. It could also tarnish the ending.',fn:()=>{addNext({declAdj:.3});return 'You came back for one more year';}},
     ...(S.farewell?[]:[{label:'📣 One last season: a farewell tour',desc:'Next season is your last. Ovations everywhere and a fired-up team.'+mileNote(),fn:()=>{S.farewell=S.nba.length+1;addNext({team:3});S.hype+=6;return 'You announced a farewell tour';}}])]};}
@@ -2306,7 +2306,7 @@ const EMOJI_ICON={
 
 // ---------- UI ----------
 const app=document.getElementById('app');
-function act(fn,...a){fn(...a);if(fn===choose&&UI().auto&&!UI().seq)autoStep();else render();}
+function act(fn,...a){if((fn===choose||fn===chooseSummer)&&!document.documentElement.classList.contains('wt')&&performance.now()-(UI().seqT||0)<500)return;fn(...a);if(fn===choose&&UI().auto&&!UI().seq)autoStep();else render();}
 const UI=()=>S.ui||(S.ui={tab:'setup',open:null,spend:false});
 const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 // every emoji in the game's text is swapped for a custom icon when a screen is drawn
@@ -2619,7 +2619,7 @@ function autoStep(){const u=UI();u.autoWhy=null;
 function autoCard(){const u=UI();if(!u.auto||!['cut','points'].includes(u.autoWhy))return'';
   return`<div class="card flash"><div class="ev gold">⏸ Career sim paused: ${u.autoWhy==='cut'?`your roster spot is at risk at ${OV()} OVR. Spend your ${S.bank} points to raise it`:`you have ${S.bank} bonus points to spend`}. Then tap Whole Career ⏭ to keep going.</div><button class="wide" style="margin-top:8px" onclick="openProfile('skills')">Spend points</button></div>`;}
 function simmedCard(){const q=UI().simmed;if(!q||S.stage!=='nba')return'';const rows=S.nba.slice(q[0],q[1]);if(!rows.length)return'';
-  return`<div class="card"><div class="sh">⏩ <span class="grow">While you simmed</span><b class="muted">${rows.length} season${rows.length>1?'s':''}</b></div>${rows.map(s=>`<div class="ev"><span><b>Season ${s.yr}</b> · ${esc(tShort(s.team))} ${s.wins}-${82-s.wins} · ${f1(s.ppg)} / ${f1(s.rpg)} / ${f1(s.apg)} · ${s.po||'Missed playoffs'}${s.aw.length?` · <span class="gold">${s.aw.join(', ')}</span>`:''}</span></div>`).join('')}<div class="note">Full season cards are in your profile timeline.</div></div>`;}
+  return`<div class="card"><div class="sh">⏩ <span class="grow">While you simmed</span><b class="muted">${rows.length} season${rows.length>1?'s':''}</b></div>${rows.map(s=>`<div class="ev"><span><b>Season ${s.yr}</b> · ${esc(tShort(s.team))} ${s.wins}-${82-s.wins} · ${f1(s.ppg)} / ${f1(s.rpg)} / ${f1(s.apg)} · ${s.po||'Missed playoffs'}${s.ovrIn!=null&&s.ovr?` · OVR ${s.ovrIn} to ${Math.round(dsp(s.ovr))}`:''}${s.aw.length?` · <span class="gold">${s.aw.join(', ')}</span>`:''}</span></div>`).join('')}<div class="note">Full season cards are in your profile timeline.</div></div>`;}
 function simAll(){UI().simmed=null;let g=0;const n0=S.nba.length,bigS=l=>l&&l.aw.some(x=>/Champion|^MVP$/.test(x));while(S.stage==='nba'&&!S.pend&&g++<25){autoBank();simNBA();if(bigS(S.nba[S.nba.length-1]))break;}autoBank();
   // a title or MVP season, or the last season of a career, always gets its story
   if(S.nba.length>n0&&(bigS(S.nba[S.nba.length-1])||S.stage==='end')&&!(S.pend&&['clutch','mid'].includes(S.pend.kind)))startSeq();else if(S.nba.length>n0)UI().simmed=[n0,S.nba.length];render();scrollTo(0,0);}
@@ -2715,7 +2715,7 @@ function seqHTML(){const q=UI().seq,k=q.k[q.i],nx=q.k[q.i+1],arr=S.stage==='coll
   const title=k==='clutch'&&(S.nba[S.nba.length-1]?.clutch||[]).length>1?'The Final Plays':k==='season'?(S.stage==='end'?'Final Season':S.stage==='nba'?`Season ${S.nba.length}`:`${YR[arr.length-1]} Year`):SEQ_L[k];
   return`<div class="seqtop"><div class="dots" aria-label="Step ${q.i+1} of ${q.k.length}">${q.k.map((_,j)=>`<i class="${j<q.i?'done':j===q.i?'on':''}"></i>`).join('')}</div><button class="ghost sm" onclick="seqSkip()">Skip</button></div>
   <h1 class="seqh">${title}</h1>${S.stage==='end'&&k==='season'&&S.endWhy?`<div class="note" style="text-align:center;margin:-4px 0 8px">${S.farewell?'Your farewell tour':S.retired==='Out of the league'?'Your last season in the league':'Your last season'}: the story first, then why it ended.</div>`:''}<div class="seqcard">${seqPiece(k)}</div>${UI().auto&&S.stage==='nba'?'<div class="note" style="text-align:center">⏭ Whole Career is on: tap Next through this season’s story, or Skip to go straight to the next season.'+(S.bank>=40&&OV()<99?` 💰 You have ${S.bank} points banked: spend them any time.`:'')+'</div>':''}`+dock((k==='summer'&&S.summerPend)||(k==='decision'&&S.pend)?`<button disabled>Make your pick above</button>`:`<button onclick="seqNext()">${nx?'Next: '+SEQ_L[nx]:S.stage==='end'?'Your legacy':UI().auto&&S.stage==='nba'?'Next season':'Continue'} ▶</button>${UI().auto?'<button class="ghost" onclick="UI().auto=0;render()">⏹ Stop the career sim</button>':''}`);}
-function seqNext(){const q=UI().seq;if(!q)return;if(q.k[q.i]==='spend'){clearUndo();UI().spend=false;}const c=document.querySelector('.seqcard'),go=()=>{if(UI().seq!==q)return;q.i++;if(q.i>=q.k.length){UI().seq=null;if(q.k.includes('summer'))UI().seenRes=S.lastResult;if(UI().auto)return autoStep();}render();scrollTo(0,0);};
+function seqNext(){const q=UI().seq;if(!q)return;if(q.k[q.i]==='spend'){clearUndo();UI().spend=false;}const c=document.querySelector('.seqcard'),go=()=>{if(UI().seq!==q)return;q.i++;UI().seqT=performance.now();if(q.i>=q.k.length){UI().seq=null;if(q.k.includes('summer'))UI().seenRes=S.lastResult;if(UI().auto)return autoStep();}render();scrollTo(0,0);};
   if(c&&!document.documentElement.classList.contains('wt')){c.classList.add('leave');document.querySelector('.seqh')?.classList.add('leave');setTimeout(go,210);}else go();}
 function seqSkip(){if(UI().seq&&UI().seq.k.includes('summer'))UI().seenRes=S.lastResult;UI().seq=null;UI().spend=false;if(UI().auto)return autoStep();render();scrollTo(0,0);}
 // ---------- motion: entrance on new screens, OVR bump, new-season glow, confetti for big moments ----------
