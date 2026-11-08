@@ -231,6 +231,32 @@ So point guards and bigs hit a lower ceiling for the same effort. That explains 
 - MVP for pure scorers is the main wall on Pro (7 scoring titles, usually 2nd to 5th in MVP). This pulls the other way from the losing-team fix above; both belong in the balance pass.
 - Season goals change after a trade; "Cut your minutes" did not visibly change minutes; one game-winner listed twice on the plaque; OVR stalls at 93 for years with hundreds of points banked.
 
+### Round G11 (3 testers)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Hall of Fame Slasher | Hall of Famer (2 rings, 6 All-Stars); Next Decision stopped on both title seasons as intended | n/a |
+| Pro Two-Way Wing, Whole Career | All-Star tier (2 rings, 1 DPOY) | n/a |
+| Menus and screens explorer (new) | Visited every menu and all six Profile tabs; one Daily Build career | 3/5 |
+
+**Fixed after G11**
+- **Hall of Builds on a phone:** the table only showed two columns (tier, score and the rest were off screen). It is now a stacked list: name, style and tier on top; difficulty, score, PPG, rings, MVPs and pick below; highlights under that.
+- "Reset all progress" is styled as a dangerous action; the progress line says "1 career".
+- One name everywhere: GTP Store (one card said GTP Shop).
+- The Daily Build says it earns GTP but no gems (a tester finished a Daily career with 0 gems and no explanation).
+- After a trade or signing, the goals card says "New team, new goals" (goals changed silently before).
+- "Race for the Top Seed" only fires for a team that won 50+ last season (it fired for a 38-44 team).
+- First scoring title and first Defensive Player of the Year get banners.
+- League headlines never show only a last name you share with a league player (an "Ellison MVP" headline was a teammate).
+
+**Seen, not changed (menus explorer's list, for a UI pass)**
+- No Profile entry in the side menu; GTP Store and How to play disappear from it once a career starts.
+- The end-of-career recap is easy to tap past and can't be reopened; Hall of Builds rows can't be tapped to reopen an old career.
+- Profile: Timeline leaves out the draft and major injuries; Traits doesn't mark your two locked traits; Badges lists an already-reached badge under "Close to"; the Skills tip suggests raising a skill that is already 99.
+- Achievements and Badge Book share an icon; some perks have icons and some don't.
+- The Daily Build can be replayed any number of times a day; turning it on hides perks already in your cart without a message.
+- Pacing in Whole Career is still 4 to 7 taps a season (one offseason stopped 4 times in a row).
+
 ## GOAT odds (checked overnight)
 
 Simulated 1,500 careers per row with the balance harness. "Casual" spends points at random; "smart" spends them well.
@@ -243,7 +269,7 @@ Latest run (final settings, after the G8 All-Star vote change):
 | Pro | 0.6% | 4.9% | ~1% casual, 4.3–5% smart |
 | Hall of Fame | 0.4% | 2.7% | ~0.5% casual, 2–2.5% smart |
 
-The run before it (same difficulty settings, before fans weighed scoring) had Rookie 9.2%, Pro 1.0% / 5.3%, Hall of Fame 0.5% / 2.7%. Pro casual at 0.6% is about 1.5 standard errors low; worth one more run before shipping.
+The run before it (same difficulty settings, before fans weighed scoring) had Rookie 9.2%, Pro 1.0% / 5.3%, Hall of Fame 0.5% / 2.7%. Two more Pro runs on the next build gave 0.7% and 0.9% casual (4.9% and 5.2% smart), so Pro casual sits slightly under 1% and smart at the top of its range. Raising casual would also raise smart, so I left Pro alone.
 
 - The All-Star changes (top-5 scorers and the DPOY always make the team) pushed Rookie casual up to 11%. To compensate, Rookie pro-season points went from .45 to .40, and Hall of Fame from .75 to .77 (between the two settings tested). Pro is unchanged.
 - Run-to-run noise is about ±0.5 points at these sample sizes.
