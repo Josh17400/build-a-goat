@@ -5,7 +5,7 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 ## Read this first
 
 **What happened overnight**
-- 16 rounds of 3 Witness playtesters (48 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (88 automated tests, all passing) and committed locally.
+- 17 rounds of 3 Witness playtesters (51 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (88 automated tests, all passing) and committed locally.
 - Testers reached THE GOAT on Rookie (five times, usually on the first or second career), Pro (a rim protector on career 3) and Hall of Fame (a center on career 2, with perks). Most Pro and Hall of Fame careers ended at Hall of Famer or Top 10 All-Time, which is where you want them.
 - Phase 2 rebuilt the character creator and polished the character art (aging, team colors, portraits on banners and the Final Buzzer card).
 - Phase 3: three high-effort leads proposed and debated what to add next. Their joint top 10 is below, and the full documents are in `docs/phase3/`.
@@ -382,6 +382,27 @@ So point guards and bigs hit a lower ceiling for the same effort. That explains 
 **Explained, not changed**
 - "OVR 69 to 68" in a season recap while the header shows 69 (reported three times): the recap records your OVR at the end of the season, and summer choices and training change it before you look at the header. A one-line "after the summer" note on the header would remove the confusion.
 - The #1 legend in the GOAT debate is always exactly 345: the 10 legends are a fixed ladder (345, 323, 301 ...), so the bar is identical every career. A little random spread (say 335 to 355) would make each league's GOAT debate feel different without changing the odds much.
+
+### Round G17 (3 testers)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Pro Two-Way Wing, Next Decision | All-Star tier (1 ring, 1 DPOY); OVR stalled around 80–82 | n/a |
+| Rookie Post Bully | Hall of Famer pace (10 All-Stars, 2 scoring titles, 1 DPOY) at 33 | n/a |
+| First-time player on Pro | Top 10 All-Time (#1 pick, 6 rings, 11 All-Stars, 30,714 points, 0 MVPs) | 4/5 |
+
+**Fixed after G17**
+- **Whole Career and banked points:** it now pauses once when you have 60+ points banked (at most every three seasons), so points don't pile up to 127 unspent.
+- Switching to Next Decision clears the "Whole Career paused" banner.
+- The All-Star line says "(voted in)" when you made it on votes (a bare "16th" next to All-Star read like a miss).
+- The league's top-players table shows a RINGS header (a ring emoji there had no icon and showed blank).
+- The plaque counts multiple college titles ("2× college national champion").
+- The shoe deal says "Star Power is already 5/5: more hype instead" when it is maxed, and gives the hype.
+
+**Seen, not changed**
+- Final plays come up in nearly every playoff run late in a career and stop feeling special. The content lead's "at most 2 final plays per playoffs" idea fits, but it changes how often you win series, so it belongs in the balance pass.
+- The pure-scorer MVP wall again (two scoring titles at 34 and 35 PPG on 56- and 57-win teams, best MVP finish 4th).
+- Every random name used the same surname in this tester's runs. That comes from the test harness's fixed random seed, not real play.
 
 ## GOAT odds (checked overnight)
 
