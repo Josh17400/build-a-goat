@@ -5,8 +5,8 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 ## Read this first
 
 **What happened overnight**
-- 23 rounds of 3 Witness playtesters (69 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (89 automated tests, all passing) and committed locally.
-- Testers reached THE GOAT on Rookie (seven times, on the first or second career), Pro (a rim protector on career 3) and Hall of Fame (a center on career 2, with perks). Most Pro and Hall of Fame careers ended at Hall of Famer or Top 10 All-Time, which is where you want them.
+- 24 rounds of 3 Witness playtesters (72 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (89 automated tests, all passing) and committed locally.
+- Testers reached THE GOAT on Rookie (eight times, often on the first career), Pro (a rim protector on career 3) and Hall of Fame (a center on career 2, with perks). Most Pro and Hall of Fame careers ended at Hall of Famer or Top 10 All-Time, which is where you want them.
 - Phase 2 rebuilt the character creator and polished the character art (aging, team colors, portraits on banners and the Final Buzzer card).
 - Phase 3: three high-effort leads proposed and debated what to add next. Their joint top 10 is below, and the full documents are in `docs/phase3/`.
 - GOAT odds were rechecked after every balance change and retuned once (Rookie .45 to .40, Hall of Fame .75 to .77).
@@ -519,6 +519,22 @@ So point guards and bigs hit a lower ceiling for the same effort. That explains 
 - "Stay an Athletic Finisher" (was "Stay a Athletic Finisher").
 - The bonus line says "defensive stats" when steals and blocks earned it (it said "big season" for a 7-point bench year).
 - When you finish top 8 in DPOY voting and lose, the season card names the winner (from G22).
+
+### Round G24 (3 testers, final round)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Pro Two-Way Wing | Stopped at season 5 after a major injury (69 OVR) | 3/5 |
+| Hall of Fame Floor General | A title in season 2 (Next Decision showed the ring story); starter at 77 OVR after 8 seasons | 4/5 |
+| First-time player on Rookie | **THE GOAT on career 1** (score 450, 7 rings, 6 MVPs) in about 20 real minutes | 4/5 |
+
+**Fixed after G24**
+- **Spend screen, buttons moving under your finger:** after a raise, an Undo row appeared above the skills and pushed the buttons down (a tap meant for "Raise by 10" hit "Max out"). Undo now only appears below the list.
+- "A five-star freshman takes your shots" no longer fires in your own freshman year.
+
+**Checked, not a bug:** "Hall of Fame selected but the setup text describes Pro" (reported again): in a browser, picking Hall of Fame shows "Hall of Fame: ... 120 skill points, start around 45 OVR". The tester read the card before the switch.
+
+**Last word on Rookie:** testers reached THE GOAT on Rookie eight times tonight, often on the first career, and several called it too easy. The simulated odds (9.5% casual, 38% smart) are on your target, so this is about how good real players are at the game, not a tuning error. If Rookie should feel harder for engaged players, the smart-player odds are the number to look at.
 
 ## GOAT odds (checked overnight)
 

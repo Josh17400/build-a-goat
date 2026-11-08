@@ -686,7 +686,7 @@ function colEvents(y){const t=S.traits;return[
   {tag:'perf',w:4,f:()=>{S.attrs.three=Math.max(MIN_A,S.attrs.three-2);S.hype-=3;return[-1,'🥶 You hit a shooting slump all of January. -2 Three-Point']}},
   {w:3,f:()=>{up('iq',2);S.hype+=1;return[1,'📚 You are named Academic All-American. +2 IQ']}},
   {w:4,f:()=>{up('str',4);S.attrs.speed=Math.max(MIN_A,S.attrs.speed-1);return[0,'🏋️ The strength coach adds 15 pounds of muscle. +4 Strength, -1 Speed']}},
-  {tag:'perf',w:4,f:()=>{S.hype-=3;return[-1,'🧑‍🤝‍🧑 A five-star freshman joins the team and takes your shots']}},
+  {tag:'perf',w:S.col.length>=1?4:0,f:()=>{S.hype-=3;return[-1,'🧑‍🤝‍🧑 A five-star freshman joins the team and takes your shots']}},
   {tag:'perf',w:es('three')>=60&&ovr()>=56?5:0,f:()=>{up('three',3);S.hype+=2;return[1,'🎯 You lead the conference in 3-point percentage. +3 Three-Point']}},
   {w:2,f:()=>{S.banned=true;S.hype-=4;return[-1,'🚨 NCAA sanctions hit the program. No postseason this year']}},
   {w:3,f:()=>{addBank(2);S.hype+=3;return[1,'🎥 You spend the summer working out with NBA pros. +12 pts']}},
