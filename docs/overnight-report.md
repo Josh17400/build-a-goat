@@ -153,6 +153,19 @@ Testers kept playing careers until they reached THE GOAT, and listed every bug, 
 - Position labels follow height (a 6'4" Sharpshooter is listed PG).
 - The Rim Protector premade projected as "Glass Cleaner" at its own default body. *Fixed:* its skill mix now leans on blocks and interior defense, and it reads as Rim Protector on every body 6'8" and up.
 
+## GOAT odds (checked overnight)
+
+Simulated 1,500 careers per row with the balance harness. "Casual" spends points at random; "smart" spends them well.
+
+| Difficulty | Casual GOAT | Smart GOAT | Your target |
+|---|---|---|---|
+| Rookie | 9.2% | 35.5% | ~9–10% casual |
+| Pro | 1.0% | 4.6–5.3% (two runs) | ~1% casual, 4.3–5% smart |
+| Hall of Fame | 0.5% | 1.9–2.7% (two settings) | ~0.5% casual, 2–2.5% smart |
+
+- The All-Star changes (top-5 scorers and the DPOY always make the team) pushed Rookie casual up to 11%. To compensate, Rookie pro-season points went from .45 to .40, and Hall of Fame from .75 to .77 (between the two settings tested). Pro is unchanged.
+- Run-to-run noise is about ±0.5 points at these sample sizes.
+
 ## Phase 2: Characters and creator
 
 **New creator (Look step)**
