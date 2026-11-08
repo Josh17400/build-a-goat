@@ -4,7 +4,7 @@ const toPros = "for(let i=0;i<4;i++){if(S.summerPend)chooseSummer(0);simHS();}ch
 export default [
   { name: 'the final season gets its story windows before the plaque', seed: 81, steps: [
     { at: 0.3, evalAs: { x: start } },
-    { at: 0.4, evalAs: { r: `(()=>{${toPros}let g=0;while(S.nba.length<3&&g++<40){if(S.pend)choose(S.pend.kind==='clutch'?S.pend.best:0);else simNBA();}S.pend=null;S.queue=[];S.farewell=S.nba.length+1;UI().seq=null;playSeason(simNBA);while(S.pend&&S.pend.kind!=='clutch'&&S.stage==='nba'&&g++<60)choose(0);if(S.pend&&S.pend.kind==='clutch')choose(S.pend.best);const q=UI().seq,h=document.getElementById('app').textContent,ok=S.stage==='end'&&q&&q.st==='end'&&q.k.includes('season')&&!q.k.includes('spend')&&/Final Season/.test(h);UI().seq=null;render();return ok&&!/Final Season/.test(document.getElementById('app').textContent);})()` },
+    { at: 0.4, evalAs: { r: `(()=>{${toPros}let g=0;while(S.nba.length<3&&g++<40){if(S.pend)choose(S.pend.kind==='clutch'?S.pend.best:0);else simNBA();}S.pend=null;S.queue=[];S.farewell=S.nba.length+1;UI().seq=null;playSeason(simNBA);while(S.pend&&S.pend.kind!=='clutch'&&S.stage==='nba'&&g++<60)choose(0);if(S.pend&&S.pend.kind==='clutch')choose(S.pend.best);const q=UI().seq,h=document.getElementById('app').textContent,ok=S.stage==='end'&&q&&q.st==='end'&&q.k.includes('season')&&q.k.includes('ending')&&!q.k.includes('spend')&&/Final Season/.test(h);UI().seq=null;render();return ok&&!/Final Season/.test(document.getElementById('app').textContent);})()` },
       expect: ['r===true'] }] },
   { name: 'staying true to a playstyle keeps that role on the court', seed: 82, steps: [
     { at: 0.3, evalAs: { x: start } },
