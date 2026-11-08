@@ -5,7 +5,7 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 ## Read this first
 
 **What happened overnight**
-- 21 rounds of 3 Witness playtesters (63 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (89 automated tests, all passing) and committed locally.
+- 22 rounds of 3 Witness playtesters (66 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (89 automated tests, all passing) and committed locally.
 - Testers reached THE GOAT on Rookie (seven times, on the first or second career), Pro (a rim protector on career 3) and Hall of Fame (a center on career 2, with perks). Most Pro and Hall of Fame careers ended at Hall of Famer or Top 10 All-Time, which is where you want them.
 - Phase 2 rebuilt the character creator and polished the character art (aging, team colors, portraits on banners and the Final Buzzer card).
 - Phase 3: three high-effort leads proposed and debated what to add next. Their joint top 10 is below, and the full documents are in `docs/phase3/`.
@@ -35,7 +35,7 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 10. **Ship it?** If you're happy, push and start TestFlight. Nothing has been pushed.
 
 **Where things are**
-- 40 local commits on `feat/ios-monetization` since last night's push (none pushed).
+- 41 local commits on `feat/ios-monetization` since last night's push (none pushed).
 - Every playtest report is in `witness/playtests/<name>/report.md` (g1a through g18c), with replays and screenshots.
 - The phase 3 proposals and critiques are in `docs/phase3/`.
 - To ship when you're ready: `git push origin HEAD:main`, then `gh workflow run ios.yml --ref main --repo Josh17400/build-a-goat`.
@@ -490,6 +490,19 @@ So point guards and bigs hit a lower ceiling for the same effort. That explains 
 - Point guards with elite passing still miss All-Star teams (the OVR-ceiling and scorer-voting questions above).
 - Injuries can keep a defender under the 65-game line in most seasons, which decides DPOY more than defense does.
 - Spend buttons change their step size near a cap ("by 10" becomes "by 2"), and cost per point rises above 80 without the button saying so. Both are covered by the phase 3 spend-preview proposal.
+
+### Round G22 (3 testers)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Rookie first-timer | Hall of Famer pace at 33 (2 rings, 7 All-Stars); first ten minutes 8/10 | 4/5 |
+| Pro rim protector | 3 straight DPOYs and 3 All-Stars by 24; "DPOY works for a rim protector" | n/a |
+| Hall of Fame Sharpshooter | Top 10 All-Time (8 rings, 2 Finals MVPs, 35,609 points, 0 MVPs); Next Decision showed every title season | n/a |
+
+**Fixed after G22**
+- When you finish top 8 in DPOY voting and lose, the season card names the winner.
+
+**Checked, not a game bug:** "Close menu left the menu open" comes from the close animation's 230 ms timer, which the test harness's frame-stepped clock may not advance; it closes normally on a device.
 
 ## GOAT odds (checked overnight)
 
