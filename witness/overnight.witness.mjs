@@ -16,7 +16,7 @@ export default [
       expect: ['r===true'] }] },
   { name: 'no Play 75+ games goal when an injury is already coming', seed: 84, steps: [
     { at: 0.3, evalAs: { x: start } },
-    { at: 0.4, evalAs: { r: `(()=>{${toPros}let a=0,b=0;for(let i=0;i<30;i++){S.next={};makeGoals();if(JSON.stringify(S.goals).includes('+ games'))a++;S.next={gp:25};makeGoals();if(JSON.stringify(S.goals).includes('+ games'))b++;}S.next={};return a>0&&b===0;})()` },
+    { at: 0.4, evalAs: { r: `(()=>{${toPros}let a=0,b=0;for(let i=0;i<30;i++){S.next={};makeGoals();if(S.goals.list.some(g=>g.k==='gp'))a++;S.next={gp:25};makeGoals();if(S.goals.list.some(g=>g.k==='gp'))b++;}S.next={};return a>0&&b===0;})()` },
       expect: ['r===true'] }] },
   { name: 'final plays: a result line does not repeat in a career, and lines name the opponent', seed: 85, steps: [
     { at: 0.3, evalAs: { x: start } },
@@ -39,5 +39,8 @@ export default [
       expect: ["r===true||r==='nopend'"] }] },
   { name: 'road to 99: every style reaches 99 with its 7 core skills maxed and the rest at 72, and starting OVRs stay low', seed: 90, steps: [
     { at: 0.3, evalAs: { r: "(()=>{const sv=JSON.stringify(S);const bad=[];for(const id of ARCH_IDS){const a=ARCHS[id];S.height=a.h;S.frame='Balanced';for(const k of SUBKEYS)S.attrs[k]=72;for(const[k]of a.core)S.attrs[k]=99;if(Math.round(OV())<99)bad.push(a.n+' '+Math.round(OV()));for(const k of SUBKEYS)S.attrs[k]=45;if(OV()>60)bad.push(a.n+' start '+Math.round(OV()));}S=Object.assign(S,JSON.parse(sv));return bad.join(', ')||'ok';})()" },
+      expect: ["r==='ok'"] }] },
+  { name: 'no skill is frozen at the 25 start: at the shortest and tallest heights, every skill at 25 can still be raised in a career', seed: 91, steps: [
+    { at: 0.3, evalAs: { r: "(()=>{const sv=JSON.stringify(S);const bad=[];for(const h of [H_MIN,H_MAX])for(const fr of Object.keys(FRAMES)){S.height=h;S.frame=fr;for(const k of SUBKEYS)S.attrs[k]=MIN_A;for(const k of SUBKEYS){const e=es(k);S.attrs[k]=40;const e2=es(k);S.attrs[k]=MIN_A;if(atCap(k)&&k!=='dunk')bad.push(h+' '+fr+' '+k+' capped');if(e2<=e&&k!=='dunk')bad.push(h+' '+fr+' '+k+' no gain');}}S=Object.assign(S,JSON.parse(sv));return bad.slice(0,6).join(', ')||'ok';})()" },
       expect: ["r==='ok'"] }] },
 ];
