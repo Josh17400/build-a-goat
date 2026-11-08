@@ -45,8 +45,8 @@ export default [
     { at: 0.3, evalAs: { x: start } },
     { at: 0.4, evalAs: { t: "(()=>{S.stage='nba';S.bank=300;const v=S.attrs.pass;armMax('pass');return S.attrs.pass>v&&S.bank<300;})()" },
       expect: ["t===true"] }] },
-  { name: 'text: a safe summer pick pays a bonus, not a risk bonus', seed: 57, steps: [
+  { name: 'text: a summer pick shows one points total', seed: 57, steps: [
     { at: 0.3, evalAs: { x: start } },
     { at: 0.4, evalAs: { t: "(()=>{S.stage='nba';S.nba=[{age:22}];S.age=22;S.pend={kind:'summer',opts:[safe('Shooting reps','x',()=>'You put up shots')]};choose(0);return S.lastResult.text;})()" },
-      expect: ["!/risk bonus/.test(t)", "/bonus pt/.test(t)"] }] },
+      expect: ["!/risk bonus/.test(t)", "/\\+\\d+ pts?$/.test(t)"] }] },
 ];

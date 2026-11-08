@@ -8,7 +8,7 @@ export default [
       expect: ['n===4'] }] },
   { name: 'growth: a pro aged 20 to 25 develops every healthy season', seed: 42, steps: [
     { at: 0.3, evalAs: { x: start } },
-    { at: 0.4, evalAs: { r: "(()=>{for(let i=0;i<4;i++){if(S.summerPend)chooseSummer(0);simHS();}chooseSchool(0);simCol();declare();S.stage='nba';smartSpend();S.ceiling=ovr()-5;const out=[];let g=0;while(S.stage==='nba'&&S.age<25&&g++<60){if(S.pend)choose(S.pend.kind==='clutch'?S.pend.best:0);else{if(S.bank>0)smartSpend();const n0=S.nba.length;simNBA();if(S.nba.length>n0){const l=S.nba[n0],p=S.nba[n0-1];if(l.age>=20)out.push((l.notes||[]).some(x=>/Development: \\+\\d+/.test(x))||(p&&/🚑/.test(p.inj||''))?1:0);}}}return out.join('');})()" },
+    { at: 0.4, evalAs: { r: "(()=>{for(let i=0;i<4;i++){if(S.summerPend)chooseSummer(0);simHS();}chooseSchool(0);simCol();declare();S.stage='nba';smartSpend();S.ceiling=ovr()-5;let g=0;while(S.stage==='nba'&&S.age<25&&g++<60){if(S.pend)choose(S.pend.kind==='clutch'?S.pend.best:0);else{if(S.bank>0)smartSpend();simNBA();}}return S.nba.map((l,i)=>l.age>=20&&l.age<=25?((l.notes||[]).some(x=>/Development: \\+\\d+/.test(x))||(i&&/🚑/.test(S.nba[i-1].inj||''))?'1':'0'):'').join('');})()" },
       expect: ["r.length>=4", "!r.includes('0')"] }] },
   { name: 'minutes: an 80+ OVR player gets starter minutes on Rookie', seed: 43, steps: [
     { at: 0.3, evalAs: { x: start } },
