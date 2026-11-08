@@ -157,16 +157,19 @@ th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
 .looks span{color:var(--tx3)}.looks b{text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.88rem}
 .looks button{padding:0;min-width:44px}
 .avwrap{display:flex;justify-content:center;margin:2px 0 8px}
-.celebrate{margin:10px 0;padding:16px 14px;border-radius:var(--r);text-align:center;background:radial-gradient(120% 140% at 50% 0,rgba(255,200,74,.38),rgba(255,138,31,.12) 55%,rgba(20,16,10,.9));border:1px solid rgba(255,200,74,.6);box-shadow:0 0 0 1px rgba(255,200,74,.15),0 12px 36px rgba(255,170,40,.18);animation:pop .6s cubic-bezier(.2,1.8,.4,1) both}.cel-t{font-family:var(--fd);font-size:1.9rem;letter-spacing:.04em;color:var(--gold)}.cel-s{color:var(--tx);font-size:.92rem;margin-top:2px}
+.sw::after{content:'';position:absolute;inset:-5px}
+.celebrate{margin:10px 0;padding:16px 14px;border-radius:var(--r);text-align:center;background:radial-gradient(120% 140% at 50% 0,rgba(255,200,74,.38),rgba(255,138,31,.12) 55%,rgba(20,16,10,.9));border:1px solid rgba(255,200,74,.6);box-shadow:0 0 0 1px rgba(255,200,74,.15),0 12px 36px rgba(255,170,40,.18);animation:pop .6s cubic-bezier(.2,1.8,.4,1) both}.cel-t{font-family:var(--fd);font-size:1.9rem;letter-spacing:.04em;color:var(--gold)}
+.cel-av{display:flex;justify-content:center;margin:-2px 0 6px}.cel-av svg{border-radius:50%;box-shadow:0 0 0 2px rgba(255,200,74,.7),0 0 24px rgba(255,200,74,.35)}.cel-s{color:var(--tx);font-size:.92rem;margin-top:2px}
 .lookcard .stage{position:sticky;top:64px;z-index:3;display:flex;align-items:center;gap:12px;padding:10px;margin:-6px -6px 10px;border-radius:14px;background:rgba(18,20,26,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid var(--line)}
 .lookcard .stage svg{filter:drop-shadow(0 8px 18px rgba(0,0,0,.45))}
 .stagebar{display:flex;flex-direction:column;gap:7px;flex:1;min-width:0}.stagebar .pn{font-size:1.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lktabs{margin:2px 0 6px}
 .lkrow{margin:12px 0 4px}.lkh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px}.lkh span{color:var(--tx3);font-size:.78rem;text-transform:uppercase;letter-spacing:.09em;font-weight:700}.lkh b{font-size:.92rem;color:var(--acc2)}
-.swatches{display:flex;flex-wrap:wrap;gap:6px}.sw{width:34px;height:34px;min-width:34px;min-height:34px;border-radius:50%;padding:0;border:2px solid rgba(255,255,255,.18);box-shadow:inset 0 -4px 8px rgba(0,0,0,.28),inset 0 3px 6px rgba(255,255,255,.18)}.sw.on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,200,74,.35),inset 0 -4px 8px rgba(0,0,0,.28)}
+.swatches{display:flex;flex-wrap:wrap;gap:6px}.sw{position:relative;width:34px;height:34px;min-width:34px;min-height:34px;border-radius:50%;padding:0;border:2px solid rgba(255,255,255,.18);box-shadow:inset 0 -4px 8px rgba(0,0,0,.28),inset 0 3px 6px rgba(255,255,255,.18)}.sw.on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,200,74,.35),inset 0 -4px 8px rgba(0,0,0,.28)}
 .thumbs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;padding:2px}
-button.th{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px 5px;min-height:0;border-radius:12px;background:var(--bg2);border:1px solid var(--line);box-shadow:none;color:var(--tx2);font-weight:600}button.th.on{border-color:rgba(255,200,74,.85);background:linear-gradient(180deg,#2c2312,#1d170c);color:var(--gold)}button.th small{font-size:.64rem;line-height:1.1;text-align:center;white-space:normal}
-.lookcard input[type=number]{background:var(--bg2);color:var(--tx);border:1px solid var(--line2);border-radius:12px;min-height:44px;width:100%;padding:6px 10px;font-family:var(--fc)}
+button.th{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px 5px;min-height:0;border-radius:12px;background:var(--bg2);border:1px solid var(--line);box-shadow:none;color:var(--tx2);font-weight:600}button.th.on{border-color:rgba(255,200,74,.85);background:linear-gradient(180deg,#2c2312,#1d170c);color:var(--gold)}.thumbs.t3{grid-template-columns:repeat(3,minmax(0,1fr))}.thumbs.t3 svg{width:100%;height:auto}
+button.th small{font-size:.64rem;line-height:1.1;text-align:center;white-space:normal}
+.lookcard input[type=number]::-webkit-inner-spin-button,.lookcard input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.lookcard input[type=number]{-moz-appearance:textfield;appearance:textfield;background:var(--bg2);color:var(--tx);border:1px solid var(--line2);border-radius:12px;min-height:44px;width:100%;padding:6px 10px;font-family:var(--fc)}
 .lkchips{display:flex;flex-wrap:wrap;gap:7px}button.lkc{min-height:38px;padding:7px 12px;border-radius:999px;background:var(--bg2);color:var(--tx2);border:1px solid var(--line);box-shadow:none;font-size:.86rem;font-weight:600}button.lkc.on{border-color:rgba(255,138,31,.8);color:var(--acc2);background:linear-gradient(180deg,#2c1d10,#201610)}
 .reveal{opacity:0;animation:rv .45s forwards}@keyframes rv{to{opacity:1}}
 .flash{animation:fl .5s}@keyframes fl{from{box-shadow:0 0 0 2px rgba(255,138,31,.5)}to{box-shadow:0 10px 30px rgba(0,0,0,.25)}}
@@ -463,6 +466,7 @@ function archFits(){const r=archRaw();return ARCH_IDS.map(id=>[id,r[id]+ARCH_CAL
 function ovr(){const r=archRaw();let b=-1e9;for(const id of ARCH_IDS){const v=r[id]+ARCH_CAL[id];if(v>b)b=v;}return b+ARCH_OFF;}
 // what you play like: the best role, plus a flavor word from a different family when that role is close behind
 // the plaque and the record books remember the player you were at your peak, not your last season
+const roleArch=()=>{if(S.idLock){const k=Object.keys(ARCHS).find(k=>ARCHS[k].n===S.idLock);if(k)return{...archetype(),...ARCHS[k],id:k};}return archetype();};
 const archName=()=>S.idLock||((S.stage==='end'||S.retired)&&S.pkArch?S.pkArch:archetype().name);
 function evoPend(){const e=S.evoPend;S.evoPend=null;if(!e||!ARCHS[e.to]||!ARCHS[e.from]||e.to===e.from)return null;const to=ARCHS[e.to].n,from=ARCHS[e.from].n,up=(S.evoUp||0)<2;
   return{kind:'evo',title:'🔄 Your Game Is Changing',text:`Your skills now say ${to}, not ${from}. Lean into the new role, or fight to keep your old identity?`,opts:[
@@ -614,7 +618,7 @@ function growWhy(o0,st,x){const o1=OV(),d=o1-o0,t=S.traits,age=S.age,r=[],dp=S.d
   if(x.hurt)r.push('the injury cost you reps');
   if(st!=='nba'){const room=S.ceiling-(S.natO??ovr())+scoutNoise();r.push(room>8?'scouts see lots of room to grow':room>3?'scouts see some room left':st==='hs'||age<=20?'scouts say the rest is up to your work':'scouts think you are close to your peak');}
   const a=archetype();let evo='';if(S.archId&&a.id!==S.archId){const pair=S.archId+'>'+a.id,lockId=S.idLock&&Object.keys(ARCHS).find(k=>ARCHS[k].n===S.idLock);if(lockId===a.id)S.idLock=null;if(st==='nba'&&lockId!==a.id&&!(S.evoDone||[]).includes(pair)&&S.nba.length-(S.evoAt??-9)>=4){(S.evoDone=S.evoDone||[]).push(pair);S.evoAt=S.nba.length;S.evoPend={from:S.archId,to:a.id};evo=` · 🔄 Your game is changing: you now play like a${/^[AEIOU]/.test(a.n)?'n':''} ${a.n}. Your call this summer`;}else evo=` · 🔄 Your game has evolved: you now play like a${/^[AEIOU]/.test(a.n)?'n':''} ${a.n}`;}S.archId=a.id;
-  return[dp>0?1:d<0?-1:0,`${dp>0?`📈 Development: +${dp} pts to spend`:d<0?`📉 OVR ${o0} to ${o1} (${d})`:'➖ No growth this year'}${dp>0&&d<0?` · OVR ${o0} to ${o1} (${d})`:''}: ${r.join(' · ')}${evo}`];}
+  return[dp>0?1:d<0?-1:0,`${dp>0?`📈 Development: +${dp} pt${dp===1?'':'s'} to spend`:d<0?`📉 OVR ${o0} to ${o1} (${d})`:'➖ No growth this year'}${dp>0&&d<0?` · OVR ${o0} to ${o1} (${d})`:''}: ${r.join(' · ')}${evo}`];}
 const nablAgeF=a=>a<=27?1:a===28?.9:a===29?.8:Math.max(.25,.8-(a-29)*.15);
 function addBank(n){n*=3;if(n>=0)S.bank+=n*2;else{const t=S.bank+n;if(t<0){S.bank=0;S.bankShort=-t;declineTo(ovr()+t*0.15);}else S.bank=t;}}
 function starNext(){const s=ovr()+S.hype*0.35,n=[58,65,72].find(x=>s<x);return n?Math.ceil(n-s):0;}
@@ -736,7 +740,7 @@ function simCol(){syncPos();S.clsStart=clsSnap();S.colNext=false;S.lastResult=nu
   develop((.30+(FRAMES[S.frame].dev||0)*.6)*T.dev*(1+(S.traits.coach-3)*.1)*(1+(S.traits.work-3)*.15)*(1-(S.traits.late-3)*.16),COL_FL*(1+(S.traits.work-3)*.1));const bch=updBadges('season'),bfx=badgeFx();
   S.hype+=T.hype*(1+(S.traits.star-3)*.2);
   S.lastTag=null;const ev=[roll(colEvents(y+1))];if(R()<.3)ev.push(roll(colEvents(y+1),S.lastTag));if(S.summerNote){ev.unshift(S.summerNote);S.summerNote=null;}
-  {const cp=Math.round(10*T.dev*(1+(S.traits.coach-3)*.15)*(S.hurt?.6:1));S.bank+=cp;ev.push([1,`🏫 ${T.lbl} program: +${cp} pts from practice and coaching`]);}ev.push(growWhy(o0,'college',{hurt:S.hurt}));for(const x of badgeLines(bch))ev.push([x.startsWith('📉')?-1:1,x]);const o=ovr(),mins=clamp(16+(o-50)*1.0+T.min+y*2,8,36),mf=mins/36*(S.tier==='mid'?1.12:1);
+  {const cp=Math.round(10*T.dev*(1+(S.traits.coach-3)*.15)*(S.hurt?.6:1));S.bank+=cp;ev.push([1,`🏫 ${T.lbl} program: +${cp} pt${cp===1?'':'s'} from practice and coaching`]);}ev.push(growWhy(o0,'college',{hurt:S.hurt}));for(const x of badgeLines(bch))ev.push([x.startsWith('📉')?-1:1,x]);const o=ovr(),mins=clamp(16+(o-50)*1.0+T.min+y*2,8,36),mf=mins/36*(S.tier==='mid'?1.12:1);
   const ppg=clamp((6+(o-50)*.6+(eff('sho')+eff('fin')-120)*.08+(es('offb')-50)*.02+bfx.pts/1.4)*mf*1.4+gauss()*1.5,1,35),rpg=clamp((2.5+(eff('reb')-40)*.17+Math.max(0,S.height-73)*.3)*mf*(1+bfx.reb)+gauss()*.6,1,16),apg=clamp((1+(eff('pla')-40)*.14)*mf*(1+bfx.ast)+gauss()*.5,.2,10),spg=clamp((.45+(es('stl')-40)*.05+(es('speed')-50)*.01)*mf*(1+(S.traits.motor-3)*.05+(S.traits.lock-3)*.05)*(1+bfx.stl)+gauss()*.2,.1,4),bpg=clamp((.1+(es('blk')-40)*.05+(S.height-80)*.03)*mf*(1+(S.traits.lock-3)*.05)*(1+bfx.blk)+gauss()*.2,.1,5);
   const wins=clamp(Math.round(17+(S.teamStr-60)*.25+(o-60)*.35+gauss()*4),6,34),losses=35-wins;
   const acc=[];const aa=o+S.hype*.12+gauss()*2+(S.tier==='mid'?-3:0);
@@ -924,12 +928,12 @@ function simNBA(){syncPos();if(!R.get)R=makeRng((Math.random()*4294967296)>>>0);
   let opp=0;if(n<2)opp=S.pick<=5?5:S.pick<=14?3:S.pick<=30?0:S.pick<=60?-4:-6;
   let mins=clamp(minBase(o,14.5+(o-55)*1.2+opp+(FRAMES[S.frame].mins||0)+(es('stam')-60)*.08+(t.motor-3)*.6+bfx.min)+(S.minAdj||0)+(X.mins||0),4,36);if(S.roleMin&&!X.mins)mins=Math.max(mins,Math.min(36,S.roleMin));if(S.roleMax)mins=Math.min(mins,S.roleMax);if(o<52)mins=Math.min(mins,8);
   const mf=mins/36,nf=()=>1+gauss()*.075*(1.25-(es('cons')-40)/120)*(1-bfx.var);
-  const RF=ROLE_F[(ARCHS[archetype().id]||{}).fam]||{},ppg=(RF.p||1)*Math.max(mins/36*3,.86*(8+(o-55)*.45+(topScr()-72)*0.12+(eff('sho')+eff('fin')-120)*.1+(S.usage||0)+(X.usage||0)+(FRAMES[S.frame].ppg||0)+(es('offb')-50)*.03+bfx.pts/.86+(t.killer-3)*.9)*mf*nf()*era().pace),
+  const RF=ROLE_F[(ARCHS[roleArch().id]||{}).fam]||{},ppg=(RF.p||1)*Math.max(mins/36*3,.86*(8+(o-55)*.45+(topScr()-72)*0.12+(eff('sho')+eff('fin')-120)*.1+(S.usage||0)+(X.usage||0)+(FRAMES[S.frame].ppg||0)+(es('offb')-50)*.03+bfx.pts/.86+(t.killer-3)*.9)*mf*nf()*era().pace),
     rpg=(RF.r||1)*Math.max(0,.64*(3.2+Math.max(-6,es('dreb')-40)*.14+Math.max(-6,es('oreb')-40)*.07+Math.max(0,S.height-74)*.3)*mf*nf()*(1+(t.motor-3)*.05)*(1+bfx.reb)),apg=(RF.a||1)*Math.max(0,.6*(1.3+(es('pass')-40)*.13+(es('handle')-40)*.05)*mf*nf()*(1-(t.killer-3)*.04)*(1+bfx.ast)),
     spg=(RF.s||1)*Math.max(0,(.45+(es('stl')-40)*.028+(es('speed')-50)*.006+(es('lat')-50)*.004)*mf*nf()*(1+(t.motor-3)*.05+(t.lock-3)*.05)*(1+bfx.stl)),bpg=(RF.b||1)*Math.max(.08*mf,(.12+(es('blk')-40)*.04+(es('vert')-50)*.005)*mf*nf()*(1+(t.lock-3)*.05)*(1+bfx.blk)),
     fg=clamp(.40+(fin3()-50)*.0017+(es('offb')-50)*.0004+bfx.fg/100+(S.height-78)*.003+(t.touch-3)*.004+gauss()*.012,.36,.68),tp=clamp(.26+(es('three')-40)*.0029+(t.touch-3)*.008+era().tp+bfx.tp/100+gauss()*.015,.18,.48),ft=clamp(.52+(es('ft')-40)*.0068+(t.touch-3)*.015+bfx.ft/100+gauss()*.02,.4,.95),
     tov=Math.max(.2,(.5+ppg*.075+apg*.22)*(1-(es('handle')-60)/250-(es('iq')-60)/350)*(1-bfx.tov)*nf());
-  {const ar=archetype(),rk=ar.id+S.team+(mins<26?'b':'');if(S.roleSeen!==rk){S.roleSeen=rk;notes.push(`📋 Role: ${mins<26?'off the bench, ':ppg<10?'in a small role, ':''}the ${tShort(S.team)} use you as a ${ar.n}`+(mins<26||ppg<10?'':{play:': the offense runs through you',shoot:': you get the shots',fin:': you attack the rim',perD:': you guard their best player',int:': you own the paint and the glass'}[(ARCHS[ar.id]||{}).fam]||''));}}
+  {const ar=roleArch(),rk=ar.id+S.team+(mins<26?'b':'');if(S.roleSeen!==rk){S.roleSeen=rk;notes.push(`📋 Role: ${mins<26?'off the bench, ':ppg<10?'in a small role, ':''}the ${tShort(S.team)} use you as a ${ar.n}`+(mins<26||ppg<10?'':{play:': the offense runs through you',shoot:': you get the shots',fin:': you attack the rim',perD:': you guard their best player',int:': you own the paint and the glass'}[(ARCHS[ar.id]||{}).fam]||''));}}
   const L=S.L;if(n){lgOffseason(L);leagueNews(n,news,notes);}
   lgPlay(L,{team:S.team,ovr:o,gp,extra:(t.lead-3)*1.5*(gp/82)+(X.team||0)*.9+bfx.team*(gp/82)});const z=L.z,wins=L.lastWins[S.team];S.teamStr=50+z[S.team]*14;if(X.seed){const cs=TEAMS.filter(t2=>CONF(t2)===CONF(S.team)).sort((x,y)=>L.lastWins[y]-L.lastWins[x]);notes.push(`🏁 You finished as the #${cs.indexOf(S.team)+1} seed in the ${CONF(S.team)}`);}
   const rival=S.rival&&!S.rival.retired?S.rival:null,sameTeam=rival&&rival.team===S.team;if(rival)rival.teamStr=50+z[rival.team]*14;
@@ -961,7 +965,7 @@ function seasonPlayoffs(){const c=S.cur,t=S.traits,L=S.L,z=L.z,{n,a,prevO,o,gp,m
   const gwN=c.clutch.filter(x=>x.won&&x.shot).length,fN=c.clutch.filter(x=>x.won&&x.shot&&x.fin).length;if(gwN){S.gw=(S.gw||0)+gwN;S.fgw=(S.fgw||0)+fN;S.hype+=4*gwN;}
   // awards: voted against every real player in the league
   const C=active(L).filter(p=>p.gp>0).map(p=>({p,name:p.name,team:p.team,ovr:p.ovr,gp:p.gp,ppg:p.ppg,rpg:p.rpg,apg:p.apg,spg:p.spg,bpg:p.bpg,tov:p.tov,fg:p.fg,wins:p.wins,star:p.star,d:p.d,rook:p.yrs===0}));
-  const ME={me:1,name:S.name,team:S.team,ovr:o,gp,ppg,rpg,apg,spg,bpg,tov,fg,wins,star:(t.star-3)*1.5+badgeFx().as,d:Math.max(eff('def'),(es('intD')+es('blk'))/2-3)+(t.lock-3)*2+badgeFx().dp,rook:n===0};C.push(ME);
+  const ME={me:1,name:S.name,team:S.team,ovr:o,gp,ppg,rpg,apg,spg,bpg,tov,fg,wins,star:(t.star-3)*1.5+badgeFx().as,d:o*.85+6+(['PF','C'].includes(S.pos)?4:0)+Math.max(0,Math.max(eff('def'),(es('intD')+es('blk'))/2,(es('perD')+es('stl'))/2-2)-o)*1.0+(t.lock-3)*2+badgeFx().dp,rook:n===0};C.push(ME);
   for(const c of C){c.pr=prodScore(c);c.mv=c.ovr*.6+c.pr*.5+(c.wins-41)*.25+gauss()*1.2;c.as=c.ovr*.6+c.star+c.pr*.7+(c.wins-41)*.05+gauss()*1.5;c.dp=c.d+gauss()*1.5;c.ry=c.ppg+gauss()*1.5;}
   const top=(k,f,g)=>C.filter(g).sort((x,y)=>y[k]-x[k]).slice(0,f),aw=[],W={},give=(c,x)=>{if(c.me)aw.push(x);else c.p.aw[x]=(c.p.aw[x]||0)+1;(W[x]=W[x]||[]).push(c);};
   const an=top('mv',15,c=>c.gp>=65);an.forEach((c,i)=>give(c,i<5?'All-NBA 1st':i<10?'All-NBA 2nd':'All-NBA 3rd'));
@@ -1015,7 +1019,7 @@ function seasonPlayoffs(){const c=S.cur,t=S.traits,L=S.L,z=L.z,{n,a,prevO,o,gp,m
   const gres=gl.map(g=>{const ok=goalOk(g,gst),r=goalReward(g);return{text:g.text,tier:g.tier,ok,pts:ok?r.pts:0,gtp:ok?r.gtp:0};});
   const gP=gres.reduce((x,g)=>x+g.pts,0),gG=gres.reduce((x,g)=>x+g.gtp,0);
   if(gP)bp+=Math.round(gP*ageF);if(gG){gtp+=gG;S.gtpRun=(S.gtpRun||0)+gG;(S.gtpLog=S.gtpLog||[]).push([`Goals Year ${n+1}`,gG]);}
-  if(gres.length)notes.push(`🎯 Season goals: ${gres.filter(g=>g.ok).length} of ${gres.length}${gP?` (+${gP} pts${gG?`, +${gG} GTP`:''})`:''}`);
+  if(gres.length)notes.push(`🎯 Season goals: ${gres.filter(g=>g.ok).length} of ${gres.length}${gP?` (+${gP} pt${gP===1?"":"s"}${gG?`, +${gG} GTP`:''})`:''}`);
   if(bp>0){S.bank+=bp;notes.push(`💰 +${bp} bonus pts to spend (${[...bpParts.map(q=>q[0]),...(gP?['goals']:[])].join(', ')}${ageF<1?`; age ${a}: ${Math.round(ageF*100)}% as you get older`:''})`);}
   S.nba.push({asRank,bdg:c.bdg||[],gtp,yr:n+1,age:a,team:S.team,bench:S.bench===1,ovrIn:Math.round(dsp(prevO)),gp,mins,ppg,rpg,apg,spg,bpg,fg,tp,ft,tov,wins,po,aw,inj,ovr:Math.round(o),mvpRank,scRank,path,notes,rv,best,goals:gres,h2h,news:c.news,clutch:c.clutch});
   // history: milestones, the all-time lists, the GOAT debate, your rival and your protégé
@@ -1059,7 +1063,7 @@ function choose(i){const p=S.pend;if(!p)return;const nx0={...(S.next||{})},tm0=S
   if(msg&&S.stage==='nba'&&p.kind==='mid')S.midNote=msg;else if(msg&&S.stage==='nba'&&!['summer','clutch'].includes(p.kind))(S.offLog=S.offLog||[]).push(msg);if(S.stage==='nba'&&S.team!==tm0&&p.kind!=='mid'&&typeof makeGoals==='function')makeGoals();
   if(S.goals&&S.rival&&S.rival.team===S.team)S.goals.list=S.goals.list.filter(g=>g.k!=='rvppg');
   if(S.pend===p)S.pend=S.stage==='nba'?nextQ():null;
-  if(p.kind==='clutch'&&!S.cur&&S.stage==='nba')startSeq();
+  if(p.kind==='clutch'&&!S.cur&&['nba','end'].includes(S.stage))startSeq();
   if(S.stage==='nba'&&!['clutch','mid'].includes(p.kind))S.offStops=(S.offStops||0)+1;
   if(p.kind==='mid'&&S.midNote){const a1=S.next||{},a0=nx0||{},d=k=>(a1[k]||0)-(a0[k]||0),fx=[];if(d('usage')>0)fx.push('more shots for you');if(d('usage')<0)fx.push('fewer shots for you');if(d('team')>0)fx.push('team chemistry up');if(d('team')<0)fx.push('team chemistry down');if(d('inj')>0)fx.push('more injury risk');if(d('inj')<0)fx.push('less injury risk');if(d('gp')>0)fx.push(`you sit ${d('gp')} games`);if(d('mins')<0)fx.push('fewer minutes');if(d('declAdj')<0)fx.push('slower aging');if(d('declAdj')>0)fx.push('faster aging');if(d('rv')>0)fx.push('a fired-up rivalry');if(fx.length)S.midNote+=` (${fx.join(', ')})`;}
   if(p.kind==='mid'&&!S.pend&&S.stage==='nba')playSeason(simNBA);}
@@ -1098,7 +1102,7 @@ function faPend(){const last=S.nba[S.nba.length-1],rv=S.rival&&!S.rival.retired&
   const opts=[offer(S.team,S.teamStr,true),...['top','mid','bot'].map(k=>{const tm=lgTeam(k,used);return offer(tm,teamStrOf(tm));})];
   if(S.age>=30&&S.L){const tm=TEAMS.filter(x=>!used.has(x)).sort((x,y)=>(S.L.z[y]||0)-(S.L.z[x]||0))[0];if(tm){used.add(tm);opts.push({why:{pro:['They are the title favorite','Contenders want veterans who can still play'],con:['You come off the bench','Fewer shots and smaller numbers']},label:`💍 Ring chase: the ${tm}`,desc:'Contender · Interest: High · Bench role, minimum deal · your best shot at a ring',fn:()=>{S.team=tm;S.teamStr=teamStrOf(tm);S.usage=-4;S.minAdj=-6;S.roleMin=0;S.roleMax=26;return `You took less money to chase a ring with the ${tm}`;}});}}
   if(rv&&rv.ovr>=76)opts.push({why:{pro:['Instant contender','You play next to an All-Star'],con:['It is his team: fewer shots for you','Fans say you took the easy way']},label:`⚔️ Team up with ${rv.name}`,desc:'If you can’t beat him, join him. A better team, but it’s his team.',fn:()=>{S.team=rv.team;S.teamStr=teamStrOf(rv.team);S.usage=-5;S.minAdj=-3;S.roleMin=0;S.roleMax=0;S.hype-=6;return `You joined rival ${rv.name} on the ${S.team}`;}});
-  if(S.age>=34&&!S.farewell)opts.push({label:'🏁 Retire now',desc:'Walk away on your own terms instead of signing.',fn:()=>{S.retired='Retires';S.queue=[];finish();return null;}});
+  if(S.age>=34&&!S.farewell)opts.push({label:'🏁 Retire now',desc:'Walk away on your own terms instead of signing.'+(()=>{const c=career(),sc=goatScore(c),nx=[[60,'Perennial All-Star'],[85,'Hall of Famer'],[145,'Top 10 All-Time'],[350,'THE GOAT']].find(x=>sc<x[0]);return nx&&nx[0]-sc<=25?` Your legacy score is ${sc}, ${nx[0]-sc} short of the ${nx[1]} line.`:'';})(),fn:()=>{S.retired='Retires';S.queue=[];finish();return null;}});
   return{kind:'fa',title:'✍️ Free Agency!',text:`Your contract is up after ${S.nba.length-(S.lastFa||0)} season${S.nba.length-(S.lastFa||0)===1?'':'s'}${(()=>{let k=0;for(let i=S.nba.length-1;i>=0&&S.nba[i].team===S.team;i--)k++;return k<S.nba.length-(S.lastFa||0)?` (the last ${k} with the ${S.team} after your move)`:'';})()}. The ${S.team} won ${last.wins} games last year. Teams in ${era().name.replace(/^\S+\s/,'')} pay extra for ${catName(want)}. Pick your next team.${S.farewell?' This is your farewell season: a one-year deal.':S.faLen?` The new deal runs ${S.faLen} season${S.faLen===1?'':'s'}.`:''}`,opts};}
 const TRAIN=[['🦘 Plyometrics','+3 Vertical, +2 Speed',{vert:3,speed:2}],['🫁 Conditioning camp','+4 Stamina, +1 Speed',{stam:4,speed:1}],['🧤 Hands & steals','+3 Steal, +2 Perimeter D',{stl:3,perD:2}],['🧱 Rim protection school','+3 Block, +2 Interior D',{blk:3,intD:2}],['🎯 Mid-range mastery','+4 Mid-Range, +1 Close Shot',{mid:4,close:1}],['🏀 Pick-and-roll reads','+3 Passing, +2 Basketball IQ',{pass:3,iq:2}],['🎯 Extend your range','+3 Three-Point, +2 Mid-Range',{three:3,mid:2}],['🏋️ Bulk up','+4 Strength, +2 Post Moves, −1 Speed',{str:4,post:2,speed:-1}],['🛡️ Lock in on defense','+2 Perimeter D, +2 Interior D, +1 Steal, +1 Block',{perD:2,intD:2,stl:1,blk:1}],['🏀 Tighten the handle','+3 Ball Handle, +3 Passing',{handle:3,pass:3}],['💥 Finishing package','+3 Layup, +2 Dunk, +2 Close Shot',{layup:3,dunk:2,close:2}],['🧱 Glass cleaner','+3 Off. Rebound, +3 Def. Rebound',{oreb:3,dreb:3}],['🧠 Film study','+3 Basketball IQ, +2 Consistency',{iq:3,cons:2}],['🎯 Free throw grind','+5 Free Throw',{ft:5}]];
 const VET=[['🧘 Recovery & longevity','You age slower next season, +2 Stamina',{stam:2},{declAdj:-.5}],['🔄 Reinvent as a shooter','+4 Three-Point, +3 Mid-Range, −2 Speed',{three:4,mid:3,speed:-2}],['👴 Old-man game','+4 Post Moves, +3 Basketball IQ',{post:4,iq:3}]];
@@ -1237,7 +1241,7 @@ function randLook(){const L={num:ri(0,99)};for(const[k,,o]of LOOKS)L[k]=ri(0,o()
 function cyc(k,d){const n=LOOKS.find(x=>x[0]===k)[2]().length;S.look[k]=((S.look[k]||0)+d+n)%n;render();}
 const hx6=h=>/^#[0-9a-f]{3}$/i.test(h)?'#'+[...h.slice(1)].map(c=>c+c).join(''):h; // '#fff' -> '#ffffff' so colour maths never misreads short hex
 function shade(hex,f){const n=parseInt(hx6(hex).slice(1),16),c=[n>>16,n>>8&255,n&255].map(v=>Math.round(clamp(f<0?v*(1+f):v+(255-v)*f,0,255)));return'#'+c.map(v=>v.toString(16).padStart(2,'0')).join('');}
-function avatar(L,age,size,bg){size=size||90;if(age<17&&(L.fh||0)>1)L={...L,fh:1};const id='av'+(++AVN),g=(a,i)=>a[(i||0)%a.length];
+function avatar(L,age,size,bg){size=size||90;if(L.face===3&&(L.head===4||L.head===5))L={...L,face:0};if(age<17&&(L.fh||0)>1)L={...L,fh:1};const id='av'+(++AVN),g=(a,i)=>a[(i||0)%a.length];
   const sk=g(SKINS,L.skin)[1],skD=shade(sk,-.2),old=age>=38,dyed=(L.hc||0)>=7,lu=h=>{const n=parseInt(hx6(h).slice(1),16);return(.299*(n>>16)+.587*(n>>8&255)+.114*(n&255))/255;},gmix=(a,b,t)=>{const q=h=>[1,3,5].map(i=>parseInt(hx6(h).slice(i,i+2),16)),A=q(a),B=q(b);return'#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('');},gry=dyed||old?0:age>=35?.5:age>=32?.22:0,gdes=h=>{const v=Math.round(lu(h)*255).toString(16).padStart(2,'0');return gmix(h,'#'+v+v+v,Math.min(1,gry*2.6));};
   // dark natural hair on a same-tone dark skin (dark brown on Ebony etc.) is pushed towards near-black so the style still reads
   const hc0=old&&!dyed?((L.hc||0)%10===5?'#e2e2e2':'#c9c9c9'):gry?gmix(gdes(g(HAIRCOL,L.hc)[1]),gry<.3?'#8c8c8c':'#bdbdbd',gry):g(HAIRCOL,L.hc)[1],hcLow=!old&&!dyed&&(L.hc||0)%10!==6&&lu(hc0)<.35&&Math.abs(lu(hc0)-lu(sk))<.1;
@@ -1649,7 +1653,7 @@ function checkAch(c,sc,t){const have=JSON.parse(localStorage.getItem('bag_ach')|
 // ---------- Hall of Fame plaque (made for screenshots) ----------
 function plaqueHTML(c,sc,t){const g=x=>c.cnt[x]||0,gp=c.gp||1,top=[['Champion','🏆','Ring'],['MVP','👑','MVP'],['Finals MVP','🏅','Finals MVP'],['All-Star','⭐','All-Star'],['DPOY','🛡️','DPOY'],['All-NBA 1st','🥇','All-NBA 1st']].filter(([k])=>g(k)).slice(0,4);
   return`<div class="plaque"><div class="row" style="align-items:flex-start;gap:14px">${avatar(teamLook(S.look),S.age,100,1)}<div class="grow">
-  <div class="sub" style="letter-spacing:2px">BUILD A GOAT · ${((S.eraStart&&S.eraStart!==S.era?ERAS.find(e=>e.id===S.eraStart).name.replace(/^\S+\s/,'')+' – ':'')+era().name.replace(/^\S+\s/,'')).toUpperCase()}</div><div class="pname">${S.name}</div>
+  <div class="sub" style="letter-spacing:2px">BUILD A GOAT · <span style="white-space:nowrap">${((S.eraStart&&S.eraStart!==S.era?ERAS.find(e=>e.id===S.eraStart).name.replace(/^\S+\s/,'')+' – ':'')+era().name.replace(/^\S+\s/,'')).toUpperCase().replace(' – ','</span> – <span style="white-space:nowrap">')}</span></div><div class="pname">${S.name}</div>
   <div class="tier" style="font-size:1.6rem;text-align:left;margin:2px 0">${t}</div>
   <div class="sub">${archName()} · ${ht(S.height)} · ${pickTxt(S.pick)} · ${c.seasons} season${c.seasons===1?'':'s'}</div></div></div>
   <div class="stat3" style="margin-top:10px">${[['PPG',f1(c.pts/gp)],['RPG',f1(c.reb/gp)],['APG',f1(c.ast/gp)],['SPG',f1((c.stl||0)/gp)],['BPG',f1((c.blk||0)/gp)],['PTS',Math.round(c.pts).toLocaleString()]].map(([l,v])=>`<div class="stat"><b>${v}</b>${l}</div>`).join('')}</div>
@@ -1779,7 +1783,7 @@ const CL_DEF=[['🛡️ Lock up their star','perD',.5,'Take the toughest assignm
   ['🧠 Take the charge','iq',.4,'Plant your feet and draw the offensive foul','You take the charge. Their bench is furious.|You beat him to the spot. Offensive foul. Ballgame.|Feet set, chest out. The whistle goes your way.','Blocking foul. He makes both free throws.|You are a half step late. Blocking foul.']];
 function clutchPend(x){const c=S.cur,t=S.traits,r2=makeRng(((c.rs0||7)^Math.imul(x.k+1,0x9E3779B9)^Math.imul(x.w+x.l+1,0x85EBCA6B))>>>0),fin=x.rd===3,g=x.w+x.l+1,RN=['1st Round','2nd Round','Conference Finals','NBA Finals'];
   // stronger teams more often get a tie or a lead; weaker teams have to come from behind
-  const d=x.q+(r2()-.5)*.34,sit=d>=.64?'up1':d>=.52?'tie':d>=.4?'down1':d>=.3?'down2':'down3',secs=(3+r2()*11).toFixed(1),u=r2();
+  const d=x.q+(r2()-.5)*.34,sit=d>=.7?'up1':d>=.52?'tie':d>=.4?'down1':d>=.3?'down2':'down3',secs=(3+r2()*11).toFixed(1),u=r2();
   const gap={up1:1,tie:0,down1:-1,down2:-2,down3:-3}[sit],me=Math.round(92+r2()*24),them=me-gap,def=sit==='up1';
   const sk=keys=>{const ks=keys.split(',');return ks.reduce((a2,k)=>a2+es(k),0)/ks.length;};
   const score=o2=>clamp(o2[2]+(sk(o2[1])-68)*.0075+(t.clutch-3)*.04+(bsm()?.05:0)+(o2[1].startsWith('pass')?(x.q-.5)*.3:0)+(def?(t.lock-3)*.03:0)+(S.diff==='rookie'?.04:0),.08,.78);
@@ -1812,7 +1816,7 @@ function makeGoals(){if(S.stage!=='nba')return;const n=S.nba.length,last=S.nba[n
   if(n===0&&o>=62)add('roy',1,o>=70?2:3,'Win Rookie of the Year');
   if(last&&last.mvpRank&&last.mvpRank<=6)add('mvptop',3,3,'Finish top 3 in MVP voting');
   if(last&&last.scRank&&last.scRank<=3)add('scoring',1,3,'Win the scoring title');
-  const hg=a>=31||S.injuryProne?70:75;add('gp',hg,a>=34?2:1,`Play ${hg}+ games`);
+  const hg=a>=31||S.injuryProne?70:75;if(!(S.next&&S.next.gp>0))add('gp',hg,a>=34?2:1,`Play ${hg}+ games`);
   if(['PF','C'].includes(S.pos)&&last&&last.rpg>=6)add('rpg',P(last.rpg+1.5),2,`Average ${P(last.rpg+1.5)}+ rebounds`);
   if(['PG','SG'].includes(S.pos)&&last&&last.apg>=4)add('apg',P(last.apg+1.5),2,`Average ${P(last.apg+1.5)}+ assists`);
   if(es('three')>=74)add('tp',.4,2,'Shoot 40% from three');
@@ -1827,8 +1831,8 @@ function goalOk(g,st){switch(g.k){case'ppg':return st.ppg>=g.v;case'rpg':return 
   case'rvppg':return st.rvppg!=null&&st.ppg>st.rvppg;case'pts':return st.ptsAfter>=g.v;}return false;}
 const GT=['','Likely','Solid','Stretch'];
 function goalsCard(){const G=S.goals;if(!G||G.yr!==S.nba.length+1||!G.list.length)return'';
-  return`<div class="card"><div class="sh">🎯 <span class="grow">Season ${G.yr} goals</span></div>${G.list.map(g=>{const r=goalReward(g);return`<div class="goal"><span class="gt t${g.tier}">${GT[g.tier]}</span><span class="grow">${g.text}</span><small>+${r.pts} pts${r.gtp?` · +${r.gtp} GTP`:''}</small></div>`;}).join('')}<div class="note">Hit a goal this season to earn bonus points${diff().mult?' and GTP':''}.</div></div>`;}
-function goalsResult(l){return`<div class="card"><div class="sh">🎯 <span class="grow">Season ${l.yr} goals</span><b class="gold">${l.goals.filter(g=>g.ok).length}/${l.goals.length}</b></div>${l.goals.map(g=>`<div class="goal ${g.ok?'':'no'}"><span>${g.ok?'✅':'❌'}</span><span class="grow">${g.text}</span><small>${g.ok?`+${g.pts} pts${g.gtp?` · +${g.gtp} GTP`:''}`:'Missed'}</small></div>`).join('')}</div>`;}
+  return`<div class="card"><div class="sh">🎯 <span class="grow">Season ${G.yr} goals</span></div>${G.list.map(g=>{const r=goalReward(g);return`<div class="goal"><span class="gt t${g.tier}">${GT[g.tier]}</span><span class="grow">${g.text}</span><small>+${r.pts} pt${r.pts===1?'':'s'}${r.gtp?` · +${r.gtp} GTP`:''}</small></div>`;}).join('')}<div class="note">Hit a goal this season to earn bonus points${diff().mult?' and GTP':''}.</div></div>`;}
+function goalsResult(l){return`<div class="card"><div class="sh">🎯 <span class="grow">Season ${l.yr} goals</span><b class="gold">${l.goals.filter(g=>g.ok).length}/${l.goals.length}</b></div>${l.goals.map(g=>`<div class="goal ${g.ok?'':'no'}"><span>${g.ok?'✅':'❌'}</span><span class="grow">${g.text}</span><small>${g.ok?`+${g.pts} pt${g.pts===1?'':'s'}${g.gtp?` · +${g.gtp} GTP`:''}`:'Missed'}</small></div>`).join('')}</div>`;}
 
 // ---------- history: legends from past eras, the all-time lists and the GOAT debate ----------
 // legend legacy scores sit on the same scale as your GOAT score, so climbing the list means passing real thresholds
@@ -2359,7 +2363,7 @@ const seasonsPlayed=()=>S.hs.length+S.col.length+S.nba.length;
 const canUndoSpend=()=>!!(S.spendLog&&S.spendLog.length&&S.spendLog[S.spendLog.length-1].at===seasonsPlayed());
 function undoSpend(){if(!canUndoSpend())return;const u=S.spendLog.pop();S.attrs[u.k]=u.v;S.bank+=u.c;S.bdg={...u.bdg};render();}
 function clearUndo(){if(S.spendLog&&S.spendLog.length)S.spendLog=[];}
-function undoBar(){if(!canUndoSpend())return'';const u=S.spendLog[S.spendLog.length-1];return`<button class="ghost wide" style="margin:6px 0" onclick="undoSpend()">↩ Undo: ${SKN[u.k]} back to ${u.shown} (+${u.c} pts back)${S.spendLog.length>1?` · ${S.spendLog.length} steps`:''}</button>`;}
+function undoBar(){if(!canUndoSpend())return'';const u=S.spendLog[S.spendLog.length-1];return`<button class="ghost wide" style="margin:6px 0" onclick="undoSpend()">↩ Undo: ${SKN[u.k]} back to ${u.shown} (+${u.c} pt${u.c===1?'':'s'} back)${S.spendLog.length>1?` · ${S.spendLog.length} steps`:''}</button>`;}
 const maxCost=k=>{const v0=S.attrs[k];let v=v0,c=0;while(v<99&&c+cost(v)<=S.bank&&!atCap(k)){c+=cost(v);v++;S.attrs[k]=v;}S.attrs[k]=v0;return[c,v];};
 function spend(k,n=1){const O0=OV(),o0=ovr(),v0=S.attrs[k],b0=S.bank,sh=Math.round(es(k)),bd={...(S.bdg||{})};UI().maxArm=null;UI().spMsg=null;for(let i=0;i<n;i++){const c=cost(S.attrs[k]);if(S.bank>=c&&S.attrs[k]<99&&!atCap(k)){S.bank-=c;S.attrs[k]=Math.min(99,S.attrs[k]+STEP);}else break;}
   if(S.bank<b0)(S.spendLog=S.spendLog||[]).push({k,v:v0,c:b0-S.bank,shown:sh,bdg:bd,at:seasonsPlayed()});
@@ -2467,11 +2471,11 @@ function legacyCard(){const c=career(),sc=goatScore(c),[t]=tierOf(sc,c),g=x=>c.c
   <div class="sub">${nx?`Next tier: <b>${nx[1]}</b> ${sc>=nx[0]?(nx[3]?`(you have the score; you also need a top-10 spot among legends and retired greats, and you are ${ord(atRank(sc))})`:'(you have the score)'):`at ${nx[0]} score`}${g('All-Star')<nx[2]?` and ${nx[2]} All-Star seasons (you have made ${g('All-Star')})`:''}${nx[3]&&sc<nx[0]?', and a top-10 spot among the legends and retired greats':''}${std?` · GOAT standard: <b>${std.score}</b>`:''}`:std&&std.score>sc?`${goatRank()>1?`GOAT score reached, but you are ${ord(goatRank())} in the GOAT debate. Pass ${esc(allTime('score')[0].name)} to be THE GOAT. `:''}GOAT territory. Now chase the GOAT standard: <b>${std.score}</b> by ${esc(std.name)}`:std?`<b class="gold">You hold the GOAT standard.</b> Every point from here raises the record`:goatRank()>1?`GOAT score reached, but you are ${ord(goatRank())} in the GOAT debate. Pass ${esc(allTime('score')[0].name)} to be THE GOAT`:'GOAT territory. Finish strong and your score becomes the GOAT standard'}${last&&S.age<34?` · on pace for ~${(Math.round(pace/1000)*1000).toLocaleString()} pts`:''}</div>
   ${S.nba.length>=3&&goatRace(sc)?`<div class="note" style="margin-top:6px">${goatRace(sc)}</div>`:''}<div class="stat4" style="margin-top:10px"><div class="stat"><b>${Math.round(c.pts).toLocaleString()}</b>PTS</div><div class="stat"><b>${g('Champion')}</b>${g('Champion')===1?'RING':'RINGS'}</div><div class="stat"><b>${g('All-Star')}</b>ALL-STAR</div>${diff().mult?`<div class="stat"><b>${Math.round(S.gtpRun||0)}</b>GTP</div>`:`<div class="stat"><b>${g('MVP')}</b>MVP</div>`}</div>
   <details><summary>Legend benchmarks · ${benchList(c).filter(x=>x[1]).length}/${benchList(c).length}</summary>${benchList(c).map(([l,ok])=>`<div class="ev ${ok?'good':'muted'}">${ok?'✅':'⬜'} ${l}</div>`).join('')}</details></div>`;}
-function seasonCard(s,lite){const si=S.nba.indexOf(s),firstR=si>=0&&s.aw.includes('Champion')&&S.nba.findIndex(x=>x.aw.includes('Champion'))===si,firstM=si>=0&&s.aw.includes('MVP')&&S.nba.findIndex(x=>x.aw.includes('MVP'))===si,ringN=si>=0&&s.aw.includes('Champion')?S.nba.slice(0,si+1).filter(x=>x.aw.includes('Champion')).length:0,firstA=si>=0&&s.aw.includes('All-Star')&&S.nba.findIndex(x=>x.aw.includes('All-Star'))===si,cel=ringN||firstM||firstA?`<div class="celebrate"><div class="cel-t">${ringN&&firstM?'🏆 Champion and MVP':firstR?'🏆 Your first ring':ringN?`🏆 Ring #${ringN}`:firstM?'👑 Your first MVP':'⭐ Your first All-Star'}</div><div class="cel-s">${firstR?`Champions with the ${esc(s.team)}. Nobody can ever take this one away.`:ringN?(S.nba.slice(0,si).filter(x=>x.aw.includes('Champion')).slice(-1)[0]?.team===s.team?`Champions again with the ${esc(s.team)}. Banner number ${ringN}.`:`Champions again, this time with the ${esc(s.team)}.`):firstM?`The best player in the league, ${f1(s.ppg)} points a night.`:'The whole league voted you in. Welcome to the big stage.'}</div></div>`:'',aw=s.aw.filter(x=>x!=='MVP'),role=s.bench&&s.mins>=18?['muted','Sixth man']:s.mins>=28?['good','Starter']:s.mins>=18?['muted','Bench rotation']:['muted','Deep bench'];
+function seasonCard(s,lite){const si=S.nba.indexOf(s),firstR=si>=0&&s.aw.includes('Champion')&&S.nba.findIndex(x=>x.aw.includes('Champion'))===si,firstM=si>=0&&s.aw.includes('MVP')&&S.nba.findIndex(x=>x.aw.includes('MVP'))===si,ringN=si>=0&&s.aw.includes('Champion')?S.nba.slice(0,si+1).filter(x=>x.aw.includes('Champion')).length:0,firstA=si>=0&&s.aw.includes('All-Star')&&S.nba.findIndex(x=>x.aw.includes('All-Star'))===si,cel=ringN||firstM||firstA?`<div class="celebrate"><div class="cel-av">${avatar({...teamLook(S.look,s.team),face:ringN||firstA?1:5},s.age||S.age,72,1)}</div><div class="cel-t">${ringN&&firstM?'🏆 Champion and MVP':firstR?'🏆 Your first ring':ringN?`🏆 Ring #${ringN}`:firstM?'👑 Your first MVP':'⭐ Your first All-Star'}</div><div class="cel-s">${firstR?`Champions with the ${esc(s.team)}. Nobody can ever take this one away.`:ringN?(S.nba.slice(0,si).filter(x=>x.aw.includes('Champion')).slice(-1)[0]?.team===s.team?`Champions again with the ${esc(s.team)}. Banner number ${ringN}.`:`Champions again, this time with the ${esc(s.team)}.`):firstM?`The best player in the league, ${f1(s.ppg)} points a night.`:'The whole league voted you in. Welcome to the big stage.'}</div></div>`:'',aw=s.aw.filter(x=>x!=='MVP'),role=s.bench&&s.mins>=18?['muted','Sixth man']:s.mins>=28?['good','Starter']:s.mins>=18?['muted','Bench rotation']:['muted','Deep bench'];
   return`${cel}<div class="card flash"><div class="sh">🏀 <span class="grow">Season ${s.yr} · Age ${s.age}</span><b class="${role[0]}">${role[1]} · ${Math.round(s.mins)} MPG</b></div><div style="font-weight:700">${s.team} · ${s.wins}-${82-s.wins}${s.ovr?` · <span class="muted">started at ${s.ovrIn??Math.round(dsp(s.ovr))} OVR</span>`:''}</div>
   <div class="stat3" style="margin:10px 0 4px"><div class="stat"><b>${f1(s.ppg)}</b>PPG</div><div class="stat"><b>${f1(s.rpg)}</b>RPG</div><div class="stat"><b>${f1(s.apg)}</b>APG</div><div class="stat"><b>${f1(s.spg||0)}</b>SPG</div><div class="stat"><b>${f1(s.bpg||0)}</b>BPG</div><div class="stat"><b>${s.gp}</b>GAMES</div></div>
   ${s.scRank&&s.scRank<=15&&s.gp>=65?`<div class="ev">📊 ${ord(s.scRank)} in the league in scoring</div>`:''}
-  ${s.asRank&&s.asRank<=45?`<div class="ev muted">⭐ All-Star voting: ${ord(s.asRank)}${s.aw.includes('All-Star')?'':' (the top 24 make it)'}</div>`:''}${s.mvpRank&&s.mvpRank<=8&&s.gp>=65?`<div class="ev ${s.mvpRank===1?'gold':''}">👑 ${s.mvpRank===1?'You win MVP!':`You finish ${ord(s.mvpRank)} in MVP voting`}</div>`:''}
+  ${s.asRank&&s.asRank<=45?`<div class="ev muted">⭐ All-Star voting: ${ord(s.asRank)}${s.aw.includes('All-Star')?(s.asRank>24?' (in as a coaches pick)':''):' (the top 24 make it)'}</div>`:''}${s.mvpRank&&s.mvpRank<=8&&s.gp>=65?`<div class="ev ${s.mvpRank===1?'gold':''}">👑 ${s.mvpRank===1?'You win MVP!':`You finish ${ord(s.mvpRank)} in MVP voting`}</div>`:''}
   ${aw.length?`<div class="ev gold">🏅 ${aw.join(' · ')}</div>`:''}${s.inj?`<div class="ev bad">${/🚑|🛡/.test(s.inj)?'':'🤕 '}${s.inj}</div>`:''}${s.gp<65?`<div class="ev muted">⚠️ ${s.gp} games: not eligible for MVP, All-NBA or other awards (65-game rule)</div>`:''}
   ${s.path.length?s.path.map(x=>`<div class="ev ${x.includes(': beat')?'good':'bad'}">${x.includes(': beat')?'✅':'❌'} ${x}</div>`).join(''):'<div class="ev muted">🚫 Missed the playoffs</div>'}
   ${s.po.includes('CHAMPION')?'<div class="ev gold">🏆 <b>NBA Champions</b></div>':''}
@@ -2494,14 +2498,14 @@ function gtpCard(full){const bank=gtpBank(),cost=perkCost();
 function diffCard(){const lock=S.stage!=='build';return`<div class="card"><div class="sh">🎚️ <span class="grow">Difficulty</span>${lock?'<b>Locked for this run</b>':''}</div><div class="seg">${Object.entries(DIFFS).map(([k,v])=>`<button class="${S.diff===k?'on':''}" onclick="setDiff('${k}')" ${(S.daily&&k!=='pro')||(lock&&S.diff!==k)?'disabled':''}>${v.name.replace(/^\S+\s/,'')}</button>`).join('')}</div><div class="note">${diff().d}${S.daily?' The Daily Build is always played on Pro.':''}</div></div>`;}
 const LOOK_GROUPS=[['face','Face',['skin','face','fh']],['hair','Hair',['hair','hc']],['gear','Gear',['head','arms','jew','guard']],['kit','Uniform',['jer','trim','js']]];
 const SWATCH={skin:()=>SKINS.map(x=>x[1]),hc:()=>HAIRCOL.map(x=>x[1]),jer:()=>JERSEYS.map(x=>x[1]),trim:()=>TRIMS.map(x=>x[1])};
-const THUMB={js:'4 76 112 64',hair:'16 -2 88 88',fh:'28 36 64 64',head:'22 12 76 76',face:'26 32 68 68',arms:'0 70 120 70',jew:'20 40 80 80',guard:'40 60 40 40'};
+const THUMB={js:'4 76 112 64',hair:'16 -2 88 88',fh:'28 36 64 64',head:'22 12 76 76',face:'26 32 68 68',arms:'0 92 120 48',jew:'20 40 80 80',guard:'40 60 40 40'};
 function setLook(k,v){S.look[k]=v;render();}
-function teamLook(L){const nm=['draft','nba','end'].includes(S.stage)?S.team:S.stage==='college'?S.school:null;if(!nm)return L;let h=0;for(const ch of nm)h=(h*31+ch.charCodeAt(0))>>>0;const j=h%JERSEYS.length;return{...L,jer:j,trim:JERSEYS[j][0]==='White'?1:JERSEYS[j][0]==='Black'||JERSEYS[j][0]==='Navy'?(h>>4)%2?2:0:(h>>4)%2?0:1};}
+function teamLook(L,tm){const nm=tm||(['draft','nba','end'].includes(S.stage)?S.team:S.stage==='college'?S.school:null);if(!nm)return L;let h=0;for(const ch of nm)h=(h*31+ch.charCodeAt(0))>>>0;const tj=JERSEYS.map((_,i)=>i).filter(i=>JERSEYS[i][0]!=='White'),j=tj[h%tj.length];return{...L,jer:j,trim:JERSEYS[j][0]==='White'?1:JERSEYS[j][0]==='Black'||JERSEYS[j][0]==='Navy'?(h>>4)%2?2:0:(h>>4)%2?0:1};}
 function lookThumb(L,age,vb){return avatar(L,age,64,0).replace(/viewBox="0 0 120 140" width="\d+" height="\d+"/,`viewBox="${vb}" width="60" height="60"`);}
 function lookEditor(){const u=UI(),g=u.lookG||'face',grp=LOOK_GROUPS.find(x=>x[0]===g)||LOOK_GROUPS[0],age=u.lookAge||18,cl=n=>n.replace(EMO_RE,'').trim();
   const row=([k,l,o])=>{const opts=o(),cur=(S.look[k]||0)%opts.length;let body;
     if(SWATCH[k]){const cs=SWATCH[k]();body=`<div class="swatches">${cs.map((c,i)=>`<button class="sw ${i===cur?'on':''}" style="background:${c}" aria-label="${l}: ${cl(opts[i])}" onclick="setLook('${k}',${i})"></button>`).join('')}</div>`;}
-    else if(THUMB[k])body=`<div class="thumbs">${opts.map((n,i)=>`<button class="th ${i===cur?'on':''}" aria-label="${l}: ${cl(n)}" onclick="setLook('${k}',${i})">${lookThumb(k==='hair'?{...S.look,hair:i,head:0,guard:0,face:S.look.face===3?0:S.look.face}:{...S.look,[k]:i},age,THUMB[k])}<small>${cl(n)}</small></button>`).join('')}</div>`;
+    else if(THUMB[k])body=`<div class="thumbs${k==='arms'?' t3':''}">${opts.map((n,i)=>`<button class="th ${i===cur?'on':''}" aria-label="${l}: ${cl(n)}" onclick="setLook('${k}',${i})">${lookThumb(k==='hair'?{...S.look,hair:i,head:0,guard:0,face:S.look.face===3?0:S.look.face}:k==='guard'?{...S.look,guard:i,fh:0,face:S.look.face===3?0:S.look.face}:{...S.look,[k]:i},age,THUMB[k])}<small>${cl(n)}</small></button>`).join('')}</div>`;
     else body=`<div class="lkchips">${opts.map((n,i)=>`<button class="lkc ${i===cur?'on':''}" onclick="setLook('${k}',${i})">${cl(n)}</button>`).join('')}</div>`;
     return`<div class="lkrow"><div class="lkh"><span>${l}</span><b>${cl(opts[cur])}</b></div>${body}</div>`;};
   return`<div class="card lookcard"><div class="stage">${avatar(S.look,age,132,1)}<div class="stagebar"><div class="pn" style="margin:0">${esc(S.name||'Your prospect')}</div><div class="sub" style="margin:0">#${S.look.num} · ${cl(SKINS[(S.look.skin||0)%SKINS.length][0])} · ${cl(HAIRS[(S.look.hair||0)%HAIRS.length])}</div><div class="seg sm">${[[18,'Now'],[36,'Preview at 36']].map(([a,n])=>`<button class="${age===a?'on':''}" onclick="UI().lookAge=${a};render()">${n}</button>`).join('')}</div><button class="sm ghost" onclick="S.look=randLook();render()">🎲 Random look</button></div></div>
@@ -2513,7 +2517,7 @@ function lookEditorOld(){return`<div class="card"><div class="avwrap">${avatar(S
   <div><span>Number</span><button class="ghost sm" aria-label="Lower number" onclick="S.look.num=(S.look.num+99)%100;render()">◀</button><b>#${S.look.num}</b><button class="ghost sm" aria-label="Higher number" onclick="S.look.num=(S.look.num+1)%100;render()">▶</button></div></div></div>`;}
 const SKN=Object.fromEntries(Object.values(SUBS).flat());
 // live "You project as" card: best role, its OVR, the top three fits, and what to raise to lean into the next one (OVR math only)
-function projCard(){const a=archetype(),f=a.fits.slice(0,3),nx=f[1][0],base=archRaw()[nx];
+function projCard(){const a=archetype(),f=a.fits.slice(0,3),nx=(f.find(([id])=>id!==a.id)||f[1])[0],base=archRaw()[nx];
   const tips=SUBKEYS.filter(k=>S.stage==='build'?S.attrs[k]<BUILD_MAX:!atCap(k)).map(k=>{const v=S.attrs[k];S.attrs[k]=Math.min(99,v+5);const x=archRaw()[nx]-base;S.attrs[k]=v;return[k,x];}).sort((x,y)=>y[1]-x[1]).slice(0,3).map(x=>SKN[x[0]]);
   return`<div class="card"><div class="sh">🧬 <span class="grow">You project as</span><b>OVR ${OV()}</b></div><div class="pn">${a.name}</div>${a.fits[0][0]!==a.id?`<div class="note" style="margin:2px 0 6px">Leaning toward ${ARCHS[a.fits[0][0]].n}: it takes a clear edge to switch styles</div>`:''}${f.map(([id,v])=>`<div class="fit"><span>${ARCHS[id].n}</span><div class="bar"><i style="width:${clamp(dsp(v),0,99)}%"></i></div><b>${dsp(v)}</b></div>`).join('')}<div class="note">OVR rates you at your best fit. To lean into <b>${ARCHS[nx].n}</b>, raise ${tips.join(', ')} (this shapes your playstyle more than your OVR).</div>${projBadges(a)}</div>`;}
 function projBadges(a){const sig=ARCH_SIG[a.id].map(id=>BADGE[id].n).join(' · ');let start='';
@@ -2554,8 +2558,8 @@ function drawScreen(){const st=S.stage;let h='';const q=UI().seq;if(q&&q.st!==st
   else if(UI().menu&&UI().menu!=='open')h=menuHTML();
   else if(st==='build')h=buildHTML();
   else if(UI().prof&&st!=='build')h=profileHTML();
-  else if(UI().seq&&st!=='draft'&&st!=='end')h=seqHTML();
-  else if(st==='hs'){const i=S.hs.length;h=`${hdr('High School')}${playerCard(true)}${S.summerPend?summerCard():resultCard()}${classCard()}${seasonList(S.hs)}`+(S.summerPend?'':dock(`<button onclick="playSeason(simHS)">Play ${YR[i]} Year</button>`));}
+  else if(UI().seq&&st!=='draft')h=seqHTML();
+  else if(st==='hs'){const i=S.hs.length;h=`${hdr('High School')}${playerCard(true)}${S.summerPend?summerCard():S.lastResult&&UI().seenRes===S.lastResult?'':resultCard()}${classCard()}${seasonList(S.hs)}`+(S.summerPend?'':dock(`<button onclick="playSeason(simHS)">Play ${YR[i]} Year</button>`));}
   else if(st==='offers'){const n=stars();h=`${hdr('Recruiting')}${playerCard(true)}<div class="card"><div class="sh">🎓 <span class="grow">Scholarship offers</span><b>${S.offers.length}</b></div><div class="row" style="align-items:baseline"><h2 style="margin:0">${n}-star recruit</h2>${starsHTML(n)}</div>
     <div class="sub">${n>=5?'Every program in the country wants you. Take your pick.':n===4?'Plenty of big-time options.':n===3?'A few solid options.':'Slim pickings. Make the most of it.'}</div>
     ${S.offers.map((o,i)=>`<button class="opt" onclick="chooseSchool(${i})"><div class="grow"><div class="t">${o.name}</div><small>${TIER[o.tier].lbl} · ${TIER[o.tier].d}</small><span class="risk l" style="text-transform:none;letter-spacing:0;font-size:.74rem">${o.perk[0]}: ${o.perk[1]}</span></div></button>`).join('')}
@@ -2599,7 +2603,7 @@ function simEnd(){let g=0;while(S.stage==='nba'&&g++<120){if(S.pend&&BIG.include
 function wholeCareer(){const u=UI();u.goOn=u.auto&&['cut','points'].includes(u.autoWhy)?1:0;u.auto=1;autoStep();}
 function autoStep(){const u=UI();u.autoWhy=null;
   if(u.auto&&S.stage==='nba'){if(S.pend){u.autoWhy='call';render();scrollTo(0,0);return;}
-    if(!u.goOn&&S.nba.length>=2&&OV()<63&&S.bank>0){u.autoWhy='cut';render();scrollTo(0,0);return;}
+    if(!u.goOn&&S.nba.length>=1&&OV()<63&&S.bank>0){u.autoWhy='cut';render();scrollTo(0,0);return;}
     u.goOn=0;playSeason(simNBA);return;}
   if(S.stage!=='nba')u.auto=0;render();scrollTo(0,0);}
 function autoCard(){const u=UI();if(!u.auto||!['cut','points'].includes(u.autoWhy))return'';
@@ -2638,7 +2642,7 @@ function achHTML(fresh,full){const have=JSON.parse(localStorage.getItem('bag_ach
 
 // ---------- sound: every effect is synthesized live (no files); music plays music/1.mp3, 2.mp3 ... if present ----------
 const SND=(()=>{let ctx=null,master=null,last={};const pref=k=>{try{return localStorage.getItem(k)!=='0';}catch{return true;}};
-  const P={sfx:pref('bag_sfx'),music:pref('bag_music')};
+  const P={sfx:pref('bag_sfx'),music:pref('bag_music'),haptics:pref('bag_haptics')};
   function unlock(){if(typeof AudioContext==='undefined'&&typeof webkitAudioContext==='undefined')return;if(!ctx){ctx=new(window.AudioContext||window.webkitAudioContext)();master=ctx.createGain();master.gain.value=1;master.connect(ctx.destination);}if(ctx.state==='suspended')ctx.resume();M.start();}
   const now=()=>ctx.currentTime;
   function env(g,t,a,peak,d){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(0.0001,t+a+d);}
@@ -2670,7 +2674,7 @@ const SND=(()=>{let ctx=null,master=null,last={};const pref=k=>{try{return local
   return{play,set,P,M};})();
 // ---------- season story: after you play a season, its pieces arrive one card at a time, then the full screen ----------
 const SEQ_L={badges:'Badges',draft:'Draft Projection',clutch:'The Final Play',goals:'Season Goals',history:'History',season:'Season Results',summer:'Summer Decision',decision:'Big Decision',class:'Class Rankings',league:'Around the League',spend:'Spend Your Points'};
-function seqPiece(k){const st=S.stage==='offers'?'hs':S.stage;
+function seqPiece(k){const st=S.stage==='offers'?'hs':S.stage==='end'?'nba':S.stage;
   if(k==='season'){let v;if(st==='nba'){const n=S.nba[S.nba.length-1];v=[n.ppg,n.rpg,n.apg];}else{const a=st==='hs'?S.hs:S.col,m=(a[a.length-1].line.match(/[\d.]+(?= [PRA]PG)/g)||[]).map(Number);v=m.slice(0,3);}
     const tiles=st!=='nba'&&v.length===3?`<div class="stat3 seqstats">${['PPG','RPG','APG'].map((l,j)=>`<div class="stat"><b class="cu" data-v="${v[j]}">${f1(v[j])}</b>${l}</div>`).join('')}</div>`:'';
     return tiles+(st==='nba'?seasonCard(S.nba[S.nba.length-1],true):seasonList(st==='hs'?S.hs:S.col,true));}
@@ -2687,18 +2691,18 @@ function seqPiece(k){const st=S.stage==='offers'?'hs':S.stage;
   if(k==='class')return classCard(true);
   if(k==='league')return leagueCard(true);
   if(k==='spend')return playerCard(true,1);return'';}
-function startSeq(){const st=S.stage;UI().open=null;if(!['hs','offers','college','nba'].includes(st)||(S.pend&&['clutch','mid'].includes(S.pend.kind)))return;const l=st==='nba'?S.nba[S.nba.length-1]:null,k=[];
+function startSeq(){const st=S.stage;UI().open=null;if(!['hs','offers','college','nba','end'].includes(st)||(st==='end'&&!S.nba.length)||(S.pend&&['clutch','mid'].includes(S.pend.kind)))return;const nb=st==='nba'||st==='end',l=nb?S.nba[S.nba.length-1]:null,k=[];
   if(l&&l.clutch&&l.clutch.length)k.push('clutch');k.push('season');k.push('badges');if(st==='college')k.push('draft');if(l&&l.goals&&l.goals.length)k.push('goals');if(l&&l.hist&&l.hist.length)k.push('history');
-  if(st!=='nba')k.push('class');if(S.summerPend)k.push('summer');if(st==='nba'&&S.pend)k.push('decision');if(st==='nba')k.push('league');if(S.bank>0)k.push('spend');
+  if(!nb)k.push('class');if(S.summerPend&&st!=='end')k.push('summer');if(st==='nba'&&S.pend)k.push('decision');if(st==='nba')k.push('league');if(S.bank>0&&st!=='end')k.push('spend');
   UI().seq={st,i:0,k:k.filter(x=>seqPiece(x))};}
 function playSeason(fn){UI().spMsg=null;fn();if(S.stage!=='nba')UI().auto=0;startSeq();render();scrollTo(0,0);}
 function seqHTML(){const q=UI().seq,k=q.k[q.i],nx=q.k[q.i+1],arr=S.stage==='college'?S.col:S.hs;
-  const title=k==='clutch'&&(S.nba[S.nba.length-1]?.clutch||[]).length>1?'The Final Plays':k==='season'?(S.stage==='nba'?`Season ${S.nba.length}`:`${YR[arr.length-1]} Year`):SEQ_L[k];
+  const title=k==='clutch'&&(S.nba[S.nba.length-1]?.clutch||[]).length>1?'The Final Plays':k==='season'?(S.stage==='end'?'Final Season':S.stage==='nba'?`Season ${S.nba.length}`:`${YR[arr.length-1]} Year`):SEQ_L[k];
   return`<div class="seqtop"><div class="dots" aria-label="Step ${q.i+1} of ${q.k.length}">${q.k.map((_,j)=>`<i class="${j<q.i?'done':j===q.i?'on':''}"></i>`).join('')}</div><button class="ghost sm" onclick="seqSkip()">Skip</button></div>
-  <h1 class="seqh">${title}</h1><div class="seqcard">${seqPiece(k)}</div>${UI().auto&&S.stage==='nba'?'<div class="note" style="text-align:center">⏭ Whole Career is on: tap Next through this season’s story, or Skip to go straight to the next season.'+(S.bank>=40&&OV()<99?` 💰 You have ${S.bank} points banked: spend them any time.`:'')+'</div>':''}`+dock((k==='summer'&&S.summerPend)||(k==='decision'&&S.pend)?`<button disabled>Make your pick above</button>`:`<button onclick="seqNext()">${nx?'Next: '+SEQ_L[nx]:UI().auto&&S.stage==='nba'?'Next season':'Continue'} ▶</button>${UI().auto?'<button class="ghost" onclick="UI().auto=0;render()">⏹ Stop the career sim</button>':''}`);}
-function seqNext(){const q=UI().seq;if(!q)return;if(q.k[q.i]==='spend'){clearUndo();UI().spend=false;}const c=document.querySelector('.seqcard'),go=()=>{if(UI().seq!==q)return;q.i++;if(q.i>=q.k.length){UI().seq=null;if(UI().auto)return autoStep();}render();scrollTo(0,0);};
+  <h1 class="seqh">${title}</h1><div class="seqcard">${seqPiece(k)}</div>${UI().auto&&S.stage==='nba'?'<div class="note" style="text-align:center">⏭ Whole Career is on: tap Next through this season’s story, or Skip to go straight to the next season.'+(S.bank>=40&&OV()<99?` 💰 You have ${S.bank} points banked: spend them any time.`:'')+'</div>':''}`+dock((k==='summer'&&S.summerPend)||(k==='decision'&&S.pend)?`<button disabled>Make your pick above</button>`:`<button onclick="seqNext()">${nx?'Next: '+SEQ_L[nx]:S.stage==='end'?'Your legacy':UI().auto&&S.stage==='nba'?'Next season':'Continue'} ▶</button>${UI().auto?'<button class="ghost" onclick="UI().auto=0;render()">⏹ Stop the career sim</button>':''}`);}
+function seqNext(){const q=UI().seq;if(!q)return;if(q.k[q.i]==='spend'){clearUndo();UI().spend=false;}const c=document.querySelector('.seqcard'),go=()=>{if(UI().seq!==q)return;q.i++;if(q.i>=q.k.length){UI().seq=null;if(q.k.includes('summer'))UI().seenRes=S.lastResult;if(UI().auto)return autoStep();}render();scrollTo(0,0);};
   if(c&&!document.documentElement.classList.contains('wt')){c.classList.add('leave');document.querySelector('.seqh')?.classList.add('leave');setTimeout(go,210);}else go();}
-function seqSkip(){UI().seq=null;UI().spend=false;if(UI().auto)return autoStep();render();scrollTo(0,0);}
+function seqSkip(){if(UI().seq&&UI().seq.k.includes('summer'))UI().seenRes=S.lastResult;UI().seq=null;UI().spend=false;if(UI().auto)return autoStep();render();scrollTo(0,0);}
 // ---------- motion: entrance on new screens, OVR bump, new-season glow, confetti for big moments ----------
 let FXprev=null,FXcur=null;
 let TAPGUARD=0;
@@ -2719,19 +2723,21 @@ function fxAfter(){const p=FXprev,c=FXcur;FXprev=c;if(!p)return;const app=docume
   if(c.ovr!=null&&p.ovr!=null&&c.ovr>p.ovr&&c.stage===p.stage&&!document.documentElement.classList.contains('wt')){const o=app.querySelector('.ovr');if(o){o.classList.add('bump');const b=o.querySelector('b');if(b){const a=p.ovr,z=c.ovr,t0=performance.now();const step=t=>{const k=Math.min(1,(t-t0)/600);b.textContent=Math.round(a+(z-a)*k);if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);}}}}
 // reacts to what changed since the last screen, so game logic never has to know about sound
 let SNDprev=null;
+// haptics on iPhone: the same beats as the sounds, never on plain taps or point ticks (no buzz storm while spending)
+function sndFx(...n){try{const sh=window.Shell;if(SND.P.haptics&&sh&&sh.native&&sh.haptic&&!globalThis.__witnessApi){const k=n.includes('fanfare')?'heavy':n.includes('bad')?'error':n.includes('good')?'success':n.includes('buzzer')?'medium':/coin|level/.test(n[0])||n.includes('cheer')?'light':null;if(k)sh.haptic(k);}}catch(e){}return SND.play(...n);}
 function sndReact(){if(typeof SND==='undefined')return;const u=UI(),r=S.lastResult,last=S.nba[S.nba.length-1],
   cur={cl:!!(S.pend&&S.pend.kind==='clutch'),stage:S.stage,seasons:S.hs.length+S.col.length+S.nba.length,res:r,sp:S.stage==='build'?spent():null,bank:S.bank,perks:JSON.stringify(S.perks||{}),tab:u.tab,menu:u.menu,sk:u.skillsPicked,sq:u.seq?u.seq.i:-1,pend:!!(S.pend||S.summerPend)};
   const p=SNDprev;SNDprev=cur;if(!p)return;
-  if(cur.cl&&!p.cl)return SND.play('buzzer','cheer');
-  if(cur.stage!==p.stage){if(cur.stage==='draft')return SND.play('buzzer','cheer');if(cur.stage==='end'){const c=career(),[t]=tierOf(goatScore(c),c);return /GOAT|Top 10|Hall/.test(t)?SND.play('fanfare','cheer'):/All-Star|Starter|Champion/.test(t)?SND.play('good','cheer'):SND.play('bad');}if(cur.stage==='nba')return SND.play('buzzer');return SND.play('swish');}
-  if(cur.seasons>p.seasons){const aw=S.stage==='nba'&&last?last.aw:[];if(aw.some(a=>/MVP|Champion/.test(a)))return SND.play('swish','fanfare','cheer');if(aw.length)return SND.play('swish','cheer');return SND.play('swish');}
-  if(r&&r!==p.res&&!r.n)return SND.play(r.ok?'good':'bad');
-  if(cur.perks!==p.perks)return SND.play('coin');
-  if(cur.sk!==p.sk&&cur.sk)return SND.play('level');
-  if((cur.sp!=null&&p.sp!=null&&cur.sp!==p.sp)||(cur.bank<p.bank))return SND.play('tick');
-  if(cur.tab!==p.tab||cur.menu!==p.menu||cur.sq!==p.sq)return SND.play('tab');}
+  if(cur.cl&&!p.cl)return sndFx('buzzer','cheer');
+  if(cur.stage!==p.stage){if(cur.stage==='draft')return sndFx('buzzer','cheer');if(cur.stage==='end'){const c=career(),[t]=tierOf(goatScore(c),c);return /GOAT|Top 10|Hall/.test(t)?sndFx('fanfare','cheer'):/All-Star|Starter|Champion/.test(t)?sndFx('good','cheer'):sndFx('bad');}if(cur.stage==='nba')return sndFx('buzzer');return sndFx('swish');}
+  if(cur.seasons>p.seasons){const aw=S.stage==='nba'&&last?last.aw:[];if(aw.some(a=>/MVP|Champion/.test(a)))return sndFx('swish','fanfare','cheer');if(aw.length)return sndFx('swish','cheer');return sndFx('swish');}
+  if(r&&r!==p.res&&!r.n)return sndFx(r.ok?'good':'bad');
+  if(cur.perks!==p.perks)return sndFx('coin');
+  if(cur.sk!==p.sk&&cur.sk)return sndFx('level');
+  if((cur.sp!=null&&p.sp!=null&&cur.sp!==p.sp)||(cur.bank<p.bank))return sndFx('tick');
+  if(cur.tab!==p.tab||cur.menu!==p.menu||cur.sq!==p.sq)return sndFx('tab');}
 function soundCard(){const P=SND.P,M=SND.M,tg=(k,l,d)=>`<div class="toggle"><div class="grow"><b>${l}</b><div class="sub">${d}</div></div><button class="${P[k]?'':'ghost'} sm" aria-label="${l} ${P[k]?'on':'off'}" onclick="SND.set('${k}',${!P[k]})">${P[k]?'On':'Off'}</button></div>`;
-  return`<div class="card"><div class="sh">🎵 <span class="grow">Sound</span></div>${tg('sfx','Sound effects','Swishes, buzzers, crowd cheers')}${tg('music','Music',M.none?'No music added yet':'Game soundtrack, loops in the background')}</div>`;}
+  return`<div class="card"><div class="sh">🎵 <span class="grow">Sound</span></div>${tg('sfx','Sound effects','Swishes, buzzers, crowd cheers')}${tg('music','Music',M.none?'No music added yet':'Game soundtrack, loops in the background')}${window.Shell&&window.Shell.native?tg('haptics','Vibration','A buzz on big moments: rings, game-winners, the draft'):''}</div>`;}
 // ---------- save & continue: a run survives closing the app ----------
 // A snapshot of the whole run is stored whenever no decision is waiting, plus the few actions taken since.
 // Replaying those actions with the same dice rebuilds any open decision exactly, so reloading can't reroll anything.
