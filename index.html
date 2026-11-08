@@ -161,6 +161,7 @@ th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
 .swatches.c10{display:grid;grid-template-columns:repeat(5,34px);justify-content:space-between;row-gap:10px;max-width:250px}
 .celebrate{margin:10px 0;padding:16px 14px;border-radius:var(--r);text-align:center;background:radial-gradient(120% 140% at 50% 0,rgba(255,200,74,.38),rgba(255,138,31,.12) 55%,rgba(20,16,10,.9));border:1px solid rgba(255,200,74,.6);box-shadow:0 0 0 1px rgba(255,200,74,.15),0 12px 36px rgba(255,170,40,.18);animation:pop .6s cubic-bezier(.2,1.8,.4,1) both}.cel-t{font-family:var(--fd);font-size:1.9rem;letter-spacing:.04em;color:var(--gold)}
 .cel-av{display:flex;justify-content:center;margin:-2px 0 6px}.cel-av svg{border-radius:50%;box-shadow:0 0 0 2px rgba(255,200,74,.7),0 0 24px rgba(255,200,74,.35)}.cel-s{color:var(--tx);font-size:.92rem;margin-top:2px}
+.lookcard .stage svg{transition:width .2s,height .2s}.lookcard .stage.mini svg{width:64px;height:75px}.lookcard .stage.mini .seg,.lookcard .stage.mini button.ghost{display:none}
 .lookcard .stage{position:sticky;top:64px;z-index:3;display:flex;align-items:center;gap:12px;padding:10px;margin:-6px -6px 10px;border-radius:14px;background:rgba(18,20,26,.94);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border:1px solid var(--line)}
 .lookcard .stage svg{filter:drop-shadow(0 8px 18px rgba(0,0,0,.45))}
 .stagebar{display:flex;flex-direction:column;gap:7px;flex:1;min-width:0}.stagebar .pn{font-size:1.25rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1499,7 +1500,7 @@ function avatar(L,age,size,bg){size=size||90;if(L.face===3&&(L.head===4||L.head=
   const hw=(L.head||0)%HEADW.length;
   const band=(y,hgt,col,edge)=>`<g clip-path="url(#${id}h)"><path d="M35 ${y} C40 ${y-6.5} 50 ${y-9} 60 ${y-9} C70 ${y-9} 80 ${y-6.5} 85 ${y} L85 ${y+hgt} C80 ${y+hgt-6} 70 ${y+hgt-8.5} 60 ${y+hgt-8.5} C50 ${y+hgt-8.5} 40 ${y+hgt-6} 35 ${y+hgt}Z" fill="${col}"${edge?` stroke="${edge}" stroke-width=".7"`:''}/>`;
   // band colours must stand out from what they sit on (hair, or skin on a bald/shaved head); bEdge gives every band a thin outline
-  const hwRef=st==='Bald'?sk:st==='Shaved'?shavedC:dyed?hc:g(HAIRCOL,L.hc)[1],hwNow=st==='Bald'?sk:st==='Shaved'?shavedC:hc,pickC=(...cs)=>cs.find(c=>Math.abs(lu(c)-lu(hwRef))>=.2&&Math.abs(lu(c)-lu(hwNow))>=.15)||cs.find(c=>Math.abs(lu(c)-lu(hwNow))>=.2)||cs[cs.length-1],bEdge=c=>shade(c,lu(c)<.25?.38:-.4);
+  const hwRef=st==='Bald'?sk:st==='Shaved'?shavedC:dyed?hc:g(HAIRCOL,L.hc)[1],hwNow=st==='Bald'?sk:st==='Shaved'?shavedC:hc,pickC=(...cs)=>cs.find(c=>Math.abs(lu(c)-lu(hwRef))>=.2)||cs[cs.length-1],bEdge=c=>shade(c,lu(c)<.25?.38:-.4);
   const ninC=pickC(lightJ?'#1c1c1c':jc,jc,tc,'#e63946','#1c1c1c'),ninE=bEdge(ninC),pwC=pickC(tc,jc,lu(hwRef)>.5?'#1c1c1c':'#f2f2f2');
   const hbS=lu(jc)>.8?(lu(tc)<.8?tc:'#1d2b57'):jc; // headband stripe: jersey colour, unless the jersey is white
   // ninja tails hang from a knot at the back of the head; they're drawn behind the ears (see ninTails in the layer list)
@@ -1661,7 +1662,7 @@ function plaqueHTML(c,sc,t){const g=x=>c.cnt[x]||0,gp=c.gp||1,top=[['Champion','
   <div class="tier" style="font-size:1.6rem;text-align:left;margin:2px 0">${t}</div>
   <div class="sub">${archName()} · ${ht(S.height)} · ${pickTxt(S.pick)} · ${c.seasons} season${c.seasons===1?'':'s'}</div></div></div>
   <div class="stat3" style="margin-top:10px">${[['PPG',f1(c.pts/gp)],['RPG',f1(c.reb/gp)],['APG',f1(c.ast/gp)],['SPG',f1((c.stl||0)/gp)],['BPG',f1((c.blk||0)/gp)],['PTS',Math.round(c.pts).toLocaleString()]].map(([l,v])=>`<div class="stat"><b>${v}</b>${l}</div>`).join('')}</div>
-  ${(()=>{const B={...(S.bdg||{}),...Object.fromEntries(Object.entries(S.bdgBest||{}).map(([k,v])=>[k,Math.max(v,(S.bdg||{})[k]||0)]))},gb=BADGES.filter(b=>B[b.id]>=3).sort((x,y)=>B[y.id]-B[x.id]);return gb.length?`<div style="margin-top:8px">${gb.slice(0,6).map(b=>`<span class="pill bpill t${B[b.id]}">${bMed(B[b.id])}${b.n}</span>`).join('')}</div>`:'';})()}
+  ${(()=>{const B={...(S.bdg||{}),...Object.fromEntries(Object.entries(S.bdgBest||{}).map(([k,v])=>[k,Math.max(v,(S.bdg||{})[k]||0)]))},gb=BADGES.filter(b=>B[b.id]>=3).sort((x,y)=>B[y.id]-B[x.id]);return gb.length?`<div class="sub" style="margin-top:8px">Best badges of your career</div><div style="margin-top:4px">${gb.slice(0,6).map(b=>`<span class="pill bpill t${B[b.id]}">${bMed(B[b.id])}${b.n}</span>`).join('')}</div>`:'';})()}
   <div style="margin-top:8px">${top.map(([k,e,l])=>`<span class="pill gold">${e} ${g(k)}× ${l}</span>`).join('')||'<span class="muted">'+(c.seasons>=10?`No hardware, but ${c.seasons} seasons and ${Math.round(c.pts).toLocaleString()} points. A real career.`:S.retired==='Out of the league'?'No hardware. Out of the league, but you made it there.':'No hardware. You still made it to the league.')+'</span>'}</div>
   <div class="sub" style="margin-top:6px">GOAT Score ${sc}${S.daily?` · 📅 Daily Build ${todayKey()}`:''}</div></div>`;}
 
@@ -2556,7 +2557,10 @@ function buildHTML(){const u=UI(),left=START_BUDGET-spent(),ti=Math.max(0,TABS.f
 
 // ---------- screens ----------
 // drawing a screen must never use the career dice, or a saved run could not be rebuilt exactly
-function render(){syncPos();const r0=R;R=Math.random;try{drawScreen();}finally{R=r0;}autosave();}
+function render(){syncPos();const r0=R;R=Math.random;try{drawScreen();}finally{R=r0;}miniStage();autosave();}
+// the creator's preview card shrinks once you scroll into the options, so it never hides the grid
+function miniStage(){const st=typeof document!=='undefined'&&document.querySelector('.lookcard .stage');if(st)st.classList.toggle('mini',(window.scrollY||0)>280);}
+if(typeof addEventListener==='function')addEventListener('scroll',miniStage,{passive:true});
 function drawScreen(){const st=S.stage;let h='';const q=UI().seq;if(q&&q.st!==st)UI().seq=null;
   if(st==='build'&&UI().intro==null&&!UI().introSeen&&!document.documentElement.classList.contains('wt')){UI().introSeen=1;try{if(!localStorage.getItem('bag_intro'))UI().intro=0;}catch{}}
   if(UI().intro!=null)h=introHTML();

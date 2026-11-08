@@ -179,15 +179,48 @@ Testers kept playing careers until they reached THE GOAT, and listed every bug, 
 - "True ceiling" only appears at retirement, so a player can't tell early that GOAT is out of reach for a build. That is by design (hidden stats stay hidden); flagging only because testers keep asking.
 - Free-agency cards show the OVR from when the offers were made, even if you spend points before choosing.
 
+### Round G9 (3 testers)
+
+| Tester | Result | Fun |
+|---|---|---|
+| First-time player on Rookie | Top 10 All-Time (5 rings, 13 All-Stars), **16 points short of 30,000**; first ten minutes 8/10 | 4/5 |
+| Pro Floor General | Solid Starter; OVR peaked at 78 with every core skill at 99 | n/a |
+| Pro Post Bully | Top 10 All-Time (6 rings, 12 All-Stars), **50 points short of 30,000** | 4/5 |
+
+**Fixed after G9**
+- **"While you simmed":** when Next Decision plays seasons without stopping, a card lists each one (team, record, points/rebounds/assists, playoff result, awards). Title and MVP seasons still open their full story.
+- **Milestone watch:** Retire now and the farewell tour options say when you are within 3,000 points of 10k/20k/30k/40k ("You are 1,240 points from 30,000"). Two testers missed 30,000 by 16 and 50 points.
+- No viral videos or social media storms in the 80s, 90s and 2000s. Those eras get highlight-show and barbershop versions; the mixtape becomes a "highlight tape".
+- "1 career" (not "1 careers") in the menu.
+
+**Biggest open issue (needs your call): OVR ceilings differ by style.** With a build's top 8 to 12 skills at 99 and everything else at 60:
+
+| Style | OVR |
+|---|---|
+| Sharpshooter, Slasher, Two-Way Wing | 89–90 |
+| Floor General, Post Bully | 84 |
+| Rim Protector | 83 |
+
+So point guards and bigs hit a lower ceiling for the same effort. That explains the "centers plateau at 82–84" report from earlier tonight and the Floor General stuck at 78. Fixing it means changing the OVR formula, which moves every odds number, so I left it for a daytime balance pass.
+
+**Also seen, not changed**
+- Class rank drops after each college season because new points are unspent (#4 to #12), then jumps back when you spend.
+- Contenders still sometimes collapse the year you join (a 52-30 Finals team went 33-49), and a 62-20 team lost in round 1 twice. This was already on the open list.
+- The rival won MVP while your teammate; pure scorers rarely win MVP.
+
 ## GOAT odds (checked overnight)
 
 Simulated 1,500 careers per row with the balance harness. "Casual" spends points at random; "smart" spends them well.
 
+Latest run (final settings, after the G8 All-Star vote change):
+
 | Difficulty | Casual GOAT | Smart GOAT | Your target |
 |---|---|---|---|
-| Rookie | 9.2% | 35.5% | ~9–10% casual |
-| Pro | 1.0% | 4.6–5.3% (two runs) | ~1% casual, 4.3–5% smart |
-| Hall of Fame | 0.5% | 1.9–2.7% (two settings) | ~0.5% casual, 2–2.5% smart |
+| Rookie | 8.8% | 36.8% | ~9–10% casual |
+| Pro | 0.6% | 4.9% | ~1% casual, 4.3–5% smart |
+| Hall of Fame | 0.4% | 2.7% | ~0.5% casual, 2–2.5% smart |
+
+The run before it (same difficulty settings, before fans weighed scoring) had Rookie 9.2%, Pro 1.0% / 5.3%, Hall of Fame 0.5% / 2.7%. Pro casual at 0.6% is about 1.5 standard errors low; worth one more run before shipping.
 
 - The All-Star changes (top-5 scorers and the DPOY always make the team) pushed Rookie casual up to 11%. To compensate, Rookie pro-season points went from .45 to .40, and Hall of Fame from .75 to .77 (between the two settings tested). Pro is unchanged.
 - Run-to-run noise is about ±0.5 points at these sample sizes.
