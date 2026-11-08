@@ -5,8 +5,8 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 ## Read this first
 
 **What happened overnight**
-- 13 rounds of 3 Witness playtesters (39 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (87 automated tests, all passing) and committed locally.
-- Testers reached THE GOAT on Rookie (several), Pro (a rim protector on career 3) and Hall of Fame (a center on career 2, with perks). Most Pro and Hall of Fame careers ended at Hall of Famer or Top 10 All-Time, which is where you want them.
+- 14 rounds of 3 Witness playtesters (42 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (88 automated tests, all passing) and committed locally.
+- Testers reached THE GOAT on Rookie (five times, usually on the first or second career), Pro (a rim protector on career 3) and Hall of Fame (a center on career 2, with perks). Most Pro and Hall of Fame careers ended at Hall of Famer or Top 10 All-Time, which is where you want them.
 - Phase 2 rebuilt the character creator and polished the character art (aging, team colors, portraits on banners and the Final Buzzer card).
 - Phase 3: three high-effort leads proposed and debated what to add next. Their joint top 10 is below, and the full documents are in `docs/phase3/`.
 - GOAT odds were rechecked after every balance change and retuned once (Rookie .45 to .40, Hall of Fame .75 to .77).
@@ -326,6 +326,23 @@ So point guards and bigs hit a lower ceiling for the same effort. That explains 
 - Undo clears the old "raised X" message on the spend screen.
 
 **The pure-scorer MVP wall, confirmed again:** 14 scoring titles across two careers, several on 63- to 70-win teams, and no MVP. In one career the player finished 2nd four times behind a teammate with 8 MVPs. This is the single biggest balance question for the next pass.
+
+### Round G14 (3 testers)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Hall of Fame Floor General | All-Star tier (4 rings, 2 All-Stars); Next Decision stopped on every title season | 4/5 |
+| Pro rim protector | Top 10 All-Time (8 DPOYs, 7 rings, 11 All-Stars); called the big-man last-shot plays "the best part of the game" | n/a |
+| First-time player, Whole Career | **THE GOAT on career 2** (6 MVPs, 3 rings, 37,249 points, score 412) | 4/5 |
+
+**Fixed after G14**
+- **Kept playstyle, consistent everywhere:** after you choose to stay a Rim Protector, the spend screen says "Your style: Rim Protector" (and notes what your skills currently lean toward), and later prompts ask about leaving Rim Protector, never about an identity you already turned down.
+- No playstyle-change prompt in a farewell season or after 32 (one promised "untapped potential" at 34).
+- **Free-agency fit text:** three testers saw "You fill their biggest need: Shooting" with a weak shooting average. Fit uses your two best skills in a group, while the screen shows the group average; the text now only claims a fit when the average agrees (offers themselves unchanged).
+- Team labels show last season's record ("Contender (56-26 last season)"), since testers kept joining "Contenders" that missed the playoffs.
+- League award tiles show "M. Duvall" instead of "DUVALL" (several players shared a surname).
+- No Request-a-trade card right after a trade.
+- A stale "you have 0 points" message from college no longer shows on the pro spend screen.
 
 ## GOAT odds (checked overnight)
 
