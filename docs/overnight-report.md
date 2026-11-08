@@ -5,7 +5,7 @@ Started 1:16 AM. Work is committed locally only; nothing is pushed to TestFlight
 ## Read this first
 
 **What happened overnight**
-- 24 rounds of 3 Witness playtesters (72 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (89 automated tests, all passing) and committed locally.
+- 25 rounds of 3 Witness playtesters (75 sessions): GOAT chases on every difficulty and style, first-time players, art-director reviews of the creator, and a menus-and-screens review. After each round I fixed what they found, ran the full test suite (89 automated tests, all passing) and committed locally.
 - Testers reached THE GOAT on Rookie (eight times, often on the first career), Pro (a rim protector on career 3) and Hall of Fame (a center on career 2, with perks). Most Pro and Hall of Fame careers ended at Hall of Famer or Top 10 All-Time, which is where you want them.
 - Phase 2 rebuilt the character creator and polished the character art (aging, team colors, portraits on banners and the Final Buzzer card).
 - Phase 3: three high-effort leads proposed and debated what to add next. Their joint top 10 is below, and the full documents are in `docs/phase3/`.
@@ -535,6 +535,22 @@ So point guards and bigs hit a lower ceiling for the same effort. That explains 
 **Checked, not a bug:** "Hall of Fame selected but the setup text describes Pro" (reported again): in a browser, picking Hall of Fame shows "Hall of Fame: ... 120 skill points, start around 45 OVR". The tester read the card before the switch.
 
 **Last word on Rookie:** testers reached THE GOAT on Rookie eight times tonight, often on the first career, and several called it too easy. The simulated odds (9.5% casual, 38% smart) are on your target, so this is about how good real players are at the game, not a tuning error. If Rookie should feel harder for engaged players, the smart-player odds are the number to look at.
+
+### Round G25 (3 testers, 20-minute sessions to finish by 8 AM)
+
+| Tester | Result | Fun |
+|---|---|---|
+| Pro Floor General | Title in season 3 on three last-play calls (a Game 7 stop, then Finals Game 6 and 7 winners); 0 All-Stars at 10–11 assists | n/a |
+| Rookie Post Bully | 81 OVR at 23; the GOAT race line and spend math checked out | 3/5 |
+| Menus check | Distinct menu icons, Your profile / How to play, and the reset warning confirmed | 3/5 |
+
+**Fixed after G25**
+- Iron body and Injury insurance perks have different icons.
+
+**Seen, not changed**
+- Pass-first point guards (10+ assists, 11–16 points) never make All-Star teams; same root as the OVR-ceiling and award questions in "Decisions for you".
+- The Undo button can sit half under the bottom bar in the season story's spend step on some screens.
+- The Undo label names only the last skill while it can refund several quick taps on the same group.
 
 ## GOAT odds (checked overnight)
 
