@@ -16,8 +16,8 @@ const drive = `(()=>{applyArch(1);toggleTrait('work');toggleTrait('dur');startCa
     if(i%3===0||getS().pend||getS().summerPend){const a=dg();resumeRun();const b=dg();checks++;if(a!==b){bad.push(i+':'+st);if(bad.length>3)break;}}}
   return JSON.stringify({checks,bad,stage:getS().stage,seasons:getS().nba.length});})()`;
 export default [
-  { name: 'save: every reload rebuilds the run exactly (stats, open decisions, dice)', seed: 17, steps: [ // a seed whose career runs long (seeds 11 and 13 got short after balance changes)
-    { at: 0.3, evalAs: { res: drive }, expect: ['JSON.parse(res).bad.length===0', 'JSON.parse(res).checks>20', 'JSON.parse(res).seasons>=3'] }] },
+  { name: 'save: every reload rebuilds the run exactly (stats, open decisions, dice)', seed: 17, steps: [ // played on Rookie so the career runs long whatever the balance (Pro seeds kept getting short careers)
+    { at: 0.3, evalAs: { res: drive.replace('applyArch(1)',"setDiff('rookie');applyArch(1)") }, expect: ['JSON.parse(res).bad.length===0', 'JSON.parse(res).checks>20', 'JSON.parse(res).seasons>=3'] }] },
   { name: 'save: a second career with a different seed also rebuilds exactly', seed: 29, steps: [
     { at: 0.3, evalAs: { res: drive }, expect: ['JSON.parse(res).bad.length===0', 'JSON.parse(res).checks>8'] }] },
   { name: 'save: the setup screen offers Continue, and it restores the run', seed: 3, steps: [

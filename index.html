@@ -367,11 +367,11 @@ const FRAMES={Lean:{speed:6,vert:5,stam:5,lat:4,hook:-2,str:-9,post:-4,intD:-3,o
   Balanced:{cons:3,iq:2,inj:0,dev:.025,d:'No glaring weakness. Steady and easy to coach',hid:['Faster development','Steadier nights']},
   Strong:{str:9,post:5,intD:4,oreb:4,dreb:3,close:2,hook:3,speed:-5,vert:-4,stam:-3,lat:-4,inj:.04,decl:.15,ppg:1,d:'Bully ball inside, but slower and heavier on the joints',hid:['Draws contact (+points)','Ages faster','More injuries']}};
 const TRAITS=[['work','Work Ethic','You develop faster and age slower'],['dur','Durability','Fewer and lighter injuries'],['clutch','Clutch Gene','You win more playoff series'],['coach','Coachability','You get more out of college'],['star','Star Power','Hype, All-Star votes, draft buzz'],['motor','Motor','You hustle every possession: more rebounds, steals and minutes'],['lead','Leadership','You make teammates better: more wins and playoff series'],['killer','Killer Instinct','Scorer’s mentality: more shots and points, fewer assists'],['late','Late Bloomer','Raw early, but a higher ceiling and a later peak (a gamble)'],['lock','Lockdown Mindset','You take defense personally: steals, blocks, DPOY votes'],['touch','Shooter’s Touch','Soft hands: better 3P%, FT% and FG%']];
-const MIN_A=40, BUILD_MAX=90, H_MIN=70, H_MAX=87;
+const MIN_A=25, BUILD_MAX=90, H_MIN=70, H_MAX=87;
 // ---------- difficulty & Generational Talent Points (GTP) ----------
-const DIFFS={rookie:{name:'🟢 Rookie',budget:225,mult:0,lg:-8,nbaPts:.4,d:'Want a relaxed, less challenging career? Play Rookie: 225 skill points, start around 55 OVR, and great careers are common. You will not earn GTP, gems or achievements.'},
-  pro:{name:'🟡 Pro',budget:205,mult:1,lg:3,nbaPts:.45,d:'The real challenge: 205 skill points, start around 50 OVR. Most careers end as role players and THE GOAT is rare. Earns GTP, gems and achievements.'},
-  hof:{name:'🔴 Hall of Fame',budget:120,mult:1.5,lg:3,nbaPts:.77,d:'The biggest challenge: 120 skill points, start around 45 OVR. Many players never stick in the league and THE GOAT is a legend-level feat. Earns 1.5× GTP, gems and achievements.'}};
+const DIFFS={rookie:{name:'🟢 Rookie',budget:350,mult:0,lg:-8,nbaPts:.4,cl:7.5,d:'Want a relaxed, less challenging career? Play Rookie: 350 skill points, start around 50 OVR, and great careers are common. You will not earn GTP, gems or achievements.'},
+  pro:{name:'🟡 Pro',budget:310,mult:1,lg:3,nbaPts:.45,cl:6.5,d:'The real challenge: 310 skill points, start around 45 OVR. Most careers end as role players and THE GOAT is rare. Earns GTP, gems and achievements.'},
+  hof:{name:'🔴 Hall of Fame',budget:260,mult:1.5,lg:3,nbaPts:.77,cl:4.3,d:'The biggest challenge: 260 skill points, start around 40 OVR. Many players never stick in the league and THE GOAT is a legend-level feat. Earns 1.5× GTP, gems and achievements.'}};
 const diff=()=>DIFFS[S.diff]||DIFFS.pro;
 Object.defineProperty(globalThis,'START_BUDGET',{configurable:true,get:()=>diff().budget+25*((S&&S.perks&&S.perks.pts)||0)});
 const gtpBank=()=>{try{return Math.max(0,parseInt(localStorage.getItem('bag_gtp')||'0',10)||0);}catch{return 0;}};
@@ -420,7 +420,7 @@ const INJ={minor:['sprained ankle','hamstring strain','sore knee','bruised hip',
 
 // ---------- state ----------
 let S;
-function newPlayer(){return{diff:(()=>{try{return localStorage.getItem('bag_diff')||'pro';}catch{return'pro';}})(),perks:{},gtpRun:0,look:randLook(),era:pick(ERAS).id,spins:1,daily:false,stage:'build',name:'',pos:'SF',height:79,frame:'Balanced',attrs:Object.fromEntries(SUBKEYS.map(k=>[k,40])),picked:[],traits:{},bank:0,hype:0,age:14,hs:[],col:[],nba:[],ceiling:0,injuryProne:false,badges:[],bdg:{},redshirt:false,flags:{}};}
+function newPlayer(){return{diff:(()=>{try{return localStorage.getItem('bag_diff')||'pro';}catch{return'pro';}})(),perks:{},gtpRun:0,look:randLook(),era:pick(ERAS).id,spins:1,daily:false,stage:'build',name:'',pos:'SF',height:79,frame:'Balanced',attrs:Object.fromEntries(SUBKEYS.map(k=>[k,MIN_A])),picked:[],traits:{},bank:0,hype:0,age:14,hs:[],col:[],nba:[],ceiling:0,injuryProne:false,badges:[],bdg:{},redshirt:false,flags:{}};}
 
 const cost=v=>v<80?1:v<90?2:3;
 const costTo=v=>{let c=0;for(let x=MIN_A;x<v;x++)c+=cost(x);return c;};
@@ -458,15 +458,23 @@ const ARCHS={
   rim:    {n:'Rim Protector',fam:'int',mod:'Rim-Protecting',h:84,w:{hook:4,lat:1,blk:14,intD:13,dreb:9,oreb:5,str:8,vert:7,stam:5,iq:5,cons:3,dunk:5,close:4,layup:2,post:3,perD:2,speed:2}}};
 const ARCH_IDS=Object.keys(ARCHS);
 const ARCH_POW=1.6;
-for(const a of Object.values(ARCHS)){const s=Object.values(a.w).reduce((x,y)=>x+y,0),s2=Object.values(a.w).reduce((x,y)=>x+y**ARCH_POW,0);a.wn0=Object.entries(a.w).map(([k,v])=>[k,v/s]);a.wn=Object.entries(a.w).map(([k,v])=>[k,v**ARCH_POW/s2]);}
+// core rating (2026-11-08): OVR is the better of the all-around rating and a core rating that only takes over near the top,
+// so any role can reach 99 by maxing its core: core 99 with the rest of your game at 72 is a 99; past that it climbs slowly. Below the top nothing changes.
+const CORE_N=7,CORE_W=.8,CORE_TOP=93.6,CORE_AT=CORE_W*99+(1-CORE_W)*72,CORE_SLOPE=3.2;
+for(const a of Object.values(ARCHS)){const s=Object.values(a.w).reduce((x,y)=>x+y,0),s2=Object.values(a.w).reduce((x,y)=>x+y**ARCH_POW,0);a.wn0=Object.entries(a.w).map(([k,v])=>[k,v/s]);a.wn=Object.entries(a.w).map(([k,v])=>[k,v**ARCH_POW/s2]);
+  // the role's core: its 7 most important skills. Maxing them (with the rest of your game decent) is a 99 in that role
+  const ks=Object.keys(a.w).sort((x,y)=>a.w[y]-a.w[x]),core=ks.slice(0,CORE_N),rest=ks.slice(CORE_N),cs=core.reduce((t,k)=>t+a.w[k],0),rs=rest.reduce((t,k)=>t+a.w[k],0)||1;
+  a.core=core.map(k=>[k,a.w[k]/cs]);a.rest=rest.map(k=>[k,a.w[k]/rs]);}
 // per-role calibration (equally good builds rate the same in every role) and one offset that keeps the scale where the
 // league's ratings sit. Measured offline (see docs/archetype-rework-plan.md); pure constants, no dice
 const ARCH_CAL={floor:-3.23,creator:1.31,sniper:-3.63,slasher:-1.76,lock:-3.26,threeD:.58,twoway:6.4,pointF:4.3,runner:.03,stretch:.97,post:1.4,glass:-1.37,rim:-3.79},ARCH_OFF=-5.1;
 // raw fit in every role, pure: depends only on skills, height and frame
 function archRaw(){const memo={},out={};for(const id of ARCH_IDS){const a=ARCHS[id];let m=memo[a.h];if(!m){m=memo[a.h]={};const d=S.height-a.h;for(const k of SUBKEYS)m[k]=esD(k,d);}
   let v=0;for(const[k,w]of a.wn)v+=w*m[k];
+  let c=0,r=0;for(const[k,w]of a.core)c+=w*Math.min(99,m[k]);for(const[k,w]of a.rest)r+=w*Math.min(99,m[k]);
+  const dd=CORE_AT-(CORE_W*c+(1-CORE_W)*r),cv=CORE_TOP-(dd>0?CORE_SLOPE*dd:.4*dd)-ARCH_CAL[id]-ARCH_OFF;
   // well off the role's size: a 6'1" can't be a rim protector, a 7'0" can't run point
-  out[id]=v-Math.max(0,a.h-S.height-2)*.9-Math.max(0,S.height-a.h-3)*.6;}return out;}
+  out[id]=Math.max(v,cv)-Math.max(0,a.h-S.height-2)*.9-Math.max(0,S.height-a.h-3)*.6;}return out;}
 function archFits(){const r=archRaw();return ARCH_IDS.map(id=>[id,r[id]+ARCH_CAL[id]+ARCH_OFF]).sort((x,y)=>y[1]-x[1]);}
 function ovr(){const r=archRaw();let b=-1e9;for(const id of ARCH_IDS){const v=r[id]+ARCH_CAL[id];if(v>b)b=v;}return b+ARCH_OFF;}
 // what you play like: the best role, plus a flavor word from a different family when that role is close behind
@@ -591,7 +599,7 @@ function badgeBookHTML(){const k=bookGet(),n=Object.keys(k).length;
 function heightNote(){const keys=[['oreb','Rebounding'],['blk','Block'],['dunk','Dunk'],['intD','Interior D'],['handle','Ball Handle'],['speed','Speed']];
   return keys.map(([k,l])=>{const dv=Math.round(es(k)-S.attrs[k]-(FRAMES[S.frame][k]||0));return dv?`${l} ${dv>0?'+':''}${dv}`:null;}).filter(Boolean).join(' · ')||'no height bonuses or penalties';}
 const DSP=[[40,38],[62,60],[69.7,70],[73,77],[80.6,85],[82.1,90],[87.4,95],[93,99]];
-function dsp(x){x-=((diff().lg||0)-2)*.6;if(x<=DSP[0][0])return Math.round(clamp(x-2,1,99));for(let i=1;i<DSP.length;i++){const[a,A]=DSP[i-1],[b,B]=DSP[i];if(x<=b)return Math.round(A+(x-a)/(b-a)*(B-A));}return 99;}
+function dsp(x){x-=((diff().lg||0)-2)*.6*clamp((x-40)/30,0,1);if(x<=DSP[0][0])return Math.round(clamp(x-2,1,99));for(let i=1;i<DSP.length;i++){const[a,A]=DSP[i-1],[b,B]=DSP[i];if(x<=b)return Math.round(A+(x-a)/(b-a)*(B-A));}return 99;}
 const OV=()=>dsp(ovr());
 function grade(n){return n>=92?'A+':n>=87?'A':n>=83?'A-':n>=79?'B+':n>=75?'B':n>=71?'B-':n>=67?'C+':n>=63?'C':n>=58?'C-':'D';}
 
@@ -601,15 +609,17 @@ function archPick(){const wn=ARCHS[archetype().id].wn;return()=>{if(R()<.25)retu
 function growTo(target){const pk=archPick();let g=0;
   while(ovr()<target&&g++<400){const sk=pk();if(S.attrs[sk]<99)S.attrs[sk]++;}}
 function declineTo(target){let g=0;const keys=['speed','speed','vert','vert','stam','perD','str','layup','dunk','oreb','stl','blk'];
-  while(ovr()>target&&g++<400){const k=pick(keys);if(S.attrs[k]>30)S.attrs[k]--;}}
+  while(ovr()>target&&g++<400){const k=pick(keys);if(S.attrs[k]>MIN_A)S.attrs[k]--;}}
 // growth is never applied for you: it turns into bonus points worth exactly what that growth would cost, and you place them
 // development pays DEVF of the points the growth would cost (tuned with the balance sims)
 const DEVF=.7,HS_FL=1.2,COL_FL=1.0,NBA_FL=1.0;
+// catch-up (2026-11-08): starts are lower, so high school and college add a share of that drop each season on top of normal growth
+const CATCH_HS=.17,CATCH_COL=.12;
 function growPts(target){const a0={...S.attrs};growTo(target);let p=0;for(const k in S.attrs)for(let v=a0[k];v<S.attrs[k];v++)p+=cost(v);p=Math.round(p*DEVF);S.attrs=a0;if(p>0){S.bank+=p;S.devPts=(S.devPts||0)+p;}return p;}
 // S.natO: where natural growth alone has taken you. Development pays the points for that growth, measured from your current
 // skills, so a player who spent ahead of it keeps developing until natural growth reaches the hidden ceiling
 // fl: the growth a young player gets just from getting older and playing (HS, college, pro up to 25), even past the ceiling
-function develop(rate,fl){if(S.natO==null)S.natO=ovr();const o=S.natO;if(S.perks&&S.perks.dev&&S.stage!=='nba')rate*=1.4;const g=Math.min(S.stage==='nba'?(S.age>29?2:3.5):99,Math.max(o<S.ceiling?(S.ceiling-o)*rate:0,fl||0));if(g>0){growPts(ovr()+g);S.natO=o+g;}}
+function develop(rate,fl){if(S.natO==null)S.natO=ovr();const o=S.natO;if(S.perks&&S.perks.dev&&S.stage!=='nba')rate*=1.4;const g=Math.min(S.stage==='nba'?(S.age>29?2:3.5):99,Math.max(o<S.ceiling?(S.ceiling-o)*rate:0,fl||0));const gg=g+(S.stage==='nba'?0:(diff().cl||0)*(S.stage==='hs'?CATCH_HS:CATCH_COL));if(gg>0){growPts(ovr()+gg);S.natO=o+gg;}}
 // why the OVR moved this season, from VISIBLE causes only (age, traits, college program, injuries) plus a deliberately noisy scout
 // read of the remaining room. Never names frame effects or hidden numbers; the true ceiling stays an end-screen reveal.
 function scoutNoise(){return(((S.seed||7)*2654435761>>>0)%11)-5;}
@@ -690,20 +700,20 @@ function colEvents(y){const t=S.traits;return[
   {tag:'perf',w:es('three')>=60&&ovr()>=56?5:0,f:()=>{up('three',3);S.hype+=2;return[1,'🎯 You lead the conference in 3-point percentage. +3 Three-Point']}},
   {w:2,f:()=>{S.banned=true;S.hype-=4;return[-1,'🚨 NCAA sanctions hit the program. No postseason this year']}},
   {w:3,f:()=>{addBank(2);S.hype+=3;return[1,'🎥 You spend the summer working out with NBA pros. +12 pts']}},
-  {w:3,f:()=>{S.hype-=2;S.attrs.cons=Math.max(30,S.attrs.cons-2);return[-1,'📱 You get into an online beef with a rival fan base. -2 Consistency']}},
+  {w:3,f:()=>{S.hype-=2;S.attrs.cons=Math.max(MIN_A,S.attrs.cons-2);return[-1,'📱 You get into an online beef with a rival fan base. -2 Consistency']}},
   {tag:'perf',w:4,f:()=>{S.hype+=6;addBank(1);return[1,'📺 You hit a game-winner on Saturday-night national TV. +6 pts']}},
-  {w:3,f:()=>{S.attrs.cons=Math.max(30,S.attrs.cons-1);return[-1,'🤕 You break your nose and play in a mask for a month. -1 Consistency']}},
+  {w:3,f:()=>{S.attrs.cons=Math.max(MIN_A,S.attrs.cons-1);return[-1,'🤕 You break your nose and play in a mask for a month. -1 Consistency']}},
   {w:4,f:()=>{up('post',3);return[1,'🧑‍🏫 An assistant coach rebuilds your footwork. +3 Post Moves']}},
   {tag:'perf',w:3,f:()=>{S.hype-=4;return[-1,'📉 You get benched for three games during conference play']}},
   {tag:'perf',w:ovr()>=60?4:0,f:()=>{S.hype+=6;addBank(1);return[1,'🏆 You are named first-team all-conference. +6 pts']}},
   {w:2+(5-t.work)*.5,f:()=>{S.hype-=3;addBank(-1);return[-1,'🎓 You land on academic probation and miss three games. -3 pts']}},
   {w:3,f:()=>{S.hype+=4;S.traits.lead=Math.min(5,S.traits.lead+1);return[1,'🎤 Your locker-room speech after a tough loss goes viral. +1 Leadership']}},
-  {tag:'perf',w:3,f:()=>{S.hype-=3;S.attrs.cons=Math.max(30,S.attrs.cons-2);return[-1,'🧊 You miss two free throws that would have won the rivalry game. -2 Consistency']}},
+  {tag:'perf',w:3,f:()=>{S.hype-=3;S.attrs.cons=Math.max(MIN_A,S.attrs.cons-2);return[-1,'🧊 You miss two free throws that would have won the rivalry game. -2 Consistency']}},
   {w:4,f:()=>{up('vert',3);return[1,'🦘 You add two inches to your vertical in the weight room. +3 Vertical']}},
-  {w:3,f:()=>{S.hype-=2;S.attrs.cons=Math.max(30,S.attrs.cons-2);return[-1,'🔄 Your head coach leaves for the NBA. New system, rough adjustment. -2 Consistency']}},
+  {w:3,f:()=>{S.hype-=2;S.attrs.cons=Math.max(MIN_A,S.attrs.cons-2);return[-1,'🔄 Your head coach leaves for the NBA. New system, rough adjustment. -2 Consistency']}},
   {w:y>=2?4:0,f:()=>{S.hype+=5;addBank(1);return[1,'📋 NBA scouts pack the gym every night. Draft buzz grows. +6 pts']}},
   {w:3,f:()=>{S.hype-=2;return[-1,'😷 You get food poisoning the night before the big tournament game']}},
-  {w:3,f:()=>{S.hype+=5;S.attrs.cons=Math.max(30,S.attrs.cons-1);return[0,'🎮 You become the cover athlete of a college hoops video game. Big hype, more distractions']}},
+  {w:3,f:()=>{S.hype+=5;S.attrs.cons=Math.max(MIN_A,S.attrs.cons-1);return[0,'🎮 You become the cover athlete of a college hoops video game. Big hype, more distractions']}},
 ];}
 function injuryCol(){const r=R()*(1+(3-S.traits.dur)*.15);
   if(r>.9){S.injuryProne=true;S.ceiling-=3;S.attrs.speed=Math.max(MIN_A,S.attrs.speed-5);S.attrs.vert=Math.max(MIN_A,S.attrs.vert-5);S.hype-=8;S.hurt=1;S.redshirt=true;return[-1,`🚑 ${capF(pick(INJ.major))} — you are out for most of the year. You get a medical redshirt (extra year of eligibility)`];}
@@ -927,7 +937,7 @@ function simNBA(){syncPos();if(!R.get)R=makeRng((Math.random()*4294967296)>>>0);
   if(R()<pI){const r=R(),majP=clamp(.1*(1+(3-t.dur)*.3),.03,.2),modP=.3;
     if(r>=majP+modP){const g=ri(4,15);lost+=g;inj=`${capF(pick(INJ.minor))} (${g} games)`;}
     else if(r>=majP){const g=ri(18,40);lost+=g;inj=`${capF(pick(INJ.mod))} (${g} games)`;}
-    else if(S.armor){S.armor=false;const g=ri(18,40);lost+=g;inj=`🛡️ Injury insurance! A major injury was downgraded (${g} games)`;}else{const g=ri(45,82);lost+=g;inj=`🚑 ${capF(pick(INJ.major))} (${g} games)`;S.injuryProne=true;S.comeback={yr:n+1,ppg:prev?prev.ppg:0};{const cut=Math.min(S.bank,Math.round((S.devPts||0)/2));S.bank-=cut;S.devPts=(S.devPts||0)-cut;}S.attrs.speed=Math.max(30,S.attrs.speed-ri(4,8));S.attrs.vert=Math.max(30,S.attrs.vert-ri(4,8));S.ceiling-=ri(2,5);}}
+    else if(S.armor){S.armor=false;const g=ri(18,40);lost+=g;inj=`🛡️ Injury insurance! A major injury was downgraded (${g} games)`;}else{const g=ri(45,82);lost+=g;inj=`🚑 ${capF(pick(INJ.major))} (${g} games)`;S.injuryProne=true;S.comeback={yr:n+1,ppg:prev?prev.ppg:0};{const cut=Math.min(S.bank,Math.round((S.devPts||0)/2));S.bank-=cut;S.devPts=(S.devPts||0)-cut;}S.attrs.speed=Math.max(MIN_A,S.attrs.speed-ri(4,8));S.attrs.vert=Math.max(MIN_A,S.attrs.vert-ri(4,8));S.ceiling-=ri(2,5);}}
   if(rest&&(inj||X.gp)&&lost<82)notes.push(`🧊 Plus ${rest} game${rest>1?'s':''} of rest and small knocks`);
   const gp=clamp(82-lost,0,82);const o=ovr(),bch=updBadges('season'),bfx=badgeFx();notes.push(growWhy(dsp(prevO),'nba',{hurt:!!inj&&gp<70})[1]);for(const x of badgeLines(bch))notes.push(x);
   let opp=0;if(n<2)opp=S.pick<=5?5:S.pick<=14?3:S.pick<=30?0:S.pick<=60?-4:-6;
@@ -1137,7 +1147,7 @@ function eventPend(){const last=S.nba[S.nba.length-1],o=ovr(),a=S.age,rv=S.rival
     {label:'🤝 Take him under your wing',desc:'+3 Basketball IQ, slightly fewer shots. He gets a lot better.',fn:()=>{up('iq',3);addNext({usage:-1.5});rk.ceil+=5;S.mentee=rk.id;S.menteeAS=rk.aw['All-Star']||0;return `You took ${rk.name} under your wing`;}},
     {label:'🙅 Not my job',desc:'Keep your touches.',fn:()=>'You ignored the rookie'}]});
   if(o>=72&&!S.shoe)E.push({title:'👟 Signature Shoe Offer',text:'A shoe company wants to build a line around you.',opts:[
-    {label:'👟 Sign it',desc:(S.traits.star>=5?'Star Power is already 5/5: more hype instead':'+1 Star Power')+', but off-court demands cost focus (−2 Consistency).',fn:()=>{S.shoe=1;if(S.traits.star>=5)S.hype+=4;S.traits.star=Math.min(5,S.traits.star+1);S.attrs.cons=Math.max(30,S.attrs.cons-2);return 'You got a signature shoe';}},
+    {label:'👟 Sign it',desc:(S.traits.star>=5?'Star Power is already 5/5: more hype instead':'+1 Star Power')+', but off-court demands cost focus (−2 Consistency).',fn:()=>{S.shoe=1;if(S.traits.star>=5)S.hype+=4;S.traits.star=Math.min(5,S.traits.star+1);S.attrs.cons=Math.max(MIN_A,S.attrs.cons-2);return 'You got a signature shoe';}},
     {label:'🏀 Stay focused',desc:S.traits.work>=5?'+2 Basketball IQ (Work Ethic is already 5/5).':'+2 Basketball IQ, +1 Work Ethic.',fn:()=>{S.shoe=-1;up('iq',2);S.traits.work=Math.min(5,S.traits.work+1);return 'You turned down a shoe deal to stay focused';}}]});
   if(o>=78)E.push({title:'🥇 Olympic Team Invite',text:'The national team wants you this summer.',opts:[
     {label:'🏅 Represent your country',desc:'Chase gold. Big hype, but a tired body next season.',fn:()=>{S.hype+=6;addNext({inj:.04});const gold=R()<.7;return gold?'You won Olympic gold 🥇':'You won Olympic silver 🥈';}},
@@ -1153,7 +1163,7 @@ function eventPend(){const last=S.nba[S.nba.length-1],o=ovr(),a=S.age,rv=S.rival
     {label:'💪 Play every game',desc:'Competitors compete.',fn:()=>{S.hype+=2;return 'You refused to tank';}}]});
   if(onlineEra())E.push({title:'📱 Social Media Storm',text:'An old clip of you resurfaces, and the internet is going crazy.',opts:[
     {label:'📵 Log off',desc:'+2 Consistency, but the clip defines you for a while.',fn:()=>{up('cons',2);S.hype-=3;return 'You logged off social media';}},
-    {label:'😂 Clap back',desc:'The fans love it. Focus slips a bit.',fn:()=>{S.hype+=3;S.attrs.cons=Math.max(30,S.attrs.cons-1);return 'You clapped back online';}}]});
+    {label:'😂 Clap back',desc:'The fans love it. Focus slips a bit.',fn:()=>{S.hype+=3;S.attrs.cons=Math.max(MIN_A,S.attrs.cons-1);return 'You clapped back online';}}]});
   const fa=o>=75&&S.L?active(S.L).filter(p=>p.team!==S.team&&p!==S.rival&&p.ovr>=76&&p.age<=32).sort((x,y)=>y.ovr-x.ovr).slice(0,5):[],star=fa.length?pick(fa):null;
   if(star)E.push({title:`📲 Recruit ${star.name}?`,text:`${star.name} (${star.pos}, ${dsp(star.ovr)} OVR) is a free agent deciding between the ${S.team} and the ${star.team}.`,opts:[
     {label:'📞 Recruit him hard',desc:'If it works, he joins your team.',fn:()=>{const ch=clamp(.35+(S.traits.star-3)*.08+(S.hype-20)/250,.15,.7);if(R()<ch){const old=star.team,sw=roster(S.L,S.team).sort((x,y)=>x.ovr-y.ovr)[0];if(sw)sw.team=old;star.team=S.team;S.teamStr=teamStrOf(S.team);return `${star.name} signs with the ${S.team}!`;}S.hype-=2;return `${star.name} stays with the ${star.team}`;}},
@@ -1681,7 +1691,7 @@ function flavor(s){const o=[],opp=()=>pick(TEAMS.filter(x=>x!==S.team));
   S.recent=S.recent||new Set(RECENT());const fresh=o.filter(x=>!(S.seenF||[]).includes(x.replace(/\d+/g,'#'))&&!S.recent.has(x.replace(/\d+/g,'#')));const f=pick(fresh.length?fresh:o);(S.seenF=S.seenF||[]).push(f.replace(/\d+/g,'#'));return f;}
 
 // ---------- summers: one decision every offseason, gambles can pay off or backfire ----------
-const up=(k,n)=>{if(n>0)S.bank+=n;else S.attrs[k]=clamp(S.attrs[k]+n,30,99);};
+const up=(k,n)=>{if(n>0)S.bank+=n;else S.attrs[k]=clamp(S.attrs[k]+n,MIN_A,99);};
 const riskTag=p=>p>=.85?'🟢 Low risk':p>=.6?'🟡 Medium risk':'🔴 High risk';
 // what each gamble leans on: good at it = safer, weak at it = riskier ('t:' = a trait)
 const RISK_FIT=[[/ball handler/i,['handle','pass']],[/slasher/i,['layup','str']],[/jump shot|shooting coach/i,['three','mid']],
@@ -2383,7 +2393,7 @@ function setH(d){S.height=clamp(S.height+d,H_MIN,H_MAX+(S.perks&&S.perks.growth?
 function toggleTrait(k){const i=S.picked.indexOf(k);if(i>=0)S.picked.splice(i,1);else if(S.picked.length<traitLimit())S.picked.push(k);render();}
 function startCareer(){syncPos();S.archId=archetype().id;S.name=(S.name||'').trim()||(pick(FIRST)+' '+pick(LAST));S.cls=null;S.L=null;if(S.daily){S.diff='pro';S.perks={};}const pc=perkCost();if(pc){setGtp(gtpBank()-pc);S.perksBought={...S.perks};}S.seed=S.daily?seedFrom('goat'+todayKey()):(Math.random()*4294967296)>>>0;R=makeRng(S.seed);
   for(const[k]of TRAITS)S.traits[k]=S.picked.includes(k)?(S.perks.maxed?5:ri(4,5)):ri(1,5);
-  S.bank=START_BUDGET-spent();wearGear();S.cls=makeClass();S.pkO=0;S.pkArch=null;S.idLock=null;S.evoPend=null;S.evoUp=0;S.midSeen=[];S.midAt=null;S.roleSeen=null;S.oldRivals=[];S.clLines=[];S.endWhy=null;S.clsSeen=[];S.rvDone=0;S.clsAdj=0;S.starFloor=0;S.ceiling=ovr()+7+gauss()*(S.perks.dna?3.5:8)+(S.traits.work-3)*2.5+(S.traits.late-3)*1.2;if(S.perks.dna)S.ceiling+=4;if(S.perks.clutch)S.traits.clutch=Math.min(5,S.traits.clutch+1);if(S.perks.hype)S.hype+=15;S.armor=!!S.perks.armor;S.startOvr=OV();S.attrs0={...S.attrs};S.stage='hs';S.bdg={};S.lastResult=gearNote();UI().spend=false;render();scrollTo(0,0);}
+  S.bank=START_BUDGET-spent();wearGear();S.cls=makeClass();S.pkO=0;S.pkArch=null;S.idLock=null;S.evoPend=null;S.evoUp=0;S.midSeen=[];S.midAt=null;S.roleSeen=null;S.oldRivals=[];S.clLines=[];S.endWhy=null;S.clsSeen=[];S.rvDone=0;S.clsAdj=0;S.starFloor=0;S.ceiling=ovr()+7+(diff().cl||0)+gauss()*(S.perks.dna?3.5:8)+(S.traits.work-3)*2.5+(S.traits.late-3)*1.2;if(S.perks.dna)S.ceiling+=4;if(S.perks.clutch)S.traits.clutch=Math.min(5,S.traits.clutch+1);if(S.perks.hype)S.hype+=15;S.armor=!!S.perks.armor;S.startOvr=OV();S.attrs0={...S.attrs};S.stage='hs';S.bdg={};S.lastResult=gearNote();UI().spend=false;render();scrollTo(0,0);}
 
 // ---------- player header ----------
 function hero(tap){const o=OV(),st=S.stage;
@@ -2531,7 +2541,7 @@ const SKN=Object.fromEntries(Object.values(SUBS).flat());
 // live "You project as" card: best role, its OVR, the top three fits, and what to raise to lean into the next one (OVR math only)
 function projCard(){const a=archetype(),f=a.fits.slice(0,3),lk=S.idLock&&Object.keys(ARCHS).find(k=>ARCHS[k].n===S.idLock),nx=lk&&lk!==a.id?lk:(f.find(([id])=>id!==a.id)||f[1])[0],base=archRaw()[nx];
   const tips=SUBKEYS.filter(k=>S.stage==='build'?S.attrs[k]<BUILD_MAX:!atCap(k)).map(k=>{const v=S.attrs[k];S.attrs[k]=Math.min(99,v+5);const x=archRaw()[nx]-base;S.attrs[k]=v;return[k,x];}).sort((x,y)=>y[1]-x[1]).slice(0,3).map(x=>SKN[x[0]]);
-  return`<div class="card"><div class="sh">🧬 <span class="grow">${S.idLock?'Your style':'You project as'}</span><b>OVR ${OV()}</b></div><div class="pn">${S.idLock?esc(S.idLock):a.name}</div>${S.idLock&&S.idLock!==a.name?`<div class="note" style="margin:2px 0 6px">You chose to keep this style. Your skills currently lean ${a.name}.</div>`:''}${a.fits[0][0]!==a.id?`<div class="note" style="margin:2px 0 6px">Leaning toward ${ARCHS[a.fits[0][0]].n}: it takes a clear edge to switch styles</div>`:''}${f.map(([id,v])=>`<div class="fit"><span>${ARCHS[id].n}</span><div class="bar"><i style="width:${clamp(dsp(v),0,99)}%"></i></div><b>${dsp(v)}</b></div>`).join('')}<div class="note">OVR rates you at your best fit. To lean into <b>${ARCHS[nx].n}</b>, raise ${tips.join(', ')} (this shapes your playstyle more than your OVR).</div>${projBadges(a)}</div>`;}
+  return`<div class="card"><div class="sh">🧬 <span class="grow">${S.idLock?'Your style':'You project as'}</span><b>OVR ${OV()}</b></div><div class="pn">${S.idLock?esc(S.idLock):a.name}</div>${S.idLock&&S.idLock!==a.name?`<div class="note" style="margin:2px 0 6px">You chose to keep this style. Your skills currently lean ${a.name}.</div>`:''}${a.fits[0][0]!==a.id?`<div class="note" style="margin:2px 0 6px">Leaning toward ${ARCHS[a.fits[0][0]].n}: it takes a clear edge to switch styles</div>`:''}${f.map(([id,v])=>`<div class="fit"><span>${ARCHS[id].n}</span><div class="bar"><i style="width:${clamp(dsp(v),0,99)}%"></i></div><b>${dsp(v)}</b></div>`).join('')}<div class="note"><b>Road to 99:</b> max your ${ARCHS[lk||a.id].n} core: ${ARCHS[lk||a.id].core.map(([k])=>`${SKN[k]} <b>${Math.round(Math.min(99,es(k)))}</b>`).join(', ')}. Keep the rest of your game around 72.</div><div class="note">OVR rates you at your best fit, so your style can change as you spend. To lean into <b>${ARCHS[nx].n}</b>, raise ${tips.join(', ')}.</div>${projBadges(a)}</div>`;}
 function projBadges(a){const sig=ARCH_SIG[a.id].map(id=>BADGE[id].n).join(' · ');let start='';
   if(S.stage==='build'){const q=badgeQual(),got=BADGES.filter(b=>q[b.id]).sort((x,y)=>q[y.id]-q[x.id]);start=`<div class="note">${got.length?`Badges you can earn in your first season: ${got.map(b=>`${BTN[q[b.id]]} ${b.n}`).join(' · ')}`:`No badges in reach yet: a skill at ${BT[0]} earns your first Bronze.`}</div>`;}
   return`${start}<div class="note">Signature badges: ${sig}</div>`;}

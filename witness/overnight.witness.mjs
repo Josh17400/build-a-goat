@@ -37,4 +37,7 @@ export default [
     { at: 0.3, evalAs: { x: start } },
     { at: 0.4, evalAs: { r: "(()=>{const p=S.summerPend;if(!p)return 'nopend';const first=/Safe/.test(p.opts[0].desc),last=/High risk|Medium risk/.test(p.opts[p.opts.length-1].desc);return first&&last&&/Safe/.test(p.opts[safeIdx(p)].desc);})()" },
       expect: ["r===true||r==='nopend'"] }] },
+  { name: 'road to 99: every style reaches 99 with its 7 core skills maxed and the rest at 72, and starting OVRs stay low', seed: 90, steps: [
+    { at: 0.3, evalAs: { r: "(()=>{const sv=JSON.stringify(S);const bad=[];for(const id of ARCH_IDS){const a=ARCHS[id];S.height=a.h;S.frame='Balanced';for(const k of SUBKEYS)S.attrs[k]=72;for(const[k]of a.core)S.attrs[k]=99;if(Math.round(OV())<99)bad.push(a.n+' '+Math.round(OV()));for(const k of SUBKEYS)S.attrs[k]=45;if(OV()>60)bad.push(a.n+' start '+Math.round(OV()));}S=Object.assign(S,JSON.parse(sv));return bad.join(', ')||'ok';})()" },
+      expect: ["r==='ok'"] }] },
 ];

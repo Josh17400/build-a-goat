@@ -50,7 +50,7 @@ export default [
         const m=JSON.parse(localStorage.getItem('bag_run_meta'));m.v='2026.11.06';localStorage.setItem('bag_run_meta',JSON.stringify(m));
         const keep=S;S=Object.assign(newPlayer(),snap);const o0=ovr21(),room0=snap.ceiling-o0;S=keep;
         resumeRun();const s=getS(),room1=s.ceiling-ovr(),dOv=Math.abs(OV()-dsp(o0));let g=0;while(getS().stage==='hs'&&g++<10){if(getS().summerPend)chooseSummer(0);else simHS();}
-        return JSON.stringify({room0,room1,dOv,has:NEW_SK.every(k=>s.attrs[k]>=40),bdg:!!s.bdg,stage:getS().stage});})()` },
+        return JSON.stringify({room0,room1,dOv,has:NEW_SK.every(k=>s.attrs[k]>=MIN_A),bdg:!!s.bdg,stage:getS().stage});})()` },
       expect: ['Math.abs(JSON.parse(r).room0-JSON.parse(r).room1)<0.01', 'JSON.parse(r).has', 'JSON.parse(r).dOv<=4', "JSON.parse(r).stage==='offers'"] }] },
   { name: 'spending: a Max can be undone until the next season, and only then', seed: 31, steps: [
     { at: 0.3, evalAs: { x: start } },
