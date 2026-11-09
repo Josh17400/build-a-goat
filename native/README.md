@@ -1,7 +1,8 @@
 # Build a GOAT: iOS app (Capacitor 8)
 
 The iOS app wraps the one-file game (`../index.html`, the same file GitHub Pages serves) in a
-Capacitor shell. The setup is a copy of The Fort's (`the-fort/native`), which itself mirrors Euchre
+Capacitor shell. That file is built from `../src/` by `node tools/build.cjs` (see `../docs/architecture.md`);
+edit the sources, not `index.html`. The setup is a copy of The Fort's (`the-fort/native`), which itself mirrors Euchre
 Unleashed's: Capacitor 8 with Swift Package Manager plugins, manual signing with the team's one
 distribution certificate, fastlane, and TestFlight builds from GitHub Actions (`../CI_SETUP.md`).
 
