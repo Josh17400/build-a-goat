@@ -45,9 +45,7 @@ function resumeRun(){const meta=runMeta();let snap=null,lg=null;try{snap=JSON.pa
   S.ui=Object.assign({tab:'setup',open:null,spend:false},ui||{},{menu:null,wig:1});writeLog();render();scrollTo(0,0);return true;}
 // leave a run without losing it: back to a fresh build screen, with the run waiting on Continue
 function quitRun(){if(S.stage!=='build'&&S.stage!=='end'&&canSave())lsSet(SV.ui,JSON.stringify(Object.assign({},S.ui,{menu:null})));R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,wig:1};render();scrollTo(0,0);}
-function continueCard(){const m=runMeta();if(!m||!m.sum)return'';const s=m.sum,where=s.stage==='nba'?`NBA · Season ${s.yr+1}${s.team?' · '+s.team:''}`:s.stage==='draft'?'Draft night':s.stage==='college'?(s.school||'College'):s.stage==='offers'?'Recruiting':`High School · ${YR[Math.min(s.hs,3)]} Year`;
-  return`<div class="card resume"><div class="hero">${avatar(s.look,s.age,60,1)}<div class="grow"><div class="sh" style="margin:0 0 4px">💾 <span class="grow">Saved run</span></div><div class="hn">${esc(s.name)}</div><div class="hm">${esc(s.arch||s.pos)} · Age ${s.age} · OVR ${s.ovr} · ${where}</div></div></div><button class="wide" style="margin-top:12px" onclick="resumeRun()">Continue run ▶</button></div>`;}
 // on launch: put a half-finished build back, and point to a saved run if there is one
 function bootSave(){if(!canSave())return;try{const b=Store.json(SV.build);if(b&&b.stage==='build'){S=Object.assign(newPlayer(),b);seedNewSkills(S.attrs,true);S.ui=Object.assign({tab:'setup',open:null,spend:false},b.ui||{},{menu:null,replaceOk:0});}}catch{}
   if(hasRun())UI().tab='setup';}
-S=newPlayer();bootSave();render();
+const SAVE_KEYS=['bag_gtp','bag_ach','bag_hof','bag_recent','bag_daily','bag_diff','bag_rec','bag_goats','bag_gems','bag_gear','bag_intro'];

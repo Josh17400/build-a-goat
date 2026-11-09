@@ -19,11 +19,4 @@ function allTime(kind){const L=S.L;if(!L)return[];const c=career(),me={name:S.na
   const np=L.P.filter(p=>p.car&&p.car.gp>0).map(p=>({name:p.name,pts:p.car.pts,reb:p.car.reb,ast:p.car.ast,score:npcScore(p),rv:p===S.rival,now:!p.retired}));
   return[...(L.leg||[]),...np,me].sort((x,y)=>y[kind]-x[kind]);}
 const goatRank=()=>{const l=allTime('score');return l.findIndex(x=>x.me)+1||99;};
-function allTimeCard(){if(!S.L||!S.L.leg||!S.nba.length)return'';const u=UI(),k=u.atK||'score',l=allTime(k),mi=l.findIndex(x=>x.me),fmt=x=>k==='score'?x.score:Math.round(x[k]).toLocaleString();
-  const row=(x,i)=>`<tr class="${x.me?'mine':x.rv?'rvrow':''}"><td>${i+1}</td><td>${esc(x.name)}${x.me?' <span class="gold">(you)</span>':x.mine?` <span class="gold">🐐 ${x.era}</span>`:x.leg?` <span class="muted">${x.era}</span>`:x.now?' <span class="muted">active</span>':''}</td><td>${fmt(x)}</td></tr>`;
-  const nm={score:'GOAT debate',pts:'points list',reb:'rebounds list',ast:'assists list'}[k];
-  return`<details class="card" ${u.atOpen?'open':''} ontoggle="UI().atOpen=this.open"><summary>📜 All-time · you are ${ord(mi+1)} in the ${nm}</summary>
-  <div class="seg sm" style="margin-top:8px">${[['score','GOAT debate'],['pts','Points'],['reb','Rebounds'],['ast','Assists']].map(([x,lb])=>`<button class="${k===x?'on':''}" onclick="UI().atK='${x}';UI().atOpen=true;render()">${lb}</button>`).join('')}</div>
-  <div class="scroll clslist"><table><tr><th>#</th><th>PLAYER</th><th>${k==='score'?'LEGACY':k.toUpperCase()}</th></tr>${l.slice(0,15).map(row).join('')}${mi>=15?row(l[mi],mi):''}</table></div>
-  <div class="note">Legends from past eras plus everyone who played in yours. The GOAT debate uses the same legacy score as your GOAT score.</div></details>`;}
 

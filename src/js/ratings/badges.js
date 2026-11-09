@@ -66,69 +66,12 @@ function spendBadges(){if(!seasonsPlayed())return;const ch=updBadges('up');if(ch
 function bookGet(){return Store.obj('bag_bbook');}
 function bookSave(){if(!Store.ok())return;const k=bookGet();let c=0;for(const id in S.bdg||{})if((k[id]||0)<S.bdg[id]){k[id]=S.bdg[id];c=1;}if(c)Store.setJson('bag_bbook',k);}
 const bookCount=()=>Object.keys(bookGet()).length;
-const bMed=t=>`<span class="bmed t${t}" title="${BTN[t]}">${icon('medal')}</span>`;
-const skNames=b=>b.sk.map(k=>Array.isArray(k)?k.map(x=>SKN[x]).join(' or '):SKN[k]).join(' + ')+(b.h?` · ${b.h[1]>=99?ht(b.h[0])+' and up':ht(b.h[0])+' to '+ht(b.h[1])}`:'');
 // next badge line for one skill: the closest tier this skill feeds (shown on skill rows when it is within reach)
 // a pair badge rates at most 6 above its weaker skill: name that skill when it is the one holding the badge back
 function badgeWeak(b){const v=b.sk.map(k=>Array.isArray(k)?k.reduce((m,x)=>es(x)>es(m)?x:m):k),av=v.reduce((s,k)=>s+Math.round(es(k)),0)/v.length,w=v.reduce((m,k)=>es(k)<es(m)?k:m);return Math.round(es(w))+6<av?w:null;}
 function badgeHint(k){let best=null;const c=S.stage==='build'?2:bCap(),B=S.bdg||{};
   for(const b of BADGES){if(!b.sk.some(x=>Array.isArray(x)?x.includes(k):x===k))continue;const r=badgeRating(b);if(r==null)continue;const t=Math.max(B[b.id]||0,tierFor(r));if(t>=c)continue;const gap=BT[t]-r;if(gap<=6&&(!best||gap<best[1]))best=[b,gap,t+1];}
   return best?`<small class="bh">${bMed(best[2])}<span><b>${BTN[best[2]]} ${best[0].n}</b> at ${BT[best[2]-1]}${best[0].sk.length>1?' avg':''} · ${Math.max(1,Math.ceil(best[1]))} to go${(()=>{const w=badgeWeak(best[0]);return w&&w!==k?(atCap(w)?` · ${SKN[w]} is maxed`:` · raise ${SKN[w]}`):'';})()}${best[2]>=3&&best[2]>ovrCap()?` · needs ${best[2]>=4?80:70} OVR`:''}</span></small>`:'';}
-function badgeRow(b,t,extra){return`<div class="brow">${bMed(t||0)}<div class="grow"><b>${b.n}</b>${t?` <span class="muted">${BTN[t]}</span>`:''}<div class="sub">${skNames(b)}</div>${extra||`<div class="note">${fxText(b.fx,Math.max(1,t))}</div>`}</div></div>`;}
-function badgesTab(){const B=S.bdg||{},c=bCap(),held=BADGES.filter(b=>B[b.id]).sort((x,y)=>B[y.id]-B[x.id]),rest=BADGES.filter(b=>!B[b.id]||B[b.id]<4);
-  const close=rest.map(b=>{const r=badgeRating(b),t=B[b.id]||0;return{b,r,t,gap:r==null?99:BT[t]-r};}).filter(x=>x.gap<=8).sort((x,y)=>x.gap-y.gap);
-  const locked=BADGES.filter(b=>!B[b.id]&&!close.some(x=>x.b===b)),sig=ARCH_SIG[archetype().id];
-  return`<div class="card"><div class="sh">${icon('medal','ici')} <span class="grow">Your badges</span><b>${held.length}</b></div>${held.length?held.map(b=>badgeRow(b,B[b.id])).join(''):`<div class="sub">${seasonsPlayed()?`No badges yet. Raise a skill to ${BT[0]} for your first Bronze.`:'Badges are earned by playing: your first ones come at the end of your first season. After that, raising a skill can earn one right away.'}</div>`}
-  ${(S.badges||[]).length?`<div class="sh" style="margin-top:12px">${icon('trophy','ici')} <span class="grow">Story badges</span></div>${S.badges.map(x=>`<span class="pill gold">${esc(x)}</span>`).join('')}`:''}</div>
-  ${close.length?`<div class="card"><div class="sh">${icon('target','ici')} <span class="grow">Close to</span></div>${close.map(x=>badgeRow(x.b,x.t,`<div class="note">${x.gap<=0?'Rating reached for '+BTN[x.t+1]:BTN[x.t+1]+' at '+BT[x.t]}${x.b.sk.length>1?' (average)':''} · you are at ${Math.floor(x.r)}${(()=>{const w=badgeWeak(x.b);return w?` (held back by ${SKN[w]} ${Math.round(es(w))}${atCap(w)?', maxed':''}: a pair rates at most 6 above its weaker skill)`:'';})()}${x.t+1>c?` · ${BTN[x.t+1]} opens ${c<3?'in college':'in the NABL'}${x.t+1>=3?` and needs ${x.t+1>=4?80:70} OVR`:''}`:x.t+1>ovrCap()?` · ${BTN[x.t+1]} needs ${x.t+1>=4?80:70} OVR`:''}</div>`)).join('')}</div>`:''}
-  <div class="card"><div class="sh">${icon('star','ici')} <span class="grow">Signature badges for a ${archetype().n}</span></div><div class="sub">${sig.map(id=>BADGE[id].n).join(' · ')}</div></div>
-  ${locked.length?`<details class="card"><summary>Locked · ${locked.length}</summary>${locked.map(b=>badgeRow(b,0,`<div class="note">Bronze at ${BT[0]}${b.sk.length>1?' (average)':''}</div>`)).join('')}</details>`:''}
-  <div class="note">Tiers: Bronze ${BT[0]}, Silver ${BT[1]}, Gold ${BT[2]}, Platinum ${BT[3]}. High school reaches Silver, college Gold, the NABL Platinum. Gold also needs 70 OVR and Platinum 80 OVR. A pair badge rates at most 6 above its weaker skill. At season end a badge drops one tier if it falls 3 below its line.</div>`;}
-function badgeBookHTML(){const k=bookGet(),n=Object.keys(k).length;
-  return`<div class="card"><div class="sh">${icon('book','ici')} <span class="grow">Badge Book</span><b>${n}/${BADGES.length}</b></div><div class="sub">The best tier you have ever reached on each badge, across all your careers.</div>
-  ${['Shooting','Finishing','Playmaking','Defense','Rebounding','Body & mind'].map(f=>`<div class="sh" style="margin-top:12px"><span class="grow">${f}</span></div>${BADGES.filter(b=>b.f===f).map(b=>`<div class="brow">${bMed(k[b.id]||0)}<div class="grow"><b class="${k[b.id]?'':'muted'}">${b.n}</b>${k[b.id]?` <span class="muted">${BTN[k[b.id]]}</span>`:''}<div class="sub">${skNames(b)}</div></div></div>`).join('')}`).join('')}</div>`;}
 
-function heightNote(){const keys=[['oreb','Rebounding'],['blk','Block'],['dunk','Dunk'],['intD','Interior D'],['handle','Ball Handle'],['speed','Speed']];
-  return keys.map(([k,l])=>{const dv=Math.round(es(k)-S.attrs[k]-(FRAMES[S.frame][k]||0));return dv?`${l} ${dv>0?'+':''}${dv}`:null;}).filter(Boolean).join(' · ')||'no height bonuses or penalties';}
-const DSP=[[40,38],[62,60],[69.7,70],[73,77],[80.6,85],[82.1,90],[87.4,95],[93,99]];
-function dsp(x){x-=((diff().lg||0)-2)*.6*clamp((x-40)/30,0,1);if(x<=DSP[0][0])return Math.round(clamp(x-2,1,99));for(let i=1;i<DSP.length;i++){const[a,A]=DSP[i-1],[b,B]=DSP[i];if(x<=b)return Math.round(A+(x-a)/(b-a)*(B-A));}return 99;}
-const OV=()=>dsp(ovr());
-function grade(n){return n>=92?'A+':n>=87?'A':n>=83?'A-':n>=79?'B+':n>=75?'B':n>=71?'B-':n>=67?'C+':n>=63?'C':n>=58?'C-':'D';}
 
-// natural growth toward a target overall
-// natural growth follows the role you play now (archetype weights), with a quarter spread over everything so your game can evolve
-function archPick(){const wn=ARCHS[archetype().id].wn;return()=>{if(R()<.25)return pick(SUBKEYS);let r=R();for(const[k,w]of wn){r-=w;if(r<=0)return k;}return wn[0][0];};}
-function growTo(target){const pk=archPick();let g=0;
-  while(ovr()<target&&g++<400){const sk=pk();if(S.attrs[sk]<99)S.attrs[sk]++;}}
-function declineTo(target){let g=0;const keys=['speed','speed','vert','vert','stam','perD','str','layup','dunk','oreb','stl','blk'];
-  while(ovr()>target&&g++<400){const k=pick(keys);if(S.attrs[k]>MIN_A)S.attrs[k]--;}}
-// growth is never applied for you: it turns into bonus points worth exactly what that growth would cost, and you place them
-// development pays DEVF of the points the growth would cost (tuned with the balance sims)
-const DEVF=.7,HS_FL=1.2,COL_FL=1.0,NBA_FL=1.0;
-// catch-up (2026-11-08): starts are lower, so high school and college add a share of that drop each season on top of normal growth
-const CATCH_HS=.17,CATCH_COL=.12;
-function growPts(target){const a0={...S.attrs};growTo(target);let p=0;for(const k in S.attrs)for(let v=a0[k];v<S.attrs[k];v++)p+=cost(v);p=Math.round(p*DEVF);S.attrs=a0;if(p>0){S.bank+=p;S.devPts=(S.devPts||0)+p;}return p;}
-// S.natO: where natural growth alone has taken you. Development pays the points for that growth, measured from your current
-// skills, so a player who spent ahead of it keeps developing until natural growth reaches the hidden ceiling
-// fl: the growth a young player gets just from getting older and playing (HS, college, pro up to 25), even past the ceiling
-function develop(rate,fl){if(S.natO==null)S.natO=ovr();const o=S.natO;if(S.perks&&S.perks.dev&&S.stage!=='nba')rate*=1.4;const g=Math.min(S.stage==='nba'?(S.age>29?2:3.5):99,Math.max(o<S.ceiling?(S.ceiling-o)*rate:0,fl||0));const gg=g+(S.stage==='nba'?0:(diff().cl||0)*(S.stage==='hs'?CATCH_HS:CATCH_COL));if(gg>0){growPts(ovr()+gg);S.natO=o+gg;}}
-// why the OVR moved this season, from VISIBLE causes only (age, traits, college program, injuries) plus a deliberately noisy scout
-// read of the remaining room. Never names frame effects or hidden numbers; the true ceiling stays an end-screen reveal.
-function scoutNoise(){return(((S.seed||7)*2654435761>>>0)%11)-5;}
-function growWhy(o0,st,x){const o1=OV(),d=o1-o0,t=S.traits,age=S.age,r=[],dp=S.devPts||0;S.devPts=0;x=x||{};
-  if(st==='nba')r.push(age<=23?(d<0&&x.hurt?'the injury set you back':d<0?'young: a dip before the jump':dp>0?'young and still improving':'young: the jump can still come'):age<=27?(d<0?'a setback year':dp>0?'in your prime years':'prime years, holding steady'):age<=29?(dp>8?'prime years: still adding to your game':dp>0?'prime years: small gains':'prime years: you hold steady'):dp>0&&d>=0?(age>=34?'still holding off Father Time':'still playing at your peak'):d<=-4?'age is catching up fast':'age starts to catch up');
-  else r.push(st==='hs'?'high school development':`${TIER[S.tier].lbl} program`);if(st!=='nba'&&S.perks&&S.perks.dev)r.push('Elite trainer +40%');
-  const late30=st==='nba'&&age>=30;if(t.work>=4&&(dp>0||late30))r.push(late30?`Work Ethic ${t.work}/5 slows the decline`:`Work Ethic ${t.work}/5 speeds you up`);else if(t.work<=2)r.push(late30?`Work Ethic ${t.work}/5 speeds the decline`:`Work Ethic ${t.work}/5 holds you back`);
-  if(t.late>=4&&age<=23)r.push('Late Bloomer: your jump comes later');
-  if(st==='college'&&t.coach>=4)r.push('Coachability pays off');
-  if(st==='nba'&&age>=30&&t.dur<=2)r.push('low Durability speeds the decline');
-  if(x.hurt)r.push('the injury cost you reps');
-  if(st!=='nba'){const room=S.ceiling-(S.natO??ovr())+scoutNoise();r.push(room>8?'scouts see lots of room to grow':room>3?'scouts see some room left':st==='hs'||age<=20?'scouts say the rest is up to your work':'scouts think you are close to your peak');}
-  const a=archetype();let evo='';if(S.archId&&a.id!==S.archId){const pair=S.archId+'>'+a.id,lockId=S.idLock&&Object.keys(ARCHS).find(k=>ARCHS[k].n===S.idLock);if(lockId===a.id)S.idLock=null;if(st==='nba'&&lockId!==a.id&&!S.farewell&&S.age<33&&!(S.evoDone||[]).includes(pair)&&S.nba.length-(S.evoAt??-9)>=4){(S.evoDone=S.evoDone||[]).push(pair);S.evoAt=S.nba.length;S.evoPend={from:lockId||S.archId,to:a.id};evo=` · 🔄 Your game is changing: you now play like a${/^[AEIOU]/.test(a.n)?'n':''} ${a.n}. Your call this summer`;}else evo=` · 🔄 Your game has evolved: you now play like a${/^[AEIOU]/.test(a.n)?'n':''} ${a.n}`;}S.archId=a.id;
-  return[dp>0?1:d<0?-1:0,`${dp>0?`📈 Development: +${dp} pt${dp===1?'':'s'} to spend`:d<0?`📉 OVR ${o0} to ${o1} (${d})`:'➖ No growth this year'}${dp>0&&d<0?` · OVR ${o0} to ${o1} (${d})`:''}: ${r.join(' · ')}${evo}`];}
-const nablAgeF=a=>a<=27?1:a===28?.9:a===29?.8:Math.max(.25,.8-(a-29)*.15);
-function addBank(n){n*=3;if(n>=0)S.bank+=n*2;else{const t=S.bank+n;if(t<0){S.bank=0;S.bankShort=-t;declineTo(ovr()+t*0.15);}else S.bank=t;}}
-function starNext(){const s=ovr()+S.hype*0.35,n=[58,65,72].find(x=>s<x);return n?Math.ceil(n-s):0;}
-const rankStars=r=>r<=10?5:r<=35?4:r<=75?3:2;
-function stars(){const s=ovr()+S.hype*0.35,c=S.stage==='hs'||S.stage==='offers'?classRank():null;return Math.max(s>=72?5:s>=65?4:s>=58?3:2,c?rankStars(c.rank):2,S.starFloor||0);}
 

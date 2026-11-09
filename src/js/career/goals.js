@@ -23,8 +23,4 @@ function goalOk(g,st){switch(g.k){case'ppg':return st.ppg>=g.v;case'rpg':return 
   case'wins':return st.wins>=g.v;case'playoffs':return st.rounds>=0;case'round':return st.rounds>=g.v;case'champ':return st.champ;case'aw':return st.aw.includes(g.v);
   case'allnba':return st.aw.some(x=>x.startsWith('All-NBA'));case'mvptop':return st.mvpRank!=null&&st.mvpRank<=g.v;case'scoring':return st.aw.includes('Scoring Title');case'roy':return st.aw.includes('ROY');
   case'rvppg':return st.rvppg!=null&&st.ppg>st.rvppg;case'pts':return st.ptsAfter>=g.v;}return false;}
-const GT=['','Likely','Solid','Stretch'];
-function goalsCard(){const G=S.goals;if(!G||G.yr!==S.nba.length+1||!G.list.length)return'';
-  return`<div class="card"><div class="sh">🎯 <span class="grow">Season ${G.yr} goals</span>${G.moved?`<b class="muted">New team, new goals</b>`:''}</div>${G.list.map(g=>{const r=goalReward(g);return`<div class="goal"><span class="gt t${g.tier}">${GT[g.tier]}</span><span class="grow">${g.text}</span><small>+${r.pts} pt${r.pts===1?'':'s'}${r.gtp?` · +${r.gtp} GTP`:''}</small></div>`;}).join('')}<div class="note">Hit a goal this season to earn bonus points${diff().mult?' and GTP':''}.</div></div>`;}
-function goalsResult(l){return`<div class="card"><div class="sh">🎯 <span class="grow">Season ${l.yr} goals</span><b class="gold">${l.goals.filter(g=>g.ok).length}/${l.goals.length}</b></div>${l.goals.map(g=>`<div class="goal ${g.ok?'':'no'}"><span>${g.ok?'✅':'❌'}</span><span class="grow">${g.text}</span><small>${g.ok?`+${g.pts} pt${g.pts===1?'':'s'}${g.gtp?` · +${g.gtp} GTP`:''}`:'Missed'}</small></div>`).join('')}</div>`;}
 

@@ -599,35 +599,21 @@ function spendBadges(){if(!seasonsPlayed())return;const ch=updBadges('up');if(ch
 function bookGet(){return Store.obj('bag_bbook');}
 function bookSave(){if(!Store.ok())return;const k=bookGet();let c=0;for(const id in S.bdg||{})if((k[id]||0)<S.bdg[id]){k[id]=S.bdg[id];c=1;}if(c)Store.setJson('bag_bbook',k);}
 const bookCount=()=>Object.keys(bookGet()).length;
-const bMed=t=>`<span class="bmed t${t}" title="${BTN[t]}">${icon('medal')}</span>`;
-const skNames=b=>b.sk.map(k=>Array.isArray(k)?k.map(x=>SKN[x]).join(' or '):SKN[k]).join(' + ')+(b.h?` · ${b.h[1]>=99?ht(b.h[0])+' and up':ht(b.h[0])+' to '+ht(b.h[1])}`:'');
 // next badge line for one skill: the closest tier this skill feeds (shown on skill rows when it is within reach)
 // a pair badge rates at most 6 above its weaker skill: name that skill when it is the one holding the badge back
 function badgeWeak(b){const v=b.sk.map(k=>Array.isArray(k)?k.reduce((m,x)=>es(x)>es(m)?x:m):k),av=v.reduce((s,k)=>s+Math.round(es(k)),0)/v.length,w=v.reduce((m,k)=>es(k)<es(m)?k:m);return Math.round(es(w))+6<av?w:null;}
 function badgeHint(k){let best=null;const c=S.stage==='build'?2:bCap(),B=S.bdg||{};
   for(const b of BADGES){if(!b.sk.some(x=>Array.isArray(x)?x.includes(k):x===k))continue;const r=badgeRating(b);if(r==null)continue;const t=Math.max(B[b.id]||0,tierFor(r));if(t>=c)continue;const gap=BT[t]-r;if(gap<=6&&(!best||gap<best[1]))best=[b,gap,t+1];}
   return best?`<small class="bh">${bMed(best[2])}<span><b>${BTN[best[2]]} ${best[0].n}</b> at ${BT[best[2]-1]}${best[0].sk.length>1?' avg':''} · ${Math.max(1,Math.ceil(best[1]))} to go${(()=>{const w=badgeWeak(best[0]);return w&&w!==k?(atCap(w)?` · ${SKN[w]} is maxed`:` · raise ${SKN[w]}`):'';})()}${best[2]>=3&&best[2]>ovrCap()?` · needs ${best[2]>=4?80:70} OVR`:''}</span></small>`:'';}
-function badgeRow(b,t,extra){return`<div class="brow">${bMed(t||0)}<div class="grow"><b>${b.n}</b>${t?` <span class="muted">${BTN[t]}</span>`:''}<div class="sub">${skNames(b)}</div>${extra||`<div class="note">${fxText(b.fx,Math.max(1,t))}</div>`}</div></div>`;}
-function badgesTab(){const B=S.bdg||{},c=bCap(),held=BADGES.filter(b=>B[b.id]).sort((x,y)=>B[y.id]-B[x.id]),rest=BADGES.filter(b=>!B[b.id]||B[b.id]<4);
-  const close=rest.map(b=>{const r=badgeRating(b),t=B[b.id]||0;return{b,r,t,gap:r==null?99:BT[t]-r};}).filter(x=>x.gap<=8).sort((x,y)=>x.gap-y.gap);
-  const locked=BADGES.filter(b=>!B[b.id]&&!close.some(x=>x.b===b)),sig=ARCH_SIG[archetype().id];
-  return`<div class="card"><div class="sh">${icon('medal','ici')} <span class="grow">Your badges</span><b>${held.length}</b></div>${held.length?held.map(b=>badgeRow(b,B[b.id])).join(''):`<div class="sub">${seasonsPlayed()?`No badges yet. Raise a skill to ${BT[0]} for your first Bronze.`:'Badges are earned by playing: your first ones come at the end of your first season. After that, raising a skill can earn one right away.'}</div>`}
-  ${(S.badges||[]).length?`<div class="sh" style="margin-top:12px">${icon('trophy','ici')} <span class="grow">Story badges</span></div>${S.badges.map(x=>`<span class="pill gold">${esc(x)}</span>`).join('')}`:''}</div>
-  ${close.length?`<div class="card"><div class="sh">${icon('target','ici')} <span class="grow">Close to</span></div>${close.map(x=>badgeRow(x.b,x.t,`<div class="note">${x.gap<=0?'Rating reached for '+BTN[x.t+1]:BTN[x.t+1]+' at '+BT[x.t]}${x.b.sk.length>1?' (average)':''} · you are at ${Math.floor(x.r)}${(()=>{const w=badgeWeak(x.b);return w?` (held back by ${SKN[w]} ${Math.round(es(w))}${atCap(w)?', maxed':''}: a pair rates at most 6 above its weaker skill)`:'';})()}${x.t+1>c?` · ${BTN[x.t+1]} opens ${c<3?'in college':'in the NABL'}${x.t+1>=3?` and needs ${x.t+1>=4?80:70} OVR`:''}`:x.t+1>ovrCap()?` · ${BTN[x.t+1]} needs ${x.t+1>=4?80:70} OVR`:''}</div>`)).join('')}</div>`:''}
-  <div class="card"><div class="sh">${icon('star','ici')} <span class="grow">Signature badges for a ${archetype().n}</span></div><div class="sub">${sig.map(id=>BADGE[id].n).join(' · ')}</div></div>
-  ${locked.length?`<details class="card"><summary>Locked · ${locked.length}</summary>${locked.map(b=>badgeRow(b,0,`<div class="note">Bronze at ${BT[0]}${b.sk.length>1?' (average)':''}</div>`)).join('')}</details>`:''}
-  <div class="note">Tiers: Bronze ${BT[0]}, Silver ${BT[1]}, Gold ${BT[2]}, Platinum ${BT[3]}. High school reaches Silver, college Gold, the NABL Platinum. Gold also needs 70 OVR and Platinum 80 OVR. A pair badge rates at most 6 above its weaker skill. At season end a badge drops one tier if it falls 3 below its line.</div>`;}
-function badgeBookHTML(){const k=bookGet(),n=Object.keys(k).length;
-  return`<div class="card"><div class="sh">${icon('book','ici')} <span class="grow">Badge Book</span><b>${n}/${BADGES.length}</b></div><div class="sub">The best tier you have ever reached on each badge, across all your careers.</div>
-  ${['Shooting','Finishing','Playmaking','Defense','Rebounding','Body & mind'].map(f=>`<div class="sh" style="margin-top:12px"><span class="grow">${f}</span></div>${BADGES.filter(b=>b.f===f).map(b=>`<div class="brow">${bMed(k[b.id]||0)}<div class="grow"><b class="${k[b.id]?'':'muted'}">${b.n}</b>${k[b.id]?` <span class="muted">${BTN[k[b.id]]}</span>`:''}<div class="sub">${skNames(b)}</div></div></div>`).join('')}`).join('')}</div>`;}
 
-function heightNote(){const keys=[['oreb','Rebounding'],['blk','Block'],['dunk','Dunk'],['intD','Interior D'],['handle','Ball Handle'],['speed','Speed']];
-  return keys.map(([k,l])=>{const dv=Math.round(es(k)-S.attrs[k]-(FRAMES[S.frame][k]||0));return dv?`${l} ${dv>0?'+':''}${dv}`:null;}).filter(Boolean).join(' · ')||'no height bonuses or penalties';}
+
+
+// ---------- the OVR you see: the display scale, and letter grades ----------
 const DSP=[[40,38],[62,60],[69.7,70],[73,77],[80.6,85],[82.1,90],[87.4,95],[93,99]];
 function dsp(x){x-=((diff().lg||0)-2)*.6*clamp((x-40)/30,0,1);if(x<=DSP[0][0])return Math.round(clamp(x-2,1,99));for(let i=1;i<DSP.length;i++){const[a,A]=DSP[i-1],[b,B]=DSP[i];if(x<=b)return Math.round(A+(x-a)/(b-a)*(B-A));}return 99;}
 const OV=()=>dsp(ovr());
 function grade(n){return n>=92?'A+':n>=87?'A':n>=83?'A-':n>=79?'B+':n>=75?'B':n>=71?'B-':n>=67?'C+':n>=63?'C':n>=58?'C-':'D';}
-
+// ---------- growth: development turns into points you place; decline takes skills away ----------
 // natural growth toward a target overall
 // natural growth follows the role you play now (archetype weights), with a quarter spread over everything so your game can evolve
 function archPick(){const wn=ARCHS[archetype().id].wn;return()=>{if(R()<.25)return pick(SUBKEYS);let r=R();for(const[k,w]of wn){r-=w;if(r<=0)return k;}return wn[0][0];};}
@@ -661,10 +647,10 @@ function growWhy(o0,st,x){const o1=OV(),d=o1-o0,t=S.traits,age=S.age,r=[],dp=S.d
   return[dp>0?1:d<0?-1:0,`${dp>0?`📈 Development: +${dp} pt${dp===1?'':'s'} to spend`:d<0?`📉 OVR ${o0} to ${o1} (${d})`:'➖ No growth this year'}${dp>0&&d<0?` · OVR ${o0} to ${o1} (${d})`:''}: ${r.join(' · ')}${evo}`];}
 const nablAgeF=a=>a<=27?1:a===28?.9:a===29?.8:Math.max(.25,.8-(a-29)*.15);
 function addBank(n){n*=3;if(n>=0)S.bank+=n*2;else{const t=S.bank+n;if(t<0){S.bank=0;S.bankShort=-t;declineTo(ovr()+t*0.15);}else S.bank=t;}}
+// ---------- recruiting stars ----------
 function starNext(){const s=ovr()+S.hype*0.35,n=[58,65,72].find(x=>s<x);return n?Math.ceil(n-s):0;}
 const rankStars=r=>r<=10?5:r<=35?4:r<=75?3:2;
 function stars(){const s=ovr()+S.hype*0.35,c=S.stage==='hs'||S.stage==='offers'?classRank():null;return Math.max(s>=72?5:s>=65?4:s>=58?3:2,c?rankStars(c.rank):2,S.starFloor||0);}
-
 // ---------- events ----------
 function hsEvents(){const t=S.traits;return[
   {w:/mixtape|highlight tape/i.test((S.summerNote||[])[1]||'')?0:8+t.star*2,f:()=>{S.hype+=8;addBank(2);return[1,onlineEra()?'📹 Your highlight reel goes viral, 4 million views overnight. +12 pts':'📹 Your dunk leads every sports show in the country for a week. +12 pts']}},
@@ -1702,17 +1688,6 @@ const ACH=[
 const achHave=()=>Store.obj('bag_ach'); // {id: when it was earned}
 function checkAch(c,sc,t){const have=achHave(),now=[];
   for(const[id,,,f]of ACH)if(!have[id]&&f(c,sc,t)){have[id]=Date.now();now.push(id);}Store.setJson('bag_ach',have);return now;}
-// ---------- Hall of Fame plaque (made for screenshots) ----------
-function plaqueHTML(c,sc,t){const g=x=>c.cnt[x]||0,gp=c.gp||1,top=[['Champion','🏆','Ring'],['MVP','👑','MVP'],['Finals MVP','🏅','Finals MVP'],['All-Star','⭐','All-Star'],['DPOY','🛡️','DPOY'],['Scoring Title','🔥','Scoring title'],['All-NBA 1st','🥇','All-NBA 1st']].filter(([k])=>g(k)).slice(0,5);
-  return`<div class="plaque"><div class="row" style="align-items:flex-start;gap:14px">${avatar(teamLook(S.look,S.nba.length?mainTeam():null),S.age,100,1)}<div class="grow">
-  <div class="sub" style="letter-spacing:2px">BUILD A GOAT · <span style="white-space:nowrap">${((S.eraStart&&S.eraStart!==S.era?ERAS.find(e=>e.id===S.eraStart).name.replace(/^\S+\s/,'')+' – ':'')+era().name.replace(/^\S+\s/,'')).toUpperCase().replace(' – ','</span> – <span style="white-space:nowrap">')}</span></div><div class="pname">${S.name}</div>
-  <div class="tier" style="font-size:1.6rem;text-align:left;margin:2px 0">${t}</div>
-  <div class="sub">${archName()} · ${ht(S.height)} · ${pickTxt(S.pick)} · ${c.seasons} season${c.seasons===1?'':'s'}</div></div></div>
-  <div class="stat3" style="margin-top:10px">${[['PPG',f1(c.pts/gp)],['RPG',f1(c.reb/gp)],['APG',f1(c.ast/gp)],['SPG',f1((c.stl||0)/gp)],['BPG',f1((c.blk||0)/gp)],['PTS',Math.round(c.pts).toLocaleString()]].map(([l,v])=>`<div class="stat"><b>${v}</b>${l}</div>`).join('')}</div>
-  ${(()=>{const B={...(S.bdg||{}),...Object.fromEntries(Object.entries(S.bdgBest||{}).map(([k,v])=>[k,Math.max(v,(S.bdg||{})[k]||0)]))},gb=BADGES.filter(b=>B[b.id]>=3).sort((x,y)=>B[y.id]-B[x.id]);return gb.length?`<div class="sub" style="margin-top:8px">Best badges of your career</div><div style="margin-top:4px">${gb.slice(0,6).map(b=>`<span class="pill bpill t${B[b.id]}">${bMed(B[b.id])}${b.n}</span>`).join('')}</div>`:'';})()}
-  <div style="margin-top:8px">${top.map(([k,e,l])=>`<span class="pill gold">${e} ${g(k)}× ${l}</span>`).join('')||'<span class="muted">'+(c.seasons>=10?`No hardware, but ${c.seasons} seasons and ${Math.round(c.pts).toLocaleString()} points. A real career.`:S.retired==='Out of the league'?'No hardware. Out of the league, but you made it there.':'No hardware. You still made it to the league.')+'</span>'}</div>
-  <div class="sub" style="margin-top:6px">GOAT Score ${sc}${S.daily?` · 📅 Daily Build ${todayKey()}`:''}</div></div>`;}
-
 // ---------- NBA flavor moments (no choice, just stories) ----------
 function flavor(s){const o=[],opp=()=>pick(TEAMS.filter(x=>x!==S.team));
   if(s.ppg>=24)o.push(`🔥 You drop ${ri(48,62)} on the ${opp()}`);if(s.bpg>=1.8)o.push(`🚫 ${ri(8,11)}-block game against the ${opp()}`);
@@ -1852,9 +1827,6 @@ function clutchPend(x){const c=S.cur,t=S.traits,r2=makeRng(((c.rs0||7)^Math.imul
     return{label:l,desc:`${dsc}${tag} · ${pr>=.6?'Good odds':pr>=.42?'Fair odds':'Long odds'}`,fn:()=>{const won=u<pr,res=won?ok:no;(S.clLines=S.clLines||[]).push(won?okL:noL);if(S.clLines.length>200)S.clLines.shift();
       c.clutch.push({won,shot:!def,fin,label:l,text:res,title});S.lastResult={ok:won,text:res,n:1,cl:1};seasonPlayoffs();return `${title}: ${won?'you came through':'it slipped away'}`;}};});
   return{kind:'clutch',title,text,ctx:{me,them,my:tShort(S.team),op:tShort(x.opp),secs,sit,fin,g},opts,best};}
-function clutchHTML(){const p=S.pend,x=p.ctx,lp=S.cur&&S.cur.clutch&&S.cur.clutch[S.cur.clutch.length-1];return`${lp?`<div class="ev ${lp.won?'good':'bad'}">${lp.won?'✅':'💔'} Last play (${lp.title}): ${esc(lp.text)}</div>`:''}<div class="clutch"><div class="cl-top">${p.title}</div>
-  <div class="board"><div class="tm"><span>${x.my}</span><b>${x.me}</b></div><div class="clock"><b>0:${String(x.secs).padStart(4,'0')}</b><small>4TH</small></div><div class="tm"><span>${x.op}</span><b>${x.them}</b></div></div>
-  <div class="cl-sit">${p.text}</div></div><div class="card"><div class="sh">🎯 <span class="grow">${x.sit==='up1'?'Your call on defense':'Your call'}</span></div>${p.opts.map((o,i)=>optBtn(o,`act(choose,${i})`)).join('')}</div>`;}
 
 // ---------- season goals: three targets every NBA season, from likely to stretch ----------
 const goalReward=g=>({pts:Math.max(1,Math.round([0,2,4,7][g.tier]*(diff().nbaPts??1))),gtp:Math.round([0,1,2,3][g.tier]*(diff().mult||0))});
@@ -1881,10 +1853,6 @@ function goalOk(g,st){switch(g.k){case'ppg':return st.ppg>=g.v;case'rpg':return 
   case'wins':return st.wins>=g.v;case'playoffs':return st.rounds>=0;case'round':return st.rounds>=g.v;case'champ':return st.champ;case'aw':return st.aw.includes(g.v);
   case'allnba':return st.aw.some(x=>x.startsWith('All-NBA'));case'mvptop':return st.mvpRank!=null&&st.mvpRank<=g.v;case'scoring':return st.aw.includes('Scoring Title');case'roy':return st.aw.includes('ROY');
   case'rvppg':return st.rvppg!=null&&st.ppg>st.rvppg;case'pts':return st.ptsAfter>=g.v;}return false;}
-const GT=['','Likely','Solid','Stretch'];
-function goalsCard(){const G=S.goals;if(!G||G.yr!==S.nba.length+1||!G.list.length)return'';
-  return`<div class="card"><div class="sh">🎯 <span class="grow">Season ${G.yr} goals</span>${G.moved?`<b class="muted">New team, new goals</b>`:''}</div>${G.list.map(g=>{const r=goalReward(g);return`<div class="goal"><span class="gt t${g.tier}">${GT[g.tier]}</span><span class="grow">${g.text}</span><small>+${r.pts} pt${r.pts===1?'':'s'}${r.gtp?` · +${r.gtp} GTP`:''}</small></div>`;}).join('')}<div class="note">Hit a goal this season to earn bonus points${diff().mult?' and GTP':''}.</div></div>`;}
-function goalsResult(l){return`<div class="card"><div class="sh">🎯 <span class="grow">Season ${l.yr} goals</span><b class="gold">${l.goals.filter(g=>g.ok).length}/${l.goals.length}</b></div>${l.goals.map(g=>`<div class="goal ${g.ok?'':'no'}"><span>${g.ok?'✅':'❌'}</span><span class="grow">${g.text}</span><small>${g.ok?`+${g.pts} pt${g.pts===1?'':'s'}${g.gtp?` · +${g.gtp} GTP`:''}`:'Missed'}</small></div>`).join('')}</div>`;}
 
 // ---------- history: legends from past eras, the all-time lists and the GOAT debate ----------
 // legend legacy scores sit on the same scale as your GOAT score, so climbing the list means passing real thresholds
@@ -1907,20 +1875,8 @@ function allTime(kind){const L=S.L;if(!L)return[];const c=career(),me={name:S.na
   const np=L.P.filter(p=>p.car&&p.car.gp>0).map(p=>({name:p.name,pts:p.car.pts,reb:p.car.reb,ast:p.car.ast,score:npcScore(p),rv:p===S.rival,now:!p.retired}));
   return[...(L.leg||[]),...np,me].sort((x,y)=>y[kind]-x[kind]);}
 const goatRank=()=>{const l=allTime('score');return l.findIndex(x=>x.me)+1||99;};
-function allTimeCard(){if(!S.L||!S.L.leg||!S.nba.length)return'';const u=UI(),k=u.atK||'score',l=allTime(k),mi=l.findIndex(x=>x.me),fmt=x=>k==='score'?x.score:Math.round(x[k]).toLocaleString();
-  const row=(x,i)=>`<tr class="${x.me?'mine':x.rv?'rvrow':''}"><td>${i+1}</td><td>${esc(x.name)}${x.me?' <span class="gold">(you)</span>':x.mine?` <span class="gold">🐐 ${x.era}</span>`:x.leg?` <span class="muted">${x.era}</span>`:x.now?' <span class="muted">active</span>':''}</td><td>${fmt(x)}</td></tr>`;
-  const nm={score:'GOAT debate',pts:'points list',reb:'rebounds list',ast:'assists list'}[k];
-  return`<details class="card" ${u.atOpen?'open':''} ontoggle="UI().atOpen=this.open"><summary>📜 All-time · you are ${ord(mi+1)} in the ${nm}</summary>
-  <div class="seg sm" style="margin-top:8px">${[['score','GOAT debate'],['pts','Points'],['reb','Rebounds'],['ast','Assists']].map(([x,lb])=>`<button class="${k===x?'on':''}" onclick="UI().atK='${x}';UI().atOpen=true;render()">${lb}</button>`).join('')}</div>
-  <div class="scroll clslist"><table><tr><th>#</th><th>PLAYER</th><th>${k==='score'?'LEGACY':k.toUpperCase()}</th></tr>${l.slice(0,15).map(row).join('')}${mi>=15?row(l[mi],mi):''}</table></div>
-  <div class="note">Legends from past eras plus everyone who played in yours. The GOAT debate uses the same legacy score as your GOAT score.</div></details>`;}
 
 // ---------- your rival: head-to-head, playoff meetings and the race for legacy ----------
-function rivalryCard(){const rv=S.rival;if(!rv||!S.nba.length)return'';const c=career(),g=x=>c.cnt[x]||0,h=S.rvH2H||{w:0,l:0,pw:0,pl:0};
-  const meR=S.nba.filter(s=>s.aw.includes('Champion')&&s.mins>=20).length*5+g('MVP')*3+g('All-Star')*.8+c.pts/2500,rvR=rv.rings*5+rv.mvps*3+((rv.aw&&rv.aw['All-Star'])||0)*.8+rv.pts/2500,row=(lb,a2,b2,f=x=>x)=>`<tr><td>${lb}</td><td class="${a2>b2?'good':''}">${f(a2)}</td><td class="${b2>a2?'bad':''}">${f(b2)}</td></tr>`;
-  return`<details class="card"><summary>⚔️ Rivalry · ${esc(rv.name)}${rv.retired?' (retired)':rv.team===S.team?' (now your teammate)':''} <span class="${meR>=rvR?'good':'bad'}">· ${meR>=rvR?'you lead':'he leads'} on legacy</span></summary>
-  <table style="margin-top:8px"><tr><th></th><th>YOU</th><th>${esc(rv.name.split(' ').slice(-1)[0]).toUpperCase()}</th></tr>${row('Rings',g('Champion'),rv.rings)}${row('MVPs',g('MVP'),rv.mvps)}${row('All-Star',g('All-Star'),rv.aw['All-Star']||0)}${row('Points',Math.round(c.pts),Math.round(rv.pts),x=>x.toLocaleString())}</table>
-  <div class="note">Head-to-head: ${h.w}-${h.l} in the regular season · ${h.pw}-${h.pl} in playoff series${rv.retired?'':rv.team===S.team?` · You are teammates on the ${rv.team} now`:` · He plays for the ${rv.team}`}</div></details>`;}
 
 // ---------- the league moves around you: era shifts, superteams, your rival's moves ----------
 const ERA_ORDER=['80s','90s','00s','10s','20s','30s'];
@@ -1945,17 +1901,6 @@ function rehabPend(){return{kind:'event',title:'🩹 Rehab Plan',text:'You are c
 // ---------- the ending: Hall of Fame, jerseys in the rafters, the GOAT debate ----------
 function jerseys(){const by={};for(const x of S.nba){const b=by[x.team]=by[x.team]||{yrs:0,pts:0,as:0,rings:0};b.yrs++;b.pts+=x.ppg*x.gp;if(x.aw.includes('All-Star'))b.as++;if(x.aw.includes('Champion'))b.rings++;}
   return Object.entries(by).filter(([,b])=>(b.yrs>=5&&(b.as>=3||(b.rings>=1&&(b.as>=1||b.pts>=9000))||b.pts>=14000))||(b.yrs>=3&&b.rings>=2)||b.as>=6).map(([team,b])=>({team,...b}));}
-function inductionHTML(t){const u=UI();
-  if(big3(t)){const sp=[['family','Thank your family','"Mom, Dad, this is yours. Every 5 a.m. workout, every long drive to practice. All of it was yours."'],
-      ['doubters','Call out every doubter','"To everyone who said I was too small, too slow, too soft: thank you. You built this."'],
-      ['rival',S.rival?`Salute ${S.rival.name}`:'Salute your teammates',S.rival?`"${S.rival.name}, you made me better every single night. Half of this is yours."`:'"Every banner I ever hung, I hung with you guys."']],ch=sp.find(x=>x[0]===u.speech);
-    return`<div class="card induct"><div class="sh">🏛️ <span class="grow">Hall of Fame induction</span><b class="gold">First ballot</b></div><div class="sub">Five years after you retire, you walk to the podium in a gold jacket. What do you say?</div>
-    ${ch?`<div class="quote">${ch[2]}</div>`:`<div class="chips" style="margin-top:10px">${sp.map(([k,l])=>`<button class="chip" onclick="UI().speech='${k}';render()">${l}</button>`).join('')}</div>`}</div>`;}
-  if(t==='Perennial All-Star')return`<div class="card"><div class="sh">🏛️ <span class="grow">Hall of Fame ballot</span><b>On the bubble</b></div><div class="sub">You are on the ballot, and voters are split. The debate starts every spring.</div></div>`;return'';}
-function goatDebateHTML(){if(!S.L||!S.L.leg)return'';const l=allTime('score'),mi=l.findIndex(x=>x.me),rk=mi+1;
-  return`<div class="card"><div class="sh">🐐 <span class="grow">The GOAT debate</span><b class="gold">${ord(rk)} all-time</b></div><div class="sub">${rk===1?'Nobody is arguing. You are the greatest of all time.':rk<=4?'You are on the Mount Rushmore of basketball.':rk<=10?'Top 10 all-time. The barbershop debates never end.':rk<=25?'One of the 25 greatest ever.':'Legends from every era, ranked by legacy.'}</div>
-  <div class="scroll" style="margin-top:8px"><table><tr><th>#</th><th>PLAYER</th><th>LEGACY</th></tr>${l.slice(0,10).map((x,i)=>`<tr class="${x.me?'mine':x.rv?'rvrow':''}"><td>${i+1}</td><td>${esc(x.name)}${x.me?' <span class="gold">(you)</span>':x.mine?` <span class="gold">🐐 ${x.era}</span>`:x.leg?` <span class="muted">${x.era}</span>`:''}</td><td>${x.score}</td></tr>`).join('')}${mi>=10?`<tr class="mine"><td>${rk}</td><td>${esc(S.name)} <span class="gold">(you)</span></td><td>${l[mi].score}</td></tr>`:''}</table></div></div>`;}
-function jerseyHTML(){const js=jerseys();return js.length?`<div class="card"><div class="sh">👕 <span class="grow">Up in the rafters</span></div>${js.map(j=>`<div class="ev gold">👕 The ${j.team} retire your #${S.look.num} (${j.yrs} season${j.yrs===1?'':'s'}${j.rings?`, ${j.rings} title${j.rings>1?'s':''}`:''})</div>`).join('')}</div>`:'';}
 
 // ---------- settings ----------
 // ---------- gems and equipment: permanent gear that every future player wears ----------
@@ -1971,20 +1916,37 @@ const gear=()=>Store.obj('bag_gear');
 function buyGear(k){const g=gear(),lv=g[k]||0;if(lv>=3||gems()<GEAR_COST[lv])return;if(setGems(gems()-GEAR_COST[lv])){g[k]=lv+1;Store.setJson('bag_gear',g);}render();}
 function gearNote(){if(S.daily)return null;const g=gear(),on=GEAR.filter(x=>g[x[0]]).map(x=>`${x[1]} +${GEAR_BOOST[g[x[0]]]} ${x[4].map(k=>SKN[k]).join(' & ')}`);return on.length?{ok:true,n:1,text:`🎽 Your equipment is on: ${on.join(' · ')}`}:null;}
 function wearGear(){if(S.daily)return;const g=gear();for(const[k,,,,ks]of GEAR)for(const a of ks)S.attrs[a]=Math.min(99,S.attrs[a]+GEAR_BOOST[g[k]||0]);}
-function gearCard(){const g=gear(),n=gems();
-  return`<div class="card"><div class="sh">${icon('sparkle')} <span class="grow">Equipment</span><b class="gold">${n} gems</b></div><div class="sub">Gear is permanent: every future player wears it (not the Daily Build). Earn gems at the end of every career on Pro and Hall of Fame.</div>
-  ${GEAR.map(([k,l,ic,d,ks])=>{const lv=g[k]||0,c=GEAR_COST[lv];return`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><span class="bub">${icon(ic)}</span><div class="grow"><b>${l}</b>${lv?` <span class="gold">${GEAR_LV[lv-1]}</span>`:''}<div class="sub">${d} · ${ks.map(sname).join(' & ')} ${lv?`+${GEAR_BOOST[lv]}`:`+${GEAR_BOOST[1]}`} each${lv&&lv<3?` · next level +${GEAR_BOOST[lv+1]}`:''}</div></div>
-    ${lv>=3?'<b class="gold">Maxed</b>':`<button class="sm" aria-label="Buy ${l}" onclick="buyGear('${k}')" ${n<c?'disabled':''}>${c} gems</button>`}</div>`;}).join('')}
-  ${storeOn()?`<button class="ghost sm" style="margin-top:14px;width:100%" onclick="openMenu('gems')">${icon('gem')} Get more gems</button>`:''}</div>`;}
-const SAVE_KEYS=['bag_gtp','bag_ach','bag_hof','bag_recent','bag_daily','bag_diff','bag_rec','bag_goats','bag_gems','bag_gear','bag_intro'];
-function settingsCard(){const u=UI(),ach=Object.keys(achHave()).length,hof=hallList().length;
-  return`${diffCard()}<div class="card"><div class="sh">🏅 <span class="grow">Your progress</span></div>
-  <div class="sub">Saved on this device: <b>${gtpBank()} GTP</b> · <b>${ach}</b> achievements · <b>${hof}</b> career${hof===1?'':'s'} in your Hall of Builds.</div>
-  ${u.resetDone?'<div class="ev good" style="margin-top:10px">Progress reset. Fresh start.</div>':''}
-  ${u.confirmReset?`<div class="ev bad" style="margin-top:10px">This erases your GTP, gems (including bought gems), equipment, perks, achievements, Badge Book, Hall of Builds${hasRun()?', daily results and your saved run':' and daily results'}. It can’t be undone.</div>
-    <div class="two" style="margin-top:8px;gap:10px"><button class="danger" onclick="resetProgress()">Yes, erase everything</button><button class="ghost" onclick="UI().confirmReset=false;render()">Cancel</button></div>`
-  :`<button class="ghost" style="margin-top:10px;width:100%;color:#ff6b6b;border-color:rgba(255,107,107,.45)" onclick="UI().confirmReset=true;UI().resetDone=false;render()">Reset all progress</button>`}</div>`;}
-function resetProgress(){for(const k of[...SAVE_KEYS,...Object.values(SV)])Store.remove(k);R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,menu:'settings',resetDone:true};render();scrollTo(0,0);}
+document.addEventListener('keydown',e=>{if(e.key!=='Escape'||typeof S==='undefined'||!S.ui)return;const u=S.ui;if(u.menu==='open')closeMenu();else if(u.menu)openMenu(null);else if(u.intro!=null)endIntro();else if(u.prof)closeProfile();});
+// ---------- the intro: what the game is and how to play ----------
+const INTRO=[['ball','This is Build a GOAT','Create a basketball player from scratch and live their whole career: high school, college, the draft and the NBA. Your goal is to retire as the Greatest Of All Time.'],
+  ['user','Build your player','Pick your height and frame, spend your skill points and lock in two traits. The game tells you what kind of player you are becoming. Every choice has a tradeoff, and there is no perfect build.'],
+  ['calendar','Play your career','Play it season by season. Make summer decisions, choose a college, decide when to declare, pick teams in free agency and take the last shot in Game 7. Spend your bonus points as you grow.'],
+  ['goat','Becoming THE GOAT','Rings, MVPs, All-Star picks and big numbers build your GOAT score. Reach 350 and be #1 all-time to be crowned. Every GOAT you make becomes a legend the next one has to beat.'],
+  ['refresh','If your first build doesn’t make it, don’t fear!','Almost nobody becomes the GOAT on the first try. Every Pro or Hall of Fame career earns GTP for one-time perks on your next player, and gems for permanent equipment (Rookie is for practice and earns neither). Every run makes the next one stronger.']];
+function introHTML(){const i=UI().intro,[ic,t,d]=INTRO[i],last=i===INTRO.length-1;
+  return`<div class="intro"><div class="row" style="justify-content:space-between"><div class="dots">${INTRO.map((x,j)=>`<i class="${j===i?'on':j<i?'done':''}"></i>`).join('')}</div>${last?'':'<button class="ghost sm" onclick="endIntro()">Skip</button>'}</div>
+  <div class="introbig">${icon(ic)}</div><h1 style="text-align:center">${t}</h1><div class="sub" style="text-align:center;font-size:1rem">${d}</div></div>`+dock(`${i?'<div class="two"><button class="ghost" onclick="UI().intro--;render()">Back</button>':''}<button onclick="${last?'endIntro()':'UI().intro++;render()'}">${last?(S.stage==='build'?'Let’s build':'Back to your career'):'Next'}</button>${i?'</div>':''}`);}
+const introSeen=()=>!!Store.get('bag_intro'),markIntroSeen=()=>Store.set('bag_intro','1');
+function endIntro(){markIntroSeen();UI().intro=null;render();scrollTo(0,0);}
+// ---------- badges on screen: medals, the badges tab, the Badge Book ----------
+const bMed=t=>`<span class="bmed t${t}" title="${BTN[t]}">${icon('medal')}</span>`;
+const skNames=b=>b.sk.map(k=>Array.isArray(k)?k.map(x=>SKN[x]).join(' or '):SKN[k]).join(' + ')+(b.h?` · ${b.h[1]>=99?ht(b.h[0])+' and up':ht(b.h[0])+' to '+ht(b.h[1])}`:'');
+function badgeRow(b,t,extra){return`<div class="brow">${bMed(t||0)}<div class="grow"><b>${b.n}</b>${t?` <span class="muted">${BTN[t]}</span>`:''}<div class="sub">${skNames(b)}</div>${extra||`<div class="note">${fxText(b.fx,Math.max(1,t))}</div>`}</div></div>`;}
+function badgesTab(){const B=S.bdg||{},c=bCap(),held=BADGES.filter(b=>B[b.id]).sort((x,y)=>B[y.id]-B[x.id]),rest=BADGES.filter(b=>!B[b.id]||B[b.id]<4);
+  const close=rest.map(b=>{const r=badgeRating(b),t=B[b.id]||0;return{b,r,t,gap:r==null?99:BT[t]-r};}).filter(x=>x.gap<=8).sort((x,y)=>x.gap-y.gap);
+  const locked=BADGES.filter(b=>!B[b.id]&&!close.some(x=>x.b===b)),sig=ARCH_SIG[archetype().id];
+  return`<div class="card"><div class="sh">${icon('medal','ici')} <span class="grow">Your badges</span><b>${held.length}</b></div>${held.length?held.map(b=>badgeRow(b,B[b.id])).join(''):`<div class="sub">${seasonsPlayed()?`No badges yet. Raise a skill to ${BT[0]} for your first Bronze.`:'Badges are earned by playing: your first ones come at the end of your first season. After that, raising a skill can earn one right away.'}</div>`}
+  ${(S.badges||[]).length?`<div class="sh" style="margin-top:12px">${icon('trophy','ici')} <span class="grow">Story badges</span></div>${S.badges.map(x=>`<span class="pill gold">${esc(x)}</span>`).join('')}`:''}</div>
+  ${close.length?`<div class="card"><div class="sh">${icon('target','ici')} <span class="grow">Close to</span></div>${close.map(x=>badgeRow(x.b,x.t,`<div class="note">${x.gap<=0?'Rating reached for '+BTN[x.t+1]:BTN[x.t+1]+' at '+BT[x.t]}${x.b.sk.length>1?' (average)':''} · you are at ${Math.floor(x.r)}${(()=>{const w=badgeWeak(x.b);return w?` (held back by ${SKN[w]} ${Math.round(es(w))}${atCap(w)?', maxed':''}: a pair rates at most 6 above its weaker skill)`:'';})()}${x.t+1>c?` · ${BTN[x.t+1]} opens ${c<3?'in college':'in the NABL'}${x.t+1>=3?` and needs ${x.t+1>=4?80:70} OVR`:''}`:x.t+1>ovrCap()?` · ${BTN[x.t+1]} needs ${x.t+1>=4?80:70} OVR`:''}</div>`)).join('')}</div>`:''}
+  <div class="card"><div class="sh">${icon('star','ici')} <span class="grow">Signature badges for a ${archetype().n}</span></div><div class="sub">${sig.map(id=>BADGE[id].n).join(' · ')}</div></div>
+  ${locked.length?`<details class="card"><summary>Locked · ${locked.length}</summary>${locked.map(b=>badgeRow(b,0,`<div class="note">Bronze at ${BT[0]}${b.sk.length>1?' (average)':''}</div>`)).join('')}</details>`:''}
+  <div class="note">Tiers: Bronze ${BT[0]}, Silver ${BT[1]}, Gold ${BT[2]}, Platinum ${BT[3]}. High school reaches Silver, college Gold, the NABL Platinum. Gold also needs 70 OVR and Platinum 80 OVR. A pair badge rates at most 6 above its weaker skill. At season end a badge drops one tier if it falls 3 below its line.</div>`;}
+function badgeBookHTML(){const k=bookGet(),n=Object.keys(k).length;
+  return`<div class="card"><div class="sh">${icon('book','ici')} <span class="grow">Badge Book</span><b>${n}/${BADGES.length}</b></div><div class="sub">The best tier you have ever reached on each badge, across all your careers.</div>
+  ${['Shooting','Finishing','Playmaking','Defense','Rebounding','Body & mind'].map(f=>`<div class="sh" style="margin-top:12px"><span class="grow">${f}</span></div>${BADGES.filter(b=>b.f===f).map(b=>`<div class="brow">${bMed(k[b.id]||0)}<div class="grow"><b class="${k[b.id]?'':'muted'}">${b.n}</b>${k[b.id]?` <span class="muted">${BTN[k[b.id]]}</span>`:''}<div class="sub">${skNames(b)}</div></div></div>`).join('')}`).join('')}</div>`;}
+function heightNote(){const keys=[['oreb','Rebounding'],['blk','Block'],['dunk','Dunk'],['intD','Interior D'],['handle','Ball Handle'],['speed','Speed']];
+  return keys.map(([k,l])=>{const dv=Math.round(es(k)-S.attrs[k]-(FRAMES[S.frame][k]||0));return dv?`${l} ${dv>0?'+':''}${dv}`:null;}).filter(Boolean).join(' · ')||'no height bonuses or penalties';}
+// ---------- the side menu and its pages ----------
 const MENU=[['settings','sliders','Settings','Difficulty, sound and reset'],['gtp','gtp','GTP Store','Perks for your next player'],['gear','shirt','Equipment','Permanent gear for every player'],['hof','🏛️','Hall of Builds','Your best careers'],['ach','trophy','Achievements','What you have unlocked'],['bbook','medal','Badge Book','Every badge you have earned']];
 // the Gem Shop item exists only while the store is on (iOS app with RevenueCat, or ?dev=1); see PLATFORM (Plat)
 const MENU_GEMS=['gems','gem','Gem Shop','Buy gems and Remove Ads'];
@@ -1996,7 +1958,6 @@ const hdr=t=>`<div class="row" style="justify-content:space-between;flex-wrap:no
 function menuBtn(){return`<button class="ham ${UI().wig?'':'wig'}" aria-label="Menu" onclick="openMenu('open')"><i></i><i></i><i></i></button>`;}
 let drawerAnim=false;
 function closeMenu(){const d=document.querySelector('.drawer');if(!d||d.classList.contains('out')){UI().menu=null;return render();}d.classList.remove('in');d.classList.add('out');d.style.pointerEvents='none';setTimeout(()=>{if(UI().menu==='open'){UI().menu=null;render();}},230);}
-document.addEventListener('keydown',e=>{if(e.key!=='Escape'||typeof S==='undefined'||!S.ui)return;const u=S.ui;if(u.menu==='open')closeMenu();else if(u.menu)openMenu(null);else if(u.intro!=null)endIntro();else if(u.prof)closeProfile();});
 const BALL='<svg class="ball" viewBox="0 0 40 40" aria-hidden="true"><defs><radialGradient id="bg1" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffb05a"/><stop offset="1" stop-color="#d9580a"/></radialGradient></defs><circle cx="20" cy="20" r="18" fill="url(#bg1)"/><g fill="none" stroke="#3a1a05" stroke-width="1.6"><path d="M2 20h36M20 2v36"/><path d="M7 7c6 5 6 21 0 26M33 7c-6 5-6 21 0 26"/></g></svg>';
 function drawerHTML(){const hofN=hallList().length,achN=Object.keys(achHave()).length,cls=drawerAnim?'in':'';drawerAnim=false;
   const sub={settings:diff().name.replace(/^\S+\s/,'')+' · difficulty, sound, reset',gtp:(gtpBank()-cartCost())+' GTP available · perks for this player',hof:hofN+(hofN===1?' career':' careers')+' · your best builds',ach:achN+'/'+ACH.length+' unlocked'};
@@ -2017,17 +1978,64 @@ function menuHTML(){const k=UI().menu,m=menuAll().find(x=>x[0]===k),hofN=hallLis
   if(k==='ach')b=achHTML([],true);
   if(k==='bbook')b=badgeBookHTML();
   return top+b+dock(`<button onclick="openMenu(null)">Back to your ${S.stage==='build'?'build':S.stage==='end'?'career recap':'career'}</button>`);}
-// ---------- the intro: what the game is and how to play ----------
-const INTRO=[['ball','This is Build a GOAT','Create a basketball player from scratch and live their whole career: high school, college, the draft and the NBA. Your goal is to retire as the Greatest Of All Time.'],
-  ['user','Build your player','Pick your height and frame, spend your skill points and lock in two traits. The game tells you what kind of player you are becoming. Every choice has a tradeoff, and there is no perfect build.'],
-  ['calendar','Play your career','Play it season by season. Make summer decisions, choose a college, decide when to declare, pick teams in free agency and take the last shot in Game 7. Spend your bonus points as you grow.'],
-  ['goat','Becoming THE GOAT','Rings, MVPs, All-Star picks and big numbers build your GOAT score. Reach 350 and be #1 all-time to be crowned. Every GOAT you make becomes a legend the next one has to beat.'],
-  ['refresh','If your first build doesn’t make it, don’t fear!','Almost nobody becomes the GOAT on the first try. Every Pro or Hall of Fame career earns GTP for one-time perks on your next player, and gems for permanent equipment (Rookie is for practice and earns neither). Every run makes the next one stronger.']];
-function introHTML(){const i=UI().intro,[ic,t,d]=INTRO[i],last=i===INTRO.length-1;
-  return`<div class="intro"><div class="row" style="justify-content:space-between"><div class="dots">${INTRO.map((x,j)=>`<i class="${j===i?'on':j<i?'done':''}"></i>`).join('')}</div>${last?'':'<button class="ghost sm" onclick="endIntro()">Skip</button>'}</div>
-  <div class="introbig">${icon(ic)}</div><h1 style="text-align:center">${t}</h1><div class="sub" style="text-align:center;font-size:1rem">${d}</div></div>`+dock(`${i?'<div class="two"><button class="ghost" onclick="UI().intro--;render()">Back</button>':''}<button onclick="${last?'endIntro()':'UI().intro++;render()'}">${last?(S.stage==='build'?'Let’s build':'Back to your career'):'Next'}</button>${i?'</div>':''}`);}
-const introSeen=()=>!!Store.get('bag_intro'),markIntroSeen=()=>Store.set('bag_intro','1');
-function endIntro(){markIntroSeen();UI().intro=null;render();scrollTo(0,0);}
+// ---------- the settings page ----------
+function settingsCard(){const u=UI(),ach=Object.keys(achHave()).length,hof=hallList().length;
+  return`${diffCard()}<div class="card"><div class="sh">🏅 <span class="grow">Your progress</span></div>
+  <div class="sub">Saved on this device: <b>${gtpBank()} GTP</b> · <b>${ach}</b> achievements · <b>${hof}</b> career${hof===1?'':'s'} in your Hall of Builds.</div>
+  ${u.resetDone?'<div class="ev good" style="margin-top:10px">Progress reset. Fresh start.</div>':''}
+  ${u.confirmReset?`<div class="ev bad" style="margin-top:10px">This erases your GTP, gems (including bought gems), equipment, perks, achievements, Badge Book, Hall of Builds${hasRun()?', daily results and your saved run':' and daily results'}. It can’t be undone.</div>
+    <div class="two" style="margin-top:8px;gap:10px"><button class="danger" onclick="resetProgress()">Yes, erase everything</button><button class="ghost" onclick="UI().confirmReset=false;render()">Cancel</button></div>`
+  :`<button class="ghost" style="margin-top:10px;width:100%;color:#ff6b6b;border-color:rgba(255,107,107,.45)" onclick="UI().confirmReset=true;UI().resetDone=false;render()">Reset all progress</button>`}</div>`;}
+function resetProgress(){for(const k of[...SAVE_KEYS,...Object.values(SV)])Store.remove(k);R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,menu:'settings',resetDone:true};render();scrollTo(0,0);}
+// ---------- the equipment page ----------
+function gearCard(){const g=gear(),n=gems();
+  return`<div class="card"><div class="sh">${icon('sparkle')} <span class="grow">Equipment</span><b class="gold">${n} gems</b></div><div class="sub">Gear is permanent: every future player wears it (not the Daily Build). Earn gems at the end of every career on Pro and Hall of Fame.</div>
+  ${GEAR.map(([k,l,ic,d,ks])=>{const lv=g[k]||0,c=GEAR_COST[lv];return`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><span class="bub">${icon(ic)}</span><div class="grow"><b>${l}</b>${lv?` <span class="gold">${GEAR_LV[lv-1]}</span>`:''}<div class="sub">${d} · ${ks.map(sname).join(' & ')} ${lv?`+${GEAR_BOOST[lv]}`:`+${GEAR_BOOST[1]}`} each${lv&&lv<3?` · next level +${GEAR_BOOST[lv+1]}`:''}</div></div>
+    ${lv>=3?'<b class="gold">Maxed</b>':`<button class="sm" aria-label="Buy ${l}" onclick="buyGear('${k}')" ${n<c?'disabled':''}>${c} gems</button>`}</div>`;}).join('')}
+  ${storeOn()?`<button class="ghost sm" style="margin-top:14px;width:100%" onclick="openMenu('gems')">${icon('gem')} Get more gems</button>`:''}</div>`;}
+// ---------- legacy on screen: the plaque, the induction, jerseys, the all-time lists ----------
+function inductionHTML(t){const u=UI();
+  if(big3(t)){const sp=[['family','Thank your family','"Mom, Dad, this is yours. Every 5 a.m. workout, every long drive to practice. All of it was yours."'],
+      ['doubters','Call out every doubter','"To everyone who said I was too small, too slow, too soft: thank you. You built this."'],
+      ['rival',S.rival?`Salute ${S.rival.name}`:'Salute your teammates',S.rival?`"${S.rival.name}, you made me better every single night. Half of this is yours."`:'"Every banner I ever hung, I hung with you guys."']],ch=sp.find(x=>x[0]===u.speech);
+    return`<div class="card induct"><div class="sh">🏛️ <span class="grow">Hall of Fame induction</span><b class="gold">First ballot</b></div><div class="sub">Five years after you retire, you walk to the podium in a gold jacket. What do you say?</div>
+    ${ch?`<div class="quote">${ch[2]}</div>`:`<div class="chips" style="margin-top:10px">${sp.map(([k,l])=>`<button class="chip" onclick="UI().speech='${k}';render()">${l}</button>`).join('')}</div>`}</div>`;}
+  if(t==='Perennial All-Star')return`<div class="card"><div class="sh">🏛️ <span class="grow">Hall of Fame ballot</span><b>On the bubble</b></div><div class="sub">You are on the ballot, and voters are split. The debate starts every spring.</div></div>`;return'';}
+function goatDebateHTML(){if(!S.L||!S.L.leg)return'';const l=allTime('score'),mi=l.findIndex(x=>x.me),rk=mi+1;
+  return`<div class="card"><div class="sh">🐐 <span class="grow">The GOAT debate</span><b class="gold">${ord(rk)} all-time</b></div><div class="sub">${rk===1?'Nobody is arguing. You are the greatest of all time.':rk<=4?'You are on the Mount Rushmore of basketball.':rk<=10?'Top 10 all-time. The barbershop debates never end.':rk<=25?'One of the 25 greatest ever.':'Legends from every era, ranked by legacy.'}</div>
+  <div class="scroll" style="margin-top:8px"><table><tr><th>#</th><th>PLAYER</th><th>LEGACY</th></tr>${l.slice(0,10).map((x,i)=>`<tr class="${x.me?'mine':x.rv?'rvrow':''}"><td>${i+1}</td><td>${esc(x.name)}${x.me?' <span class="gold">(you)</span>':x.mine?` <span class="gold">🐐 ${x.era}</span>`:x.leg?` <span class="muted">${x.era}</span>`:''}</td><td>${x.score}</td></tr>`).join('')}${mi>=10?`<tr class="mine"><td>${rk}</td><td>${esc(S.name)} <span class="gold">(you)</span></td><td>${l[mi].score}</td></tr>`:''}</table></div></div>`;}
+function jerseyHTML(){const js=jerseys();return js.length?`<div class="card"><div class="sh">👕 <span class="grow">Up in the rafters</span></div>${js.map(j=>`<div class="ev gold">👕 The ${j.team} retire your #${S.look.num} (${j.yrs} season${j.yrs===1?'':'s'}${j.rings?`, ${j.rings} title${j.rings>1?'s':''}`:''})</div>`).join('')}</div>`:'';}
+function allTimeCard(){if(!S.L||!S.L.leg||!S.nba.length)return'';const u=UI(),k=u.atK||'score',l=allTime(k),mi=l.findIndex(x=>x.me),fmt=x=>k==='score'?x.score:Math.round(x[k]).toLocaleString();
+  const row=(x,i)=>`<tr class="${x.me?'mine':x.rv?'rvrow':''}"><td>${i+1}</td><td>${esc(x.name)}${x.me?' <span class="gold">(you)</span>':x.mine?` <span class="gold">🐐 ${x.era}</span>`:x.leg?` <span class="muted">${x.era}</span>`:x.now?' <span class="muted">active</span>':''}</td><td>${fmt(x)}</td></tr>`;
+  const nm={score:'GOAT debate',pts:'points list',reb:'rebounds list',ast:'assists list'}[k];
+  return`<details class="card" ${u.atOpen?'open':''} ontoggle="UI().atOpen=this.open"><summary>📜 All-time · you are ${ord(mi+1)} in the ${nm}</summary>
+  <div class="seg sm" style="margin-top:8px">${[['score','GOAT debate'],['pts','Points'],['reb','Rebounds'],['ast','Assists']].map(([x,lb])=>`<button class="${k===x?'on':''}" onclick="UI().atK='${x}';UI().atOpen=true;render()">${lb}</button>`).join('')}</div>
+  <div class="scroll clslist"><table><tr><th>#</th><th>PLAYER</th><th>${k==='score'?'LEGACY':k.toUpperCase()}</th></tr>${l.slice(0,15).map(row).join('')}${mi>=15?row(l[mi],mi):''}</table></div>
+  <div class="note">Legends from past eras plus everyone who played in yours. The GOAT debate uses the same legacy score as your GOAT score.</div></details>`;}
+function plaqueHTML(c,sc,t){const g=x=>c.cnt[x]||0,gp=c.gp||1,top=[['Champion','🏆','Ring'],['MVP','👑','MVP'],['Finals MVP','🏅','Finals MVP'],['All-Star','⭐','All-Star'],['DPOY','🛡️','DPOY'],['Scoring Title','🔥','Scoring title'],['All-NBA 1st','🥇','All-NBA 1st']].filter(([k])=>g(k)).slice(0,5);
+  return`<div class="plaque"><div class="row" style="align-items:flex-start;gap:14px">${avatar(teamLook(S.look,S.nba.length?mainTeam():null),S.age,100,1)}<div class="grow">
+  <div class="sub" style="letter-spacing:2px">BUILD A GOAT · <span style="white-space:nowrap">${((S.eraStart&&S.eraStart!==S.era?ERAS.find(e=>e.id===S.eraStart).name.replace(/^\S+\s/,'')+' – ':'')+era().name.replace(/^\S+\s/,'')).toUpperCase().replace(' – ','</span> – <span style="white-space:nowrap">')}</span></div><div class="pname">${S.name}</div>
+  <div class="tier" style="font-size:1.6rem;text-align:left;margin:2px 0">${t}</div>
+  <div class="sub">${archName()} · ${ht(S.height)} · ${pickTxt(S.pick)} · ${c.seasons} season${c.seasons===1?'':'s'}</div></div></div>
+  <div class="stat3" style="margin-top:10px">${[['PPG',f1(c.pts/gp)],['RPG',f1(c.reb/gp)],['APG',f1(c.ast/gp)],['SPG',f1((c.stl||0)/gp)],['BPG',f1((c.blk||0)/gp)],['PTS',Math.round(c.pts).toLocaleString()]].map(([l,v])=>`<div class="stat"><b>${v}</b>${l}</div>`).join('')}</div>
+  ${(()=>{const B={...(S.bdg||{}),...Object.fromEntries(Object.entries(S.bdgBest||{}).map(([k,v])=>[k,Math.max(v,(S.bdg||{})[k]||0)]))},gb=BADGES.filter(b=>B[b.id]>=3).sort((x,y)=>B[y.id]-B[x.id]);return gb.length?`<div class="sub" style="margin-top:8px">Best badges of your career</div><div style="margin-top:4px">${gb.slice(0,6).map(b=>`<span class="pill bpill t${B[b.id]}">${bMed(B[b.id])}${b.n}</span>`).join('')}</div>`:'';})()}
+  <div style="margin-top:8px">${top.map(([k,e,l])=>`<span class="pill gold">${e} ${g(k)}× ${l}</span>`).join('')||'<span class="muted">'+(c.seasons>=10?`No hardware, but ${c.seasons} seasons and ${Math.round(c.pts).toLocaleString()} points. A real career.`:S.retired==='Out of the league'?'No hardware. Out of the league, but you made it there.':'No hardware. You still made it to the league.')+'</span>'}</div>
+  <div class="sub" style="margin-top:6px">GOAT Score ${sc}${S.daily?` · 📅 Daily Build ${todayKey()}`:''}</div></div>`;}
+// ---------- career cards: the final play, season goals, your rival, continue a run ----------
+function clutchHTML(){const p=S.pend,x=p.ctx,lp=S.cur&&S.cur.clutch&&S.cur.clutch[S.cur.clutch.length-1];return`${lp?`<div class="ev ${lp.won?'good':'bad'}">${lp.won?'✅':'💔'} Last play (${lp.title}): ${esc(lp.text)}</div>`:''}<div class="clutch"><div class="cl-top">${p.title}</div>
+  <div class="board"><div class="tm"><span>${x.my}</span><b>${x.me}</b></div><div class="clock"><b>0:${String(x.secs).padStart(4,'0')}</b><small>4TH</small></div><div class="tm"><span>${x.op}</span><b>${x.them}</b></div></div>
+  <div class="cl-sit">${p.text}</div></div><div class="card"><div class="sh">🎯 <span class="grow">${x.sit==='up1'?'Your call on defense':'Your call'}</span></div>${p.opts.map((o,i)=>optBtn(o,`act(choose,${i})`)).join('')}</div>`;}
+const GT=['','Likely','Solid','Stretch'];
+function goalsCard(){const G=S.goals;if(!G||G.yr!==S.nba.length+1||!G.list.length)return'';
+  return`<div class="card"><div class="sh">🎯 <span class="grow">Season ${G.yr} goals</span>${G.moved?`<b class="muted">New team, new goals</b>`:''}</div>${G.list.map(g=>{const r=goalReward(g);return`<div class="goal"><span class="gt t${g.tier}">${GT[g.tier]}</span><span class="grow">${g.text}</span><small>+${r.pts} pt${r.pts===1?'':'s'}${r.gtp?` · +${r.gtp} GTP`:''}</small></div>`;}).join('')}<div class="note">Hit a goal this season to earn bonus points${diff().mult?' and GTP':''}.</div></div>`;}
+function goalsResult(l){return`<div class="card"><div class="sh">🎯 <span class="grow">Season ${l.yr} goals</span><b class="gold">${l.goals.filter(g=>g.ok).length}/${l.goals.length}</b></div>${l.goals.map(g=>`<div class="goal ${g.ok?'':'no'}"><span>${g.ok?'✅':'❌'}</span><span class="grow">${g.text}</span><small>${g.ok?`+${g.pts} pt${g.pts===1?'':'s'}${g.gtp?` · +${g.gtp} GTP`:''}`:'Missed'}</small></div>`).join('')}</div>`;}
+function rivalryCard(){const rv=S.rival;if(!rv||!S.nba.length)return'';const c=career(),g=x=>c.cnt[x]||0,h=S.rvH2H||{w:0,l:0,pw:0,pl:0};
+  const meR=S.nba.filter(s=>s.aw.includes('Champion')&&s.mins>=20).length*5+g('MVP')*3+g('All-Star')*.8+c.pts/2500,rvR=rv.rings*5+rv.mvps*3+((rv.aw&&rv.aw['All-Star'])||0)*.8+rv.pts/2500,row=(lb,a2,b2,f=x=>x)=>`<tr><td>${lb}</td><td class="${a2>b2?'good':''}">${f(a2)}</td><td class="${b2>a2?'bad':''}">${f(b2)}</td></tr>`;
+  return`<details class="card"><summary>⚔️ Rivalry · ${esc(rv.name)}${rv.retired?' (retired)':rv.team===S.team?' (now your teammate)':''} <span class="${meR>=rvR?'good':'bad'}">· ${meR>=rvR?'you lead':'he leads'} on legacy</span></summary>
+  <table style="margin-top:8px"><tr><th></th><th>YOU</th><th>${esc(rv.name.split(' ').slice(-1)[0]).toUpperCase()}</th></tr>${row('Rings',g('Champion'),rv.rings)}${row('MVPs',g('MVP'),rv.mvps)}${row('All-Star',g('All-Star'),rv.aw['All-Star']||0)}${row('Points',Math.round(c.pts),Math.round(rv.pts),x=>x.toLocaleString())}</table>
+  <div class="note">Head-to-head: ${h.w}-${h.l} in the regular season · ${h.pw}-${h.pl} in playoff series${rv.retired?'':rv.team===S.team?` · You are teammates on the ${rv.team} now`:` · He plays for the ${rv.team}`}</div></details>`;}
+function continueCard(){const m=runMeta();if(!m||!m.sum)return'';const s=m.sum,where=s.stage==='nba'?`NBA · Season ${s.yr+1}${s.team?' · '+s.team:''}`:s.stage==='draft'?'Draft night':s.stage==='college'?(s.school||'College'):s.stage==='offers'?'Recruiting':`High School · ${YR[Math.min(s.hs,3)]} Year`;
+  return`<div class="card resume"><div class="hero">${avatar(s.look,s.age,60,1)}<div class="grow"><div class="sh" style="margin:0 0 4px">💾 <span class="grow">Saved run</span></div><div class="hn">${esc(s.name)}</div><div class="hm">${esc(s.arch||s.pos)} · Age ${s.age} · OVR ${s.ovr} · ${where}</div></div></div><button class="wide" style="margin-top:12px" onclick="resumeRun()">Continue run ▶</button></div>`;}
 // ---------- league screens ----------
 const tShort=t=>t.split(' ').slice(-1)[0];
 function clsSnap(){const c=classRank();if(!c)return null;const ix=new Map(S.cls.map((p,i)=>[p,i])),sn={};let r=0;for(const p of c.all){r++;sn[ix.get(p)]=r>=c.rank?r+1:r;}sn.me=c.rank;return sn;}
@@ -2850,11 +2858,12 @@ function resumeRun(){const meta=runMeta();let snap=null,lg=null;try{snap=JSON.pa
   S.ui=Object.assign({tab:'setup',open:null,spend:false},ui||{},{menu:null,wig:1});writeLog();render();scrollTo(0,0);return true;}
 // leave a run without losing it: back to a fresh build screen, with the run waiting on Continue
 function quitRun(){if(S.stage!=='build'&&S.stage!=='end'&&canSave())lsSet(SV.ui,JSON.stringify(Object.assign({},S.ui,{menu:null})));R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,wig:1};render();scrollTo(0,0);}
-function continueCard(){const m=runMeta();if(!m||!m.sum)return'';const s=m.sum,where=s.stage==='nba'?`NBA · Season ${s.yr+1}${s.team?' · '+s.team:''}`:s.stage==='draft'?'Draft night':s.stage==='college'?(s.school||'College'):s.stage==='offers'?'Recruiting':`High School · ${YR[Math.min(s.hs,3)]} Year`;
-  return`<div class="card resume"><div class="hero">${avatar(s.look,s.age,60,1)}<div class="grow"><div class="sh" style="margin:0 0 4px">💾 <span class="grow">Saved run</span></div><div class="hn">${esc(s.name)}</div><div class="hm">${esc(s.arch||s.pos)} · Age ${s.age} · OVR ${s.ovr} · ${where}</div></div></div><button class="wide" style="margin-top:12px" onclick="resumeRun()">Continue run ▶</button></div>`;}
 // on launch: put a half-finished build back, and point to a saved run if there is one
 function bootSave(){if(!canSave())return;try{const b=Store.json(SV.build);if(b&&b.stage==='build'){S=Object.assign(newPlayer(),b);seedNewSkills(S.attrs,true);S.ui=Object.assign({tab:'setup',open:null,spend:false},b.ui||{},{menu:null,replaceOk:0});}}catch{}
   if(hasRun())UI().tab='setup';}
+const SAVE_KEYS=['bag_gtp','bag_ach','bag_hof','bag_recent','bag_daily','bag_diff','bag_rec','bag_goats','bag_gems','bag_gear','bag_intro'];
+// ---------- start: a fresh player (or the saved creator build), then the first screen ----------
+// This runs before the platform file below it has loaded: code the first screen reaches must not need Plat.
 S=newPlayer();bootSave();render();
 // ================= PLATFORM (Plat) =================
 // The one seam between the game and the device. The web build (GitHub Pages) has no ad network and no store, so the banner, the

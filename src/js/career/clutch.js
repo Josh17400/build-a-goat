@@ -33,7 +33,4 @@ function clutchPend(x){const c=S.cur,t=S.traits,r2=makeRng(((c.rs0||7)^Math.imul
     return{label:l,desc:`${dsc}${tag} · ${pr>=.6?'Good odds':pr>=.42?'Fair odds':'Long odds'}`,fn:()=>{const won=u<pr,res=won?ok:no;(S.clLines=S.clLines||[]).push(won?okL:noL);if(S.clLines.length>200)S.clLines.shift();
       c.clutch.push({won,shot:!def,fin,label:l,text:res,title});S.lastResult={ok:won,text:res,n:1,cl:1};seasonPlayoffs();return `${title}: ${won?'you came through':'it slipped away'}`;}};});
   return{kind:'clutch',title,text,ctx:{me,them,my:tShort(S.team),op:tShort(x.opp),secs,sit,fin,g},opts,best};}
-function clutchHTML(){const p=S.pend,x=p.ctx,lp=S.cur&&S.cur.clutch&&S.cur.clutch[S.cur.clutch.length-1];return`${lp?`<div class="ev ${lp.won?'good':'bad'}">${lp.won?'✅':'💔'} Last play (${lp.title}): ${esc(lp.text)}</div>`:''}<div class="clutch"><div class="cl-top">${p.title}</div>
-  <div class="board"><div class="tm"><span>${x.my}</span><b>${x.me}</b></div><div class="clock"><b>0:${String(x.secs).padStart(4,'0')}</b><small>4TH</small></div><div class="tm"><span>${x.op}</span><b>${x.them}</b></div></div>
-  <div class="cl-sit">${p.text}</div></div><div class="card"><div class="sh">🎯 <span class="grow">${x.sit==='up1'?'Your call on defense':'Your call'}</span></div>${p.opts.map((o,i)=>optBtn(o,`act(choose,${i})`)).join('')}</div>`;}
 
