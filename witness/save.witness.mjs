@@ -13,7 +13,7 @@ const drive = `(()=>{applyArch(1);toggleTrait('work');toggleTrait('dur');startCa
     else if(st==='draft')startNBA();
     else if(st==='nba'){if(getS().pend)choose(rnd(getS().pend.opts.length));else if(getS().bank>0&&rnd(3)>0)smartSpend();else simNBA();}
     if(getS().stage==='end')break;
-    if(i%3===0||getS().pend||getS().summerPend){const a=dg();resumeRun();const b=dg();checks++;if(a!==b){bad.push(i+':'+st);if(bad.length>3)break;}}}
+    if(i%2===0||getS().pend||getS().summerPend){const a=dg();resumeRun();const b=dg();checks++;if(a!==b){bad.push(i+':'+st);if(bad.length>3)break;}}}
   return JSON.stringify({checks,bad,stage:getS().stage,seasons:getS().nba.length});})()`;
 export default [
   { name: 'save: every reload rebuilds the run exactly (stats, open decisions, dice)', seed: 17, steps: [ // played on Rookie so the career runs long whatever the balance (Pro seeds kept getting short careers)
