@@ -1,0 +1,11 @@
+// ---------- Hall of Fame plaque (made for screenshots) ----------
+function plaqueHTML(c,sc,t){const g=x=>c.cnt[x]||0,gp=c.gp||1,top=[['Champion','🏆','Ring'],['MVP','👑','MVP'],['Finals MVP','🏅','Finals MVP'],['All-Star','⭐','All-Star'],['DPOY','🛡️','DPOY'],['Scoring Title','🔥','Scoring title'],['All-NBA 1st','🥇','All-NBA 1st']].filter(([k])=>g(k)).slice(0,5);
+  return`<div class="plaque"><div class="row" style="align-items:flex-start;gap:14px">${avatar(teamLook(S.look,S.nba.length?mainTeam():null),S.age,100,1)}<div class="grow">
+  <div class="sub" style="letter-spacing:2px">BUILD A GOAT · <span style="white-space:nowrap">${((S.eraStart&&S.eraStart!==S.era?ERAS.find(e=>e.id===S.eraStart).name.replace(/^\S+\s/,'')+' – ':'')+era().name.replace(/^\S+\s/,'')).toUpperCase().replace(' – ','</span> – <span style="white-space:nowrap">')}</span></div><div class="pname">${S.name}</div>
+  <div class="tier" style="font-size:1.6rem;text-align:left;margin:2px 0">${t}</div>
+  <div class="sub">${archName()} · ${ht(S.height)} · ${pickTxt(S.pick)} · ${c.seasons} season${c.seasons===1?'':'s'}</div></div></div>
+  <div class="stat3" style="margin-top:10px">${[['PPG',f1(c.pts/gp)],['RPG',f1(c.reb/gp)],['APG',f1(c.ast/gp)],['SPG',f1((c.stl||0)/gp)],['BPG',f1((c.blk||0)/gp)],['PTS',Math.round(c.pts).toLocaleString()]].map(([l,v])=>`<div class="stat"><b>${v}</b>${l}</div>`).join('')}</div>
+  ${(()=>{const B={...(S.bdg||{}),...Object.fromEntries(Object.entries(S.bdgBest||{}).map(([k,v])=>[k,Math.max(v,(S.bdg||{})[k]||0)]))},gb=BADGES.filter(b=>B[b.id]>=3).sort((x,y)=>B[y.id]-B[x.id]);return gb.length?`<div class="sub" style="margin-top:8px">Best badges of your career</div><div style="margin-top:4px">${gb.slice(0,6).map(b=>`<span class="pill bpill t${B[b.id]}">${bMed(B[b.id])}${b.n}</span>`).join('')}</div>`:'';})()}
+  <div style="margin-top:8px">${top.map(([k,e,l])=>`<span class="pill gold">${e} ${g(k)}× ${l}</span>`).join('')||'<span class="muted">'+(c.seasons>=10?`No hardware, but ${c.seasons} seasons and ${Math.round(c.pts).toLocaleString()} points. A real career.`:S.retired==='Out of the league'?'No hardware. Out of the league, but you made it there.':'No hardware. You still made it to the league.')+'</span>'}</div>
+  <div class="sub" style="margin-top:6px">GOAT Score ${sc}${S.daily?` · 📅 Daily Build ${todayKey()}`:''}</div></div>`;}
+

@@ -1,0 +1,4 @@
+# The game sources and the built page are LF everywhere, so the build is byte-identical on every OS.
+index.html text eol=lf
+src/** text eol=lf
+tools/** text eol=lf
