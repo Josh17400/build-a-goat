@@ -19,8 +19,25 @@ function makeGoals(){if(S.stage!=='nba')return;const n=S.nba.length,last=S.nba[n
   const out=[],pickT=tr=>{const cs=G.filter(g=>g.tier===tr&&!out.some(x=>x.k===g.k));return cs.length?pick(cs):null;};
   for(const tr of[1,2,3]){const g=pickT(tr)||pickT(2)||pickT(1);if(g)out.push(g);}
   S.goals={yr:n+1,list:out};}
-function goalOk(g,st){switch(g.k){case'ppg':return st.ppg>=g.v;case'rpg':return st.rpg>=g.v;case'apg':return st.apg>=g.v;case'tp':return st.tp>=g.v&&st.gp>=50;case'gp':return st.gp>=g.v;
-  case'wins':return st.wins>=g.v;case'playoffs':return st.rounds>=0;case'round':return st.rounds>=g.v;case'champ':return st.champ;case'aw':return st.aw.includes(g.v);
-  case'allnba':return st.aw.some(x=>x.startsWith('All-NBA'));case'mvptop':return st.mvpRank!=null&&st.mvpRank<=g.v;case'scoring':return st.aw.includes('Scoring Title');case'roy':return st.aw.includes('ROY');
-  case'rvppg':return st.rvppg!=null&&st.ppg>st.rvppg;case'pts':return st.ptsAfter>=g.v;}return false;}
+// how each kind of season goal is judged against the season you just played. To add a kind of goal:
+// give it a check here and offer it in makeGoals.
+const GOAL_OK={
+  ppg:(g,st)=>st.ppg>=g.v,
+  rpg:(g,st)=>st.rpg>=g.v,
+  apg:(g,st)=>st.apg>=g.v,
+  tp:(g,st)=>st.tp>=g.v&&st.gp>=50,
+  gp:(g,st)=>st.gp>=g.v,
+  wins:(g,st)=>st.wins>=g.v,
+  playoffs:(g,st)=>st.rounds>=0,
+  round:(g,st)=>st.rounds>=g.v,
+  champ:(g,st)=>st.champ,
+  aw:(g,st)=>st.aw.includes(g.v),
+  allnba:(g,st)=>st.aw.some(x=>x.startsWith('All-NBA')),
+  mvptop:(g,st)=>st.mvpRank!=null&&st.mvpRank<=g.v,
+  scoring:(g,st)=>st.aw.includes('Scoring Title'),
+  roy:(g,st)=>st.aw.includes('ROY'),
+  rvppg:(g,st)=>st.rvppg!=null&&st.ppg>st.rvppg,
+  pts:(g,st)=>st.ptsAfter>=g.v,
+};
+function goalOk(g,st){const ok=GOAL_OK[g.k];return ok?ok(g,st):false;}
 
