@@ -11,10 +11,23 @@ const JEWEL=['None','Stud Earring','Hoop Earring','Chain','Studs + Chain'];
 const GUARD=['None','Clear','Black','Team Color'];
 const JERSEYS=[['Orange','#ff8a1f'],['Royal','#2b6cff'],['Red','#e63946'],['Teal','#2a9d8f'],['Purple','#7b3fb0'],['Gold','#e0a815'],['Green','#1f8a4c'],['Black','#1f1f1f'],['White','#f2f2f2'],['Navy','#1d2b57']];
 const TRIMS=[['White','#ffffff'],['Black','#111111'],['Gold','#f2c14e'],['Silver','#b9c2cc']];
-const JSTYLE=['Tank','Throwback Stripes','Shooting Shirt'];
-const LOOKS=[['skin','Skin',()=>SKINS.map(x=>x[0])],['hair','Hair',()=>HAIRS],['hc','Hair Color',()=>HAIRCOL.map(x=>x[0])],['fh','Facial Hair',()=>FACIAL],['face','Expression',()=>FACES],['head','Headwear',()=>HEADW],['arms','Arms',()=>ARMS],['jew','Jewelry',()=>JEWEL],['guard','Mouthguard',()=>GUARD],['jer','Jersey',()=>JERSEYS.map(x=>x[0])],['trim','Trim',()=>TRIMS.map(x=>x[0])],['js','Uniform',()=>JSTYLE]];
-function randLook(){const L={num:ri(0,99)};for(const[k,,o]of LOOKS)L[k]=ri(0,o().length-1);
-  if(R()<.45)L.fh=ri(0,1);if(R()<.55)L.head=0;if(R()<.7)L.guard=0;if(R()<.5)L.jew=0;if(R()<.4)L.arms=0;if(R()<.75)L.hc=ri(0,3);if(R()<.6)L.js=0;if(TRIMS[L.trim][0]===JERSEYS[L.jer][0])L.trim=(L.trim+1)%TRIMS.length;return L;}
+const JSTYLE=['Tank','Throwback Stripes','Shooting Shirt','Pinstripes','Side Panels','Sash'];
+// face features (2026-11). A look saved before these existed has none of them and draws as it always did:
+// each defaults to its first option. They are never rolled with the dice (see randLook).
+const FSHAPE=['Oval','Round','Square','Long','Heart','Strong Jaw'];
+const EYES=['Round','Almond','Wide','Hooded'];
+const EYECOL=[['Dark Brown','#3b2414'],['Brown','#6b4423'],['Hazel','#8a6a2f'],['Green','#3f7d4e'],['Blue','#3a6ea8'],['Gray','#6f7d8a']];
+const BROWS=['Classic','Thick','Thin','Slit'];
+const NOSES=['Classic','Wide','Button','Long','Round'];
+const MARKS=['None','Freckles','Beauty Mark','Brow Scar','Cheek Scar','Eye Black','Nose Strip','Bandage'];
+const LOOKS=[['skin','Skin',()=>SKINS.map(x=>x[0])],['hair','Hair',()=>HAIRS],['hc','Hair Color',()=>HAIRCOL.map(x=>x[0])],['fh','Facial Hair',()=>FACIAL],['face','Expression',()=>FACES],['head','Headwear',()=>HEADW],['arms','Arms',()=>ARMS],['jew','Jewelry',()=>JEWEL],['guard','Mouthguard',()=>GUARD],['jer','Jersey',()=>JERSEYS.map(x=>x[0])],['trim','Trim',()=>TRIMS.map(x=>x[0])],['js','Uniform',()=>JSTYLE],
+  ['fs','Face Shape',()=>FSHAPE,1],['ey','Eyes',()=>EYES,1],['ec','Eye Color',()=>EYECOL.map(x=>x[0]),1],['br','Brows',()=>BROWS,1],['no','Nose',()=>NOSES,1],['mk','Marks',()=>MARKS,1]];
+function randLook(){const L={num:ri(0,99)};for(const[k,,o,derived]of LOOKS)if(!derived)L[k]=ri(0,o().length-1);
+  if(R()<.45)L.fh=ri(0,1);if(R()<.55)L.head=0;if(R()<.7)L.guard=0;if(R()<.5)L.jew=0;if(R()<.4)L.arms=0;if(R()<.75)L.hc=ri(0,3);if(R()<.6)L.js=0;if(TRIMS[L.trim][0]===JERSEYS[L.jer][0])L.trim=(L.trim+1)%TRIMS.length;return faceFeatures(L);}
+// face features for a rolled look, from its own numbers (no dice). Most faces carry no mark, classic brows and dark eyes.
+function faceFeatures(L){const r=makeRng(seedFrom(LOOKS.filter(x=>!x[3]).map(x=>L[x[0]]).join('.')+'#'+L.num)),n=a=>Math.floor(r()*a.length);
+  L.fs=n(FSHAPE);L.ey=n(EYES);L.no=n(NOSES);L.ec=r()<.55?ri0(r,2):n(EYECOL);L.br=r()<.6?0:n(BROWS);L.mk=r()<.62?0:n(MARKS);return L;}
+const ri0=(r,k)=>Math.floor(r()*k);
 function cyc(k,d){const n=LOOKS.find(x=>x[0]===k)[2]().length;S.look[k]=((S.look[k]||0)+d+n)%n;render();}
 const hx6=h=>/^#[0-9a-f]{3}$/i.test(h)?'#'+[...h.slice(1)].map(c=>c+c).join(''):h; // '#fff' -> '#ffffff' so colour maths never misreads short hex
 function shade(hex,f){const n=parseInt(hx6(hex).slice(1),16),c=[n>>16,n>>8&255,n&255].map(v=>Math.round(clamp(f<0?v*(1+f):v+(255-v)*f,0,255)));return'#'+c.map(v=>v.toString(16).padStart(2,'0')).join('');}
@@ -25,6 +38,11 @@ function avatar(L,age,size,bg){size=size||90;if(L.face===3&&(L.head===4||L.head=
   const hc=hcLow?shade(hc0,-.45):hc0,hcD=shade(hc,-.32),hcL=shade(hc,.35);
   const jc=g(JERSEYS,L.jer)[1],tc=g(TRIMS,L.trim)[1],lightJ=['#f2f2f2','#e0a815','#ff8a1f'].includes(jc),st=g(HAIRS,L.hair),js=g(JSTYLE,L.js);
   const w=typeof S!=='undefined'&&S.frame==='Strong'?34:typeof S!=='undefined'&&S.frame==='Lean'?26:30,lx=60-w,rx=60+w;
+  // the face: the top half is the same for everyone (every hairstyle sits on it); the jaw and chin below the ears vary.
+  // Each shape is the right-hand jaw from the ear line (83,58) down to the chin, as cubic curves; the left side mirrors it.
+  const fsI=(L.fs||0)%FSHAPE.length,JAW=[null,[[83.7,71.6,74.6,83.5,60,83.5]],[[83.2,67.5,82.3,77,76,80.8],[72,83.4,66,84.7,60,84.7]],[[82.7,72.4,72.2,87.3,60,87.3]],[[82.6,69.4,73,80.2,65.4,84.2],[63.4,85.4,61.6,86,60,86]],[[84,70.5,81.6,80.4,73.6,83.6],[69.4,85.3,64.4,85.5,60,85.5]]][fsI];
+  const chinY=JAW?JAW[JAW.length-1][5]:84.5,jawR=JAW?JAW.map(s=>`C${s[0]} ${s[1]} ${s[2]} ${s[3]} ${s[4]} ${s[5]}`).join(' '):'',jawL=JAW?JAW.map((s,i)=>{const p=i?JAW[i-1]:[0,0,0,0,83,58];return`C${120-s[2]} ${s[3]} ${120-s[0]} ${s[1]} ${120-p[4]} ${p[5]}`;}).reverse().join(' '):'';
+  const faceD=JAW?`M37 58 A23 26.5 0 0 1 83 58 ${jawR} ${jawL}Z`:'M37 58 A23 26.5 0 0 1 83 58 A23 26.5 0 0 1 37 58Z';
   const cap=(y=40.5)=>`M37.3 57 C35 34 46 27 60 27 C74 27 85 34 82.7 57 C82 46 76 ${y} 60 ${y} C44 ${y} 38 46 37.3 57Z`;
   // shared hair helpers: mr() mirrors a left-side path (x -> 120-x); mix() blends two colours opaquely;
   // skull clip (#k) keeps fades/sideburns on the head; #lf is a vertical fade from the fade colour (y45) to clear (y56)
@@ -182,8 +200,14 @@ function avatar(L,age,size,bg){size=size||90;if(L.face===3&&(L.head===4||L.head=
   const bcol=Math.abs(lu(bc0)-lu(sk))>=.12?bc0:lu(sk)>.5?shade(bc0,-.4):shade(sk,-.55); // brows never melt into a same-tone skin
   const mc=sn>=4?shade(sk,-.6):'#5a2d22'; // mouth/lid line colour that always contrasts with the skin
   const browD=[[`M45 53 Q50 51 55 53`,`M65 53 Q70 51 75 53`],[`M45 52 Q50 47.5 55 51`,`M65 51 Q70 47.5 75 52`],[`M44.5 50.5 L55 54.5`,`M75.5 50.5 L65 54.5`],[`M45 52.5 Q50 51 55 52.5`,`M65 51 Q70 49 75 51.5`],[`M45 53 Q50 51.5 55 53`,`M65 50.5 Q70 46.5 75 50`],[`M44 50 L55 55`,`M76 50 L65 55`],[`M45 54 Q50 53 55 54.5`,`M65 51.5 Q70 48.5 75 51.5`]][f];
-  const brows=browD.map(d=>`<path d="${d}" stroke="${bcol}" stroke-width="2.8" stroke-linecap="round" fill="none"/>`).join('');
-  const eye=(x,ry)=>`<ellipse cx="${x}" cy="60" rx="4.4" ry="${ry}" fill="#fff"/><circle cx="${x+.4}" cy="60.3" r="2.4" fill="#3b2414"/><circle cx="${x+.4}" cy="60.3" r="1.2" fill="#0d0d0d"/><circle cx="${x+1.3}" cy="59.3" r=".8" fill="#fff"/>`;
+  const brI=(L.br||0)%BROWS.length,brW=[2.8,3.9,1.9,3][brI];
+  const brows=browD.map((d,i)=>`<path d="${d}" stroke="${bcol}" stroke-width="${brW}" stroke-linecap="round" fill="none"${brI===3&&i===1?' stroke-dasharray="5.6 4.4 20"':''}/>`).join('');
+  const eyI=(L.ey||0)%EYES.length,[erx,ery]=[[4.4,3.3],[5.1,2.6],[4.9,4.1],[4.6,3.3]][eyI],ecol=g(EYECOL,L.ec)[1],lidC=shade(sk,sn>=4?-.45:-.3);
+  // ry0 is the opening the expression asks for (3.3 open, 2.9 glaring); the eye shape scales it
+  const eye=(x,ry0)=>{const ry=+(ry0>3?ery:Math.min(3.3,ery*ry0/3.3)).toFixed(2),ir=+Math.min(eyI===2?2.6:2.4,ry-.25).toFixed(2),open=ry0>3;
+    return`<ellipse cx="${x}" cy="60" rx="${erx}" ry="${ry}" fill="#fff"/><circle cx="${x+.4}" cy="60.3" r="${ir}" fill="${ecol}"/><circle cx="${x+.4}" cy="60.3" r="${+(ir*.5).toFixed(2)}" fill="#0d0d0d"/><circle cx="${x+1.3}" cy="59.3" r=".8" fill="#fff"/>`
+      +(eyI===3&&open?`<path d="M${x-erx-.5} ${+(59.4-ry).toFixed(2)} H${x+erx+.5} V${+(60-ry*.3).toFixed(2)} Q${x} ${+(60-ry*.78).toFixed(2)} ${x-erx-.5} ${+(60-ry*.3).toFixed(2)}Z" fill="${sk}"/><path d="M${x-erx-.3} ${+(60-ry*.3).toFixed(2)} Q${x} ${+(60-ry*.78).toFixed(2)} ${x+erx+.3} ${+(60-ry*.3).toFixed(2)}" stroke="${mc}" stroke-width="1.1" fill="none" stroke-linecap="round"/>`
+        :open?`<path d="M${+(x-erx+.2).toFixed(2)} ${+(60-ry*.45).toFixed(2)} Q${x} ${+(59.1-ry*1.42).toFixed(2)} ${+(x+erx-.2).toFixed(2)} ${+(60-ry*.45).toFixed(2)}" stroke="${lidC}" stroke-width=".9" fill="none" stroke-linecap="round" opacity=".8"/>`:'');};
   const glint=`<path d="M44 57.5 L49 57.5 M66 57.5 L71 57.5" stroke="#fff" stroke-width="1.3" opacity=".5" stroke-linecap="round"/>`;
   const sunG=[4,5].includes((L.head||0)%HEADW.length)&&f===3; // "too cool" under goggles / face mask: tint their eye windows instead of stacking sunglasses inside them
   const angry=f===2||f===5,lid=angry?`<path d="M45.2 56.6 L54.9 56.6 L54.9 59.6 L45.6 57.6Z M74.8 56.6 L65.1 56.6 L65.1 59.6 L74.4 57.6Z" fill="${sk}"/><path d="M45.6 57.6 L54.4 59.4 M74.4 57.6 L65.6 59.4" stroke="${mc}" stroke-width="1.4" stroke-linecap="round"/>`:'';
@@ -191,6 +215,19 @@ function avatar(L,age,size,bg){size=size||90;if(L.face===3&&(L.head===4||L.head=
     :f===6?`<path d="M45.5 60.5 Q50 63 54.5 60.5 M45.5 60.5 l-1.4 -1" stroke="${mc}" stroke-width="2" fill="none" stroke-linecap="round"/>`+eye(70,3.3)
     :eye(50,angry?2.9:3.3)+eye(70,angry?2.9:3.3)+lid;
   const ln=(d,sw)=>`<path d="${d}" stroke="${mc}" stroke-width="${sw}" stroke-linecap="round" fill="none"/>`;
+  const noseD=['M60 62 Q57.2 69 59 70.6 Q61.5 71.6 64 69.8','M55.6 68.6 Q55.4 71.4 58.2 71 Q60 72.2 61.8 71 Q64.6 71.4 64.4 68.6','M57.6 69.2 Q60 71.8 62.4 69.2','M60.6 59.5 L59.2 69.4 Q60.4 71.6 63.6 70.2','M57 68.4 Q56.2 71.4 59.2 71 Q60 71.6 60.8 71 Q63.8 71.4 63 68.4 M59 64.5 Q58.4 67 58.6 68.4'][(L.no||0)%NOSES.length];
+  // marks sit on the skin, under facial hair and headwear
+  const mkI=(L.mk||0)%MARKS.length,scarC=shade(sk,sn>=4?.3:-.2),dot=(x,y,r)=>`<circle cx="${x}" cy="${y}" r="${r}"/>`;
+  const marks=['',
+    `<g fill="${shade(sk,-.3)}" opacity=".6">${[[44.5,66.5],[47,68.2],[49.6,66.8],[46,70.4],[51.2,69.2],[43.6,69.4],[75.5,66.5],[73,68.2],[70.4,66.8],[74,70.4],[68.8,69.2],[76.4,69.4],[57.4,66.2],[62.6,66.2],[60,64.6]].map(([x,y])=>dot(x,y,.62)).join('')}</g>`,
+    `<g fill="${shade(sk,-.62)}">${dot(69.6,72.2,.95)}</g>`,
+    `<path d="M46.8 48.8 L48.8 56.6" stroke="${scarC}" stroke-width="1.2" stroke-linecap="round"/>`,
+    `<path d="M71.6 65.6 L76.6 70.6 M73 64.9 L71.9 66.3 M75.3 67.2 L74.2 68.6 M77.4 69.4 L76.3 70.8" stroke="${scarC}" stroke-width="1.05" stroke-linecap="round" fill="none"/>`,
+    `<path d="M45.2 65.3 Q50 66.9 54.8 65.3 L54.3 67.6 Q50 69 45.7 67.6Z M65.2 65.3 Q70 66.9 74.8 65.3 L74.3 67.6 Q70 69 65.7 67.6Z" fill="#15161a" opacity=".93"/>`,
+    `<path d="M53.6 63 Q60 61.4 66.4 63 L66 66 Q60 64.5 54 66Z" fill="#efe6d4" stroke="${shade(sk,-.34)}" stroke-width=".6" stroke-linejoin="round"/><path d="M57.4 62.6 V65 M62.6 62.6 V65" stroke="#cbbfa8" stroke-width=".6"/>`,
+    `<g transform="rotate(-24 47.5 69.5)"><rect x="43" y="67.6" width="9" height="3.8" rx="1.7" fill="#ecc9a2" stroke="${shade('#ecc9a2',-.3)}" stroke-width=".5"/><rect x="45.9" y="67.9" width="3.2" height="3.2" rx=".6" fill="#dcb184"/></g>`][mkI];
+  // closed mouths get a soft shadow under the lower lip (not where a beard or mouthguard covers the chin)
+  const lipShade=[0,2,3,4,6].includes(f)&&[0,1,2,4].includes((L.fh||0)%FACIAL.length)?`<path d="M57.6 ${f===2?81.6:80.4} Q60 ${f===2?82.5:81.3} 62.4 ${f===2?81.6:80.4}" stroke="${shade(sk,sn>=5?-.3:-.16)}" stroke-width="1.1" fill="none" stroke-linecap="round" opacity=".5"/>`:'';
   const grinO='M49.5 72.5 Q60 86 70.5 72.5 Q60 75 49.5 72.5Z',fireO='M53 77 A7 5.5 0 1 0 67 77 A7 5.5 0 1 0 53 77Z';
   const mouths=[ln('M54 76 Q60 77.6 66 76',2.2),
     `<clipPath id="${id}m"><path d="${grinO}"/></clipPath><path d="${grinO}" fill="#5a1e1e"/><ellipse cx="60" cy="80.4" rx="6" ry="2.6" fill="#d9636b" clip-path="url(#${id}m)"/><path d="M51 73.2 Q60 75.6 69 73.2 L68.2 75.4 Q60 77.6 51.8 75.4Z" fill="#fff"/>`,
@@ -205,7 +242,7 @@ function avatar(L,age,size,bg){size=size||90;if(L.face===3&&(L.head===4||L.head=
   const gb=[76.4,76.5,76.8,76.4,76,75.6,77.2][f],gBand=c=>`<path d="M47 69 H73 V${gb} Q60 ${gb+.8} 47 ${gb}Z" fill="${c}" clip-path="url(#${id}g)"/>`;
   // on the small closed-mouth openings a dark inner rim shows parted lips above and below the band, so a coloured guard never reads as lipstick
   const gRim=[0,2,3,4].includes(f)?`<path d="${gO}" fill="none" stroke="#4a1414" stroke-width="1.6" stroke-linejoin="round" clip-path="url(#${id}g)"/>`:'';
-  const mouth=L.guard?`<clipPath id="${id}g"><path d="${gO}"/></clipPath><path d="${gO}" fill="#4a1414"/>${L.guard===1?gBand('#fff')+`<g opacity=".55">${gBand('#9fd8f5')}</g>`:gBand(gcol)}<g clip-path="url(#${id}g)"><path d="M47 ${gb-1.3} Q60 ${gb-.5} 73 ${gb-1.3}" stroke="#fff" stroke-width=".7" fill="none" opacity="${L.guard===1?0:.3}"/><path d="M53.2 70 V${gb-.2} M56.6 70 V${gb+.2} M60 70 V${gb+.4} M63.4 70 V${gb+.2} M66.8 70 V${gb-.2}" stroke="${L.guard===1?'#7fa9c2':shade(gcol,lu(gcol)<.2?.35:-.35)}" stroke-width=".55" opacity=".7"/></g>${gRim}<path d="${gO}" fill="none" stroke="${mc}" stroke-width="1.1" stroke-linejoin="round"/>`:mouths[f];
+  const mouth=L.guard?`<clipPath id="${id}g"><path d="${gO}"/></clipPath><path d="${gO}" fill="#4a1414"/>${L.guard===1?gBand('#fff')+`<g opacity=".55">${gBand('#9fd8f5')}</g>`:gBand(gcol)}<g clip-path="url(#${id}g)"><path d="M47 ${gb-1.3} Q60 ${gb-.5} 73 ${gb-1.3}" stroke="#fff" stroke-width=".7" fill="none" opacity="${L.guard===1?0:.3}"/><path d="M53.2 70 V${gb-.2} M56.6 70 V${gb+.2} M60 70 V${gb+.4} M63.4 70 V${gb+.2} M66.8 70 V${gb-.2}" stroke="${L.guard===1?'#7fa9c2':shade(gcol,lu(gcol)<.2?.35:-.35)}" stroke-width=".55" opacity=".7"/></g>${gRim}<path d="${gO}" fill="none" stroke="${mc}" stroke-width="1.1" stroke-linejoin="round"/>`:mouths[f]+lipShade;
   // facial hair (fills in naturally with age). Sideburns tuck under the hair cap, which is drawn later.
   let fh=L.fh||0;const autoStub=age>=31&&fh===0;if(autoStub)fh=1;const bald=st==='Bald',mUp=f===1||f===5; // dye stays on the head: beards keep a natural colour (same family as the brows)
   // facial hair never melts into a same-tone skin (brown beard on dark skin etc.): darken it until it separates, like the brows
@@ -323,6 +360,9 @@ function avatar(L,age,size,bg){size=size||90;if(L.face===3&&(L.head===4||L.head=
   const trims=shirt?`<path d="M${60-nw} 99 Q60 106 ${60+nw} 99" stroke="${tcE}" stroke-width="6.2" fill="none"/><path d="${pair(`M${sx} 100.9 C${lx+5} 105 ${lx-.4} 110 ${lx-.5} 121`)}" stroke="${shade(jc,-.22)}" stroke-width="2" fill="none"/>`
     :`<path d="${pair(`M${sx} 101 C${lx+8.6} 112 ${lx+5} 119 ${lx-.5} 120`)}" stroke="${tcE}" stroke-width="4.8" fill="none"/>`
     +(js==='Throwback Stripes'?`<path d="${pair(stripe(4.6))}" stroke="${tcE}" stroke-width="2.6" fill="none" stroke-linejoin="round"/><path d="${pair(stripe(8.2))}" stroke="${shade(jc,-.35)}" stroke-width="2" fill="none" stroke-linejoin="round"/>`:'')
+    +(js==='Pinstripes'?`<path d="${Array.from({length:Math.ceil((rx-lx)/4.4)+1},(_,i)=>`M${+(lx+1.2+i*4.4).toFixed(1)} 96 V140`).join(' ')}" stroke="${tcE}" stroke-width=".75" opacity=".6" fill="none"/>`:'')
+    +(js==='Side Panels'?`<path d="${pair(`M${lx-1} 119 C${lx+3} 119.4 ${lx+6.4} 117.6 ${lx+8.2} 114.6 L${lx+9.4} 140 L${lx-1} 140Z`)}" fill="${tcE}"/><path d="${pair(`M${lx+10.9} 116 L${lx+12} 140`)}" stroke="${shade(jc,-.3)}" stroke-width="1" fill="none"/>`:'')
+    +(js==='Sash'?`<path d="M${sx-2} 99 L${sx+9} 99 L${rx+1} 133 L${rx+1} 140 L${rx-7.5} 140Z" fill="${tcE}" opacity=".92"/><path d="M${sx+11.6} 99 L${rx+1} 129.6" stroke="${shade(jc,-.3)}" stroke-width="1.1" fill="none"/>`:'')
     +`<path d="M${n0} 98.5 Q${n0+4} 110 60 110 Q${n1-4} 110 ${n1} 98.5" stroke="${tcE}" stroke-width="4.8" fill="none"/>`;
   // arm gear (clipped to the arms). Under a shooting shirt it moves below the cuff.
   const gy=shirt?4.5:0,inkC=(L.skin||0)>=7?'#7f9cbd':(L.skin||0)>=6?'#6886aa':(L.skin||0)>=5?'#3a4b78':'#1d2433';
@@ -345,20 +385,20 @@ function avatar(L,age,size,bg){size=size||90;if(L.face===3&&(L.head===4||L.head=
     +`<path d="M60 ${103.4+pY} V${105.2+pY}" stroke="${ccD}" stroke-width="1.2"/><circle cx="60" cy="${107+pY*.6}" r="${fh===6?1.9:2.1}" fill="${cc}" stroke="${ccD}" stroke-width=".8"/><circle cx="59.3" cy="${106.3+pY*.6}" r=".6" fill="#fff" opacity=".7"/>`;
   const jewelry=['',stud,hoop,'',stud][jew];
   const bl=lum(jc),bgSvg=bg?`<rect width="120" height="140" rx="16" fill="url(#${id})"/><rect width="120" height="140" fill="url(#${id}sp)"/><circle cx="60" cy="58" r="44" fill="none" stroke="#fff" stroke-opacity=".07" stroke-width="6"/><g opacity=".16" fill="#fff">${[[14,18],[26,11],[96,14],[107,24],[19,33],[101,37],[9,48],[111,52]].map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="${i%3?0.9:1.3}"/>`).join('')}</g>`:'';
-  const defs=`<defs>${bg?`<radialGradient id="${id}" cx="50%" cy="38%" r="75%"><stop offset="0" stop-color="${shade(jc,bl<.22?.35:bl>.55?-.52:-.2)}"/><stop offset="1" stop-color="${shade(jc,bl<.22?-.15:-.72)}"/></radialGradient><clipPath id="${id}c"><rect width="120" height="140" rx="16"/></clipPath><radialGradient id="${id}sp" cx="50%" cy="-8%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".55" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><linearGradient id="${id}vg" x1="0" y1="0" x2="0" y2="1"><stop offset=".62" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".38"/></linearGradient>`:''}<linearGradient id="${id}jf" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".24"/><stop offset=".3" stop-color="#fff" stop-opacity=".07"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".26"/></linearGradient><clipPath id="${id}a"><path d="${pair(armO)}"/></clipPath><clipPath id="${id}j"><path d="${jersey}"/></clipPath><clipPath id="${id}k"><ellipse cx="60" cy="58" rx="23" ry="26.5"/></clipPath><clipPath id="${id}h"><ellipse cx="60" cy="57.5" rx="23.8" ry="27.4"/></clipPath><linearGradient id="${id}lf" gradientUnits="userSpaceOnUse" x1="0" y1="45" x2="0" y2="56"><stop offset="0" stop-color="${fadeC}"/><stop offset="1" stop-color="${fadeC}" stop-opacity="0"/></linearGradient></defs>`;
+  const defs=`<defs>${bg?`<radialGradient id="${id}" cx="50%" cy="38%" r="75%"><stop offset="0" stop-color="${shade(jc,bl<.22?.35:bl>.55?-.52:-.2)}"/><stop offset="1" stop-color="${shade(jc,bl<.22?-.15:-.72)}"/></radialGradient><clipPath id="${id}c"><rect width="120" height="140" rx="16"/></clipPath><radialGradient id="${id}sp" cx="50%" cy="-8%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".55" stop-color="#fff" stop-opacity=".05"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><linearGradient id="${id}vg" x1="0" y1="0" x2="0" y2="1"><stop offset=".62" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".38"/></linearGradient>`:''}<linearGradient id="${id}jf" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#000" stop-opacity=".24"/><stop offset=".3" stop-color="#fff" stop-opacity=".07"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".26"/></linearGradient><clipPath id="${id}a"><path d="${pair(armO)}"/></clipPath><clipPath id="${id}j"><path d="${jersey}"/></clipPath><clipPath id="${id}k"><path d="${faceD}"/></clipPath><clipPath id="${id}h"><ellipse cx="60" cy="57.5" rx="23.8" ry="27.4"/></clipPath><linearGradient id="${id}lf" gradientUnits="userSpaceOnUse" x1="0" y1="45" x2="0" y2="56"><stop offset="0" stop-color="${fadeC}"/><stop offset="1" stop-color="${fadeC}" stop-opacity="0"/></linearGradient></defs>`;
   // brows: under goggles they are lifted clear of the frame and drawn beneath it; under the clear mask they are drawn beneath the shell (tinted by it),
   // and the mouth goes under the mask too so its rim stays on top
   const browsL=hw===4?`<g transform="translate(0,${angry?-3.2:-2.2})">${brows}</g>`:hw===5&&angry?`<g transform="translate(0,-1)">${brows}</g>`:brows;
   const numF=lightJ?'#151515':'#ffffff',numS=Math.abs(lum(tcE)-lum(numF))<.25?jc:tcE;
   return`<svg viewBox="0 0 120 140" width="${size}" height="${Math.round(size*140/120)}" style="flex:none">${defs}${bgSvg}${bg?`<g clip-path="url(#${id}c)">`:''}${back}
-  <path d="${pair(arm)}" fill="${sk}"/><g clip-path="url(#${id}a)">${armGear}</g>${shirtSleeves}
+  <path d="${pair(arm)}" fill="${sk}"/><path d="${pair(`M${lx+3.4} 106.5 C${lx-1.4} 110 ${lx-3.8} 115 ${lx-4.4} 121.5`)}" stroke="${shade(sk,-.2)}" stroke-width="1.2" fill="none" stroke-linecap="round" opacity=".6"/><g clip-path="url(#${id}a)">${armGear}</g>${shirtSleeves}
   ${shirt?'':`<path d="${vHole}" fill="${shade(sk,-.12)}" stroke="${shade(sk,-.12)}" stroke-width="1.6" stroke-linejoin="round"/>`}<path d="${pair(trap)}" fill="${sk}"/>
   <path d="${jersey}" fill="${jc}"/><g clip-path="url(#${id}j)">${trims}<rect x="0" y="70" width="120" height="70" fill="url(#${id}jf)"/></g>
   <text x="60" y="134" font-size="19" font-weight="800" text-anchor="middle" fill="${numF}" font-family="'Barlow Condensed','Bebas Neue',system-ui,sans-serif" letter-spacing=".5" stroke="${numS}" stroke-width="1.1" stroke-linejoin="round" paint-order="stroke">${L.num}</text>
   ${mid}${ninTails}<path d="${neck}" fill="${sk}"/><path d="M${60-nw} 78 L${60+nw} 78 L${60+nw} 88 Q60 96 ${60-nw} 88Z" fill="#000" opacity=".14"/>${jew>=3?chain:''}
   <ellipse cx="37" cy="61" rx="4.6" ry="7" fill="${sk}"/><ellipse cx="37.5" cy="61" rx="2.2" ry="4" fill="${skD}" opacity=".6"/><ellipse cx="83" cy="61" rx="4.6" ry="7" fill="${sk}"/><ellipse cx="82.5" cy="61" rx="2.2" ry="4" fill="${skD}" opacity=".6"/>
-  <ellipse cx="60" cy="58" rx="23" ry="26.5" fill="${sk}"/>
-  <path d="M60 31.5 C75 31.5 83 44 83 58 C83 74 74 84.5 60 84.5 C72 79 79 69 79.5 58 C80 45 73 35 60 31.5Z" fill="#000" opacity=".07"/><ellipse cx="52" cy="47" rx="9" ry="6" fill="#fff" opacity="${sn>=5?.07:.1}"/><path d="M81.6 52 C82.6 58 82.2 66 79.4 72" stroke="#fff" stroke-opacity=".14" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+  <path d="${faceD}" fill="${sk}"/>
+  <path d="M60 31.5 H96 V96 H60 V${chinY} C72 ${chinY-5.5} 79 69 79.5 58 C80 45 73 35 60 31.5Z" fill="#000" opacity=".07" clip-path="url(#${id}k)"/><ellipse cx="52" cy="47" rx="9" ry="6" fill="#fff" opacity="${sn>=5?.07:.1}"/><path d="M81.6 52 C82.6 58 82.2 66 79.4 72" stroke="#fff" stroke-opacity=".14" stroke-width="1.4" fill="none" stroke-linecap="round"/>
   <ellipse cx="46" cy="70" rx="4" ry="2.4" fill="${sn>=5?'#b3263a':'#ff7a7a'}" opacity="${sn>=5?.2:.13}"/><ellipse cx="74" cy="70" rx="4" ry="2.4" fill="${sn>=5?'#b3263a':'#ff7a7a'}" opacity="${sn>=5?.2:.13}"/>
-  ${wrinkles}<path d="M60 62 Q57.2 69 59 70.6 Q61.5 71.6 64 69.8" stroke="${shade(sk,sn>=5?-.38:-.2)}" stroke-width="1.6" fill="none" stroke-linecap="round"/>${facial}${st==='Mullet'&&hw>=4?browsL+hair:hair+(hw<4?head:'')+browsL}${eyes}${hw===5?mouth:''}${hw>=4?head:''}${jewelry}
+  ${wrinkles}<path d="${noseD}" stroke="${shade(sk,sn>=5?-.38:-.2)}" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>${marks}${facial}${st==='Mullet'&&hw>=4?browsL+hair:hair+(hw<4?head:'')+browsL}${eyes}${hw===5?mouth:''}${hw>=4?head:''}${jewelry}
   ${hw===5?'':mouth}${bg?`<rect width="120" height="140" fill="url(#${id}vg)"/></g><rect x=".5" y=".5" width="119" height="139" rx="15.5" fill="none" stroke="#fff" stroke-opacity=".1"/>`:''}</svg>`;}

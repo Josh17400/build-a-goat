@@ -11,7 +11,7 @@ const { ROOT, page, gameScript, runGame } = require('./lib/headless.cjs');
 const HTML = path.join(ROOT, 'index.html');
 // Appended to the game's script: hands the tests the top-level names they need (a `const` is not a
 // property of the page's global object).
-const EXPORTS = ';globalThis.__g={Store,Plat,UI,gems,addGems,setGems,gear,gtpBank,setGtp,hallList,hallAdd,achHave,canSave,noAds,grantNoAds,bookGet,getS,SV};';
+const EXPORTS = ';globalThis.__g={Store,Plat,UI,gems,addGems,setGems,gear,gtpBank,setGtp,hallList,hallAdd,achHave,canSave,noAds,grantNoAds,bookGet,getS,SV,avatar,randLook,faceFeatures,LOOKS,setDice:f=>{R=f;}};';
 
 const tests = [];
 const test = (name, fn) => tests.push([name, fn]);
@@ -206,6 +206,50 @@ test('iOS: after a purge, boot restores progress from the native copy', async ()
   eq(g.noAds(), true, 'Remove Ads survives the purge');
   eq(pg.store.get('bag_run'), undefined, 'a run in the blob is not restored');
   eq(pg.store.get('other'), undefined);
+});
+
+test('looks: a look saved before face features existed draws the same as the defaults', () => {
+  const { g } = boot();
+  const old = { num: 7, skin: 2, hair: 3, hc: 1, fh: 5, face: 1, head: 1, arms: 2, jew: 1, guard: 0, jer: 4, trim: 1, js: 1 };
+  const now = { ...old, fs: 0, ey: 0, ec: 0, br: 0, no: 0, mk: 0 };
+  const same = (a, b) => a.replace(/av\d+/g, 'av') === b.replace(/av\d+/g, 'av');
+  ok(same(g.avatar(old, 24, 90, 1), g.avatar(now, 24, 90, 1)), 'missing features mean the first option of each');
+  ok(!same(g.avatar(old, 24, 90, 1), g.avatar({ ...now, fs: 2 }, 24, 90, 1)), 'a face shape changes the drawing');
+});
+
+test('looks: a random look rolls the same dice as before and derives its face features from them', () => {
+  const { g } = boot();
+  let rolls = 0;
+  const dice = (seed) => { let a = seed; return () => { rolls++; a = (a * 1664525 + 1013904223) >>> 0; return a / 4294967296; }; };
+  g.setDice(dice(5));
+  const one = g.randLook();
+  const used = rolls;
+  g.setDice(dice(5));
+  const two = g.randLook();
+  eq(one, two, 'the same dice give the same look, features included');
+  const rolled = g.LOOKS.filter((x) => !x[3]).length, derived = g.LOOKS.filter((x) => x[3]).map((x) => x[0]);
+  eq(derived, ['fs', 'ey', 'ec', 'br', 'no', 'mk']);
+  ok(used <= 1 + rolled + 12, 'no dice are spent on the derived features (' + used + ' rolls for ' + rolled + ' rolled options)');
+  for (const k of derived) ok(Number.isInteger(one[k]) && one[k] >= 0, k + ' is set');
+  eq(g.faceFeatures({ ...one }), one, 'deriving again changes nothing');
+});
+
+test('looks: every option draws, and no combination produces a broken drawing', () => {
+  const { g } = boot();
+  const counts = Object.fromEntries(g.LOOKS.map(([k, , o]) => [k, o().length]));
+  const check = (L, age, why) => {
+    const svg = g.avatar(L, age, 90, 1);
+    ok(svg.startsWith('<svg') && svg.endsWith('</svg>'), 'an svg for ' + why);
+    const bad = /NaN|undefined|null|Infinity/.exec(svg);
+    ok(!bad, why + ' contains "' + (bad && bad[0]) + '"');
+  };
+  const base = { num: 23, skin: 3, hair: 1, hc: 0, fh: 0, face: 0, head: 0, arms: 0, jew: 0, guard: 0, jer: 1, trim: 0, js: 0 };
+  for (const [k, n] of Object.entries(counts)) for (let v = 0; v < n; v++) for (const age of [14, 24, 39]) check({ ...base, [k]: v }, age, k + '=' + v + ' at ' + age);
+  let a = 99;
+  g.setDice(() => { a = (a * 1664525 + 1013904223) >>> 0; return a / 4294967296; });
+  const seen = Object.fromEntries(Object.keys(counts).map((k) => [k, new Set()]));
+  for (let i = 0; i < 1500; i++) { const L = g.randLook(); check(L, 14 + (i % 28), 'random look ' + i); for (const k in seen) seen[k].add(L[k]); }
+  for (const k of ['fs', 'ey', 'ec', 'br', 'no', 'mk', 'js']) eq(seen[k].size, counts[k], 'random looks reach every ' + k + ' option');
 });
 
 (async () => {
