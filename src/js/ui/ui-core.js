@@ -2,7 +2,6 @@
 const app=document.getElementById('app');
 function act(fn,...a){if((fn===choose||fn===chooseSummer)&&!document.documentElement.classList.contains('wt')&&performance.now()-(UI().seqT||0)<500)return;fn(...a);if(fn===choose&&UI().auto&&!UI().seq)autoStep();else render();}
 const UI=()=>S.ui||(S.ui={tab:'setup',open:null,spend:false});
-const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 // every emoji in the game's text is swapped for a custom icon when a screen is drawn
 const EMO_RE=/(?:\p{Extended_Pictographic}|[←-⇿⌀-⏿■-◿☀-➿⬀-⯿])(?:️|‍(?:\p{Extended_Pictographic}|[☀-➿]))*️?/gu;
 function emo(m){if(typeof EMOJI_ICON==='undefined')return m;const v=EMOJI_ICON[m.replace(/️/g,'')]||EMOJI_ICON[m];if(!v)return'';const[nm,cls]=Array.isArray(v)?v:[v,''];return icon(nm,'ici '+(cls||''));}

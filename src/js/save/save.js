@@ -34,18 +34,18 @@ const LOGGED=['simHS','simCol','simNBA','chooseSummer','chooseSchool','declare',
 for(const n of LOGGED){const f=globalThis[n];if(typeof f!=='function')continue;
   globalThis[n]=function(...a){if(REPLAY||LOGD||!S.seed||S.stage==='build')return f.apply(this,a);LOGD++;let r;try{r=f.apply(this,a);}finally{LOGD--;}try{afterAction(n,a);}catch(e){console.warn(e);}return r;};}
 {const f=globalThis.startCareer;if(typeof f==='function')globalThis.startCareer=function(...a){const r=f.apply(this,a);if(!REPLAY&&canSave()){clearRun();writeSnap();}return r;};}
-function resumeRun(){const meta=runMeta();let snap=null,lg=null;try{snap=JSON.parse(teamRename(Store.get(SV.snap))||'null',(k,v)=>v&&typeof v==='object'&&Array.isArray(v.__set)?new Set(v.__set):v);lg=Store.json(SV.log);}catch{}
-  if(!meta||!snap){clearRun();render();return false;}
-  const rend=render;render=()=>{};REPLAY=true;
+function loadRun(){const meta=runMeta();let snap=null,lg=null;try{snap=JSON.parse(teamRename(Store.get(SV.snap))||'null',(k,v)=>v&&typeof v==='object'&&Array.isArray(v.__set)?new Set(v.__set):v);lg=Store.json(SV.log);}catch{}
+  if(!meta||!snap){clearRun();return false;}
+  REPLAY=true;
   try{S=Object.assign(newPlayer(),snap);if(S.rival&&S.rival.__ref!=null)S.rival=(S.L&&S.L.P.find(p=>p.id===S.rival.__ref))||null;
     convertRun(meta);R=makeRng(meta.rs);RUNID=meta.id;RUNLOG=[];
     if(lg&&lg.id===meta.id)for(const e of lg.log){try{globalThis[e[0]](...e.slice(1));RUNLOG.push(e);}catch(err){console.warn('replay stopped at',e[0],err);break;}}}
-  finally{REPLAY=false;render=rend;}
+  finally{REPLAY=false;}
   const ui=Store.json(SV.ui);
-  S.ui=Object.assign({tab:'setup',open:null,spend:false},ui||{},{menu:null,wig:1});writeLog();render();scrollTo(0,0);return true;}
+  S.ui=Object.assign({tab:'setup',open:null,spend:false},ui||{},{menu:null,wig:1});writeLog();return true;}
 // leave a run without losing it: back to a fresh build screen, with the run waiting on Continue
-function quitRun(){if(S.stage!=='build'&&S.stage!=='end'&&canSave())lsSet(SV.ui,JSON.stringify(Object.assign({},S.ui,{menu:null})));R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,wig:1};render();scrollTo(0,0);}
+function leaveRun(){if(S.stage!=='build'&&S.stage!=='end'&&canSave())lsSet(SV.ui,JSON.stringify(Object.assign({},S.ui,{menu:null})));R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,wig:1};}
 // on launch: put a half-finished build back, and point to a saved run if there is one
 function bootSave(){if(!canSave())return;try{const b=Store.json(SV.build);if(b&&b.stage==='build'){S=Object.assign(newPlayer(),b);seedNewSkills(S.attrs,true);S.ui=Object.assign({tab:'setup',open:null,spend:false},b.ui||{},{menu:null,replaceOk:0});}}catch{}
-  if(hasRun())UI().tab='setup';}
+  if(hasRun())(S.ui=S.ui||{tab:'setup',open:null,spend:false}).tab='setup';}
 const SAVE_KEYS=['bag_gtp','bag_ach','bag_hof','bag_recent','bag_daily','bag_diff','bag_rec','bag_goats','bag_gems','bag_gear','bag_intro'];

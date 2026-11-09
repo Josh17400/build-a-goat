@@ -1,5 +1,5 @@
 // ---------- college ----------
-function chooseSchool(i){const o=S.offers[i];o.perk[2]();S.school=o.name;S.tier=o.tier;S.teamStr=TIER[o.tier].str;S.stage='college';render();}
+function enroll(i){const o=S.offers[i];o.perk[2]();S.school=o.name;S.tier=o.tier;S.teamStr=TIER[o.tier].str;S.stage='college';}
 function draftAge(){return 18+S.col.length;}
 function scoutGrade(){const ab={18:9,19:7,20:4,21:1,22:-2,23:-5,24:-7}[draftAge()]??-7;
   return ovr()+ab+(eff('ath')-60)*.08+(S.height-ARCHS[archetype().id].h)*.6+clamp(S.hype,-20,60)*.12+(S.traits.star-3)*.6+clamp(eraValue()*.15,-2,2);}
@@ -22,8 +22,8 @@ function simCol(){syncPos();S.clsStart=clsSnap();S.colNext=false;S.lastResult=nu
   S.hype=Math.max(0,S.hype);const hm=S.hurt?.6:1,hurtTxt=S.hurt?` · ${ri(3,8)} games (injured)`:'';S.hurt=0;
   S.banned=false;S.col.push({bdg:bch,st:{ppg:ppg*hm,rpg:rpg*hm,apg:apg*hm,spg:spg*hm,bpg:bpg*hm},title:`${YR[y]} at ${S.school} · age ${S.age}`,line:`${f1(ppg*hm)} PPG · ${f1(rpg*hm)} RPG · ${f1(apg*hm)} APG · ${f1(spg*hm)} SPG · ${f1(bpg*hm)} BPG · ${wins}-${losses} · ${mm}${hurtTxt}`,ev,acc,proj:projRange()});
   const maxY=S.redshirt?5:4;if(S.col.length>=maxY)S.mustDeclare=true;}
-function declare(){S.lastResult=null;S.summerNote=null;S.projD=projRange();S.combine=runCombine();const miss=gauss()*2.5,g=scoutGrade()+miss+S.combine.adj;S.scoutMiss=gauss()*5;S.ceiling+=gauss()*4-S.scoutMiss*.5;S.scoutAtDraft=g;S.pick=pickFor(g);S.ovrAtDraft=OV();
-  S.age=draftAge();leagueDraft();S.stage='draft';render();}
-function startNBA(){S.stage='nba';UI().spMsg=null;makeGoals();render();scrollTo(0,0);}
-function returnSchool(){S.summerPend=summerCol();S.colNext=true;render();}
+function enterDraft(){S.lastResult=null;S.summerNote=null;S.projD=projRange();S.combine=runCombine();const miss=gauss()*2.5,g=scoutGrade()+miss+S.combine.adj;S.scoutMiss=gauss()*5;S.ceiling+=gauss()*4-S.scoutMiss*.5;S.scoutAtDraft=g;S.pick=pickFor(g);S.ovrAtDraft=OV();
+  S.age=draftAge();leagueDraft();S.stage='draft';}
+function turnPro(){S.stage='nba';makeGoals();}
+function stayInSchool(){S.summerPend=summerCol();S.colNext=true;}
 

@@ -8,8 +8,8 @@ const ARCH=[
   ['🐻 Post Bully','PF',81,'Strong',{post:3,hook:2.5,str:3,close:2,fade:1,oreb:2,dreb:2,intD:1.5}]];
 function fillPoints(pk){for(const k of SUBKEYS)S.attrs[k]=MIN_A;let g=0,miss=0;
   while(g++<6000&&miss<60){const k=pk();if(S.attrs[k]>=BUILD_MAX){miss++;continue;}if(spent()+cost(S.attrs[k])>START_BUDGET){miss++;continue;}S.attrs[k]++;miss=0;}}
-function applyArch(i){const[l,pos,h,fr,w]=ARCH[i],keys=Object.keys(w),tot=keys.reduce((s,k)=>s+w[k],0);S.arch=l;
-  fillPoints(()=>{if(R()<.22)return pick(SUBKEYS);let r=R()*tot;for(const k of keys){r-=w[k];if(r<=0)return k;}return keys[0];});render();}
-function randomBuild(){S.arch=null;fillPoints(()=>pick(SUBKEYS));
-  const T=TRAITS.map(t=>t[0]);S.picked=[T.splice(ri(0,T.length-1),1)[0],T.splice(ri(0,T.length-1),1)[0]];if(!S.name)S.name=pick(FIRST)+' '+pick(LAST);render();}
+function fillArch(i){const[l,pos,h,fr,w]=ARCH[i],keys=Object.keys(w),tot=keys.reduce((s,k)=>s+w[k],0);S.arch=l;
+  fillPoints(()=>{if(R()<.22)return pick(SUBKEYS);let r=R()*tot;for(const k of keys){r-=w[k];if(r<=0)return k;}return keys[0];});}
+function fillRandom(){S.arch=null;fillPoints(()=>pick(SUBKEYS));
+  const T=TRAITS.map(t=>t[0]);S.picked=[T.splice(ri(0,T.length-1),1)[0],T.splice(ri(0,T.length-1),1)[0]];if(!S.name)S.name=pick(FIRST)+' '+pick(LAST);}
 

@@ -41,6 +41,7 @@
   "ui/gear-shop.js",
   "ui/legacy-cards.js",
   "ui/career-cards.js",
+  "ui/actions.js",
   "ui/league-screens.js",
   "ui/icons.js",
   "ui/ui-core.js",

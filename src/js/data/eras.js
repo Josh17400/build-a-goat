@@ -15,5 +15,5 @@ const onlineEra=()=>['10s','20s','30s'].includes(S.era);
 // era taste: what teams of this era pay for. Changes interest (draft buzz, free agency), never OVR
 function eraValue(){const w=era().w,o=ovr();let v=0;for(const c in w)v+=w[c]*(eff(c)-o);return v;}
 const eraWants=()=>Object.entries(era().w).sort((a,b)=>b[1]-a[1])[0][0],catName=c=>ATTRS.find(x=>x[0]===c)[1];
-function spinEra(){if(S.spins<=0||S.daily)return;S.spins--;S.spunEra=true;let e;do e=pick(ERAS).id;while(e===S.era);S.era=e;render();}
+function rollEra(){if(S.spins<=0||S.daily)return;S.spins--;S.spunEra=true;let e;do e=pick(ERAS).id;while(e===S.era);S.era=e;return true;}
 

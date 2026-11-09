@@ -29,15 +29,15 @@ const PERKS_GTP=[
   ['spin','🎰 Era re-spins','+2 era re-spins. Use them before high school: unused ones don’t carry over',5,1]];
 const cartCost=()=>S.stage==='build'?perkCost():0;
 const perkCost=()=>PERKS_GTP.reduce((s,[k,,,c])=>s+c*((S.perks&&S.perks[k])||0),0);
-function buyPerk(k,d){if(S.daily)return;S.perks=S.perks||{};const p=PERKS_GTP.find(x=>x[0]===k),n=(S.perks[k]||0)+d;
+function setPerk(k,d){if(S.daily)return;S.perks=S.perks||{};const p=PERKS_GTP.find(x=>x[0]===k),n=(S.perks[k]||0)+d;
   if(n<0||n>p[4])return;if(d>0&&perkCost()+p[3]>gtpBank())return;if(k==='spin'&&d<0&&S.spunEra)return;S.perks[k]=n;
   if(k==='spin')S.spins=Math.max(0,S.spins+2*d);
   if(k==='trait3'&&n===0&&S.picked.length>2)S.picked.length=2;
   if(k==='growth'&&n===0)S.height=Math.min(S.height,H_MAX);
-  trimToBudget();render();}
+  trimToBudget();return true;}
 function trimToBudget(){let g=0;while(spent()>START_BUDGET&&g++<2000){const k=SUBKEYS.reduce((a,b)=>S.attrs[b]>S.attrs[a]?b:a);S.attrs[k]--;}}
 const savedDiff=()=>Store.get('bag_diff')||'pro';
-function setDiff(d){if(S.daily||S.stage!=='build')return;S.diff=d;Store.set('bag_diff',d);trimToBudget();render();}
+function chooseDiff(d){if(S.daily||S.stage!=='build')return;S.diff=d;Store.set('bag_diff',d);trimToBudget();return true;}
 const traitLimit=()=>S.perks&&S.perks.trait3?3:2;
 // every NBA city, with a nickname that is close to but not the real one. Order matters: CONF() puts the first 15 in the East
 const TEAMS=['Atlanta Talons','Boston Clovers','Brooklyn Bridges','Charlotte Stingers','Chicago Bison','Cleveland Cavalry','Detroit Motors','Indiana Speedsters','Miami Blaze','Milwaukee Stags','New York Skyliners','Orlando Illusions','Philadelphia Founders','Toronto Dinos','Washington Warlocks','Dallas Wranglers','Denver Prospectors','Golden State Gladiators','Houston Orbiters','Los Angeles Schooners','Los Angeles Lagoons','Memphis Kodiaks','Minnesota Howlers','New Orleans Herons','Oklahoma City Twisters','Phoenix Scorch','Portland Pathfinders','Sacramento Crowns','San Antonio Rustlers','Utah Rhythm'];

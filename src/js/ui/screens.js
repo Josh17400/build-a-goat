@@ -1,6 +1,6 @@
 // ---------- screens ----------
 // drawing a screen must never use the career dice, or a saved run could not be rebuilt exactly
-function render(){syncPos();{const u=UI(),pk=(S.pend?S.pend.title:'')+'|'+(S.summerPend?S.summerPend.title:'');if(u.pendKey!==pk){u.pendKey=pk;u.seqT=performance.now();}}const r0=R;R=Math.random;try{drawScreen();}finally{R=r0;}miniStage();autosave();}
+function render(){if(REPLAY)return;syncPos();{const u=UI(),pk=(S.pend?S.pend.title:'')+'|'+(S.summerPend?S.summerPend.title:'');if(u.pendKey!==pk){u.pendKey=pk;u.seqT=performance.now();}}const r0=R;R=Math.random;try{drawScreen();}finally{R=r0;}miniStage();autosave();}
 // the creator's preview card shrinks once you scroll into the options, so it never hides the grid
 function miniStage(){const st=typeof document!=='undefined'&&document.querySelector('.lookcard .stage');if(!st)return;const pin=st.getBoundingClientRect().top<=parseFloat(getComputedStyle(st).top||'64')+1;const on=st.classList.contains('mini'),want=on?(pin&&(window.scrollY||0)>60):(pin&&(window.scrollY||0)>120);if(want===on)return;const h0=st.offsetHeight;st.classList.toggle('mini',want);st.style.marginBottom=want?(10+h0-st.offsetHeight)+'px':'';}
 if(typeof addEventListener==='function')addEventListener('scroll',miniStage,{passive:true});

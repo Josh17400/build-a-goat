@@ -1,4 +1,5 @@
 // ---------- the side menu and its pages ----------
+document.addEventListener('keydown',e=>{if(e.key!=='Escape'||typeof S==='undefined'||!S.ui)return;const u=S.ui;if(u.menu==='open')closeMenu();else if(u.menu)openMenu(null);else if(u.intro!=null)endIntro();else if(u.prof)closeProfile();});
 const MENU=[['settings','sliders','Settings','Difficulty, sound and reset'],['gtp','gtp','GTP Store','Perks for your next player'],['gear','shirt','Equipment','Permanent gear for every player'],['hof','🏛️','Hall of Builds','Your best careers'],['ach','trophy','Achievements','What you have unlocked'],['bbook','medal','Badge Book','Every badge you have earned']];
 // the Gem Shop item exists only while the store is on (iOS app with RevenueCat, or ?dev=1); see PLATFORM (Plat)
 const MENU_GEMS=['gems','gem','Gem Shop','Buy gems and Remove Ads'];

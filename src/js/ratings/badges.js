@@ -60,18 +60,10 @@ function badgeFx(){const o={};for(const k in BCAP)o[k]=0;const B=S.bdg||{};for(c
 const FXL={pts:['PPG',1],fg:['FG%',1],tp:['3P%',1],ft:['FT%',1],reb:['Rebounds',2],ast:['Assists',2],stl:['Steals',2],blk:['Blocks',2],tov:['Turnovers',3],min:['Minutes',1],dp:['DPOY votes',0],as:['All-Star votes',0],team:['Team strength',0],var:['Steadier seasons',4]};
 function fxText(fx,t){return Object.entries(fx).map(([k,v])=>{const[l,m]=FXL[k],x=v*t;return m===1?`${l} +${f1(x)}`:m===2?`${l} +${Math.round(x*100)}%`:m===3?`${l} −${Math.round(x*100)}%`:m===4?`${l}`:`${l} up`;}).join(' · ');}
 function badgeLines(ch){return ch.map(([id,h,t])=>{const n=BADGE[id].n;return t>h?(h?`🏅 ${n} upgraded to ${BTN[t]}`:`🏅 New badge: ${BTN[t]} ${n}`):`📉 ${S.stage==='nba'&&S.age>=30?'Age is catching up: ':''}${t?`${n} drops from ${BTN[h]} to ${BTN[t]}`:`${n} fades away`}`;});}
-// spending can cross a line: the badge comes right away, with a toast (never during a replay or a headless run)
-function spendBadges(){if(!seasonsPlayed())return;const ch=updBadges('up');if(ch.length&&!REPLAY&&typeof document!=='undefined'&&document.body&&!document.documentElement.classList.contains('wt')&&typeof platToast==='function')platToast(badgeLines(ch).join(' · '));}
 // the Badge Book: the best tier you have ever reached on each badge, across careers (shown on every difficulty, pays nothing)
 function bookGet(){return Store.obj('bag_bbook');}
 function bookSave(){if(!Store.ok())return;const k=bookGet();let c=0;for(const id in S.bdg||{})if((k[id]||0)<S.bdg[id]){k[id]=S.bdg[id];c=1;}if(c)Store.setJson('bag_bbook',k);}
 const bookCount=()=>Object.keys(bookGet()).length;
-// next badge line for one skill: the closest tier this skill feeds (shown on skill rows when it is within reach)
-// a pair badge rates at most 6 above its weaker skill: name that skill when it is the one holding the badge back
-function badgeWeak(b){const v=b.sk.map(k=>Array.isArray(k)?k.reduce((m,x)=>es(x)>es(m)?x:m):k),av=v.reduce((s,k)=>s+Math.round(es(k)),0)/v.length,w=v.reduce((m,k)=>es(k)<es(m)?k:m);return Math.round(es(w))+6<av?w:null;}
-function badgeHint(k){let best=null;const c=S.stage==='build'?2:bCap(),B=S.bdg||{};
-  for(const b of BADGES){if(!b.sk.some(x=>Array.isArray(x)?x.includes(k):x===k))continue;const r=badgeRating(b);if(r==null)continue;const t=Math.max(B[b.id]||0,tierFor(r));if(t>=c)continue;const gap=BT[t]-r;if(gap<=6&&(!best||gap<best[1]))best=[b,gap,t+1];}
-  return best?`<small class="bh">${bMed(best[2])}<span><b>${BTN[best[2]]} ${best[0].n}</b> at ${BT[best[2]-1]}${best[0].sk.length>1?' avg':''} · ${Math.max(1,Math.ceil(best[1]))} to go${(()=>{const w=badgeWeak(best[0]);return w&&w!==k?(atCap(w)?` · ${SKN[w]} is maxed`:` · raise ${SKN[w]}`):'';})()}${best[2]>=3&&best[2]>ovrCap()?` · needs ${best[2]>=4?80:70} OVR`:''}</span></small>`:'';}
 
 
 

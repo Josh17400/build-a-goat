@@ -9,7 +9,6 @@ const GEAR_BOOST=[0,2,4,6],GEAR_COST=[20,50,100],GEAR_LV=['Bronze','Silver','Gol
 const gems=()=>+Store.get('bag_gems')||0;
 const setGems=n=>Store.set('bag_gems',n),addGems=n=>setGems(gems()+n);
 const gear=()=>Store.obj('bag_gear');
-function buyGear(k){const g=gear(),lv=g[k]||0;if(lv>=3||gems()<GEAR_COST[lv])return;if(setGems(gems()-GEAR_COST[lv])){g[k]=lv+1;Store.setJson('bag_gear',g);}render();}
+function upgradeGear(k){const g=gear(),lv=g[k]||0;if(lv>=3||gems()<GEAR_COST[lv])return;if(setGems(gems()-GEAR_COST[lv])){g[k]=lv+1;Store.setJson('bag_gear',g);}return true;}
 function gearNote(){if(S.daily)return null;const g=gear(),on=GEAR.filter(x=>g[x[0]]).map(x=>`${x[1]} +${GEAR_BOOST[g[x[0]]]} ${x[4].map(k=>SKN[k]).join(' & ')}`);return on.length?{ok:true,n:1,text:`🎽 Your equipment is on: ${on.join(' · ')}`}:null;}
 function wearGear(){if(S.daily)return;const g=gear();for(const[k,,,,ks]of GEAR)for(const a of ks)S.attrs[a]=Math.min(99,S.attrs[a]+GEAR_BOOST[g[k]||0]);}
-document.addEventListener('keydown',e=>{if(e.key!=='Escape'||typeof S==='undefined'||!S.ui)return;const u=S.ui;if(u.menu==='open')closeMenu();else if(u.menu)openMenu(null);else if(u.intro!=null)endIntro();else if(u.prof)closeProfile();});
