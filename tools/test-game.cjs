@@ -11,7 +11,7 @@ const { ROOT, page, gameScript, runGame } = require('./lib/headless.cjs');
 const HTML = path.join(ROOT, 'index.html');
 // Appended to the game's script: hands the tests the top-level names they need (a `const` is not a
 // property of the page's global object).
-const EXPORTS = ';globalThis.__g={Store,Plat,UI,gems,addGems,setGems,gear,gtpBank,setGtp,hallList,hallAdd,achHave,canSave,noAds,grantNoAds,bookGet,getS,SV,avatar,randLook,faceFeatures,LOOKS,setDice:f=>{R=f;}};';
+const EXPORTS = ';globalThis.__g={Store,Plat,UI,gems,addGems,setGems,gear,gtpBank,setGtp,hallList,hallAdd,achHave,canSave,noAds,grantNoAds,bookGet,getS,SV,avatar,randLook,faceFeatures,LOOKS,HAIRS,HAIR_TOP,setDice:f=>{R=f;}};';
 
 const tests = [];
 const test = (name, fn) => tests.push([name, fn]);
@@ -250,6 +250,20 @@ test('looks: every option draws, and no combination produces a broken drawing', 
   const seen = Object.fromEntries(Object.keys(counts).map((k) => [k, new Set()]));
   for (let i = 0; i < 1500; i++) { const L = g.randLook(); check(L, 14 + (i % 28), 'random look ' + i); for (const k in seen) seen[k].add(L[k]); }
   for (const k of ['fs', 'ey', 'ec', 'br', 'no', 'mk', 'js']) eq(seen[k].size, counts[k], 'random looks reach every ' + k + ' option');
+});
+
+test('looks: on a card every hairstyle is scaled to fill it without its hair leaving the top', () => {
+  const { g } = boot();
+  const base = { num: 23, skin: 3, hc: 0, fh: 0, face: 0, head: 0, arms: 0, jew: 0, guard: 0, jer: 1, trim: 0, js: 0 };
+  g.HAIRS.forEach((name, hair) => {
+    ok(typeof g.HAIR_TOP[name] === 'number', 'HAIR_TOP has no entry for "' + name + '" (measure its top and add it)');
+    const m = /transform="matrix\(([0-9.]+) 0 0 [0-9.]+ /.exec(g.avatar({ ...base, hair }, 24, 90, 1));
+    ok(m, name + ': the card scales its figure');
+    const fit = +m[1], top = 140 - (140 - g.HAIR_TOP[name]) * fit;
+    ok(fit >= 1 && fit <= 1.14, name + ': scale ' + fit + ' is between 1 and 1.14');
+    ok(top >= -1.5, name + ': the hair top lands at ' + top.toFixed(1) + ', inside the card');
+    ok(!/transform="matrix/.test(g.avatar({ ...base, hair }, 24, 90, 0)), name + ': without a card nothing is scaled (the creator crops depend on it)');
+  });
 });
 
 (async () => {
