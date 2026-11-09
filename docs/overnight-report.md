@@ -657,14 +657,15 @@ You asked for two things: any build can reach 99, and players start low and clim
 ### What changed
 - **Any style can reach 99.** OVR is now the better of two ratings: the old all-around rating, and a new core rating built on your style's 7 most important skills. Get those 7 to 99 and the rest of your game to about 72, and you are a 99 in that style. This holds for all 13 styles, and a test checks it. Below the top, nothing changes.
 - **Your style can change as you spend.** OVR rates you at your best-fitting style. Lean into new skills and the label follows once you have a clear edge, with a message when it happens.
-- **You start at 25.** Every skill starts at 25 (it was 40), so you are a 25 before you place a point. Budgets are now 350 (Rookie), 310 (Pro) and 260 (Hall of Fame), which puts average starts at about 50, 45 and 40.
+- **You start at 25.** Every skill starts at 25 (it was 40), so you are a 25 before you place a point. Budgets are now 365 (Rookie), 310 (Pro) and 260 (Hall of Fame), which puts average starts at about 50, 45 and 40.
+- **Rookie is tougher (evening change).** Smart Rookie players were winning GOAT 33% of the time. The Rookie league is now stronger (`lg` -8 → -1) and the growth head start is smaller (7.5 → 3), so smart Rookie lands at 9.4% and casual at 1.8%. 8% of casual Rookie players go undrafted, against 10% on Pro. The Rookie description now says great careers are "within reach" instead of "common".
 - **The climb makes up the gap.** The hidden ceiling sits higher, and high school and college add a share of the lower start each season. By the draft, players are back where they were on the old build.
 - **The projection card has a Road to 99 note.** It lists your 7 core skills with their current values, marks the ones that are as high as they go ("max"), and shows where the rest of your game stands against the 72 bar. Once your core is maxed, it tells you to raise the rest.
 
 ### GOAT odds (sims, 2,500 careers each)
 | Difficulty | Casual | Smart | Target |
 |---|---|---|---|
-| Rookie | 9.1% | 33% | ~9–10% casual |
+| Rookie | 1.8% | 9.4% | ~10% smart (changed Nov 8 evening) |
 | Pro | 0.4% | 4.9% | ~1% / 4.3–5% |
 | Hall of Fame | 0.2% | 2.0% | ~0.5% / 2–2.5% |
 
