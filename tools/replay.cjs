@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 // Replay check: plays a fixed set of seeded careers through the built index.html, headless, and
 // fingerprints everything the game produced: every screen's HTML after every action, the full game
-// state at the end of each career, and everything it wrote to storage. Every few steps it also
+// state at the end of each career, and everything it wrote to storage. It plays through the real
+// buttons (creator tabs, the season story, profile tabs, menus, Next Decision, Whole Career), and
+// every few steps it also
 // fingerprints the save and reopens the run from it, so saving and loading are part of the replay.
 //
 // A change that is meant to leave the game's behaviour alone (a refactor, a move between files) must
@@ -12,7 +14,7 @@
 //   node tools/replay.cjs --check      exit 1 if it differs from tools/replay.digest.json
 //   node tools/replay.cjs --save       record the current fingerprint in tools/replay.digest.json
 //   node tools/replay.cjs --dump DIR   also write each career's end state and last screen to DIR
-//   Options: --careers N (per difficulty, default 12)   --html FILE (default ../index.html)
+//   Options: --careers N (per difficulty, default 8)   --html FILE (default ../index.html)
 //
 // How it stays exact: the page's script runs unmodified in a Node vm with a stand-in page (below),
 // Math.random is a seeded generator (the game seeds its career dice from it), the clock is frozen, and
@@ -37,7 +39,7 @@ function fail(msg) {
 }
 
 function args() {
-  const a = process.argv.slice(2), o = { careers: 12, html: path.join(ROOT, 'index.html'), mode: 'print', dump: null };
+  const a = process.argv.slice(2), o = { careers: 8, html: path.join(ROOT, 'index.html'), mode: 'print', dump: null };
   for (let i = 0; i < a.length; i++) {
     if (a[i] === '--check') o.mode = 'check';
     else if (a[i] === '--save') o.mode = 'save';
@@ -134,6 +136,10 @@ function page(screens) {
 const HARNESS = String.raw`
 ;(function replayHarness(){
   const io=globalThis.__io, DIFFS_ORDER=['pro','hof','rookie'];
+  const PROFILE=['over','skills','badges','stats','time','traits'], MENUS=()=>menuAll().map(m=>m[0]).filter(k=>k!=='how'&&k!=='prof');
+  localStorage.setItem('bag_intro','1');                       // the first-run intro would cover every screen
+  // every screen a player can open from where they are: the profile's tabs and each menu page
+  const tour=()=>{if(S.stage!=='build'){for(const t of PROFILE)openProfile(t);closeProfile();}openMenu('open');closeMenu();for(const k of MENUS()){openMenu(k);closeMenu();}};
   for(let n=0;n<io.careers;n++)for(let d=0;d<DIFFS_ORDER.length;d++){
     const diffKey=DIFFS_ORDER[d], seed=1000+n*3+d, pc=io.rng(seed*104729+17), pi=k=>Math.floor(pc()*k);
     Math.random=io.rng(seed*7919+1);
@@ -141,21 +147,32 @@ const HARNESS = String.raw`
     // two builds in three are a premade; the third is placed by hand, one tap at a time
     if(n%3<2)applyArch(pi(ARCH.length));
     else{S.height=H_MIN+pi(H_MAX-H_MIN+1);S.frame=Object.keys(FRAMES)[pi(Object.keys(FRAMES).length)];let g=0;while(g++<900&&spent()<START_BUDGET){const k=SUBKEYS[pi(SUBKEYS.length)];pc()<.3?adjN(k,10):adj(k,1);}}
+    for(const t of ['body','look','skills','traits','setup'])goTab(t);
     const T=TRAITS.map(t=>t[0]);toggleTrait(T.splice(pi(T.length),1)[0]);toggleTrait(T.splice(pi(T.length),1)[0]);
-    render();startCareer();render();
+    if(n===0)tour();
+    startCareer();render();
+    const spendSome=()=>{if(S.bank>0&&pc()<.4)spend(SUBKEYS[pi(SUBKEYS.length)],1+pi(3));else if(S.bank>0&&pc()<.7)smartSpend();};
     let steps=0;
-    for(;steps<400&&S.stage!=='end';steps++){const st=S.stage;
-      if(st==='hs'){if(S.summerPend)chooseSummer(pi(S.summerPend.opts.length));else if(S.bank>0&&pc()<.34)spend(SUBKEYS[pi(SUBKEYS.length)],1+pi(3));else if(S.bank>40&&pc()<.5)smartSpend();else simHS();}
+    for(;steps<900&&S.stage!=='end';steps++){const st=S.stage,q=UI().seq;
+      // a season's story is open: read it card by card (sometimes skip), choosing and spending where it asks
+      if(q){const k=q.k[q.i];
+        if(k==='summer'&&S.summerPend)chooseSummer(pi(S.summerPend.opts.length));
+        else if(k==='decision'&&S.pend)choose(pi(S.pend.opts.length));
+        else{if(k==='spend')spendSome();pc()<.12?seqSkip():seqNext();}}
+      else if(st==='hs'){if(S.summerPend)chooseSummer(pi(S.summerPend.opts.length));else if(S.bank>0&&pc()<.5)spendSome();else playSeason(simHS);}
       else if(st==='offers')chooseSchool(pi(S.offers.length));
-      else if(st==='college'){if(S.summerPend)chooseSummer(pi(S.summerPend.opts.length));else if(!S.col.length)simCol();else if(S.mustDeclare||pc()<.4)declare();else returnSchool();}
+      else if(st==='college'){if(S.summerPend)chooseSummer(pi(S.summerPend.opts.length));else if(!S.col.length)playSeason(simCol);else if(S.mustDeclare||pc()<.4)declare();else returnSchool();}
       else if(st==='draft')startNBA();
-      else if(st==='nba'){if(S.pend)choose(pi(S.pend.opts.length));else if(S.bank>0&&pc()<.3)spend(SUBKEYS[pi(SUBKEYS.length)],1+pi(3));else if(S.bank>0&&pc()<.6)smartSpend();else simNBA();}
+      else if(st==='nba'){if(S.pend)choose(pi(S.pend.opts.length));else if(S.bank>0&&pc()<.5)spendSome();else if(pc()<.08)simAll();else if(pc()<.05)wholeCareer();else playSeason(simNBA);}
       else throw new Error('replay: unknown stage '+st);
       render();
+      if(steps%23===11&&!UI().seq&&!S.pend&&!S.summerPend)tour();
       // every few steps: fingerprint what is saved right now, then close and reopen the run from that save
       if(steps%7===3&&S.stage!=='end'){io.mark();resumeRun();render();}
     }
-    if(S.stage!=='end')throw new Error('replay: career '+diffKey+' #'+seed+' did not end in 400 steps (stage '+S.stage+')');
+    if(S.stage!=='end')throw new Error('replay: career '+diffKey+' #'+seed+' did not end in 900 steps (stage '+S.stage+')');
+    // the ending: read the last season's story to the plaque, then every screen once more
+    let g=0;while(UI().seq&&g++<30){seqNext();}render();tour();
     const c=career();
     io.done({diff:diffKey,seed,steps,tier:tierOf(goatScore(c),c)[0],goatScore:goatScore(c),career:c,state:S});
   }
