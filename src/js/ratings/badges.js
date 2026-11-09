@@ -63,8 +63,8 @@ function badgeLines(ch){return ch.map(([id,h,t])=>{const n=BADGE[id].n;return t>
 // spending can cross a line: the badge comes right away, with a toast (never during a replay or a headless run)
 function spendBadges(){if(!seasonsPlayed())return;const ch=updBadges('up');if(ch.length&&!REPLAY&&typeof document!=='undefined'&&document.body&&!document.documentElement.classList.contains('wt')&&typeof platToast==='function')platToast(badgeLines(ch).join(' · '));}
 // the Badge Book: the best tier you have ever reached on each badge, across careers (shown on every difficulty, pays nothing)
-function bookGet(){try{return JSON.parse(localStorage.getItem('bag_bbook')||'{}');}catch{return{};}}
-function bookSave(){if(typeof localStorage==='undefined')return;const k=bookGet();let c=0;for(const id in S.bdg||{})if((k[id]||0)<S.bdg[id]){k[id]=S.bdg[id];c=1;}if(c)try{localStorage.setItem('bag_bbook',JSON.stringify(k));}catch{}}
+function bookGet(){return Store.obj('bag_bbook');}
+function bookSave(){if(!Store.ok())return;const k=bookGet();let c=0;for(const id in S.bdg||{})if((k[id]||0)<S.bdg[id]){k[id]=S.bdg[id];c=1;}if(c)Store.setJson('bag_bbook',k);}
 const bookCount=()=>Object.keys(bookGet()).length;
 const bMed=t=>`<span class="bmed t${t}" title="${BTN[t]}">${icon('medal')}</span>`;
 const skNames=b=>b.sk.map(k=>Array.isArray(k)?k.map(x=>SKN[x]).join(' or '):SKN[k]).join(' + ')+(b.h?` · ${b.h[1]>=99?ht(b.h[0])+' and up':ht(b.h[0])+' to '+ht(b.h[1])}`:'');

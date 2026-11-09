@@ -48,7 +48,7 @@ jobs:
         run: npm ci
 
       - name: Check index.html is what src/ builds, test the native shell, check the game's scripts
-        run: node tools/build.cjs --check && node native/test_shell.cjs && node native/check_game.cjs
+        run: node tools/build.cjs --check && node tools/test-game.cjs && node native/test_shell.cjs && node native/check_game.cjs
 
       - name: Build web assets (index.html + capacitor.js + shell.js + fonts -> native/www)
         working-directory: native

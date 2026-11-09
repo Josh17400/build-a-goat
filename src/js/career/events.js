@@ -77,7 +77,9 @@ function injuryCol(){const r=R()*(1+(3-S.traits.dur)*.15);
   if(r>.9){S.injuryProne=true;S.ceiling-=3;S.attrs.speed=Math.max(MIN_A,S.attrs.speed-5);S.attrs.vert=Math.max(MIN_A,S.attrs.vert-5);S.hype-=8;S.hurt=1;S.redshirt=true;return[-1,`🚑 ${capF(pick(INJ.major))} — you are out for most of the year. You get a medical redshirt (extra year of eligibility)`];}
   S.hype-=3;addBank(-1);return[-1,`🤕 ${capF(pick(INJ.mod))} — you miss a month. -3 pts`];}
 function shortNote(t){if(!S.bankShort)return t;const lost=(+((t.match(/-(\d+) pts/)||[0,0])[1]))-S.bankShort;S.bankShort=0;return t+(lost>0?` (you only had ${lost} pts left, the rest came out of your skills)`:' (no bonus points left, so it cost you skill instead)');}
-const RECENT=()=>{try{return JSON.parse(localStorage.getItem('bag_recent')||'[]');}catch{return[];}};
+const RECENT=()=>Store.list('bag_recent');
+// after a career: remember which events and moments it showed, so the next careers lead with fresh ones
+function rememberSeen(){try{const rec=[...Object.keys(S.seenE||{}),...(S.seenF||[]),...RECENT()];Store.setJson('bag_recent',[...new Set(rec)].slice(0,70));}catch{}}
 function roll(list,avoid){S.seenE=S.seenE||{};S.recent=S.recent||new Set(RECENT());const key=i=>list.length+':'+i,wt=(e,i)=>e.w<=0||S.lastEv===key(i)||(avoid&&e.tag===avoid)?0:Math.max(.5,e.w)/(S.seenE[key(i)]?60:1)/(S.recent.has(key(i))?2.5:1);
   const tot=list.reduce((s,e,i)=>s+wt(e,i),0);let r=R()*tot;for(const[i,e]of list.entries()){const w=wt(e,i);if(!w)continue;r-=w;if(r<=0){S.lastEv=key(i);S.lastTag=e.tag;S.seenE[key(i)]=(S.seenE[key(i)]||0)+1;S.bankShort=0;const out=e.f();out[1]=shortNote(out[1]);return out;}}return list[0].f();}
 

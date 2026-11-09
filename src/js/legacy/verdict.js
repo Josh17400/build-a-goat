@@ -22,12 +22,16 @@ function tierOf(sc,c){const avgMin=c.gp?c.min/c.gp:0,AS=c.cnt['All-Star']||0,RG=
   if(c.seasons>=5)return['Role Player','You carved out a career. Locker room guy.'];
   return S.pick>14?['Journeyman',S.pick>=61?'Undrafted, and the league never found a spot for you.':'You bounced around but never stuck.']:['Bust','It just never clicked.'];}
 const GOAT_LINE=350;
-function goatStd(){try{return JSON.parse(localStorage.getItem('bag_rec')||'{}')[S.diff]||null;}catch{return null;}}
+function goatStd(){return Store.obj('bag_rec')[S.diff]||null;}
+function setGoatStd(score,name){const all=Store.obj('bag_rec');all[S.diff]={score,name};Store.setJson('bag_rec',all);}
+// the Hall of Builds: your 15 best careers on this device
+const hallList=()=>Store.list('bag_hof');
+function hallAdd(run){const h=hallList();h.push(run);h.sort((a,b)=>b.score-a.score);Store.setJson('bag_hof',h.slice(0,15));}
 function finish(){const c=career(),sc=goatScore(c),[t]=tierOf(sc,c);
-  S.gemsRun=S.daily?0:Math.round((GEM_TIER[t]||3)*(GEM_MULT[S.diff]??1));if(S.gemsRun)try{localStorage.setItem('bag_gems',gems()+S.gemsRun);}catch{}
-  if(!S.daily&&t.includes('GOAT')){immortalize(c,sc);const r=goatStd();if(!r||sc>r.score){S.newStd={prev:r};try{const all=JSON.parse(localStorage.getItem('bag_rec')||'{}');all[S.diff]={score:sc,name:S.name};localStorage.setItem('bag_rec',JSON.stringify(all));}catch{}earnGtp(r?40:20,r?'Broke the GOAT standard':'Set the GOAT standard');}}
-  const hof=JSON.parse(localStorage.getItem('bag_hof')||'[]');hof.push({hl:highlights(true).slice(0,2),diff:S.diff,name:S.name,pos:S.pos,arch:archName(),bd:Object.keys(S.bdg||{}).length,score:sc,tier:t,pick:S.pick,ppg:c.gp?c.pts/c.gp:0,rings:c.cnt['Champion']||0,mvp:c.cnt['MVP']||0,date:Date.now()});
-  hof.sort((a,b)=>b.score-a.score);localStorage.setItem('bag_hof',JSON.stringify(hof.slice(0,15)));S.newAch=S.diff==='rookie'?[]:checkAch(c,sc,t);earnGtp(GTP_TIER[t]||0,'Career: '+t);S.gtpRun=Math.round(S.gtpRun||0);setGtp(gtpBank()+S.gtpRun);try{const rec=[...Object.keys(S.seenE||{}),...(S.seenF||[]),...RECENT()];localStorage.setItem('bag_recent',JSON.stringify([...new Set(rec)].slice(0,70)));}catch{}
-  if(S.daily){const runs=dailyBest();runs.push({name:S.name,score:sc,tier:t});runs.sort((a,b)=>b.score-a.score);localStorage.setItem('bag_daily',JSON.stringify({date:todayKey(),runs:runs.slice(0,10)}));}
+  S.gemsRun=S.daily?0:Math.round((GEM_TIER[t]||3)*(GEM_MULT[S.diff]??1));if(S.gemsRun)addGems(S.gemsRun);
+  if(!S.daily&&t.includes('GOAT')){immortalize(c,sc);const r=goatStd();if(!r||sc>r.score){S.newStd={prev:r};setGoatStd(sc,S.name);earnGtp(r?40:20,r?'Broke the GOAT standard':'Set the GOAT standard');}}
+  hallAdd({hl:highlights(true).slice(0,2),diff:S.diff,name:S.name,pos:S.pos,arch:archName(),bd:Object.keys(S.bdg||{}).length,score:sc,tier:t,pick:S.pick,ppg:c.gp?c.pts/c.gp:0,rings:c.cnt['Champion']||0,mvp:c.cnt['MVP']||0,date:Date.now()});
+  S.newAch=S.diff==='rookie'?[]:checkAch(c,sc,t);earnGtp(GTP_TIER[t]||0,'Career: '+t);S.gtpRun=Math.round(S.gtpRun||0);setGtp(gtpBank()+S.gtpRun);rememberSeen();
+  if(S.daily){const runs=dailyBest();runs.push({name:S.name,score:sc,tier:t});runs.sort((a,b)=>b.score-a.score);Store.setJson('bag_daily',{date:todayKey(),runs:runs.slice(0,10)});}
   S.stage='end';}
 

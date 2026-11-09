@@ -36,5 +36,6 @@ const ACH=[
   ['bcol','🏅 Badge Collector','Hold 10 badges at once',()=>(S.bdgMax||0)>=10],
   ['bplat','💠 Platinum Club','Reach Platinum on any badge',()=>!!S.bdgPlat],
   ['bfull','📖 Full Badge Book','Discover every badge across your careers',()=>bookCount()>=BADGES.length]];
-function checkAch(c,sc,t){const have=JSON.parse(localStorage.getItem('bag_ach')||'{}'),now=[];
-  for(const[id,,,f]of ACH)if(!have[id]&&f(c,sc,t)){have[id]=Date.now();now.push(id);}localStorage.setItem('bag_ach',JSON.stringify(have));return now;}
+const achHave=()=>Store.obj('bag_ach'); // {id: when it was earned}
+function checkAch(c,sc,t){const have=achHave(),now=[];
+  for(const[id,,,f]of ACH)if(!have[id]&&f(c,sc,t)){have[id]=Date.now();now.push(id);}Store.setJson('bag_ach',have);return now;}

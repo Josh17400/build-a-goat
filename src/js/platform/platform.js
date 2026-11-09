@@ -5,7 +5,7 @@
 // The iOS app (native/, Capacitor 8) loads native/shell.js before this script; window.Shell is the device side over the plugins
 // (@capacitor-community/admob, @revenuecat/purchases-capacitor, preferences, app, splash-screen). Plat never calls a plugin itself.
 // Under Witness (globalThis.__witnessApi, html.wt) Plat does nothing. See native/README.md.
-//   Plat.boot()                  once at startup: restores the native copy of the progress keys if iOS purged localStorage, hands
+//   Plat.boot()                  once at startup: restores the native copy of the progress keys if iOS purged web storage, hands
 //                                PLAT_IDS to Shell.configure (ATT, consent, ad preload, RevenueCat), shows the banner unless Remove
 //                                Ads is owned, re-reads owned purchases, then lifts the launch splash
 //   Plat.ad() -> Promise<bool>   a rewarded video, true only when the reward was earned
@@ -32,7 +32,7 @@ const SHOP_PACKS=[{sku:'bag_gems_t1',gems:40,usd:1.99},{sku:'bag_gems_t2',gems:1
   {sku:'bag_gems_t5',gems:1500,usd:49.99,tag:'Best value'}];
 const SHOP_NOADS={sku:'bag_noads',usd:3.99};
 const SHOP_SKUS=()=>[...SHOP_PACKS.map(p=>p.sku),SHOP_NOADS.sku];
-const noAds=()=>{try{return localStorage.getItem('bag_noads')==='1';}catch{return false;}};
+const noAds=()=>Store.get('bag_noads')==='1';
 const Plat=(()=>{let busy=false,booted=null,mt=null;
   const sh=()=>window.Shell&&window.Shell.native?window.Shell:null;
   const wt=()=>!!globalThis.__witnessApi;
@@ -41,15 +41,14 @@ const Plat=(()=>{let busy=false,booted=null,mt=null;
   // the soundtrack pauses under a full-screen ad
   const hush=on=>{try{const m=SND.M;if(!m||!m.el)return;if(on)m.el.pause();else if(SND.P.music&&!document.hidden)m.el.play().catch(()=>{});}catch(e){}};
   const sim=what=>new Promise(r=>setTimeout(()=>r(confirm('[dev] '+what+'\nOK = it worked, Cancel = cancelled')),30));
-  // native save mirror: iOS can purge a WKWebView's localStorage, so the progress keys (gems, gear, GTP, achievements, Hall of Builds,
+  // native save mirror: iOS can purge a WKWebView's web storage, so the progress keys (gems, gear, GTP, achievements, Hall of Builds,
   // Remove Ads...) are copied as one JSON blob to Capacitor Preferences (Shell.store). The in-progress run snapshot is not mirrored.
   const NKEY='bag_all',MIRROR=k=>typeof k==='string'&&/^bag_/.test(k)&&!/^bag_(run|build|all)/.test(k);
-  function snapshot(){const o={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(MIRROR(k))o[k]=localStorage.getItem(k);}}catch(e){}return JSON.stringify(o);}
-  function mirrorNow(){clearTimeout(mt);mt=null;const s=sh();if(!s)return;const j=snapshot();try{localStorage.setItem(NKEY,j);}catch(e){}s.store.put(NKEY,j);}
+  function snapshot(){const o={};for(const k of Store.keys())if(MIRROR(k))o[k]=Store.get(k);return JSON.stringify(o);}
+  function mirrorNow(){clearTimeout(mt);mt=null;const s=sh();if(!s)return;const j=snapshot();Store.set(NKEY,j);s.store.put(NKEY,j);}
   const mirror=()=>{if(!mt)mt=setTimeout(mirrorNow,400);};
-  function watchStorage(){try{const SP=Storage.prototype,set=SP.setItem,rm=SP.removeItem;
-    SP.setItem=function(k,v){set.call(this,k,v);if(this===localStorage&&MIRROR(k))mirror();};
-    SP.removeItem=function(k){rm.call(this,k);if(this===localStorage&&MIRROR(k))mirror();};}catch(e){}}
+  // every write the game makes goes through Store, which reports it here
+  function watchStorage(){Store.onChange(k=>{if(MIRROR(k))mirror();});}
   // #adStrip is the dark backing under the native banner (and the home-indicator strip below it)
   function setBanner(h){const r=document.documentElement;let el=document.getElementById('adStrip');
     if(!el){el=document.createElement('div');el.id='adStrip';el.setAttribute('aria-hidden','true');document.body.appendChild(el);}
@@ -63,7 +62,7 @@ const Plat=(()=>{let busy=false,booted=null,mt=null;
     boot(){if(booted)return booted;const s=sh();if(wt())return booted=Promise.resolve();if(!s){P.banner();return booted=Promise.resolve();}
       watchStorage();s.app.onState(on=>{if(!on)mirrorNow();});
       return booted=s.store.hydrate(NKEY).then(j=>{if(!j)return;let o=null;try{o=JSON.parse(j);}catch(e){}if(!o)return;
-          for(const k in o)if(MIRROR(k))try{localStorage.setItem(k,o[k]);}catch(e){}S=newPlayer();bootSave();render();})
+          for(const k in o)if(MIRROR(k))Store.set(k,o[k]);S=newPlayer();bootSave();render();})
         .catch(()=>{}).then(()=>{
           s.configure({rewarded:live()?PLAT_IDS.rewarded:PLAT_IDS.testRewarded,banner:live()?PLAT_IDS.banner:PLAT_IDS.testBanner,
             rcKey:PLAT_IDS.rcKey,products:SHOP_SKUS(),nonConsumables:[SHOP_NOADS.sku]});
@@ -84,15 +83,15 @@ function storeOn(){try{return Plat.iapOn();}catch(e){return false;}}
 // gems -> GTP: ~0.5-0.6 GTP per gem. A Pro career pays ~23 GTP (median 19) and ~6.6 gems (600 simulated careers), so the
 // $1.99 pack (40 gems) buys about one career's worth of GTP, and a full set of perks (~370 GTP) costs ~600+ gems.
 const GEM_TRADES=[[20,10],[50,28],[100,60]];
-function tradeGems(i){const t=GEM_TRADES[i];if(!t||gems()<t[0])return;try{localStorage.setItem('bag_gems',gems()-t[0]);}catch{}setGtp(gtpBank()+t[1]);UI().tradeMsg=`+${t[1]} GTP for ${t[0]} gems`;render();}
+function tradeGems(i){const t=GEM_TRADES[i];if(!t||gems()<t[0])return;addGems(-t[0]);setGtp(gtpBank()+t[1]);UI().tradeMsg=`+${t[1]} GTP for ${t[0]} gems`;render();}
 function gemTradeCard(){const n=gems(),u=UI();
   return`<div class="card"><div class="sh">${icon('gem')} <span class="grow">Trade gems for GTP</span><b class="gold">${n} gems</b></div><div class="sub">Short on GTP for a perk? Swap some gems. GTP is spent on perks for one player; gems buy permanent gear.</div>
   ${GEM_TRADES.map(([g,p],i)=>`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><span class="bub">🪙</span><div class="grow"><b>+${p} GTP</b></div><button class="sm" aria-label="Trade ${g} gems for ${p} GTP" onclick="tradeGems(${i})" ${n<g?'disabled':''}>${g} gems</button></div>`).join('')}
   ${u.tradeMsg?`<div class="ev good" style="margin-top:10px">${esc(u.tradeMsg)}</div>`:''}${storeOn()?`<button class="ghost sm" style="margin-top:12px;width:100%" onclick="openMenu('gems')">${icon('gem')} Get more gems</button>`:''}</div>`;}
 function platToast(msg){let t=document.querySelector('.platToast');if(!t){t=document.createElement('div');t.className='platToast';document.body.appendChild(t);}t.textContent=msg;clearTimeout(platToast.t);platToast.t=setTimeout(()=>t.remove(),3200);}
-function grantNoAds(){try{localStorage.setItem('bag_noads','1');}catch{}Plat.banner();}
+function grantNoAds(){Store.set('bag_noads','1');Plat.banner();}
 function shopBuy(sku){if(Plat.busy())return;UI().shopMsg='';const go=Plat.buy(sku);render();go.then(ok=>{if(ok){const p=SHOP_PACKS.find(x=>x.sku===sku);
-    if(p){try{localStorage.setItem('bag_gems',gems()+p.gems);}catch{}UI().shopMsg=`+${p.gems.toLocaleString()} gems added. Thank you!`;}
+    if(p){addGems(p.gems);UI().shopMsg=`+${p.gems.toLocaleString()} gems added. Thank you!`;}
     else if(sku===SHOP_NOADS.sku){grantNoAds();UI().shopMsg='Banner ads removed. Thank you!';}}render();});}
 function shopRestore(){if(Plat.busy())return;Plat.restore().then(ids=>{const had=ids.includes(SHOP_NOADS.sku);if(had)grantNoAds();UI().shopMsg=had?'Remove Ads restored.':'Nothing to restore on this Apple ID.';render();})
   .catch(e=>{UI().shopMsg=String(e&&e.message||e);render();});}
@@ -108,6 +107,6 @@ function rewardCard(){if(!S.gemsRun)return'';const can=!S.dbl&&!S.daily&&S.diff!
   return`<div class="card"><div class="sh">${icon('sparkle')} <span class="grow">+${S.gemsRun} gems${S.dbl?' <span class="gold">· doubled</span>':''}</span><b class="gold">${gems()} total</b></div><div class="sub">Spend them on permanent Equipment from the menu. Better careers pay more: Role Player 10 · Solid Starter 15 · All-Star 20 · Hall of Famer 35 · THE GOAT 60${S.diff==='hof'?' (×1.5 on Hall of Fame)':''}.</div>
   ${can?`<button class="wide" style="margin-top:12px" onclick="doubleRewards()" ${Plat.busy()?'disabled':''}>${icon('video')} Watch an ad: double to +${S.gemsRun*2} gems${S.gtpRun?` and +${S.gtpRun*2} GTP`:''}</button>`:''}</div>`;}
 function doubleRewards(){if(S.dbl||Plat.busy()||S.stage!=='end')return;const run=S;const go=Plat.ad();render();
-  go.then(ok=>{if(!ok||run!==S||S.dbl||S.stage!=='end'){render();return;}S.dbl=true;try{localStorage.setItem('bag_gems',gems()+S.gemsRun);}catch{}S.gemsRun*=2;
+  go.then(ok=>{if(!ok||run!==S||S.dbl||S.stage!=='end'){render();return;}S.dbl=true;addGems(S.gemsRun);S.gemsRun*=2;
     if(S.gtpRun){setGtp(gtpBank()+S.gtpRun);(S.gtpLog=S.gtpLog||[]).push(['Ad bonus',S.gtpRun]);S.gtpRun*=2;}render();});}
 Plat.boot();

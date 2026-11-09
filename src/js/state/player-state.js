@@ -1,6 +1,6 @@
 // ---------- state ----------
 let S;
-function newPlayer(){return{diff:(()=>{try{return localStorage.getItem('bag_diff')||'pro';}catch{return'pro';}})(),perks:{},gtpRun:0,look:randLook(),era:pick(ERAS).id,spins:1,daily:false,stage:'build',name:'',pos:'SF',height:79,frame:'Balanced',attrs:Object.fromEntries(SUBKEYS.map(k=>[k,MIN_A])),picked:[],traits:{},bank:0,hype:0,age:14,hs:[],col:[],nba:[],ceiling:0,injuryProne:false,badges:[],bdg:{},redshirt:false,flags:{}};}
+function newPlayer(){return{diff:savedDiff(),perks:{},gtpRun:0,look:randLook(),era:pick(ERAS).id,spins:1,daily:false,stage:'build',name:'',pos:'SF',height:79,frame:'Balanced',attrs:Object.fromEntries(SUBKEYS.map(k=>[k,MIN_A])),picked:[],traits:{},bank:0,hype:0,age:14,hs:[],col:[],nba:[],ceiling:0,injuryProne:false,badges:[],bdg:{},redshirt:false,flags:{}};}
 
 const cost=v=>v<80?1:v<90?2:3;
 const costTo=v=>{let c=0;for(let x=MIN_A;x<v;x++)c+=cost(x);return c;};

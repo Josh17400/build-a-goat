@@ -1,5 +1,5 @@
 // ---------- sound: every effect is synthesized live (no files); music plays music/1.mp3, 2.mp3 ... if present ----------
-const SND=(()=>{let ctx=null,master=null,last={};const pref=k=>{try{return localStorage.getItem(k)!=='0';}catch{return true;}};
+const SND=(()=>{let ctx=null,master=null,last={};const pref=k=>Store.get(k)!=='0';
   const P={sfx:pref('bag_sfx'),music:pref('bag_music'),haptics:pref('bag_haptics')};
   function unlock(){if(typeof AudioContext==='undefined'&&typeof webkitAudioContext==='undefined')return;if(!ctx){ctx=new(window.AudioContext||window.webkitAudioContext)();master=ctx.createGain();master.gain.value=1;master.connect(ctx.destination);}if(ctx.state==='suspended')ctx.resume();M.start();}
   const now=()=>ctx.currentTime;
@@ -28,5 +28,5 @@ const SND=(()=>{let ctx=null,master=null,last={};const pref=k=>{try{return local
   document.addEventListener('visibilitychange',()=>{if(document.hidden)M.stop();else if(P.music&&M.el)M.el.play().catch(()=>{});});
   document.addEventListener('pointerdown',e=>{unlock();if(e.target.closest&&e.target.closest('button,summary'))play('tap');},true);
   document.addEventListener('keydown',unlock,true);
-  function set(k,v){P[k]=v;try{localStorage.setItem('bag_'+k,v?'1':'0');}catch{}if(k==='music'){if(v){M.none=false;M.start();}else M.stop();}if(k==='sfx'&&v){unlock();play('good');}render();}
+  function set(k,v){P[k]=v;Store.set('bag_'+k,v?'1':'0');if(k==='music'){if(v){M.none=false;M.start();}else M.stop();}if(k==='sfx'&&v){unlock();play('good');}render();}
   return{play,set,P,M};})();

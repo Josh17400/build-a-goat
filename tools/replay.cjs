@@ -3,8 +3,7 @@
 // fingerprints everything the game produced: every screen's HTML after every action, the full game
 // state at the end of each career, and everything it wrote to storage. It plays through the real
 // buttons (creator tabs, the season story, profile tabs, menus, Next Decision, Whole Career), and
-// every few steps it also
-// fingerprints the save and reopens the run from it, so saving and loading are part of the replay.
+// every few steps it also fingerprints the save and reopens the run from it.
 //
 // A change that is meant to leave the game's behaviour alone (a refactor, a move between files) must
 // leave the fingerprint alone. A change that is meant to alter gameplay or a screen changes it; then
@@ -16,7 +15,7 @@
 //   node tools/replay.cjs --dump DIR   also write each career's end state and last screen to DIR
 //   Options: --careers N (per difficulty, default 8)   --html FILE (default ../index.html)
 //
-// How it stays exact: the page's script runs unmodified in a Node vm with a stand-in page (below),
+// How it stays exact: the page's script runs unmodified in a Node vm with a stand-in page (tools/lib),
 // Math.random is a seeded generator (the game seeds its career dice from it), the clock is frozen, and
 // timers never fire. The player's choices come from a second seeded generator, so they never disturb
 // the game's own dice. Only the boot line is cut: the harness starts each career itself.
@@ -25,13 +24,10 @@
 'use strict';
 const fs = require('fs');
 const path = require('path');
-const vm = require('vm');
 const crypto = require('crypto');
+const { ROOT, rng, page, gameScript, runGame } = require('./lib/headless.cjs');
 
-const ROOT = path.resolve(__dirname, '..');
 const DIGEST = path.join(__dirname, 'replay.digest.json');
-const BOOT = '\nS=newPlayer();bootSave();render();\n';
-const FROZEN_NOW = Date.UTC(2026, 10, 9, 15, 0, 0);
 
 function fail(msg) {
   console.error('replay: ' + msg);
@@ -49,86 +45,6 @@ function args() {
     else fail('unknown option ' + a[i]);
   }
   return o;
-}
-
-// mulberry32: small, fast, and identical on every platform.
-function rng(seed) {
-  let a = seed >>> 0;
-  return () => {
-    a = (a + 0x6D2B79F5) | 0;
-    let t = Math.imul(a ^ (a >>> 15), 1 | a);
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-  };
-}
-
-// The stand-in page. Anything the game might touch but the replay does not care about is a "hole":
-// every property read, call or construction on it yields the hole again, and it reads as 0 / ''.
-function page(screens) {
-  const hole = new Proxy(function () {}, {
-    get: (t, k) => (k === Symbol.toPrimitive ? () => 0 : k === Symbol.iterator ? function* () {} : k === 'then' ? undefined : k === 'length' ? 0 : hole),
-    apply: () => hole,
-    construct: () => hole,
-    set: () => true,
-  });
-  const classList = { contains: () => false, add() {}, remove() {}, toggle() {} };
-  // An element: remembers its innerHTML (the app root's is the screen), a text value, and is a hole otherwise.
-  const element = (id) => {
-    const own = { innerHTML: '', value: 'Replay', id, classList, style: hole, dataset: {} };
-    return new Proxy(own, {
-      get: (t, k) => (k in t ? t[k] : k === 'querySelector' ? () => null : k === 'querySelectorAll' ? () => [] : hole),
-      set: (t, k, v) => {
-        t[k] = v;
-        if (id === 'app' && k === 'innerHTML') screens.push(String(v));
-        return true;
-      },
-    });
-  };
-  const byId = new Map();
-  const store = new Map();
-  const document = {
-    documentElement: element('html'),
-    body: element('body'),
-    head: element('head'),
-    activeElement: null,
-    visibilityState: 'visible',
-    hidden: false,
-    getElementById: (id) => byId.get(id) || (byId.set(id, element(id)), byId.get(id)),
-    querySelector: () => null,
-    querySelectorAll: () => [],
-    createElement: (tag) => element(tag),
-    createTreeWalker: () => ({ nextNode: () => null }),
-    addEventListener() {},
-    removeEventListener() {},
-  };
-  const localStorage = {
-    getItem: (k) => (store.has(String(k)) ? store.get(String(k)) : null),
-    setItem: (k, v) => void store.set(String(k), String(v)),
-    removeItem: (k) => void store.delete(String(k)),
-    key: (i) => [...store.keys()][i] ?? null,
-    get length() { return store.size; },
-    clear: () => store.clear(),
-  };
-  class FrozenDate extends Date {
-    constructor(...a) { if (a.length) super(...a); else super(FROZEN_NOW); }
-    static now() { return FROZEN_NOW; }
-  }
-  const win = {
-    document, localStorage, Date: FrozenDate, console,
-    navigator: { userAgent: 'replay', vibrate() {}, language: 'en-US', onLine: true },
-    location: { search: '', href: 'http://replay.invalid/', hash: '', pathname: '/' },
-    performance: { now: () => 0 },
-    innerWidth: 390, innerHeight: 844, scrollY: 0, devicePixelRatio: 2,
-    scrollTo() {}, scroll() {}, addEventListener() {}, removeEventListener() {},
-    setTimeout: () => 0, clearTimeout() {}, setInterval: () => 0, clearInterval() {},
-    requestAnimationFrame: () => 0, cancelAnimationFrame() {},
-    matchMedia: () => ({ matches: false, addEventListener() {}, removeEventListener() {} }),
-    getComputedStyle: () => hole,
-    NodeFilter: { SHOW_TEXT: 4 },
-    history: { pushState() {}, replaceState() {}, back() {} },
-  };
-  win.window = win.self = win.globalThis = win;
-  return { win, store };
 }
 
 // Runs inside the game's own script scope (it is appended to the script), so it sees every top-level
@@ -181,12 +97,9 @@ const HARNESS = String.raw`
 
 function run(o) {
   if (!fs.existsSync(o.html)) fail('no such file: ' + o.html);
-  const html = fs.readFileSync(o.html, 'utf8');
-  const m = /<script>([\s\S]*)<\/script>/.exec(html);
-  if (!m) fail('no inline <script> in ' + o.html);
-  if (m[1].split(BOOT).length !== 2) fail('the boot line was not found exactly once: ' + JSON.stringify(BOOT.trim()));
+  const source = gameScript(o.html, { boot: false });
   const screens = [];
-  const { win, store } = page(screens);
+  const pg = page(screens), { win, store } = pg;
   const all = crypto.createHash('sha256');
   const careers = [];
   // JSON without functions; Map/Set and undefined never appear in saved state.
@@ -216,8 +129,7 @@ function run(o) {
     },
   };
   if (o.dump) fs.mkdirSync(o.dump, { recursive: true });
-  vm.createContext(win);
-  vm.runInContext(m[1].replace(BOOT, '\n') + HARNESS, win, { filename: 'index.html<script>' });
+  runGame(source, HARNESS, pg);
   return { fingerprint: all.digest('hex'), careers };
 }
 

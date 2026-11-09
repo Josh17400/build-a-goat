@@ -1,6 +1,7 @@
 {
  "js": [
   "core/helpers.js",
+  "core/storage.js",
   "data/constants.js",
   "economy/difficulty-gtp.js",
   "state/player-state.js",

@@ -5,5 +5,5 @@ function makeRng(a){a>>>=0;const f=()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^
 const todayKey=()=>new Date().toISOString().slice(0,10);
 function seedFrom(s){let h=1779033703;for(const c of s){h=Math.imul(h^c.charCodeAt(0),3432918353);h=h<<13|h>>>19;}return h>>>0;}
 function toggleDaily(){S.daily=!S.daily;if(!S.daily&&S.perksHeld){S.perks=S.perksHeld;S.perksHeld=null;if(S.perks.spin)S.spins+=2;trimToBudget();}if(S.daily){S.diff='pro';S.perksHeld=Object.keys(S.perks||{}).length?{...S.perks}:null;if(S.perks&&S.perks.spin)S.spins=Math.max(0,S.spins-2);S.perks={};trimToBudget();S.era=ERAS[seedFrom('era'+todayKey())%ERAS.length].id;}render();}
-const dailyBest=()=>{const d=JSON.parse(localStorage.getItem('bag_daily')||'{}');return d.date===todayKey()?d.runs||[]:[];};
+const dailyBest=()=>{const d=Store.obj('bag_daily');return d.date===todayKey()?d.runs||[]:[];};
 

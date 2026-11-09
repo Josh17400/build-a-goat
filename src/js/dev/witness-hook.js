@@ -8,7 +8,7 @@ function uiList(){const out=[],vh=innerHeight,vw=innerWidth;let n=0;
     out.push({id:'u'+(n++),kind:btn?'button':'text',rect:[rr.left,rr.top,rr.width,rr.height],text:(btn?(el.getAttribute('aria-label')||el.innerText):[...el.childNodes].filter(c=>c.nodeType===3).map(c=>c.textContent).join(' ')).trim().slice(0,60),font:parseFloat(cs.fontSize),tap:btn});}
   return out;}
 if(globalThis.__witnessApi){document.documentElement.classList.add('wt');const W=globalThis.__witnessApi;W.start({name:'Build a GOAT',fps:30,
-  reset({scene}={}){try{localStorage.setItem('bag_intro','1');}catch{}['bag_hof','bag_ach','bag_daily','bag_recent','bag_gtp','bag_diff','bag_rec','bag_goats','bag_gems','bag_gear',...Object.values(SV)].forEach(k=>localStorage.removeItem(k));RUNLOG=[];R=Math.random;S=newPlayer();render();
+  reset({scene}={}){markIntroSeen();['bag_hof','bag_ach','bag_daily','bag_recent','bag_gtp','bag_diff','bag_rec','bag_goats','bag_gems','bag_gear',...Object.values(SV)].forEach(k=>Store.remove(k));RUNLOG=[];R=Math.random;S=newPlayer();render();
     // test scenes: jump straight to a screen (witness --scene hs|offers|college|draft|nba|decision|end)
     const order=['build','hs','offers','college','draft','nba','decision','end'],at=order.indexOf(scene||'build');if(at<=0)return;
     S.name='Test Prospect';applyArch(2);for(const k of SUBKEYS)S.attrs[k]=Math.min(90,S.attrs[k]+14);S.picked=['work','dur'];startCareer();S.bank=Math.max(0,S.bank);const sp=()=>{if(S.bank>0)smartSpend();};if(at===1){simHS();UI().seq=null;render();return;}

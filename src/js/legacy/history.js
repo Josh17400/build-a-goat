@@ -8,10 +8,10 @@ function makeLegends(L){const out=[],mi=Math.max(0,ERA_ORDER.indexOf(S.era)),pre
   // your own past GOATs on this difficulty are immortal: they sit on the all-time list in every future career
   if(!S.daily)for(const g of goatsOf())out.push({...g,era:'Your GOAT',leg:1,mine:1});
   return out;}
-function goatsOf(){try{return JSON.parse(localStorage.getItem('bag_goats')||'{}')[S.diff]||[];}catch{return[];}}
-function immortalize(c,sc){try{const all=JSON.parse(localStorage.getItem('bag_goats')||'{}'),l=all[S.diff]=all[S.diff]||[],k=c.cnt;
+function goatsOf(){return Store.obj('bag_goats')[S.diff]||[];}
+function immortalize(c,sc){try{const all=Store.obj('bag_goats'),l=all[S.diff]=all[S.diff]||[],k=c.cnt;
   l.push({name:S.name,pos:S.pos,arch:archName(),score:sc,pts:Math.round(c.pts),reb:Math.round(c.reb),ast:Math.round(c.ast),rings:k['Champion']||0,mvps:k['MVP']||0,as:k['All-Star']||0});
-  l.sort((a,b)=>b.score-a.score);all[S.diff]=l.slice(0,12);localStorage.setItem('bag_goats',JSON.stringify(all));}catch{}}
+  l.sort((a,b)=>b.score-a.score);all[S.diff]=l.slice(0,12);Store.setJson('bag_goats',all);}catch{}}
 // production score: points, boards, dimes, stocks, minus turnovers, plus or minus for shooting efficiency
 const prodScore=c=>c.ppg+1.1*c.rpg+1.4*c.apg+1.8*((c.spg||0)+(c.bpg||0))-1.5*(c.tov||0)+((c.fg||.47)-.47)*60;
 function npcScore(p){const g=x=>p.aw[x]||0;return Math.round(p.rings*12+p.mvps*18+g('Finals MVP')*8+g('All-NBA 1st')*7+g('All-NBA 2nd')*4+g('All-NBA 3rd')*2+g('All-Star')*3+g('DPOY')*5+g('ROY')*2+g('Scoring Title')*3+p.car.pts/1000*2);}

@@ -4,8 +4,8 @@ const DIFFS={rookie:{name:'🟢 Rookie',budget:365,mult:0,lg:-1,nbaPts:.4,cl:5.8
   hof:{name:'🔴 Hall of Fame',budget:260,mult:1.5,lg:3,nbaPts:.77,cl:4.3,d:'The biggest challenge: 260 skill points, start around 40 OVR. Many players never stick in the league and THE GOAT is a legend-level feat. Earns 1.5× GTP, gems and achievements.'}};
 const diff=()=>DIFFS[S.diff]||DIFFS.pro;
 Object.defineProperty(globalThis,'START_BUDGET',{configurable:true,get:()=>diff().budget+25*((S&&S.perks&&S.perks.pts)||0)});
-const gtpBank=()=>{try{return Math.max(0,parseInt(localStorage.getItem('bag_gtp')||'0',10)||0);}catch{return 0;}};
-const setGtp=n=>{try{localStorage.setItem('bag_gtp',String(Math.max(0,Math.round(n))));}catch{}};
+const gtpBank=()=>Math.max(0,parseInt(Store.get('bag_gtp')||'0',10)||0);
+const setGtp=n=>{Store.set('bag_gtp',String(Math.max(0,Math.round(n))));};
 // what a season / college year / career is worth (before the difficulty multiplier)
 // bonus points earned in the NBA, same currency as high school and college
 const BANK_AW={'Comeback Player':4,'All-Star':3,'All-NBA 1st':8,'All-NBA 2nd':6,'All-NBA 3rd':5,MVP:10,'Finals MVP':4,Champion:3,DPOY:5,ROY:5,'6MOY':3,MIP:3,'Scoring Title':5};
@@ -36,7 +36,8 @@ function buyPerk(k,d){if(S.daily)return;S.perks=S.perks||{};const p=PERKS_GTP.fi
   if(k==='growth'&&n===0)S.height=Math.min(S.height,H_MAX);
   trimToBudget();render();}
 function trimToBudget(){let g=0;while(spent()>START_BUDGET&&g++<2000){const k=SUBKEYS.reduce((a,b)=>S.attrs[b]>S.attrs[a]?b:a);S.attrs[k]--;}}
-function setDiff(d){if(S.daily||S.stage!=='build')return;S.diff=d;try{localStorage.setItem('bag_diff',d);}catch{}trimToBudget();render();}
+const savedDiff=()=>Store.get('bag_diff')||'pro';
+function setDiff(d){if(S.daily||S.stage!=='build')return;S.diff=d;Store.set('bag_diff',d);trimToBudget();render();}
 const traitLimit=()=>S.perks&&S.perks.trait3?3:2;
 // every NBA city, with a nickname that is close to but not the real one. Order matters: CONF() puts the first 15 in the East
 const TEAMS=['Atlanta Talons','Boston Clovers','Brooklyn Bridges','Charlotte Stingers','Chicago Bison','Cleveland Cavalry','Detroit Motors','Indiana Speedsters','Miami Blaze','Milwaukee Stags','New York Skyliners','Orlando Illusions','Philadelphia Founders','Toronto Dinos','Washington Warlocks','Dallas Wranglers','Denver Prospectors','Golden State Gladiators','Houston Orbiters','Los Angeles Schooners','Los Angeles Lagoons','Memphis Kodiaks','Minnesota Howlers','New Orleans Herons','Oklahoma City Twisters','Phoenix Scorch','Portland Pathfinders','Sacramento Crowns','San Antonio Rustlers','Utah Rhythm'];

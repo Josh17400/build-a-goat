@@ -7,4 +7,5 @@ const INTRO=[['ball','This is Build a GOAT','Create a basketball player from scr
 function introHTML(){const i=UI().intro,[ic,t,d]=INTRO[i],last=i===INTRO.length-1;
   return`<div class="intro"><div class="row" style="justify-content:space-between"><div class="dots">${INTRO.map((x,j)=>`<i class="${j===i?'on':j<i?'done':''}"></i>`).join('')}</div>${last?'':'<button class="ghost sm" onclick="endIntro()">Skip</button>'}</div>
   <div class="introbig">${icon(ic)}</div><h1 style="text-align:center">${t}</h1><div class="sub" style="text-align:center;font-size:1rem">${d}</div></div>`+dock(`${i?'<div class="two"><button class="ghost" onclick="UI().intro--;render()">Back</button>':''}<button onclick="${last?'endIntro()':'UI().intro++;render()'}">${last?(S.stage==='build'?'Let’s build':'Back to your career'):'Next'}</button>${i?'</div>':''}`);}
-function endIntro(){try{localStorage.setItem('bag_intro','1');}catch{}UI().intro=null;render();scrollTo(0,0);}
+const introSeen=()=>!!Store.get('bag_intro'),markIntroSeen=()=>Store.set('bag_intro','1');
+function endIntro(){markIntroSeen();UI().intro=null;render();scrollTo(0,0);}
