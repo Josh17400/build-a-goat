@@ -63,5 +63,5 @@ const ARCH_CAL25={floor:-1.54,creator:.17,sniper:-1.65,slasher:-1.66,lock:-1.61,
 const ovr25=()=>ovrOld(ARCH_CAL25,ARCH_OFF25,false);
 // runs saved before the new skills get them from related ones, so nobody's rating drops; a build in progress starts them at the minimum
 const NEW_FROM={hook:['post','close'],fade:['post','mid'],offb:['iq','speed'],lat:['perD','speed']};
-function seedNewSkills(a,build){for(const k of NEW_SK)if(a[k]==null)a[k]=build?MIN_A:Math.round((a[NEW_FROM[k][0]]+a[NEW_FROM[k][1]])/2);}
+function seedNewSkills(a,build){for(const k of NEW_SK)if(a[k]==null)a[k]=build?START_A:Math.round((a[NEW_FROM[k][0]]+a[NEW_FROM[k][1]])/2);}
 

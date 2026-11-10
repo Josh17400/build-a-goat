@@ -392,11 +392,12 @@ const FRAMES={Lean:{speed:6,vert:5,stam:5,lat:4,hook:-2,str:-9,post:-4,intD:-3,o
   Balanced:{cons:3,iq:2,inj:0,dev:.025,d:'No glaring weakness. Steady and easy to coach',hid:['Faster development','Steadier nights']},
   Strong:{str:9,post:5,intD:4,oreb:4,dreb:3,close:2,hook:3,speed:-5,vert:-4,stam:-3,lat:-4,inj:.04,decl:.15,ppg:1,d:'Bully ball inside, but slower and heavier on the joints',hid:['Draws contact (+points)','Ages faster','More injuries']}};
 const TRAITS=[['work','Work Ethic','You develop faster and age slower'],['dur','Durability','Fewer and lighter injuries'],['clutch','Clutch Gene','You win more playoff series'],['coach','Coachability','You get more out of college'],['star','Star Power','Hype, All-Star votes, draft buzz'],['motor','Motor','You hustle every possession: more rebounds, steals and minutes'],['lead','Leadership','You make teammates better: more wins and playoff series'],['killer','Killer Instinct','Scorer’s mentality: more shots and points, fewer assists'],['late','Late Bloomer','Raw early, but a higher ceiling and a later peak (a gamble)'],['lock','Lockdown Mindset','You take defense personally: steals, blocks, DPOY votes'],['touch','Shooter’s Touch','Soft hands: better 3P%, FT% and FG%']];
-const MIN_A=25, BUILD_MAX=90, H_MIN=70, H_MAX=87;
+// START_A: where every skill starts in the creator (and the creator's minimum). MIN_A: the floor penalties can push a skill down to
+const START_A=40,MIN_A=30, BUILD_MAX=90, H_MIN=70, H_MAX=87;
 // ---------- difficulty & Generational Talent Points (GTP) ----------
-const DIFFS={rookie:{name:'🟢 Rookie',budget:365,mult:0,lg:-1,nbaPts:.4,cl:5.8,d:'Want a relaxed, less challenging career? Play Rookie: 365 skill points, start around 50 OVR, and great careers are within reach. You will not earn GTP, gems or achievements.'},
-  pro:{name:'🟡 Pro',budget:310,mult:1,lg:3,nbaPts:.45,cl:6.5,d:'The real challenge: 310 skill points, start around 45 OVR. Most careers end as role players and THE GOAT is rare. Earns GTP, gems and achievements.'},
-  hof:{name:'🔴 Hall of Fame',budget:260,mult:1.5,lg:3,nbaPts:.77,cl:4.3,d:'The biggest challenge: 260 skill points, start around 40 OVR. Many players never stick in the league and THE GOAT is a legend-level feat. Earns 1.5× GTP, gems and achievements.'}};
+const DIFFS={rookie:{name:'🟢 Rookie',budget:225,mult:0,lg:-8,nbaPts:.4,d:'Want a relaxed, less challenging career? Play Rookie: 225 skill points, start around 55 OVR, and great careers are common. You will not earn GTP, gems or achievements.'},
+  pro:{name:'🟡 Pro',budget:205,mult:1,lg:3,nbaPts:.45,d:'The real challenge: 205 skill points, start around 50 OVR. Most careers end as role players and THE GOAT is rare. Earns GTP, gems and achievements.'},
+  hof:{name:'🔴 Hall of Fame',budget:120,mult:1.5,lg:3,nbaPts:.77,d:'The biggest challenge: 120 skill points, start around 45 OVR. Many players never stick in the league and THE GOAT is a legend-level feat. Earns 1.5× GTP, gems and achievements.'}};
 const diff=()=>DIFFS[S.diff]||DIFFS.pro;
 Object.defineProperty(globalThis,'START_BUDGET',{configurable:true,get:()=>diff().budget+25*((S&&S.perks&&S.perks.pts)||0)});
 const gtpBank=()=>Math.max(0,parseInt(Store.get('bag_gtp')||'0',10)||0);
@@ -446,10 +447,10 @@ const INJ={minor:['sprained ankle','hamstring strain','sore knee','bruised hip',
 
 // ---------- state ----------
 let S;
-function newPlayer(){return{diff:savedDiff(),perks:{},gtpRun:0,look:randLook(),era:pick(ERAS).id,spins:1,daily:false,stage:'build',name:'',pos:'SF',height:79,frame:'Balanced',attrs:Object.fromEntries(SUBKEYS.map(k=>[k,MIN_A])),picked:[],traits:{},bank:0,hype:0,age:14,hs:[],col:[],nba:[],ceiling:0,injuryProne:false,badges:[],bdg:{},redshirt:false,flags:{}};}
+function newPlayer(){return{diff:savedDiff(),perks:{},gtpRun:0,look:randLook(),era:pick(ERAS).id,spins:1,daily:false,stage:'build',name:'',pos:'SF',height:79,frame:'Balanced',attrs:Object.fromEntries(SUBKEYS.map(k=>[k,START_A])),picked:[],traits:{},bank:0,hype:0,age:14,hs:[],col:[],nba:[],ceiling:0,injuryProne:false,badges:[],bdg:{},redshirt:false,flags:{}};}
 
 const cost=v=>v<80?1:v<90?2:3;
-const costTo=v=>{let c=0;for(let x=MIN_A;x<v;x++)c+=cost(x);return c;};
+const costTo=v=>{let c=0;for(let x=START_A;x<v;x++)c+=cost(x);return c;};
 const spent=()=>SUBKEYS.reduce((s,k)=>s+costTo(S.attrs[k]),0);
 function esD(k,d){const fr=FRAMES[S.frame];let v=S.attrs[k]+(fr[k]||0)+d*(HMOD[k]||0)*(d<0&&(k==='blk'||k==='oreb'||k==='dreb')?1.25:1);
   // you can only dunk as well as your size and bounce allow: short players need real Vertical to dunk
@@ -531,7 +532,7 @@ const ARCH_CAL25={floor:-1.54,creator:.17,sniper:-1.65,slasher:-1.66,lock:-1.61,
 const ovr25=()=>ovrOld(ARCH_CAL25,ARCH_OFF25,false);
 // runs saved before the new skills get them from related ones, so nobody's rating drops; a build in progress starts them at the minimum
 const NEW_FROM={hook:['post','close'],fade:['post','mid'],offb:['iq','speed'],lat:['perD','speed']};
-function seedNewSkills(a,build){for(const k of NEW_SK)if(a[k]==null)a[k]=build?MIN_A:Math.round((a[NEW_FROM[k][0]]+a[NEW_FROM[k][1]])/2);}
+function seedNewSkills(a,build){for(const k of NEW_SK)if(a[k]==null)a[k]=build?START_A:Math.round((a[NEW_FROM[k][0]]+a[NEW_FROM[k][1]])/2);}
 
 // ---------- badges: earned from your skills, never bought. Bronze, Silver, Gold, Platinum ----------
 // sk: skills averaged into the badge rating (an inner list = the best of those), h: size range in inches, fx: boost per tier
@@ -604,7 +605,7 @@ const bookCount=()=>Object.keys(bookGet()).length;
 
 // ---------- the OVR you see: the display scale, and letter grades ----------
 const DSP=[[40,38],[62,60],[69.7,70],[73,77],[80.6,85],[82.1,90],[87.4,95],[93,99]];
-function dsp(x){x-=((diff().lg||0)-2)*.6*clamp((x-40)/30,0,1);if(x<=DSP[0][0])return Math.round(clamp(x-2,1,99));for(let i=1;i<DSP.length;i++){const[a,A]=DSP[i-1],[b,B]=DSP[i];if(x<=b)return Math.round(A+(x-a)/(b-a)*(B-A));}return 99;}
+function dsp(x){x-=((diff().lg||0)-2)*.6;if(x<=DSP[0][0])return Math.round(clamp(x-2,1,99));for(let i=1;i<DSP.length;i++){const[a,A]=DSP[i-1],[b,B]=DSP[i];if(x<=b)return Math.round(A+(x-a)/(b-a)*(B-A));}return 99;}
 const OV=()=>dsp(ovr());
 function grade(n){return n>=92?'A+':n>=87?'A':n>=83?'A-':n>=79?'B+':n>=75?'B':n>=71?'B-':n>=67?'C+':n>=63?'C':n>=58?'C-':'D';}
 // ---------- growth: development turns into points you place; decline takes skills away ----------
@@ -618,13 +619,11 @@ function declineTo(target){let g=0;const keys=['speed','speed','vert','vert','st
 // growth is never applied for you: it turns into bonus points worth exactly what that growth would cost, and you place them
 // development pays DEVF of the points the growth would cost (tuned with the balance sims)
 const DEVF=.7,HS_FL=1.2,COL_FL=1.0,NBA_FL=1.0;
-// catch-up (2026-11-08): starts are lower, so high school and college add a share of that drop each season on top of normal growth
-const CATCH_HS=.17,CATCH_COL=.12;
 function growPts(target){const a0={...S.attrs};growTo(target);let p=0;for(const k in S.attrs)for(let v=a0[k];v<S.attrs[k];v++)p+=cost(v);p=Math.round(p*DEVF);S.attrs=a0;if(p>0){S.bank+=p;S.devPts=(S.devPts||0)+p;}return p;}
 // S.natO: where natural growth alone has taken you. Development pays the points for that growth, measured from your current
 // skills, so a player who spent ahead of it keeps developing until natural growth reaches the hidden ceiling
 // fl: the growth a young player gets just from getting older and playing (HS, college, pro up to 25), even past the ceiling
-function develop(rate,fl){if(S.natO==null)S.natO=ovr();const o=S.natO;if(S.perks&&S.perks.dev&&S.stage!=='nba')rate*=1.4;const g=Math.min(S.stage==='nba'?(S.age>29?2:3.5):99,Math.max(o<S.ceiling?(S.ceiling-o)*rate:0,fl||0));const gg=g+(S.stage==='nba'?0:(diff().cl||0)*(S.stage==='hs'?CATCH_HS:CATCH_COL));if(gg>0){growPts(ovr()+gg);S.natO=o+gg;}}
+function develop(rate,fl){if(S.natO==null)S.natO=ovr();const o=S.natO;if(S.perks&&S.perks.dev&&S.stage!=='nba')rate*=1.4;const g=Math.min(S.stage==='nba'?(S.age>29?2:3.5):99,Math.max(o<S.ceiling?(S.ceiling-o)*rate:0,fl||0));if(g>0){growPts(ovr()+g);S.natO=o+g;}}
 // why the OVR moved this season, from VISIBLE causes only (age, traits, college program, injuries) plus a deliberately noisy scout
 // read of the remaining room. Never names frame effects or hidden numbers; the true ceiling stays an end-screen reveal.
 function scoutNoise(){return(((S.seed||7)*2654435761>>>0)%11)-5;}
@@ -1682,7 +1681,7 @@ const ARCH=[
   ['🧠 Floor General','PG',74,'Balanced',{pass:3,handle:3,iq:2.5,three:1.5,mid:1.5,speed:1.5,cons:1}],
   ['💥 Slasher','SG',77,'Lean',{layup:3,dunk:2.5,speed:2.5,vert:2,handle:1.5,ft:1,offb:1}],
   ['🐻 Post Bully','PF',81,'Strong',{post:3,hook:2.5,str:3,close:2,fade:1,oreb:2,dreb:2,intD:1.5}]];
-function fillPoints(pk){for(const k of SUBKEYS)S.attrs[k]=MIN_A;let g=0,miss=0;
+function fillPoints(pk){for(const k of SUBKEYS)S.attrs[k]=START_A;let g=0,miss=0;
   while(g++<6000&&miss<60){const k=pk();if(S.attrs[k]>=BUILD_MAX){miss++;continue;}if(spent()+cost(S.attrs[k])>START_BUDGET){miss++;continue;}S.attrs[k]++;miss=0;}}
 function fillArch(i){const[l,pos,h,fr,w]=ARCH[i],keys=Object.keys(w),tot=keys.reduce((s,k)=>s+w[k],0);S.arch=l;
   fillPoints(()=>{if(R()<.22)return pick(SUBKEYS);let r=R()*tot;for(const k of keys){r-=w[k];if(r<=0)return k;}return keys[0];});}
@@ -2498,7 +2497,7 @@ function atCap(k){const v=S.attrs[k];if(v>=99||Math.round(es(k))>=99)return true
 function stepN(k,n){const v0=S.attrs[k];let v=v0,c=0,i=0;while(i<n&&v<99&&c+cost(v)<=S.bank&&!atCap(k)){c+=cost(v);v++;i++;S.attrs[k]=v;}S.attrs[k]=v0;return[c,i];}
 function costN(k,n){return stepN(k,n)[0];}
 function skillRow(k,l,mode){const v=S.attrs[k],e=Math.round(es(k));let ctl;
-  if(mode==='build'){const top=es(k)>=99,off=v>=BUILD_MAX||top||spent()+cost(v)>START_BUDGET;ctl=`<button class="ghost sm" aria-label="Remove a point from ${l}" onclick="adj('${k}',-1)" ${v<=MIN_A?'disabled':''}>−</button>`+(v>=BUILD_MAX||top?`<span class="capd">${top?'99: maxed':`Max ${BUILD_MAX} here`}</span>`:`<button class="sm" aria-label="Add a point to ${l}" onclick="adj('${k}',1)" ${off?'disabled':''}>+${cost(v)>1?cost(v):''}</button><button class="ghost sm" aria-label="Add 10 points to ${l}" onclick="adjN('${k}',10)" ${off?'disabled':''}>+10</button><button class="ghost sm" aria-label="Max out ${l}" onclick="adjN('${k}',99)" ${off?'disabled':''}>Max</button>`);}
+  if(mode==='build'){const top=es(k)>=99,off=v>=BUILD_MAX||top||spent()+cost(v)>START_BUDGET;ctl=`<button class="ghost sm" aria-label="Remove a point from ${l}" onclick="adj('${k}',-1)" ${v<=START_A?'disabled':''}>−</button>`+(v>=BUILD_MAX||top?`<span class="capd">${top?'99: maxed':`Max ${BUILD_MAX} here`}</span>`:`<button class="sm" aria-label="Add a point to ${l}" onclick="adj('${k}',1)" ${off?'disabled':''}>+${cost(v)>1?cost(v):''}</button><button class="ghost sm" aria-label="Add 10 points to ${l}" onclick="adjN('${k}',10)" ${off?'disabled':''}>+10</button><button class="ghost sm" aria-label="Max out ${l}" onclick="adjN('${k}',99)" ${off?'disabled':''}>Max</button>`);}
   else if(mode==='view')ctl='';
   else{const cap=atCap(k),off=S.bank<cost(v)||cap;ctl=`${canUndo(k)?`<button class="ghost sm" aria-label="Take a point back from ${l}" onclick="unspend('${k}')">−</button>`:''}`+(cap?`<span class="capd">Maxed${Math.round(es(k))<99?' for your build':''}</span>`:`<button class="sm" aria-label="Add a point to ${l}" onclick="spend('${k}')" ${off?'style="opacity:.45"':''}>+${cost(v)>1?cost(v):''}</button>${(()=>{const[c10,n10]=off?[0,10]:stepN(k,10);return`<button class="ghost sm" aria-label="Raise ${l} by ${n10}" onclick="spend('${k}',10)" ${off?'disabled':''}>+${n10}${off?'':` <small>· ${c10} pt${c10===1?'':'s'}</small>`}</button>`;})()}${UI().maxArm===k?`<button class="sm" aria-label="Confirm max ${l}" onclick="spend('${k}',99)" style="background:var(--gold,#ffc84a);color:#000">Tap again: ${maxCost(k)[0]} pts → ${Math.min(99,Math.round(es(k))+maxCost(k)[1]-S.attrs[k])}</button>`:`<button class="ghost sm" aria-label="Max out ${l}" onclick="armMax('${k}')" ${off?'disabled':''}>Max</button>`}`);}
   const capT=mode!=='build'&&mode!=='view'&&atCap(k),sm=UI().spMsg&&UI().spMsg.k===k?`<small class="bh">${UI().spMsg.t}</small>`:'';
@@ -2510,7 +2509,7 @@ function skillAcc(mode){const u=UI();IMP=impactMap();return ATTRS.map(([c,cl])=>
   return`<div class="acc ${open?'open':''}"><button class="acch" aria-label="${cl} skills" aria-expanded="${open}" onclick="UI().open=UI().open==='${c}'?null:'${c}';render()"><span>${cl}</span><div class="bar"><i style="width:${v}%"></i></div><span class="v">${v}</span><span class="chev">▶</span></button>${open?`<div class="accb">${SUBS[c].map(([k,l])=>skillRow(k,l,mode)).join('')}</div>`:''}</div>`;}).join('')+(mode==='bank'||mode==='view'?undoBar():'');}
 function attrRows(mode){return skillAcc(mode);}
 function adjN(k,n){const r=render;render=()=>{};try{for(let i=0;i<n;i++)adj(k,1);}finally{render=r;}render();}
-function adj(k,d){if(d>0&&spent()+cost(S.attrs[k])<=START_BUDGET&&S.attrs[k]<BUILD_MAX&&es(k)<99)S.attrs[k]++;if(d<0&&S.attrs[k]>MIN_A)S.attrs[k]--;render();}
+function adj(k,d){if(d>0&&spent()+cost(S.attrs[k])<=START_BUDGET&&S.attrs[k]<BUILD_MAX&&es(k)<99)S.attrs[k]++;if(d<0&&S.attrs[k]>START_A)S.attrs[k]--;render();}
 // auto-assign: each point goes where it raises OVR the most per point spent, leaning toward weak spots
 function buildFill(){let g=0;while(g++<900){const left=START_BUDGET-spent(),o0=ovr();let best=null,bs=-1;
     for(const k of SUBKEYS){const v=S.attrs[k],c=cost(v);if(v>=BUILD_MAX||c>left)continue;S.attrs[k]=v+1;const d=ovr()-o0;S.attrs[k]=v;const sc=d/c*(1+(75-v)/150);if(sc>bs){bs=sc;best=k;}}
@@ -2535,7 +2534,7 @@ function setH(d){S.height=clamp(S.height+d,H_MIN,H_MAX+(S.perks&&S.perks.growth?
 function toggleTrait(k){const i=S.picked.indexOf(k);if(i>=0)S.picked.splice(i,1);else if(S.picked.length<traitLimit())S.picked.push(k);render();}
 function startCareer(){syncPos();S.archId=archetype().id;S.name=(S.name||'').trim()||(pick(FIRST)+' '+pick(LAST));S.cls=null;S.L=null;if(S.daily){S.diff='pro';S.perks={};}const pc=perkCost();if(pc){setGtp(gtpBank()-pc);S.perksBought={...S.perks};}S.seed=S.daily?seedFrom('goat'+todayKey()):(Math.random()*4294967296)>>>0;R=makeRng(S.seed);
   for(const[k]of TRAITS)S.traits[k]=S.picked.includes(k)?(S.perks.maxed?5:ri(4,5)):ri(1,5);
-  S.bank=START_BUDGET-spent();wearGear();S.cls=makeClass();S.pkO=0;S.pkArch=null;S.idLock=null;S.evoPend=null;S.evoUp=0;S.midSeen=[];S.midAt=null;S.roleSeen=null;S.oldRivals=[];S.clLines=[];S.endWhy=null;S.clsSeen=[];S.rvDone=0;S.clsAdj=0;S.starFloor=0;S.ceiling=ovr()+7+(diff().cl||0)+gauss()*(S.perks.dna?3.5:8)+(S.traits.work-3)*2.5+(S.traits.late-3)*1.2;if(S.perks.dna)S.ceiling+=4;if(S.perks.clutch)S.traits.clutch=Math.min(5,S.traits.clutch+1);if(S.perks.hype)S.hype+=15;S.armor=!!S.perks.armor;S.startOvr=OV();S.attrs0={...S.attrs};S.stage='hs';S.bdg={};S.lastResult=gearNote();UI().spend=false;render();scrollTo(0,0);}
+  S.bank=START_BUDGET-spent();wearGear();S.cls=makeClass();S.pkO=0;S.pkArch=null;S.idLock=null;S.evoPend=null;S.evoUp=0;S.midSeen=[];S.midAt=null;S.roleSeen=null;S.oldRivals=[];S.clLines=[];S.endWhy=null;S.clsSeen=[];S.rvDone=0;S.clsAdj=0;S.starFloor=0;S.ceiling=ovr()+7+gauss()*(S.perks.dna?3.5:8)+(S.traits.work-3)*2.5+(S.traits.late-3)*1.2;if(S.perks.dna)S.ceiling+=4;if(S.perks.clutch)S.traits.clutch=Math.min(5,S.traits.clutch+1);if(S.perks.hype)S.hype+=15;S.armor=!!S.perks.armor;S.startOvr=OV();S.attrs0={...S.attrs};S.stage='hs';S.bdg={};S.lastResult=gearNote();UI().spend=false;render();scrollTo(0,0);}
 
 // ---------- player header ----------
 function hero(tap){const o=OV(),st=S.stage;

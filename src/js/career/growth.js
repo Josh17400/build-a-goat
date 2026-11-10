@@ -9,13 +9,11 @@ function declineTo(target){let g=0;const keys=['speed','speed','vert','vert','st
 // growth is never applied for you: it turns into bonus points worth exactly what that growth would cost, and you place them
 // development pays DEVF of the points the growth would cost (tuned with the balance sims)
 const DEVF=.7,HS_FL=1.2,COL_FL=1.0,NBA_FL=1.0;
-// catch-up (2026-11-08): starts are lower, so high school and college add a share of that drop each season on top of normal growth
-const CATCH_HS=.17,CATCH_COL=.12;
 function growPts(target){const a0={...S.attrs};growTo(target);let p=0;for(const k in S.attrs)for(let v=a0[k];v<S.attrs[k];v++)p+=cost(v);p=Math.round(p*DEVF);S.attrs=a0;if(p>0){S.bank+=p;S.devPts=(S.devPts||0)+p;}return p;}
 // S.natO: where natural growth alone has taken you. Development pays the points for that growth, measured from your current
 // skills, so a player who spent ahead of it keeps developing until natural growth reaches the hidden ceiling
 // fl: the growth a young player gets just from getting older and playing (HS, college, pro up to 25), even past the ceiling
-function develop(rate,fl){if(S.natO==null)S.natO=ovr();const o=S.natO;if(S.perks&&S.perks.dev&&S.stage!=='nba')rate*=1.4;const g=Math.min(S.stage==='nba'?(S.age>29?2:3.5):99,Math.max(o<S.ceiling?(S.ceiling-o)*rate:0,fl||0));const gg=g+(S.stage==='nba'?0:(diff().cl||0)*(S.stage==='hs'?CATCH_HS:CATCH_COL));if(gg>0){growPts(ovr()+gg);S.natO=o+gg;}}
+function develop(rate,fl){if(S.natO==null)S.natO=ovr();const o=S.natO;if(S.perks&&S.perks.dev&&S.stage!=='nba')rate*=1.4;const g=Math.min(S.stage==='nba'?(S.age>29?2:3.5):99,Math.max(o<S.ceiling?(S.ceiling-o)*rate:0,fl||0));if(g>0){growPts(ovr()+g);S.natO=o+g;}}
 // why the OVR moved this season, from VISIBLE causes only (age, traits, college program, injuries) plus a deliberately noisy scout
 // read of the remaining room. Never names frame effects or hidden numbers; the true ceiling stays an end-screen reveal.
 function scoutNoise(){return(((S.seed||7)*2654435761>>>0)%11)-5;}

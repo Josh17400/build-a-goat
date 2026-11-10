@@ -1,7 +1,7 @@
 // ---------- difficulty & Generational Talent Points (GTP) ----------
-const DIFFS={rookie:{name:'🟢 Rookie',budget:365,mult:0,lg:-1,nbaPts:.4,cl:5.8,d:'Want a relaxed, less challenging career? Play Rookie: 365 skill points, start around 50 OVR, and great careers are within reach. You will not earn GTP, gems or achievements.'},
-  pro:{name:'🟡 Pro',budget:310,mult:1,lg:3,nbaPts:.45,cl:6.5,d:'The real challenge: 310 skill points, start around 45 OVR. Most careers end as role players and THE GOAT is rare. Earns GTP, gems and achievements.'},
-  hof:{name:'🔴 Hall of Fame',budget:260,mult:1.5,lg:3,nbaPts:.77,cl:4.3,d:'The biggest challenge: 260 skill points, start around 40 OVR. Many players never stick in the league and THE GOAT is a legend-level feat. Earns 1.5× GTP, gems and achievements.'}};
+const DIFFS={rookie:{name:'🟢 Rookie',budget:225,mult:0,lg:-8,nbaPts:.4,d:'Want a relaxed, less challenging career? Play Rookie: 225 skill points, start around 55 OVR, and great careers are common. You will not earn GTP, gems or achievements.'},
+  pro:{name:'🟡 Pro',budget:205,mult:1,lg:3,nbaPts:.45,d:'The real challenge: 205 skill points, start around 50 OVR. Most careers end as role players and THE GOAT is rare. Earns GTP, gems and achievements.'},
+  hof:{name:'🔴 Hall of Fame',budget:120,mult:1.5,lg:3,nbaPts:.77,d:'The biggest challenge: 120 skill points, start around 45 OVR. Many players never stick in the league and THE GOAT is a legend-level feat. Earns 1.5× GTP, gems and achievements.'}};
 const diff=()=>DIFFS[S.diff]||DIFFS.pro;
 Object.defineProperty(globalThis,'START_BUDGET',{configurable:true,get:()=>diff().budget+25*((S&&S.perks&&S.perks.pts)||0)});
 const gtpBank=()=>Math.max(0,parseInt(Store.get('bag_gtp')||'0',10)||0);

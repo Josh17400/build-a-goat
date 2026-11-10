@@ -6,7 +6,7 @@ const ARCH=[
   ['🧠 Floor General','PG',74,'Balanced',{pass:3,handle:3,iq:2.5,three:1.5,mid:1.5,speed:1.5,cons:1}],
   ['💥 Slasher','SG',77,'Lean',{layup:3,dunk:2.5,speed:2.5,vert:2,handle:1.5,ft:1,offb:1}],
   ['🐻 Post Bully','PF',81,'Strong',{post:3,hook:2.5,str:3,close:2,fade:1,oreb:2,dreb:2,intD:1.5}]];
-function fillPoints(pk){for(const k of SUBKEYS)S.attrs[k]=MIN_A;let g=0,miss=0;
+function fillPoints(pk){for(const k of SUBKEYS)S.attrs[k]=START_A;let g=0,miss=0;
   while(g++<6000&&miss<60){const k=pk();if(S.attrs[k]>=BUILD_MAX){miss++;continue;}if(spent()+cost(S.attrs[k])>START_BUDGET){miss++;continue;}S.attrs[k]++;miss=0;}}
 function fillArch(i){const[l,pos,h,fr,w]=ARCH[i],keys=Object.keys(w),tot=keys.reduce((s,k)=>s+w[k],0);S.arch=l;
   fillPoints(()=>{if(R()<.22)return pick(SUBKEYS);let r=R()*tot;for(const k of keys){r-=w[k];if(r<=0)return k;}return keys[0];});}

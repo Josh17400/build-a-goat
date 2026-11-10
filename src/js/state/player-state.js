@@ -1,9 +1,9 @@
 // ---------- state ----------
 let S;
-function newPlayer(){return{diff:savedDiff(),perks:{},gtpRun:0,look:randLook(),era:pick(ERAS).id,spins:1,daily:false,stage:'build',name:'',pos:'SF',height:79,frame:'Balanced',attrs:Object.fromEntries(SUBKEYS.map(k=>[k,MIN_A])),picked:[],traits:{},bank:0,hype:0,age:14,hs:[],col:[],nba:[],ceiling:0,injuryProne:false,badges:[],bdg:{},redshirt:false,flags:{}};}
+function newPlayer(){return{diff:savedDiff(),perks:{},gtpRun:0,look:randLook(),era:pick(ERAS).id,spins:1,daily:false,stage:'build',name:'',pos:'SF',height:79,frame:'Balanced',attrs:Object.fromEntries(SUBKEYS.map(k=>[k,START_A])),picked:[],traits:{},bank:0,hype:0,age:14,hs:[],col:[],nba:[],ceiling:0,injuryProne:false,badges:[],bdg:{},redshirt:false,flags:{}};}
 
 const cost=v=>v<80?1:v<90?2:3;
-const costTo=v=>{let c=0;for(let x=MIN_A;x<v;x++)c+=cost(x);return c;};
+const costTo=v=>{let c=0;for(let x=START_A;x<v;x++)c+=cost(x);return c;};
 const spent=()=>SUBKEYS.reduce((s,k)=>s+costTo(S.attrs[k]),0);
 function esD(k,d){const fr=FRAMES[S.frame];let v=S.attrs[k]+(fr[k]||0)+d*(HMOD[k]||0)*(d<0&&(k==='blk'||k==='oreb'||k==='dreb')?1.25:1);
   // you can only dunk as well as your size and bounce allow: short players need real Vertical to dunk
