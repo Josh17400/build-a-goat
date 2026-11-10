@@ -278,7 +278,7 @@ function device() {
     clear: () => m.clear(),
   };
 }
-const RUN_EXPORTS = EXPORTS.replace(/};$/, '') + ',startCareer,abandonRun,quitRun,hasRun,autosave,menuItems};';
+const RUN_EXPORTS = EXPORTS.replace(/};$/, '') + ',startCareer,abandonRun,quitRun,hasRun,autosave,menuItems,spentNow:()=>spent(),budgetNow:()=>START_BUDGET};';
 function bootOn(storage) {
   const pg = page([], { storage });
   return runGame(gameScript(HTML), RUN_EXPORTS, pg).__g;
@@ -337,6 +337,21 @@ test('Abandon build deletes the run and opens a fresh creator; Main menu keeps i
   eq(g.hallList().length, hof, 'nothing added to the Hall of Builds');
   g = bootOn(dev);
   ok(!g.hasRun(), 'still gone after reopening');
+});
+
+test('a creator draft saved while skills started at 25 opens with every skill at 40 or more, within budget', () => {
+  const dev = device();
+  let g = bootOn(dev);
+  const d = JSON.parse(JSON.stringify(g.getS()));
+  delete d.ui;
+  for (const k of Object.keys(d.attrs)) d.attrs[k] = 25;
+  d.attrs.three = 90; d.attrs.mid = 85; d.attrs.handle = 80; d.attrs.pass = 80; d.attrs.speed = 80; d.name = 'Old Draft';
+  dev.setItem('bag_build', JSON.stringify(d));
+  g = bootOn(dev);
+  const s = g.getS();
+  eq(s.name, 'Old Draft', 'the draft itself is kept');
+  for (const [k, v] of Object.entries(s.attrs)) ok(v >= 40, k + ' is ' + v + ', below the start of 40');
+  ok(g.spentNow() <= g.budgetNow(), 'spent ' + g.spentNow() + ' of ' + g.budgetNow());
 });
 
 (async () => {

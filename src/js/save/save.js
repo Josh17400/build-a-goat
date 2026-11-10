@@ -51,6 +51,8 @@ function dropRun(){if(canSave()){clearRun();Store.remove(SV.build);}R=Math.rando
 // a draft saved by older versions can be the very build the saved run started from: that is not a new player, so skip it
 const sameAsRun=b=>{const s=runMeta()?.sum;return!!s&&JSON.stringify(b.look)===JSON.stringify(s.look);};
 // on launch: put a half-finished build back, and point to a saved run if there is one
-function bootSave(){if(!canSave())return;try{const b=Store.json(SV.build);if(b&&b.stage==='build'&&sameAsRun(b))Store.remove(SV.build);else if(b&&b.stage==='build'){S=Object.assign(newPlayer(),b);seedNewSkills(S.attrs,true);S.ui=Object.assign({tab:'setup',open:null,spend:false},b.ui||{},{menu:null,replaceOk:0});}}catch{}
+function bootSave(){if(!canSave())return;try{const b=Store.json(SV.build);if(b&&b.stage==='build'&&sameAsRun(b))Store.remove(SV.build);else if(b&&b.stage==='build'){S=Object.assign(newPlayer(),b);seedNewSkills(S.attrs,true);
+    // drafts saved while skills started at 25 (2026-11-08 to 11-10): lift them to today's start, then hand back any points over the budget
+    for(const k of SUBKEYS)if(!(S.attrs[k]>=START_A))S.attrs[k]=START_A;trimToBudget();S.ui=Object.assign({tab:'setup',open:null,spend:false},b.ui||{},{menu:null,replaceOk:0});}}catch{}
   if(hasRun())(S.ui=S.ui||{tab:'setup',open:null,spend:false}).tab='setup';}
 const SAVE_KEYS=['bag_gtp','bag_ach','bag_hof','bag_recent','bag_daily','bag_diff','bag_rec','bag_goats','bag_gems','bag_gear','bag_intro'];
