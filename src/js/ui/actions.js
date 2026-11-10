@@ -15,3 +15,4 @@ function applyArch(i){fillArch(i);render();}
 function randomBuild(){fillRandom();render();}
 function resumeRun(){const ok=loadRun();render();if(ok)scrollTo(0,0);return ok;}
 function quitRun(){leaveRun();render();scrollTo(0,0);}
+function abandonRun(){dropRun();render();scrollTo(0,0);}

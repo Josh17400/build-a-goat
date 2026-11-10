@@ -266,6 +266,79 @@ test('looks: on a card every hairstyle is scaled to fill it without its hair lea
   });
 });
 
+// A device's storage that outlives one boot, so a test can close the game and open it again.
+function device() {
+  const m = new Map();
+  return {
+    getItem: (k) => (m.has(String(k)) ? m.get(String(k)) : null),
+    setItem: (k, v) => void m.set(String(k), String(v)),
+    removeItem: (k) => void m.delete(String(k)),
+    key: (i) => [...m.keys()][i] ?? null,
+    get length() { return m.size; },
+    clear: () => m.clear(),
+  };
+}
+const RUN_EXPORTS = EXPORTS.replace(/};$/, '') + ',startCareer,abandonRun,quitRun,hasRun,autosave,menuItems};';
+function bootOn(storage) {
+  const pg = page([], { storage });
+  return runGame(gameScript(HTML), RUN_EXPORTS, pg).__g;
+}
+
+test('starting a career uses up its draft: reopening the game shows a new player in the creator', () => {
+  const dev = device();
+  let g = bootOn(dev);
+  g.getS().name = 'First Player';
+  g.autosave();
+  ok(dev.getItem('bag_build'), 'the half-finished build is saved while you make it');
+  g.startCareer();
+  eq(dev.getItem('bag_build'), null, 'draft after the career starts');
+  g = bootOn(dev);
+  ok(g.hasRun(), 'the run is still saved');
+  eq(g.getS().stage, 'build');
+  ok(g.getS().name !== 'First Player', 'the creator holds a new player, not the one already playing');
+  g.getS().name = 'Second Player';
+  g.autosave();
+  g = bootOn(dev);
+  eq(g.getS().name, 'Second Player', 'a draft of a genuinely new player still comes back');
+});
+
+test('a draft left by older versions that is the saved run itself is skipped on launch', () => {
+  const dev = device();
+  let g = bootOn(dev);
+  g.getS().name = 'Old Draft';
+  g.autosave();
+  const stale = dev.getItem('bag_build');
+  g.startCareer();
+  dev.setItem('bag_build', stale); // older versions never removed it
+  g = bootOn(dev);
+  ok(g.getS().name !== 'Old Draft', 'the creator does not reopen the player already in a run');
+  ok(!/Old Draft/.test(dev.getItem('bag_build') || ''), 'the stale draft is gone (the new player\'s own draft may be saved)');
+  ok(g.hasRun(), 'the run itself is untouched');
+});
+
+test('Abandon build deletes the run and opens a fresh creator; Main menu keeps it', () => {
+  const dev = device();
+  let g = bootOn(dev);
+  g.getS().name = 'Quitter';
+  g.startCareer();
+  ok(g.menuItems().some((m) => m[0] === 'abandon'), 'the side menu offers Abandon build during a career');
+  const hof = g.hallList().length;
+  g.quitRun();
+  ok(g.hasRun(), 'Main menu keeps the run');
+  ok(!g.menuItems().some((m) => m[0] === 'abandon'), 'no Abandon build on the creator');
+  g = bootOn(dev);
+  g.startCareer();
+  g.abandonRun();
+  ok(!g.hasRun(), 'the run is gone');
+  for (const k of ['bag_run', 'bag_run_meta', 'bag_run_log', 'bag_run_ui']) eq(dev.getItem(k), null, k);
+  ok(!/Quitter/.test(dev.getItem('bag_build') || ''), 'no draft of the abandoned player');
+  eq(g.getS().stage, 'build');
+  eq(g.getS().name, '', 'a fresh player');
+  eq(g.hallList().length, hof, 'nothing added to the Hall of Builds');
+  g = bootOn(dev);
+  ok(!g.hasRun(), 'still gone after reopening');
+});
+
 (async () => {
   let failed = 0;
   for (const [name, fn] of tests) {

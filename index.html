@@ -2028,7 +2028,12 @@ const MENU=[['settings','sliders','Settings','Difficulty, sound and reset'],['gt
 // the Gem Shop item exists only while the store is on (iOS app with RevenueCat, or ?dev=1); see PLATFORM (Plat)
 const MENU_GEMS=['gems','gem','Gem Shop','Buy gems and Remove Ads'];
 const menuAll=()=>{const m=[...MENU];if(storeOn())m.splice(m.findIndex(x=>x[0]==='gear')+1,0,MENU_GEMS);return m;};
-const menuItems=()=>{const M=menuAll();return S.stage==='build'?[...M,['how','book','How to play','']]:S.stage==='end'?M.map(m=>m[0]==='gtp'?['gtpnext','gtp','GTP Store','Perks for your next player']:m):[['prof','user','Your profile','Skills, badges, stats and timeline'],...M.filter(m=>m[0]!=='gtp'),['how','book','How to play',''],['quit','home','Main menu','']];};
+const menuItems=()=>{const M=menuAll();return S.stage==='build'?[...M,['how','book','How to play','']]:S.stage==='end'?M.map(m=>m[0]==='gtp'?['gtpnext','gtp','GTP Store','Perks for your next player']:m):[['prof','user','Your profile','Skills, badges, stats and timeline'],...M.filter(m=>m[0]!=='gtp'),['how','book','How to play',''],['quit','home','Main menu',''],['abandon','refresh','Abandon build','']];};
+// giving up a run asks once, on its own page; the run is gone after this
+const ABANDON=['abandon','refresh','Abandon build',''];
+function abandonHTML(){const n=esc(S.name||'this player');
+  return`<div class="card"><div class="sh">${icon('alert')} <span class="grow">Give up on ${n}?</span></div><div class="sub">This deletes the run for good. ${n} won't go into your Hall of Builds and earns no GTP or achievements from this career. You go straight back to the creator to build someone new.</div><div class="note">Just want a break? Use <b>Main menu</b> instead: it keeps the run saved.</div></div>`
+    +dock(`<div class="two"><button class="ghost" onclick="openMenu(null)">Keep playing</button><button class="danger" onclick="abandonRun()">Abandon build</button></div>`);}
 function nextGtp(){R=Math.random;S=newPlayer();UI().menu='gtp';render();scrollTo(0,0);}
 function openMenu(k){document.activeElement?.blur?.();const u=UI();if(k==='prof'){u.menu=null;openProfile('over');return;}if(k==='how'){u.menu=null;u.intro=0;render();scrollTo(0,0);return;}if(k==='open'){drawerAnim=true;u.wig=1;}u.menu=k;u.confirmReset=false;if(k!=='settings')u.resetDone=false;if(k!=='open')scrollTo(0,0);render();}
 const hdr=t=>`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>${t}</h1>${menuBtn()}</div>`;
@@ -2038,15 +2043,16 @@ function closeMenu(){const d=document.querySelector('.drawer');if(!d||d.classLis
 const BALL='<svg class="ball" viewBox="0 0 40 40" aria-hidden="true"><defs><radialGradient id="bg1" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#ffb05a"/><stop offset="1" stop-color="#d9580a"/></radialGradient></defs><circle cx="20" cy="20" r="18" fill="url(#bg1)"/><g fill="none" stroke="#3a1a05" stroke-width="1.6"><path d="M2 20h36M20 2v36"/><path d="M7 7c6 5 6 21 0 26M33 7c-6 5-6 21 0 26"/></g></svg>';
 function drawerHTML(){const hofN=hallList().length,achN=Object.keys(achHave()).length,cls=drawerAnim?'in':'';drawerAnim=false;
   const sub={settings:diff().name.replace(/^\S+\s/,'')+' · difficulty, sound, reset',gtp:(gtpBank()-cartCost())+' GTP available · perks for this player',hof:hofN+(hofN===1?' career':' careers')+' · your best builds',ach:achN+'/'+ACH.length+' unlocked'};
-  const ic={gtpnext:icon('gtp'),bbook:icon('medal'),settings:icon('sliders'),gtp:icon('gtp'),gear:icon('shirt'),gems:icon('gem'),how:icon('book'),hof:'🏛️',ach:icon('trophy'),quit:icon('home'),prof:icon('user')};sub.prof='Skills, badges, stats and timeline';sub.gear=gems()+' gems · permanent gear';sub.gems=gems()+' gems · buy gems, Remove Ads';sub.how='The basics, any time';sub.gtpnext=gtpBank()+' GTP · starts your next player (leaves this recap)';sub.bbook=bookCount()+'/'+BADGES.length+' badges discovered';sub.quit='Your run is saved. Continue it any time';if(S.stage!=='build')sub.settings='Sound and reset';
+  const ic={gtpnext:icon('gtp'),bbook:icon('medal'),settings:icon('sliders'),gtp:icon('gtp'),gear:icon('shirt'),gems:icon('gem'),how:icon('book'),hof:'🏛️',ach:icon('trophy'),quit:icon('home'),abandon:icon('refresh'),prof:icon('user')};sub.abandon='Delete this run and start a new player';sub.prof='Skills, badges, stats and timeline';sub.gear=gems()+' gems · permanent gear';sub.gems=gems()+' gems · buy gems, Remove Ads';sub.how='The basics, any time';sub.gtpnext=gtpBank()+' GTP · starts your next player (leaves this recap)';sub.bbook=bookCount()+'/'+BADGES.length+' badges discovered';sub.quit='Your run is saved. Continue it any time';if(S.stage!=='build')sub.settings='Sound and reset';
   return`<div class="drawer ${cls}" role="dialog" aria-label="Menu"><div class="bd" onclick="closeMenu()"></div><div class="pn">
   <div class="row" style="flex-wrap:nowrap"><div class="logo">${BALL}<div>BUILD A <span>GOAT</span></div></div><button class="x" aria-label="Close menu" onclick="closeMenu()"><i></i><i></i></button></div>
   <div class="curchips"><div class="gtpchip">🪙 ${gtpBank()-cartCost()} GTP${cartCost()?` · ${cartCost()} in cart`:''}</div><div class="gtpchip gemchip">${icon('gem','ici')}${gems()} gems</div></div>
   ${menuItems().map(([k,,l])=>`<button class="mi" onclick="${k==='quit'?'quitRun()':k==='gtpnext'?'nextGtp()':`openMenu('${k}')`}"><span class="bub">${ic[k]}</span><span class="grow"><span class="t">${l}</span><small>${sub[k]}</small></span><span class="chev">›</span></button>`).join('')}
   </div></div>`;}
-function menuHTML(){const k=UI().menu,m=menuAll().find(x=>x[0]===k),hofN=hallList().length,achN=Object.keys(achHave()).length;
+function menuHTML(){const k=UI().menu,m=k==='abandon'?ABANDON:menuAll().find(x=>x[0]===k),hofN=hallList().length,achN=Object.keys(achHave()).length;
   const top=`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>${m?m[2]:'Menu'}</h1><button class="ghost sm" onclick="openMenu('open')">◀ Menu</button></div>`;
   if(!m)return top+`<div class="card">${menuAll().map(([k,ic,l,d])=>`<button class="opt" onclick="openMenu('${k}')"><div class="grow"><div class="t">${/^[a-z]+$/.test(ic)?icon(ic):ic} ${l}</div><small>${k==='gtp'?gtpBank()+' GTP · ':k==='gear'||k==='gems'?gems()+' gems · ':k==='hof'?hofN+(hofN===1?' career · ':' careers · '):k==='ach'?achN+'/'+ACH.length+' · ':diff().name.replace(/^\S+\s/,'')+' · '}${d}</small></div></button>`).join('')}</div>`+dock(`<button onclick="openMenu(null)">Back to your build</button>`);
+  if(k==='abandon')return top+abandonHTML();
   let b='';if(k==='settings')b=settingsCard()+soundCard();
   if(k==='gtp')b=gtpCard(true)+gemTradeCard();
   if(k==='gear')b=gearCard();
@@ -2130,6 +2136,7 @@ function applyArch(i){fillArch(i);render();}
 function randomBuild(){fillRandom();render();}
 function resumeRun(){const ok=loadRun();render();if(ok)scrollTo(0,0);return ok;}
 function quitRun(){leaveRun();render();scrollTo(0,0);}
+function abandonRun(){dropRun();render();scrollTo(0,0);}
 // ---------- league screens ----------
 const tShort=t=>t.split(' ').slice(-1)[0];
 function clsSnap(){const c=classRank();if(!c)return null;const ix=new Map(S.cls.map((p,i)=>[p,i])),sn={};let r=0;for(const p of c.all){r++;sn[ix.get(p)]=r>=c.rank?r+1:r;}sn.me=c.rank;return sn;}
@@ -2945,7 +2952,8 @@ function autosave(){if(!canSave())return;if(S.stage==='build')lsSet(SV.build,JSO
 const LOGGED=['simHS','simCol','simNBA','chooseSummer','chooseSchool','declare','returnSchool','choose','simAll','simEnd','spend','smartSpend','startNBA','unspend','undoSpend','clearUndo'];
 for(const n of LOGGED){const f=globalThis[n];if(typeof f!=='function')continue;
   globalThis[n]=function(...a){if(REPLAY||LOGD||!S.seed||S.stage==='build')return f.apply(this,a);LOGD++;let r;try{r=f.apply(this,a);}finally{LOGD--;}try{afterAction(n,a);}catch(e){console.warn(e);}return r;};}
-{const f=globalThis.startCareer;if(typeof f==='function')globalThis.startCareer=function(...a){const r=f.apply(this,a);if(!REPLAY&&canSave()){clearRun();writeSnap();}return r;};}
+// a started career uses up the build it came from: drop that draft, or the next launch reopens the same player in the creator
+{const f=globalThis.startCareer;if(typeof f==='function')globalThis.startCareer=function(...a){const r=f.apply(this,a);if(!REPLAY&&canSave()){clearRun();Store.remove(SV.build);writeSnap();}return r;};}
 function loadRun(){const meta=runMeta();let snap=null,lg=null;try{snap=JSON.parse(teamRename(Store.get(SV.snap))||'null',(k,v)=>v&&typeof v==='object'&&Array.isArray(v.__set)?new Set(v.__set):v);lg=Store.json(SV.log);}catch{}
   if(!meta||!snap){clearRun();return false;}
   REPLAY=true;
@@ -2957,8 +2965,12 @@ function loadRun(){const meta=runMeta();let snap=null,lg=null;try{snap=JSON.pars
   S.ui=Object.assign({tab:'setup',open:null,spend:false},ui||{},{menu:null,wig:1});writeLog();return true;}
 // leave a run without losing it: back to a fresh build screen, with the run waiting on Continue
 function leaveRun(){if(S.stage!=='build'&&S.stage!=='end'&&canSave())lsSet(SV.ui,JSON.stringify(Object.assign({},S.ui,{menu:null})));R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,wig:1};}
+// give up on a run: it is deleted (no Hall of Builds entry, no GTP), and a fresh player waits in the creator
+function dropRun(){if(canSave()){clearRun();Store.remove(SV.build);}R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,wig:1};}
+// a draft saved by older versions can be the very build the saved run started from: that is not a new player, so skip it
+const sameAsRun=b=>{const s=runMeta()?.sum;return!!s&&JSON.stringify(b.look)===JSON.stringify(s.look);};
 // on launch: put a half-finished build back, and point to a saved run if there is one
-function bootSave(){if(!canSave())return;try{const b=Store.json(SV.build);if(b&&b.stage==='build'){S=Object.assign(newPlayer(),b);seedNewSkills(S.attrs,true);S.ui=Object.assign({tab:'setup',open:null,spend:false},b.ui||{},{menu:null,replaceOk:0});}}catch{}
+function bootSave(){if(!canSave())return;try{const b=Store.json(SV.build);if(b&&b.stage==='build'&&sameAsRun(b))Store.remove(SV.build);else if(b&&b.stage==='build'){S=Object.assign(newPlayer(),b);seedNewSkills(S.attrs,true);S.ui=Object.assign({tab:'setup',open:null,spend:false},b.ui||{},{menu:null,replaceOk:0});}}catch{}
   if(hasRun())(S.ui=S.ui||{tab:'setup',open:null,spend:false}).tab='setup';}
 const SAVE_KEYS=['bag_gtp','bag_ach','bag_hof','bag_recent','bag_daily','bag_diff','bag_rec','bag_goats','bag_gems','bag_gear','bag_intro'];
 // ---------- start: a fresh player (or the saved creator build), then the first screen ----------

@@ -33,7 +33,8 @@ function autosave(){if(!canSave())return;if(S.stage==='build')lsSet(SV.build,JSO
 const LOGGED=['simHS','simCol','simNBA','chooseSummer','chooseSchool','declare','returnSchool','choose','simAll','simEnd','spend','smartSpend','startNBA','unspend','undoSpend','clearUndo'];
 for(const n of LOGGED){const f=globalThis[n];if(typeof f!=='function')continue;
   globalThis[n]=function(...a){if(REPLAY||LOGD||!S.seed||S.stage==='build')return f.apply(this,a);LOGD++;let r;try{r=f.apply(this,a);}finally{LOGD--;}try{afterAction(n,a);}catch(e){console.warn(e);}return r;};}
-{const f=globalThis.startCareer;if(typeof f==='function')globalThis.startCareer=function(...a){const r=f.apply(this,a);if(!REPLAY&&canSave()){clearRun();writeSnap();}return r;};}
+// a started career uses up the build it came from: drop that draft, or the next launch reopens the same player in the creator
+{const f=globalThis.startCareer;if(typeof f==='function')globalThis.startCareer=function(...a){const r=f.apply(this,a);if(!REPLAY&&canSave()){clearRun();Store.remove(SV.build);writeSnap();}return r;};}
 function loadRun(){const meta=runMeta();let snap=null,lg=null;try{snap=JSON.parse(teamRename(Store.get(SV.snap))||'null',(k,v)=>v&&typeof v==='object'&&Array.isArray(v.__set)?new Set(v.__set):v);lg=Store.json(SV.log);}catch{}
   if(!meta||!snap){clearRun();return false;}
   REPLAY=true;
@@ -45,7 +46,11 @@ function loadRun(){const meta=runMeta();let snap=null,lg=null;try{snap=JSON.pars
   S.ui=Object.assign({tab:'setup',open:null,spend:false},ui||{},{menu:null,wig:1});writeLog();return true;}
 // leave a run without losing it: back to a fresh build screen, with the run waiting on Continue
 function leaveRun(){if(S.stage!=='build'&&S.stage!=='end'&&canSave())lsSet(SV.ui,JSON.stringify(Object.assign({},S.ui,{menu:null})));R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,wig:1};}
+// give up on a run: it is deleted (no Hall of Builds entry, no GTP), and a fresh player waits in the creator
+function dropRun(){if(canSave()){clearRun();Store.remove(SV.build);}R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,wig:1};}
+// a draft saved by older versions can be the very build the saved run started from: that is not a new player, so skip it
+const sameAsRun=b=>{const s=runMeta()?.sum;return!!s&&JSON.stringify(b.look)===JSON.stringify(s.look);};
 // on launch: put a half-finished build back, and point to a saved run if there is one
-function bootSave(){if(!canSave())return;try{const b=Store.json(SV.build);if(b&&b.stage==='build'){S=Object.assign(newPlayer(),b);seedNewSkills(S.attrs,true);S.ui=Object.assign({tab:'setup',open:null,spend:false},b.ui||{},{menu:null,replaceOk:0});}}catch{}
+function bootSave(){if(!canSave())return;try{const b=Store.json(SV.build);if(b&&b.stage==='build'&&sameAsRun(b))Store.remove(SV.build);else if(b&&b.stage==='build'){S=Object.assign(newPlayer(),b);seedNewSkills(S.attrs,true);S.ui=Object.assign({tab:'setup',open:null,spend:false},b.ui||{},{menu:null,replaceOk:0});}}catch{}
   if(hasRun())(S.ui=S.ui||{tab:'setup',open:null,spend:false}).tab='setup';}
 const SAVE_KEYS=['bag_gtp','bag_ach','bag_hof','bag_recent','bag_daily','bag_diff','bag_rec','bag_goats','bag_gems','bag_gear','bag_intro'];
