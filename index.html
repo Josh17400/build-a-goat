@@ -408,7 +408,9 @@ const BANK_AW={'Comeback Player':4,'All-Star':3,'All-NBA 1st':8,'All-NBA 2nd':6,
 const GTP_AW={'Comeback Player':2,'All-Star':2,'All-NBA 1st':5,'All-NBA 2nd':4,'All-NBA 3rd':3,MVP:8,'Finals MVP':4,Champion:5,DPOY:4,ROY:3,'6MOY':1,MIP:1,'Scoring Title':2};
 const GTP_TIER={'Bust':0,'Journeyman':0,'Role Player':1,'Solid Starter':3,'Champion Role Player':4,'All-Star':5,'Perennial All-Star':8,'Hall of Famer':12,'Top 10 All-Time':20,'🐐 THE GOAT':35};
 const capF=s=>s[0].toUpperCase()+s.slice(1);
-function earnGtp(base,why){const g=Math.round(base*diff().mult*.5);if(g>0){S.gtpRun=(S.gtpRun||0)+g;(S.gtpLog=S.gtpLog||[]).push([why,g]);}return g;}
+// 2026-11-10: the owner cut every GTP and gem payout by 25% (purchases, trades and the ad bonus are unchanged)
+const EARN=.75;
+function earnGtp(base,why){const g=Math.round(base*diff().mult*.5*EARN);if(g>0){S.gtpRun=(S.gtpRun||0)+g;(S.gtpLog=S.gtpLog||[]).push([why,g]);}return g;}
 // the shop: perks bought for the NEXT player you build (applied when the career starts)
 const PERKS_GTP=[
   ['pts','➕ +25 skill points','Stack up to 3 times',20,3],
@@ -1216,7 +1218,7 @@ function setGoatStd(score,name){const all=Store.obj('bag_rec');all[S.diff]={scor
 const hallList=()=>Store.list('bag_hof');
 function hallAdd(run){const h=hallList();h.push(run);h.sort((a,b)=>b.score-a.score);Store.setJson('bag_hof',h.slice(0,15));}
 function finish(){const c=career(),sc=goatScore(c),[t]=tierOf(sc,c);
-  S.gemsRun=S.daily?0:Math.round((GEM_TIER[t]||3)*(GEM_MULT[S.diff]??1));if(S.gemsRun)addGems(S.gemsRun);
+  S.gemsRun=S.daily?0:Math.round((GEM_TIER[t]||3)*(GEM_MULT[S.diff]??1)*EARN);if(S.gemsRun)addGems(S.gemsRun);
   if(!S.daily&&t.includes('GOAT')){immortalize(c,sc);const r=goatStd();if(!r||sc>r.score){S.newStd={prev:r};setGoatStd(sc,S.name);earnGtp(r?40:20,r?'Broke the GOAT standard':'Set the GOAT standard');}}
   hallAdd({hl:highlights(true).slice(0,2),diff:S.diff,name:S.name,pos:S.pos,arch:archName(),bd:Object.keys(S.bdg||{}).length,score:sc,tier:t,pick:S.pick,ppg:c.gp?c.pts/c.gp:0,rings:c.cnt['Champion']||0,mvp:c.cnt['MVP']||0,date:Date.now()});
   S.newAch=S.diff==='rookie'?[]:checkAch(c,sc,t);earnGtp(GTP_TIER[t]||0,'Career: '+t);S.gtpRun=Math.round(S.gtpRun||0);setGtp(gtpBank()+S.gtpRun);rememberSeen();
@@ -1880,7 +1882,7 @@ function clutchPend(x){const c=S.cur,t=S.traits,r2=makeRng(((c.rs0||7)^Math.imul
   return{kind:'clutch',title,text,ctx:{me,them,my:tShort(S.team),op:tShort(x.opp),secs,sit,fin,g},opts,best};}
 
 // ---------- season goals: three targets every NBA season, from likely to stretch ----------
-const goalReward=g=>({pts:Math.max(1,Math.round([0,2,4,7][g.tier]*(diff().nbaPts??1))),gtp:Math.round([0,1,2,3][g.tier]*(diff().mult||0))});
+const goalReward=g=>({pts:Math.max(1,Math.round([0,2,4,7][g.tier]*(diff().nbaPts??1))),gtp:Math.round([0,1,2,3][g.tier]*(diff().mult||0)*EARN)});
 function makeGoals(){if(S.stage!=='nba')return;const n=S.nba.length,last=S.nba[n-1],o=ovr(),a=S.age,c=career(),z=S.L?S.L.z[S.team]||0:0,rv=S.rival&&!S.rival.retired&&S.rival.team!==S.team?S.rival:null,G=[];
   const lp=last?last.ppg:Math.max(5,8+(o-55)*.45),lw=last?last.wins:Math.round(41+z*11),add=(k,v,tier,text)=>G.push({k,v,tier,text}),P=x=>Math.max(4,Math.round(x));
   add('ppg',P(lp-1.5),1,`Average ${P(lp-1.5)}+ points`);add('ppg',P(lp+1.5),2,`Average ${P(lp+1.5)}+ points`);add('ppg',P(lp+4.5),3,`Average ${P(lp+4.5)}+ points`);

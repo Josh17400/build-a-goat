@@ -1,5 +1,5 @@
 // ---------- season goals: three targets every NBA season, from likely to stretch ----------
-const goalReward=g=>({pts:Math.max(1,Math.round([0,2,4,7][g.tier]*(diff().nbaPts??1))),gtp:Math.round([0,1,2,3][g.tier]*(diff().mult||0))});
+const goalReward=g=>({pts:Math.max(1,Math.round([0,2,4,7][g.tier]*(diff().nbaPts??1))),gtp:Math.round([0,1,2,3][g.tier]*(diff().mult||0)*EARN)});
 function makeGoals(){if(S.stage!=='nba')return;const n=S.nba.length,last=S.nba[n-1],o=ovr(),a=S.age,c=career(),z=S.L?S.L.z[S.team]||0:0,rv=S.rival&&!S.rival.retired&&S.rival.team!==S.team?S.rival:null,G=[];
   const lp=last?last.ppg:Math.max(5,8+(o-55)*.45),lw=last?last.wins:Math.round(41+z*11),add=(k,v,tier,text)=>G.push({k,v,tier,text}),P=x=>Math.max(4,Math.round(x));
   add('ppg',P(lp-1.5),1,`Average ${P(lp-1.5)}+ points`);add('ppg',P(lp+1.5),2,`Average ${P(lp+1.5)}+ points`);add('ppg',P(lp+4.5),3,`Average ${P(lp+4.5)}+ points`);

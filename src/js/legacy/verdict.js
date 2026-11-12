@@ -28,7 +28,7 @@ function setGoatStd(score,name){const all=Store.obj('bag_rec');all[S.diff]={scor
 const hallList=()=>Store.list('bag_hof');
 function hallAdd(run){const h=hallList();h.push(run);h.sort((a,b)=>b.score-a.score);Store.setJson('bag_hof',h.slice(0,15));}
 function finish(){const c=career(),sc=goatScore(c),[t]=tierOf(sc,c);
-  S.gemsRun=S.daily?0:Math.round((GEM_TIER[t]||3)*(GEM_MULT[S.diff]??1));if(S.gemsRun)addGems(S.gemsRun);
+  S.gemsRun=S.daily?0:Math.round((GEM_TIER[t]||3)*(GEM_MULT[S.diff]??1)*EARN);if(S.gemsRun)addGems(S.gemsRun);
   if(!S.daily&&t.includes('GOAT')){immortalize(c,sc);const r=goatStd();if(!r||sc>r.score){S.newStd={prev:r};setGoatStd(sc,S.name);earnGtp(r?40:20,r?'Broke the GOAT standard':'Set the GOAT standard');}}
   hallAdd({hl:highlights(true).slice(0,2),diff:S.diff,name:S.name,pos:S.pos,arch:archName(),bd:Object.keys(S.bdg||{}).length,score:sc,tier:t,pick:S.pick,ppg:c.gp?c.pts/c.gp:0,rings:c.cnt['Champion']||0,mvp:c.cnt['MVP']||0,date:Date.now()});
   S.newAch=S.diff==='rookie'?[]:checkAch(c,sc,t);earnGtp(GTP_TIER[t]||0,'Career: '+t);S.gtpRun=Math.round(S.gtpRun||0);setGtp(gtpBank()+S.gtpRun);rememberSeen();

@@ -12,7 +12,9 @@ const BANK_AW={'Comeback Player':4,'All-Star':3,'All-NBA 1st':8,'All-NBA 2nd':6,
 const GTP_AW={'Comeback Player':2,'All-Star':2,'All-NBA 1st':5,'All-NBA 2nd':4,'All-NBA 3rd':3,MVP:8,'Finals MVP':4,Champion:5,DPOY:4,ROY:3,'6MOY':1,MIP:1,'Scoring Title':2};
 const GTP_TIER={'Bust':0,'Journeyman':0,'Role Player':1,'Solid Starter':3,'Champion Role Player':4,'All-Star':5,'Perennial All-Star':8,'Hall of Famer':12,'Top 10 All-Time':20,'🐐 THE GOAT':35};
 const capF=s=>s[0].toUpperCase()+s.slice(1);
-function earnGtp(base,why){const g=Math.round(base*diff().mult*.5);if(g>0){S.gtpRun=(S.gtpRun||0)+g;(S.gtpLog=S.gtpLog||[]).push([why,g]);}return g;}
+// 2026-11-10: the owner cut every GTP and gem payout by 25% (purchases, trades and the ad bonus are unchanged)
+const EARN=.75;
+function earnGtp(base,why){const g=Math.round(base*diff().mult*.5*EARN);if(g>0){S.gtpRun=(S.gtpRun||0)+g;(S.gtpLog=S.gtpLog||[]).push([why,g]);}return g;}
 // the shop: perks bought for the NEXT player you build (applied when the career starts)
 const PERKS_GTP=[
   ['pts','➕ +25 skill points','Stack up to 3 times',20,3],
