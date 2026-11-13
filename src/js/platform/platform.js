@@ -33,7 +33,7 @@ const SHOP_PACKS=[{sku:'bag_gems_t1',gems:40,usd:1.99},{sku:'bag_gems_t2',gems:1
 const SHOP_NOADS={sku:'bag_noads',usd:3.99};
 const SHOP_SKUS=()=>[...SHOP_PACKS.map(p=>p.sku),SHOP_NOADS.sku];
 const noAds=()=>Store.get('bag_noads')==='1';
-const Plat=(()=>{let busy=false,booted=null,mt=null;
+const Plat=(()=>{let busy=false,booted=null,mt=null,lastTxs=null;
   const sh=()=>window.Shell&&window.Shell.native?window.Shell:null;
   const wt=()=>!!globalThis.__witnessApi;
   const dev=()=>!sh()&&!wt()&&typeof location!=='undefined'&&/[?&]dev=1(&|$)/.test(location.search);
@@ -60,22 +60,25 @@ const Plat=(()=>{let busy=false,booted=null,mt=null;
     banner(){const s=sh();if(s){if(noAds())s.ads.removeBanner();else s.ads.showBanner();return;}
       if(dev()){document.documentElement.classList.toggle('adsim',!noAds());setBanner(noAds()?0:50);}},
     boot(){if(booted)return booted;const s=sh();if(wt())return booted=Promise.resolve();if(!s){P.banner();return booted=Promise.resolve();}
-      watchStorage();s.app.onState(on=>{if(!on)mirrorNow();});
+      watchStorage();s.app.onState(on=>{if(!on)mirrorNow();else if(booted)syncPurchases();});
       return booted=s.store.hydrate(NKEY).then(j=>{if(!j)return;let o=null;try{o=JSON.parse(j);}catch(e){}if(!o)return;
           for(const k in o)if(MIRROR(k))Store.set(k,o[k]);S=newPlayer();bootSave();render();})
         .catch(()=>{}).then(()=>{
           s.configure({rewarded:live()?PLAT_IDS.rewarded:PLAT_IDS.testRewarded,banner:live()?PLAT_IDS.banner:PLAT_IDS.testBanner,
             rcKey:PLAT_IDS.rcKey,products:SHOP_SKUS(),nonConsumables:[SHOP_NOADS.sku]});
           s.ads.onBanner(setBanner);P.banner();
-          if(s.iap.available()){s.iap.owned().then(ids=>{if(ids.includes(SHOP_NOADS.sku)&&!noAds())grantNoAds();}).catch(()=>{});
-            s.iap.getProducts(SHOP_SKUS()).then(()=>{if(UI().menu==='gear')render();}).catch(()=>{});}
+          if(s.iap.available()){syncPurchases();s.iap.owned().then(ids=>{if(ids.includes(SHOP_NOADS.sku)&&!noAds())grantNoAds();}).catch(()=>{});
+            s.iap.getProducts(SHOP_SKUS()).then(()=>{if(['gear','gems'].includes(UI().menu))render();}).catch(()=>{});}
           mirror();}).finally(()=>s.ready());},
     async ad(){if(busy||!P.adsOn())return false;busy=true;try{const s=sh();if(!s)return await sim('Rewarded ad');
         hush(true);try{const r=await s.ads.showRewarded();if(r&&r.reason==='nofill')platToast('No ad available right now. Try again in a minute.');return!!(r&&r.rewarded);}finally{hush(false);}}
       catch(e){return false;}finally{busy=false;}},
     async buy(sku){if(busy||!P.iapOn())return false;busy=true;try{const s=sh();if(!s)return await sim('Buy '+sku);
-        const r=await s.iap.purchase(sku);if(r&&!r.ok&&!r.cancelled)platToast('Purchase failed · '+String(r.error||'try again later').slice(0,80));return!!(r&&r.ok);}
+        const r=await s.iap.purchase(sku);if(r&&!r.ok&&!r.cancelled)platToast('Purchase failed · '+String(r.error||'try again later').slice(0,80));if(r&&r.ok)lastTxs=Array.isArray(r.txs)?r.txs:null;return!!(r&&r.ok);}
       catch(e){return false;}finally{busy=false;}},
+    // the store's list of one-time purchases ([{key,product}]), or null when it cannot be read right now
+    lastTxs:()=>lastTxs,
+    async txs(){const s=sh();if(!s||!s.iap.available()||typeof s.iap.transactions!=='function')return null;try{const l=await s.iap.transactions();return Array.isArray(l)?l:null;}catch(e){return null;}},
     async restore(){const s=sh();if(s)return s.iap.available()?await s.iap.restore():[];return dev()&&await sim('Restore purchases')?[SHOP_NOADS.sku]:[];}};
   return P;})();
 // hoisted so menu code can ask before Plat's const is initialized (render() runs once before the PLATFORM section loads)
@@ -89,11 +92,27 @@ function gemTradeCard(){const n=gems(),u=UI();
   ${GEM_TRADES.map(([g,p],i)=>`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><span class="bub">🪙</span><div class="grow"><b>+${p} GTP</b></div><button class="sm" aria-label="Trade ${g} gems for ${p} GTP" onclick="tradeGems(${i})" ${n<g?'disabled':''}>${g} gems</button></div>`).join('')}
   ${u.tradeMsg?`<div class="ev good" style="margin-top:10px">${esc(u.tradeMsg)}</div>`:''}${storeOn()?`<button class="ghost sm" style="margin-top:12px;width:100%" onclick="openMenu('gems')">${icon('gem')} Get more gems</button>`:''}</div>`;}
 function platToast(msg){let t=document.querySelector('.platToast');if(!t){t=document.createElement('div');t.className='platToast';document.body.appendChild(t);}t.textContent=msg;clearTimeout(platToast.t);platToast.t=setTimeout(()=>t.remove(),3200);}
+onSaveFail=()=>platToast('Could not save your progress. Your device may be out of storage.');
 function grantNoAds(){Store.set('bag_noads','1');Plat.banner();}
+// Gem packs are paid out once per store transaction. bag_tx lists the transactions already settled; bag_txdue counts packs
+// paid on the spot whose transaction had not reached the list yet. A pack that is approved after its purchase call returned
+// (Ask to Buy, a bank approval, the app killed under the payment sheet) is in neither, so syncPurchases() pays it later.
+// The first list ever seen only sets the baseline: nothing in it is paid. only=true settles the list without paying (restore).
+function settleTx(txs,paid,only){const due=Store.obj('bag_txdue');let seen=Store.json('bag_tx'),got=0,mine=!paid;
+  if(!Array.isArray(txs)){if(paid){due[paid]=(due[paid]||0)+1;Store.setJson('bag_txdue',due);}return 0;}
+  const first=!Array.isArray(seen);if(first)seen=[];
+  for(const t of txs){if(!t||seen.includes(t.key))continue;seen.push(t.key);const p=SHOP_PACKS.find(x=>x.sku===t.product);if(!p)continue;
+    if(!mine&&t.product===paid){mine=true;continue;}
+    if(first||only)continue;
+    if(due[t.product]>0){due[t.product]--;continue;}
+    addGems(p.gems);got+=p.gems;}
+  if(!mine)due[paid]=(due[paid]||0)+1;
+  Store.setJson('bag_tx',seen.slice(-400));Store.setJson('bag_txdue',due);return got;}
+function syncPurchases(){return Plat.txs().then(l=>{const got=settleTx(l);if(got){platToast(`Your purchase came through: +${got.toLocaleString()} gems`);render();}return got;}).catch(()=>0);}
 function shopBuy(sku){if(Plat.busy())return;UI().shopMsg='';const go=Plat.buy(sku);render();go.then(ok=>{if(ok){const p=SHOP_PACKS.find(x=>x.sku===sku);
-    if(p){addGems(p.gems);UI().shopMsg=`+${p.gems.toLocaleString()} gems added. Thank you!`;}
+    if(p){addGems(p.gems);settleTx(Plat.lastTxs(),sku);UI().shopMsg=`+${p.gems.toLocaleString()} gems added. Thank you!`;}
     else if(sku===SHOP_NOADS.sku){grantNoAds();UI().shopMsg='Banner ads removed. Thank you!';}}render();});}
-function shopRestore(){if(Plat.busy())return;Plat.restore().then(ids=>{const had=ids.includes(SHOP_NOADS.sku);if(had)grantNoAds();UI().shopMsg=had?'Remove Ads restored.':'Nothing to restore on this Apple ID.';render();})
+function shopRestore(){if(Plat.busy())return;Plat.restore().then(ids=>{Plat.txs().then(l=>settleTx(l,null,true));const had=ids.includes(SHOP_NOADS.sku);if(had)grantNoAds();UI().shopMsg=had?'Remove Ads restored.':'Nothing to restore on this Apple ID.';render();})
   .catch(e=>{UI().shopMsg=String(e&&e.message||e);render();});}
 // the gem shop, under Equipment: only in the iOS app (or ?dev=1)
 function shopCard(){if(!Plat.iapOn())return'';const u=UI(),b=Plat.busy()?'disabled':'';
@@ -104,9 +123,11 @@ function shopCard(){if(!Plat.iapOn())return'';const u=UI(),b=Plat.busy()?'disabl
   <button class="ghost sm" style="margin-top:12px;width:100%" onclick="shopRestore()" ${b}>Restore purchases</button></div>`;}
 // end of a career: the gems card, with one rewarded ad that doubles this career's gems and GTP (never Rookie or the Daily Build)
 function rewardCard(){if(!S.gemsRun)return'';const can=!S.dbl&&!S.daily&&S.diff!=='rookie'&&Plat.adsOn();
-  return`<div class="card"><div class="sh">${icon('sparkle')} <span class="grow">+${S.gemsRun} gems${S.dbl?' <span class="gold">· doubled</span>':''}</span><b class="gold">${gems()} total</b></div><div class="sub">Spend them on permanent Equipment from the menu. Better careers pay more: Role Player 10 · Solid Starter 15 · All-Star 20 · Hall of Famer 35 · THE GOAT 60${S.diff==='hof'?' (×1.5 on Hall of Fame)':''}.</div>
+  return`<div class="card"><div class="sh">${icon('sparkle')} <span class="grow">+${S.gemsRun} gems${S.dbl?' <span class="gold">· doubled</span>':''}</span><b class="gold">${gems()} total</b></div><div class="sub">Spend them on permanent Equipment from the menu. Better careers pay more: ${[['Role Player'],['Solid Starter'],['All-Star'],['Hall of Famer'],['🐐 THE GOAT','THE GOAT']].map(([t,l])=>`${l||t} ${Math.round(GEM_TIER[t]*EARN)}`).join(' · ')}${S.diff==='hof'?' (×1.5 on Hall of Fame)':''}.</div>
   ${can?`<button class="wide" style="margin-top:12px" onclick="doubleRewards()" ${Plat.busy()?'disabled':''}>${icon('video')} Watch an ad: double to +${S.gemsRun*2} gems${S.gtpRun?` and +${S.gtpRun*2} GTP`:''}</button>`:''}</div>`;}
-function doubleRewards(){if(S.dbl||Plat.busy()||S.stage!=='end')return;const run=S;const go=Plat.ad();render();
-  go.then(ok=>{if(!ok||run!==S||S.dbl||S.stage!=='end'){render();return;}S.dbl=true;addGems(S.gemsRun);S.gemsRun*=2;
-    if(S.gtpRun){setGtp(gtpBank()+S.gtpRun);(S.gtpLog=S.gtpLog||[]).push(['Ad bonus',S.gtpRun]);S.gtpRun*=2;}render();});}
+function doubleRewards(){if(S.dbl||Plat.busy()||S.stage!=='end')return;const run=S,g=S.gemsRun,t=S.gtpRun;const go=Plat.ad();render();
+  go.then(ok=>{if(!ok||run.dbl){render();return;}run.dbl=true;addGems(g);run.gemsRun=g*2;
+    if(t){setGtp(gtpBank()+t);(run.gtpLog=run.gtpLog||[]).push(['Ad bonus',t]);run.gtpRun=t*2;}
+    // still on the recap: remember the ad was used. Already building the next player: say what arrived
+    if(run===S)writeSnap();else platToast(`Ad bonus: +${g} gems${t?` and +${t} GTP`:''}`);render();});}
 Plat.boot();

@@ -444,6 +444,19 @@ async function iap() {
   check('iap: getProducts maps id/price/title, skips unknown ids', JSON.stringify(list) === JSON.stringify([{ id: 'fort_gems_80', price: '€12,99', title: 'T fort_gems_80' }]), list);
   const ok = await env.Shell.iap.purchase('fort_gems_500');
   check('iap: purchase ok', ok.ok === true && env.args('purchaseStoreProduct').includes('fort_gems_500'), ok);
+  check('iap: a purchase hands back the one-time purchase list', JSON.stringify(ok.txs) === '[]', ok);
+  const txEnv = makeEnv({ plugins: { Purchases: { customerInfo: { nonSubscriptionTransactions: [
+    { productIdentifier: 'fort_gems_80', transactionIdentifier: 'rc_1', purchaseDate: '2026-11-01T10:00:00Z' },
+    { productIdentifier: 'fort_gems_500:base', purchaseDate: '2026-11-02T10:00:00Z' },
+    { productIdentifier: 'fort_gems_80' }, null
+  ] } } } });
+  txEnv.Shell.configure(cfg());
+  await txEnv.advance(50);
+  const txs = await txEnv.Shell.iap.transactions();
+  check('iap: transactions lists every one-time purchase with a stable key, skipping ones it cannot key',
+    JSON.stringify(txs) === '[{"key":"rc_1","product":"fort_gems_80"},{"key":"fort_gems_500|2026-11-02T10:00:00Z","product":"fort_gems_500"}]', txs);
+  const bought = await txEnv.Shell.iap.purchase('fort_gems_80');
+  check('iap: a purchase result carries the same list', bought.ok === true && JSON.stringify(bought.txs) === JSON.stringify(txs), bought);
   const unknown = await env.Shell.iap.purchase('fort_gems_1200');
   check('iap: a product the store lacks fails cleanly', unknown.ok === false && /not in the App Store yet/.test(unknown.error), unknown);
   const owned = await env.Shell.iap.owned();

@@ -10,7 +10,7 @@ const ABANDON=['abandon','refresh','Abandon build',''];
 function abandonHTML(){const n=esc(S.name||'this player');
   return`<div class="card"><div class="sh">${icon('alert')} <span class="grow">Give up on ${n}?</span></div><div class="sub">This deletes the run for good. ${n} won't go into your Hall of Builds and earns no GTP or achievements from this career. You go straight back to the creator to build someone new.</div><div class="note">Just want a break? Use <b>Main menu</b> instead: it keeps the run saved.</div></div>`
     +dock(`<div class="two"><button class="ghost" onclick="openMenu(null)">Keep playing</button><button class="danger" onclick="abandonRun()">Abandon build</button></div>`);}
-function nextGtp(){R=Math.random;S=newPlayer();UI().menu='gtp';render();scrollTo(0,0);}
+function nextGtp(){if(S.stage==='end'&&canSave())clearRun();R=Math.random;S=newPlayer();UI().menu='gtp';render();scrollTo(0,0);}
 function openMenu(k){document.activeElement?.blur?.();const u=UI();if(k==='prof'){u.menu=null;openProfile('over');return;}if(k==='how'){u.menu=null;u.intro=0;render();scrollTo(0,0);return;}if(k==='open'){drawerAnim=true;u.wig=1;}u.menu=k;u.confirmReset=false;if(k!=='settings')u.resetDone=false;if(k!=='open')scrollTo(0,0);render();}
 const hdr=t=>`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>${t}</h1>${menuBtn()}</div>`;
 function menuBtn(){return`<button class="ham ${UI().wig?'':'wig'}" aria-label="Menu" onclick="openMenu('open')"><i></i><i></i><i></i></button>`;}

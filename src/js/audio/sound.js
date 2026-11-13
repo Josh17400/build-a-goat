@@ -1,7 +1,7 @@
 // ---------- sound: every effect is synthesized live (no files); music plays music/1.mp3, 2.mp3 ... if present ----------
 const SND=(()=>{let ctx=null,master=null,last={};const pref=k=>Store.get(k)!=='0';
   const P={sfx:pref('bag_sfx'),music:pref('bag_music'),haptics:pref('bag_haptics')};
-  function unlock(){if(typeof AudioContext==='undefined'&&typeof webkitAudioContext==='undefined')return;if(!ctx){ctx=new(window.AudioContext||window.webkitAudioContext)();master=ctx.createGain();master.gain.value=1;master.connect(ctx.destination);}if(ctx.state==='suspended')ctx.resume();M.start();}
+  function unlock(){if(typeof AudioContext==='undefined'&&typeof webkitAudioContext==='undefined')return;if(!ctx){ctx=new(window.AudioContext||window.webkitAudioContext)();master=ctx.createGain();master.gain.value=1;master.connect(ctx.destination);}if(ctx.state!=='running')ctx.resume();M.start();}
   const now=()=>ctx.currentTime;
   function env(g,t,a,peak,d){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(0.0001,t+a+d);}
   function tone(f,t,{type='sine',a=.005,d=.15,v=.3,to=null,dest=master}={}){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(to)o.frequency.exponentialRampToValueAtTime(to,t+a+d);env(g,t,a,v,d);o.connect(g);g.connect(dest);o.start(t);o.stop(t+a+d+.05);}

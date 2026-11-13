@@ -12,7 +12,7 @@ function simNBA(){syncPos();if(!R.get)R=makeRng((Math.random()*4294967296)>>>0);
   growPts(ovr()+clamp(gauss()*.8,-1,a>=30?.4:1.5));
   S.teamStr=clamp(S.teamStr+gauss()*4+(n<4&&S.pick<=10?2:0)+(50-S.teamStr)*.12+(X.team||0),20,85);
   // injury
-  const rest=ri(0,4);let lost=rest+(X.gp||0),inj=null;if(X.gp)notes.push(X.load?`🛋️ You sit ${Math.round(X.gp)} games by plan (load management)`:X.midrest&&X.gp<=6?`🛌 You sit ${Math.round(X.gp)} games to rest a nagging injury`:`🩹 You miss ${Math.round(X.gp)} games recovering from the offseason`);const pI=.11+(S.height-80)*.012+(3-t.dur)*.04+Math.max(0,a-30)*.015+FRAMES[S.frame].inj+(S.injuryProne?.06:0)+(X.inj||0);
+  const rest=ri(0,4);let lost=rest+(X.gp||0),inj=null;if(X.gp)notes.push(X.load?`🛋️ You sit ${Math.round(X.gp)} games by plan (load management)`:X.midrest&&X.gp<=6?`🛌 You sit ${Math.round(X.gp)} games to rest a nagging injury`:`🩹 You miss ${Math.round(X.gp)} games recovering from the offseason`);const pI=Math.max(.05,.11+(S.height-80)*.012+(3-t.dur)*.04+Math.max(0,a-30)*.015+FRAMES[S.frame].inj+(S.injuryProne?.06:0)+(X.inj||0));
   if(R()<pI){const r=R(),majP=clamp(.1*(1+(3-t.dur)*.3),.03,.2),modP=.3;
     if(r>=majP+modP){const g=ri(4,15);lost+=g;inj=`${capF(pick(INJ.minor))} (${g} games)`;}
     else if(r>=majP){const g=ri(18,40);lost+=g;inj=`${capF(pick(INJ.mod))} (${g} games)`;}
@@ -25,7 +25,7 @@ function simNBA(){syncPos();if(!R.get)R=makeRng((Math.random()*4294967296)>>>0);
   const RF=ROLE_F[(ARCHS[roleArch().id]||{}).fam]||{},ppg=(RF.p||1)*Math.max(mins/36*3,.86*(8+(o-55)*.45+(topScr()-72)*0.12+(eff('sho')+eff('fin')-120)*.1+(S.usage||0)+(X.usage||0)+(FRAMES[S.frame].ppg||0)+(es('offb')-50)*.03+bfx.pts/.86+(t.killer-3)*.9)*mf*nf()*era().pace),
     rpg=(RF.r||1)*Math.max(0,.64*(3.2+Math.max(-6,es('dreb')-40)*.14+Math.max(-6,es('oreb')-40)*.07+Math.max(0,S.height-74)*.3)*mf*nf()*(1+(t.motor-3)*.05)*(1+bfx.reb)),apg=(RF.a||1)*Math.max(0,.6*(1.3+(es('pass')-40)*.13+(es('handle')-40)*.05)*mf*nf()*(1-(t.killer-3)*.04)*(1+bfx.ast)),
     spg=(RF.s||1)*Math.max(.18*mf,(.45+(es('stl')-40)*.028+(es('speed')-50)*.006+(es('lat')-50)*.004)*mf*nf()*(1+(t.motor-3)*.05+(t.lock-3)*.05)*(1+bfx.stl)),bpg=(RF.b||1)*Math.max(.12*mf,(.12+(es('blk')-40)*.04+(es('vert')-50)*.005)*mf*nf()*(1+(t.lock-3)*.05)*(1+bfx.blk)),
-    fg=clamp(.40+(fin3()-50)*.0017+(es('offb')-50)*.0004+bfx.fg/100+(S.height-78)*.003+(t.touch-3)*.004+gauss()*.012,.36,.68),tp=clamp(.26+(es('three')-40)*.0029+(t.touch-3)*.008+era().tp+bfx.tp/100+gauss()*.015,.18,.48),ft=clamp(.52+(es('ft')-40)*.0068+(t.touch-3)*.015+bfx.ft/100+gauss()*.02,.4,.95),
+    fg=clamp(.40+(fin3()-50)*.0017+(es('offb')-50)*.0004+bfx.fg/100+(S.height-78)*.003+(t.touch-3)*.004+gauss()*.012,.36,.68),tp=clamp(.26+(es('three')-40)*.0029+(t.touch-3)*.008+era().tp+bfx.tp/100+gauss()*.015,.18,.48),ft=clamp(.52+(Math.max(es('ft'),es('ft')*.6+es('three')*.4)-40)*.0068+(t.touch-3)*.015+bfx.ft/100+gauss()*.02,.4,.95),
     tov=Math.max(.2,(.5+ppg*.075+apg*.22)*(1-(es('handle')-60)/250-(es('iq')-60)/350)*(1-bfx.tov)*nf());
   {const ar=roleArch(),rk=ar.id+S.team+(mins<26?'b':'');if(S.roleSeen!==rk){S.roleSeen=rk;notes.push(`📋 Role: ${mins<26?'off the bench, ':ppg<10?'as a low-usage starter, ':''}the ${tShort(S.team)} use you as a ${ar.n}`+(mins<26||ppg<10?'':{play:': the offense runs through you',shoot:': you get the shots',fin:': you attack the rim',perD:': you guard their best player',int:': you own the paint and the glass'}[(ARCHS[ar.id]||{}).fam]||''));}}
   const L=S.L;if(n){lgOffseason(L);leagueNews(n,news,notes);}

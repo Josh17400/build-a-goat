@@ -30,7 +30,7 @@ function seasonPlayoffs(){const c=S.cur,t=S.traits,L=S.L,z=L.z,{n,a,prevO,o,gp,m
   const sc=top('ppg',1,c=>c.gp>=65)[0];if(sc)give(sc,'Scoring Title');
   const fm=C.filter(c=>c.team===br.champ&&c.gp>=20).sort((x,y)=>(y.pr+y.ovr*.25)-(x.pr+x.ovr*.25))[0];
   let mvpRank=null;if(gp>=58)mvpRank=1+C.filter(c=>!c.me&&c.gp>=58&&c.mv>ME.mv).length;
-  const scRank=ppg>=12?1+C.filter(c=>!c.me&&c.gp>=58&&c.ppg>ppg).length:null;
+  const scRank=ppg>=12?1+C.filter(c=>!c.me&&c.gp>=65&&c.ppg>ppg).length:null;
   if(rival&&mvp&&mvp.p===rival)notes.push(`👑 ${rival.name} wins MVP`);
   L.hist.push({yr:n+1,champ:br.champ,mvp:mvp?.name,roy:ry?.name,dpoy:dp?.name,sc:sc?`${sc.name} (${f1(sc.ppg)})`:'',fmvp:fm?.name});
   if(gp>=65&&mins<26&&ppg>=13&&R()<.5)aw.push('6MOY');

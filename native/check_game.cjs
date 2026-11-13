@@ -59,6 +59,7 @@ const CONTRACT = {
   'iap.purchase': /\.iap\.purchase\(/,
   'iap.restore': /\.iap\.restore\(/,
   'iap.owned': /\.iap\.owned\(/,
+  'iap.transactions': /\.iap\.transactions\(/,
   'iap.getProducts': /\.iap\.getProducts\(/,
   'store.put': /\.store\.put\(NKEY,/,
   'store.hydrate': /\.store\.hydrate\(NKEY\)/

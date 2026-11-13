@@ -6,4 +6,4 @@ const pick=a=>a[Math.floor(R()*a.length)];
 const f1=n=>(Math.round(n*10)/10).toFixed(1);
 const ht=h=>`${Math.floor(h/12)}'${h%12}"`;
 
-const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));

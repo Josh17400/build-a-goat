@@ -14,5 +14,7 @@ function spinEra(){if(rollEra())render();}
 function applyArch(i){fillArch(i);render();}
 function randomBuild(){fillRandom();render();}
 function resumeRun(){const ok=loadRun();render();if(ok)scrollTo(0,0);return ok;}
+// leaving the recap for a new player: the finished career's saved copy is no longer needed
+function buildAnother(){if(canSave())clearRun();R=Math.random;S=newPlayer();render();scrollTo(0,0);}
 function quitRun(){leaveRun();render();scrollTo(0,0);}
 function abandonRun(){dropRun();render();scrollTo(0,0);}

@@ -590,7 +590,30 @@
     return p && p.priceString ? p.priceString : null;
   }
 
-  // Never rejects: { ok:true } | { ok:false, cancelled:true } | { ok:false, error }.
+  // Every one-time purchase RevenueCat knows of, consumables included: [{ key, product }].
+  // key is stable for one purchase, so the game can tell which ones it has already paid out.
+  function txList(info) {
+    var txs = (info && info.nonSubscriptionTransactions) || [];
+    var out = [];
+    for (var i = 0; i < txs.length; i++) {
+      var t = txs[i] || {};
+      var id = typeof t.productIdentifier === 'string' ? t.productIdentifier.split(':')[0] : '';
+      var key = t.transactionIdentifier || (t.purchaseDate ? id + '|' + t.purchaseDate : '');
+      if (id && key) out.push({ key: String(key), product: id });
+    }
+    return out;
+  }
+
+  // Cached CustomerInfo, no sign-in sheet: a purchase approved after its purchase call returned
+  // (Ask to Buy, a bank approval, the app killed under the payment sheet) shows up here later.
+  function iapTransactions() {
+    return ensureIapConfigured()
+      .then(function () { return Purchases.getCustomerInfo(); })
+      .then(function (res) { return txList(res && res.customerInfo); });
+  }
+
+  // Never rejects: { ok:true, txs } | { ok:false, cancelled:true } | { ok:false, error }.
+  // txs is the purchase list right after this purchase, or null when the store did not send one.
   function iapPurchase(id) {
     return Promise.resolve()
       .then(function () {
@@ -601,9 +624,9 @@
         if (!product) throw new Error('not in the App Store yet (' + id + ')');
         return Purchases.purchaseStoreProduct({ product: product });
       })
-      .then(function () {
+      .then(function (res) {
         log('purchase ok: ' + id);
-        return { ok: true };
+        return { ok: true, txs: res && res.customerInfo ? txList(res.customerInfo) : null };
       }, function (e) {
         e = e || {};
         if (isCancelled(e)) { log('purchase cancelled: ' + id); return { ok: false, cancelled: true }; }
@@ -877,7 +900,8 @@
       price: iapPrice,
       purchase: iapPurchase,
       restore: iapRestore,
-      owned: iapOwned
+      owned: iapOwned,
+      transactions: iapTransactions
     },
     notify: { schedule: noteSchedule, cancel: noteCancel, id: noteId },
     haptic: haptic,

@@ -316,6 +316,18 @@ test('a draft left by older versions that is the saved run itself is skipped on 
   ok(g.hasRun(), 'the run itself is untouched');
 });
 
+test('Reset all progress is a testing tool: the App Store build leaves it out', () => {
+  const dev = device();
+  const win = runGame(gameScript(HTML), EXPORTS.replace(/};$/, '') + ',settingsCard,resetProgress};', page([], { storage: dev }));
+  const g = win.__g;
+  ok(g.settingsCard().includes('Reset all progress'), 'TestFlight and web builds show the reset button');
+  win.BAG_ADS = 'live';
+  g.addGems(40);
+  ok(!g.settingsCard().includes('Reset all progress'), 'the release build has no reset button');
+  g.resetProgress();
+  ok(g.gems() === 40, 'and reset does nothing there, so gems stay');
+});
+
 test('Abandon build deletes the run and opens a fresh creator; Main menu keeps it', () => {
   const dev = device();
   let g = bootOn(dev);
@@ -352,6 +364,171 @@ test('a creator draft saved while skills started at 25 opens with every skill at
   eq(s.name, 'Old Draft', 'the draft itself is kept');
   for (const [k, v] of Object.entries(s.attrs)) ok(v >= 40, k + ' is ' + v + ', below the start of 40');
   ok(g.spentNow() <= g.budgetNow(), 'spent ' + g.spentNow() + ' of ' + g.budgetNow());
+});
+
+// ---------- a whole career, for the tests that need a run in a given state ----------
+// PLAY is appended to the game's script: __play(stop) plays on from wherever the run is (answering every decision with its
+// first option, the best odds in the clutch) until the career ends or stop() says so.
+const PLAY = `;globalThis.__play=function(stop){
+  const spendAll=()=>{let g=0;const wn=ARCHS[archetype().id].wn.slice().sort((a,b)=>b[1]-a[1]).map(x=>x[0]);while(S.bank>0&&g++<80)spend(wn[g%wn.length],10);};
+  for(let i=0;i<4000&&S.stage!=='end';i++){if(stop&&stop())return true;const st=S.stage;if(UI().seq)UI().seq=null;
+    if(st==='build'){const T=TRAITS.map(t=>t[0]);while(S.picked.length<2)toggleTrait(T[S.picked.length]);startCareer();}
+    else if(st==='hs'){if(S.summerPend)chooseSummer(0);else{spendAll();simHS();}}else if(st==='offers')chooseSchool(0);
+    else if(st==='college'){if(S.summerPend)chooseSummer(0);else if(!S.col.length||S.colNext)simCol();else declare();}else if(st==='draft')startNBA();
+    else if(st==='nba'){if(S.pend){const p=S.pend;choose(p.kind==='clutch'?p.best||0:0);}else{spendAll();simNBA();}}}
+  UI().seq=null;render();return S.stage==='end';};`;
+const CAREER_EXPORTS = RUN_EXPORTS.replace(/};$/, '') + ',resumeRun,buildAnother,liveRun,continueCard,doubleRewards,rewardCard,render,act,playSeason,seqSkip,esc,settleTx,syncPurchases,shopBuy,shopRestore,SHOP_PACKS,askTrade,get chooseSummer(){return chooseSummer},get simHS(){return simHS},play:s=>globalThis.__play(s)};';
+// opts.clock = {t} is the page clock (performance.now), which starts again near zero every time the app is launched
+function launch(storage, opts = {}) {
+  const pg = page([], Object.assign({ storage }, opts.page));
+  if (opts.clock) pg.win.performance = { now: () => opts.clock.t };
+  const g = runGame(gameScript(HTML), PLAY + CAREER_EXPORTS, pg).__g;
+  return opts.withPage ? { g, pg } : g;
+}
+const tick = async () => { for (let i = 0; i < 6; i++) await Promise.resolve(); };
+
+test('a decision left open is answerable straight after the app is closed and reopened', () => {
+  const dev = device();
+  // 20 minutes into a session, the first summer decision comes up and the app is closed
+  let g = launch(dev, { clock: { t: 20 * 60 * 1000 } });
+  g.play(() => !!g.getS().summerPend);
+  g.render();
+  ok(g.getS().summerPend, 'a summer decision is open');
+  const clock = { t: 3000 };
+  g = launch(dev, { clock });
+  ok(g.resumeRun(), 'the run resumes');
+  ok(g.getS().summerPend, 'the decision is still open');
+  clock.t += 2000;
+  g.act(g.chooseSummer, 0);
+  ok(!g.getS().summerPend, 'a tap 2 seconds after Continue answers it');
+});
+
+test('a finished career stays saved for its recap, pays its rewards once, and Build Another clears it', () => {
+  const dev = device();
+  let g = launch(dev);
+  ok(g.play(), 'the career ends');
+  const paid = [g.gems(), g.gtpBank(), g.hallList().length];
+  ok(paid[0] > 0 && paid[2] === 1, 'rewards were paid: ' + paid);
+  ok(g.hasRun() && !g.liveRun(), 'the finished career is saved, and is not a run in progress');
+  for (let i = 0; i < 2; i++) {
+    g = launch(dev);
+    eq(g.getS().stage, 'build', 'reopening the app lands on the creator');
+    ok(/See your career recap/.test(g.continueCard()), 'the saved card offers the recap');
+    ok(g.resumeRun(), 'the recap reopens');
+    eq(g.getS().stage, 'end');
+    eq([g.gems(), g.gtpBank(), g.hallList().length], paid, 'nothing is paid again (reopen ' + (i + 1) + ')');
+  }
+  g.buildAnother();
+  ok(!g.hasRun(), 'Build Another clears the saved career');
+  eq(launch(dev).hasRun(), false, 'and it stays cleared');
+});
+
+test('a replay that ends the career pays once, however often Continue is used', () => {
+  const dev = device();
+  let g = launch(dev);
+  // stop on the first "is it time to retire" decision, then make the saved log end the career (as a changed sim could)
+  ok(g.play(() => g.getS().pend && g.getS().pend.kind === 'retire'), 'a retirement decision came up');
+  g.render();
+  const lg = JSON.parse(dev.getItem('bag_run_log'));
+  lg.log.push(['choose', 0]);
+  dev.setItem('bag_run_log', JSON.stringify(lg));
+  g = launch(dev);
+  ok(g.resumeRun());
+  eq(g.getS().stage, 'end', 'the replay ended the career');
+  const paid = [g.gems(), g.gtpBank(), g.hallList().length];
+  for (let i = 0; i < 2; i++) {
+    g = launch(dev);
+    ok(g.resumeRun());
+    eq([g.gems(), g.gtpBank(), g.hallList().length], paid, 'Continue ' + (i + 2) + ' pays nothing more');
+  }
+});
+
+test('the double-rewards ad pays what it offered even if Build Another is tapped while it loads', async () => {
+  let settleAd = null;
+  const { shell } = fakeShell();
+  shell.ads.available = () => true;
+  shell.ads.showRewarded = () => new Promise((r) => { settleAd = r; });
+  const { g } = launch(device(), { page: { shell }, withPage: true });
+  ok(g.play(), 'the career ends');
+  const gems0 = g.gems(), gtp0 = g.gtpBank(), offer = g.getS().gemsRun, offerGtp = g.getS().gtpRun;
+  ok(offer > 0, 'there are gems to double');
+  g.doubleRewards();
+  g.buildAnother();
+  settleAd({ rewarded: true });
+  await tick();
+  eq([g.gems(), g.gtpBank()], [gems0 + offer, gtp0 + offerGtp], 'the bonus still arrives');
+});
+
+test('a gem pack is paid exactly once: on the spot, or later if the store approves it late', async () => {
+  let txs = [{ key: 'old-1', product: 'bag_gems_t1' }], buy = null;
+  const { shell } = fakeShell();
+  shell.iap.available = () => true;
+  shell.iap.transactions = () => Promise.resolve(txs.slice());
+  shell.iap.purchase = (sku) => Promise.resolve(buy(sku));
+  shell.iap.restore = () => Promise.resolve([]);
+  const { g } = launch(device(), { page: { shell }, withPage: true });
+  const pack = (sku) => g.SHOP_PACKS.find((p) => p.sku === sku).gems;
+  await g.Plat.boot(); await tick();
+  eq(g.gems(), 0, 'purchases made before this bookkeeping existed are the baseline, not paid again');
+
+  // a normal purchase: paid on the spot, and its transaction in the list is not paid a second time
+  buy = (sku) => { txs.push({ key: 'new-1', product: sku }); return { ok: true, txs: txs.slice() }; };
+  g.shopBuy('bag_gems_t2'); await tick();
+  eq(g.gems(), pack('bag_gems_t2'), 'paid on the spot');
+  await g.syncPurchases();
+  eq(g.gems(), pack('bag_gems_t2'), 'not paid again when the list is read later');
+
+  // the store answers before its list has the new purchase: still paid once
+  buy = () => ({ ok: true, txs: txs.slice() });
+  g.shopBuy('bag_gems_t1'); await tick();
+  let want = pack('bag_gems_t2') + pack('bag_gems_t1');
+  eq(g.gems(), want, 'paid on the spot');
+  txs.push({ key: 'new-2', product: 'bag_gems_t1' });
+  await g.syncPurchases();
+  eq(g.gems(), want, 'its late-arriving transaction is recognized as already paid');
+
+  // Ask to Buy: the purchase call fails, the approval lands later
+  buy = () => ({ ok: false, error: 'Payment is pending' });
+  g.shopBuy('bag_gems_t3'); await tick();
+  eq(g.gems(), want, 'nothing is paid while it is pending');
+  txs.push({ key: 'late-1', product: 'bag_gems_t3' });
+  await g.syncPurchases();
+  want += pack('bag_gems_t3');
+  eq(g.gems(), want, 'the approved purchase is paid when the app next looks');
+  await g.syncPurchases();
+  eq(g.gems(), want, 'and only once');
+
+  // the store's list cannot be read: nothing changes
+  const readable = shell.iap.transactions;
+  shell.iap.transactions = () => Promise.reject(new Error('offline'));
+  await g.syncPurchases();
+  eq(g.gems(), want, 'a failed read pays nothing');
+
+  // Restore purchases never pays for gem packs, even ones this device has not seen
+  txs.push({ key: 'other-device', product: 'bag_gems_t5' });
+  shell.iap.transactions = readable;
+  g.shopRestore(); await tick();
+  await g.syncPurchases();
+  eq(g.gems(), want, 'restore settles the list without paying');
+});
+
+test('a name with a quote mark survives being drawn into a text field', () => {
+  eq(launch(device()).esc('Earvin "Magic" <b>'), 'Earvin &quot;Magic&quot; &lt;b&gt;');
+});
+
+test('a refused save keeps the last good save usable instead of rolling the run back', () => {
+  const dev = device();
+  let g = launch(dev);
+  g.play(() => g.getS().nba.length >= 2 && !g.getS().pend);
+  const real = dev.setItem;
+  // from here on the device refuses anything as large as a full snapshot
+  dev.setItem = (k, v) => { if (String(v).length > 100000) throw new Error('QuotaExceededError'); real(k, v); };
+  g.play(() => g.getS().nba.length >= 4 && !g.getS().pend);
+  const want = [g.getS().nba.length, g.getS().age, g.getS().bank];
+  dev.setItem = real;
+  g = launch(dev);
+  ok(g.resumeRun(), 'the run resumes');
+  eq([g.getS().nba.length, g.getS().age, g.getS().bank], want, 'at the point the player reached, not at the last full save');
 });
 
 (async () => {

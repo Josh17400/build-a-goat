@@ -17,20 +17,30 @@ const runSafe=()=>!S.summerPend&&!S.pend&&!(S.queue&&S.queue.length)&&S.stage!==
 function lsSet(k,v){const ok=Store.set(k,v);if(!ok)console.warn('save failed: '+k);return ok;}
 function runMeta(){try{return JSON.parse(teamRename(Store.get(SV.meta))||'null');}catch{return null;}}
 const hasRun=()=>!!runMeta();
+// a finished career is kept only so its recap can be reopened: it is not a run in progress
+const liveRun=()=>{const s=runMeta()?.sum;return!!s&&s.stage!=='end';};
 function getS(){return S;} // tests read the live run through this (a reload swaps S for a new object)
 function runSummary(){return{name:S.name,stage:S.stage,age:S.age,ovr:OV(),look:S.look,pos:S.pos,arch:archName(),yr:S.nba.length,hs:S.hs.length,col:S.col.length,school:S.school||null,team:S.team||null,diff:S.diff,ts:Date.now()};}
 // the rival also lives in the league list, so he is stored by id and linked back on load
 // sets (like recently seen events) are stored as lists and turned back into sets on load
 const snapJSON=()=>JSON.stringify(S,(k,v)=>k==='ui'?undefined:v instanceof Set?{__set:[...v]}:k==='rival'&&v&&typeof v==='object'?{__ref:v.id}:v);
-function writeSnap(){if(!canSave()||!R.get)return;RUNID++;if(!lsSet(SV.snap,snapJSON()))return;
-  lsSet(SV.meta,JSON.stringify({v:GAME_V,id:RUNID,rs:R.get(),sum:runSummary()}));RUNLOG=[];writeLog();}
+// a refused write (storage full) must not strand the old snapshot: the run id only moves on once the new one is stored
+function writeSnap(){if(!canSave()||!R.get)return;if(!lsSet(SV.snap,snapJSON()))return false;RUNID++;
+  lsSet(SV.meta,JSON.stringify({v:GAME_V,id:RUNID,rs:R.get(),sum:runSummary()}));RUNLOG=[];writeLog();return true;}
 function writeLog(){if(!canSave())return;lsSet(SV.log,JSON.stringify({id:RUNID,log:RUNLOG}));if(S.stage!=='build'&&S.stage!=='end'&&RUNID){try{const m=Store.json(SV.meta);if(m&&m.id===RUNID){m.sum=runSummary();lsSet(SV.meta,JSON.stringify(m));}}catch{}}}
 function clearRun(){for(const k of[SV.snap,SV.meta,SV.log,SV.ui])Store.remove(k);RUNLOG=[];}
-function afterAction(n,a){if(!canSave())return;if(S.stage==='end'||S.stage==='build'){clearRun();return;}
+// the screen side sets onSaveFail to tell the player (once) that the device refused a save
+let SAVE_WARNED=false,onSaveFail=null;
+function saveFailed(){if(SAVE_WARNED)return;SAVE_WARNED=true;if(onSaveFail)onSaveFail();}
+function afterAction(n,a){if(!canSave())return;if(S.stage==='build'){clearRun();return;}
+  // a finished career stays saved, so its recap survives the app being closed; Build Another clears it (rewards are already paid)
+  if(S.stage==='end'){const w=writeSnap();if(w!==true){clearRun();if(w===false)saveFailed();}return;}
   // spending points is a cheap log entry; anything bigger folds into a fresh snapshot once nothing is waiting
-  if(runSafe()&&!['spend','smartSpend','unspend','undoSpend','clearUndo'].includes(n))writeSnap();else{RUNLOG.push([n,...a]);if(runSafe()&&RUNLOG.length>=40)writeSnap();else writeLog();}}
+  const snap=runSafe()&&!['spend','smartSpend','unspend','undoSpend','clearUndo'].includes(n);
+  if(snap&&writeSnap()!==false)return;
+  RUNLOG.push([n,...a]);if(snap)saveFailed();if(!snap&&runSafe()&&RUNLOG.length>=40&&writeSnap()!==false)return;writeLog();}
 function autosave(){if(!canSave())return;if(S.stage==='build')lsSet(SV.build,JSON.stringify(S));else if(S.stage!=='end'&&RUNID)lsSet(SV.ui,JSON.stringify(S.ui||{}));}
-const LOGGED=['simHS','simCol','simNBA','chooseSummer','chooseSchool','declare','returnSchool','choose','simAll','simEnd','spend','smartSpend','startNBA','unspend','undoSpend','clearUndo'];
+const LOGGED=['simHS','simCol','simNBA','chooseSummer','chooseSchool','declare','returnSchool','choose','simAll','simEnd','spend','smartSpend','startNBA','unspend','undoSpend','clearUndo','askTrade'];
 for(const n of LOGGED){const f=globalThis[n];if(typeof f!=='function')continue;
   globalThis[n]=function(...a){if(REPLAY||LOGD||!S.seed||S.stage==='build')return f.apply(this,a);LOGD++;let r;try{r=f.apply(this,a);}finally{LOGD--;}try{afterAction(n,a);}catch(e){console.warn(e);}return r;};}
 // a started career uses up the build it came from: drop that draft, or the next launch reopens the same player in the creator
@@ -40,10 +50,15 @@ function loadRun(){const meta=runMeta();let snap=null,lg=null;try{snap=JSON.pars
   REPLAY=true;
   try{S=Object.assign(newPlayer(),snap);if(S.rival&&S.rival.__ref!=null)S.rival=(S.L&&S.L.P.find(p=>p.id===S.rival.__ref))||null;
     convertRun(meta);R=makeRng(meta.rs);RUNID=meta.id;RUNLOG=[];
-    if(lg&&lg.id===meta.id)for(const e of lg.log){try{globalThis[e[0]](...e.slice(1));RUNLOG.push(e);}catch(err){console.warn('replay stopped at',e[0],err);break;}}}
+    // live play re-reads the listed position on every screen, so the replay does it after every action too
+    if(S.stage!=='end')syncPos();
+    if(lg&&lg.id===meta.id&&snap.stage!=='end')for(const e of lg.log){try{globalThis[e[0]](...e.slice(1));syncPos();RUNLOG.push(e);}catch(err){console.warn('replay stopped at',e[0],err);break;}}}
   finally{REPLAY=false;}
   const ui=Store.json(SV.ui);
-  S.ui=Object.assign({tab:'setup',open:null,spend:false},ui||{},{menu:null,wig:1});writeLog();return true;}
+  // seqT and pendKey are clock readings from the last launch: carried over, they leave the decision buttons dead
+  S.ui=Object.assign({tab:'setup',open:null,spend:false},S.stage==='end'?{}:ui||{},{menu:null,wig:1,seqT:0,pendKey:null});
+  // a replay that ended the career has just paid its rewards: store the finished run so no later Continue pays them again
+  if(S.stage==='end'&&snap.stage!=='end'){if(writeSnap()!==true)clearRun();}else writeLog();return true;}
 // leave a run without losing it: back to a fresh build screen, with the run waiting on Continue
 function leaveRun(){if(S.stage!=='build'&&S.stage!=='end'&&canSave())lsSet(SV.ui,JSON.stringify(Object.assign({},S.ui,{menu:null})));R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,wig:1};}
 // give up on a run: it is deleted (no Hall of Builds entry, no GTP), and a fresh player waits in the creator
@@ -55,4 +70,4 @@ function bootSave(){if(!canSave())return;try{const b=Store.json(SV.build);if(b&&
     // drafts saved while skills started at 25 (2026-11-08 to 11-10): lift them to today's start, then hand back any points over the budget
     for(const k of SUBKEYS)if(!(S.attrs[k]>=START_A))S.attrs[k]=START_A;trimToBudget();S.ui=Object.assign({tab:'setup',open:null,spend:false},b.ui||{},{menu:null,replaceOk:0});}}catch{}
   if(hasRun())(S.ui=S.ui||{tab:'setup',open:null,spend:false}).tab='setup';}
-const SAVE_KEYS=['bag_gtp','bag_ach','bag_hof','bag_recent','bag_daily','bag_diff','bag_rec','bag_goats','bag_gems','bag_gear','bag_intro'];
+const SAVE_KEYS=['bag_gtp','bag_ach','bag_hof','bag_recent','bag_daily','bag_diff','bag_rec','bag_goats','bag_gems','bag_gear','bag_intro','bag_bbook'];

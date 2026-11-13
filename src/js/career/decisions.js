@@ -14,6 +14,8 @@ function talkPend(){const last=S.nba[S.nba.length-1];if(last.team!==S.team||last
     {label:'📤 Ask for a trade',desc:'Pick from the teams that call. Your contract comes with you.',fn:()=>{S.queue.unshift({trade:1});return 'You asked for a trade. Teams are calling';}},
     {label:'🧱 Stay and build',desc:'The front office promises help. The fans love you for it.',fn:()=>{addNext({team:2});S.hype+=2;return 'You stayed to help rebuild';}}]};}
 // a trade: like free agency, but your contract comes with you and there is no re-signing
+// asking out is a saved action (it rolls the offers and uses up the once-every-two-seasons request)
+function askTrade(){if(S.stage!=='nba'||S.pend)return;S.tradeAskAt=S.nba.length;S.pend=tradePend();}
 function tradePend(){const f=faPend(),left=Math.max(1,(S.faAt||0)-S.nba.length);f.kind='trade';f.title='📞 Trade Request';
   f.text=`Teams are calling about you. Pick your new home. Your contract comes with you (${left} season${left===1?'':'s'} left).`;
   f.opts=f.opts.filter(o=>!/^🤝|Ring chase|Team up|Retire now/.test(o.label)).slice(0,3).map(o=>({...o,desc:(o.desc||'').replace('Max money, featured role','Featured role').replace('Bench role, minimum deal','Bench role'),why:o.why?{pro:o.why.pro,con:o.why.con.map(x=>x.replace('Contenders are picky about who they sign','Contenders give up less to get you'))}:o.why,label:o.label.replace(/^🏀/,'📞'),fn:()=>(o.fn()||'').replace('You signed with','You were traded to')}));

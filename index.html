@@ -89,7 +89,9 @@ body.kb .dock{display:none}
 .attr .ctl .capd{font-size:.72rem;font-weight:700;color:var(--muted,#9aa);align-self:center;padding:0 6px;white-space:nowrap}
 .attr>small.bh{grid-column:1/-1;margin:-2px 0 2px}.attr>small.bh b{color:var(--tx1,#eceef3);font-weight:700}
 .attr .imp{display:block;font-size:.68rem;color:var(--tx3);letter-spacing:.2px;margin-top:1px}.attr .imp.hi{color:var(--acc)}
-.hero.tap{cursor:pointer}.profbtn{margin-top:10px}.ptabs{margin:4px 0 10px}.ptabs button{padding:9px 2px;font-size:.84rem}
+/* on a phone the four buttons get their own line, so a skill's name never has to wrap around them */
+@media (max-width:520px){.attr{grid-template-columns:minmax(0,1fr) 84px 30px;row-gap:6px;padding:9px 0}.attr .ctl{grid-column:1/-1;flex-wrap:wrap}.attr .ctl:empty{display:none}.attr .ctl>button{flex:1 1 56px;white-space:nowrap}.attr .ctl .capd{flex:1;text-align:right}.attr .imp{display:inline-block;margin:0 0 0 7px;white-space:nowrap}}
+.perkbuy{min-width:74px;white-space:nowrap}.hero.tap{cursor:pointer}.profbtn{margin-top:10px}.ptabs{margin:4px 0 10px}.ptabs button{flex:1 1 auto;padding:9px 3px;font-size:.8rem;letter-spacing:-.01em}
 .pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pgrid small{display:block;color:var(--tx2);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em}.pgrid b{font-size:1rem}
 .ptab{width:100%;border-collapse:collapse;font-size:.82rem}.ptab th{color:var(--tx2);font-weight:600;text-align:right;padding:4px 3px}.ptab td{text-align:right;padding:5px 3px;border-top:1px solid rgba(255,255,255,.05)}.ptab th:first-child,.ptab td:first-child{text-align:left}.pscroll{overflow-x:auto}
 .trow{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)}
@@ -103,6 +105,7 @@ small.bh{display:flex;align-items:center;gap:3px;color:var(--tx2);font-size:.7re
 .hero{display:flex;gap:12px;align-items:center}
 .hero .hn{font-size:1.15rem;font-weight:800;letter-spacing:-.01em;line-height:1.15}
 .hero .hm{font-size:.82rem;color:var(--tx2);margin-top:3px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.hero .hm.hmx{display:block;overflow:hidden}.hero .hml{display:flex;flex-wrap:wrap;align-items:center;margin-left:-13px;row-gap:1px}.hero .hml>span{position:relative;padding-left:13px;white-space:nowrap}.hero .hml>span.w{white-space:normal}.hero .hml>span::before{content:"\00b7";position:absolute;left:4px;top:0;color:var(--tx3)}
 .ovr{flex:none;width:68px;height:68px;border-radius:50%;display:grid;place-items:center;text-align:center;background:conic-gradient(var(--acc) calc(var(--p)*1%),#262a34 0);position:relative}
 .ovr::before{content:"";position:absolute;inset:5px;border-radius:50%;background:var(--card)}
 .ovr div{position:relative;line-height:1}.ovr b{font-size:1.45rem;font-weight:900;display:block}.ovr span{font-size:.58rem;color:var(--tx3);letter-spacing:.1em}
@@ -113,6 +116,7 @@ details>summary::-webkit-details-marker{display:none}
 details>summary::after{content:"";margin-left:auto;width:8px;height:8px;border-right:2px solid var(--tx3);border-bottom:2px solid var(--tx3);transform:rotate(45deg);transition:transform .15s}
 details[open]>summary::after{transform:rotate(-135deg)}
 details.card{border-top:1px solid var(--line);padding-top:14px}
+details.howsk{border-top:0;margin:0 0 8px;padding-top:0}details.howsk>summary{font-size:.8rem;color:var(--acc2,var(--tx2));min-height:30px}
 details.card>summary{margin:-4px 0;font-size:.95rem;color:var(--tx)}
 .pill{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;background:#232733;border:1px solid var(--line);font-size:.78rem;margin:3px 3px 0 0;color:var(--tx)}
 .pill.bad{color:#ff8585}.pill.gold{color:var(--gold);background:#2b2214;border-color:rgba(255,200,74,.25)}
@@ -149,17 +153,19 @@ th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
 .plaque{background:radial-gradient(400px 200px at 20% 0,#3a2c12,transparent),linear-gradient(160deg,#241c0f,#14110b);border:1px solid #c9a24a;border-radius:20px;padding:16px;margin:10px 0;box-shadow:0 0 0 1px rgba(201,162,74,.2),0 18px 40px rgba(201,162,74,.15)}
 .pname{font-size:1.5rem;font-weight:900;letter-spacing:-.01em}
 .ach{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
-.ach div{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:8px 10px;opacity:.5;font-size:.85rem}
-.ach div.got{opacity:1;border-color:rgba(201,162,74,.35)}.ach div.new{border-color:var(--gold);box-shadow:0 0 12px rgba(255,200,74,.35)}
+.ach div{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:8px 10px;font-size:.85rem}.ach div>b{color:var(--tx2)}.ach div.got>b{color:var(--tx)}
+.ach div.got{border-color:rgba(201,162,74,.35)}.ach div.new{border-color:var(--gold);box-shadow:0 0 12px rgba(255,200,74,.35)}
 .ach .gotlbl{display:block;font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-top:2px}
-.ach small{display:block;color:var(--tx3);font-size:.72rem;margin-top:2px}
+.ach small{display:block;color:var(--tx2);font-size:.75rem;margin-top:2px;line-height:1.3}
 .looks{display:grid;grid-template-columns:1fr;gap:6px;margin-top:4px}
 .looks div{display:grid;grid-template-columns:96px 44px minmax(0,1fr) 44px;align-items:center;gap:6px;font-size:.88rem}
 .looks span{color:var(--tx3)}.looks b{text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.88rem}
 .looks button{padding:0;min-width:44px}
 .avwrap{display:flex;justify-content:center;margin:2px 0 8px}
 .sw::after{content:'';position:absolute;inset:-5px}
-.hofl{margin-top:8px}.hofr{padding:10px 0;border-top:1px solid var(--line)}.hofr:first-child{border-top:0}
+.hofl{margin-top:8px}.hofr{padding:12px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:24px minmax(0,1fr);column-gap:8px}.hofr:first-child{border-top:0}
+.hofr .hk{font-family:var(--fd);font-size:1.15rem;color:var(--tx3);line-height:1.2}.hofr .hname{display:flex;align-items:baseline;gap:8px}.hofr .hname b{flex:1;min-width:0;font-size:1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hofr .htier{color:var(--gold);font-weight:800;font-size:.82rem;white-space:nowrap}
+.hofr .hrole{font-size:.8rem;color:var(--tx2);margin-top:1px}.hofr .hstats{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}.hofr .hstats span{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:3px 7px;font-size:.74rem;color:var(--tx2);white-space:nowrap}.hofr .hstats span b{color:var(--tx)}.hofr .note{margin:7px 0 0}
 .swatches.c10{display:grid;grid-template-columns:repeat(5,34px);justify-content:space-between;row-gap:10px;max-width:250px}
 .celebrate{margin:10px 0;padding:16px 14px;border-radius:var(--r);text-align:center;background:radial-gradient(120% 140% at 50% 0,rgba(255,200,74,.38),rgba(255,138,31,.12) 55%,rgba(20,16,10,.9));border:1px solid rgba(255,200,74,.6);box-shadow:0 0 0 1px rgba(255,200,74,.15),0 12px 36px rgba(255,170,40,.18);animation:pop .6s cubic-bezier(.2,1.8,.4,1) both}.cel-t{font-family:var(--fd);font-size:1.9rem;letter-spacing:.04em;color:var(--gold)}
 .cel-av{display:flex;justify-content:center;margin:-2px 0 6px}.cel-av svg{border-radius:50%;box-shadow:0 0 0 2px rgba(255,200,74,.7),0 0 24px rgba(255,200,74,.35)}.cel-s{color:var(--tx);font-size:.92rem;margin-top:2px}
@@ -293,6 +299,8 @@ button .ic{vertical-align:-.18em}
 .resume{border-color:rgba(255,138,31,.55);box-shadow:0 0 0 1px rgba(255,138,31,.25),0 14px 34px rgba(0,0,0,.45),0 0 30px rgba(255,138,31,.15)}
 /* season story */
 .seqstats{margin-bottom:10px}.seqstats .stat{animation:pop .5s cubic-bezier(.2,1.6,.4,1) both;background-image:var(--grain),radial-gradient(circle at 50% 0,rgba(255,138,31,.18),transparent 70%)}
+.seqstats.s5{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.seqstats.s5 .stat{grid-column:span 2}.seqstats.s5 .stat:nth-child(n+4){grid-column:span 3}
+.seqstats .stat:nth-child(4){animation-delay:.62s}.seqstats .stat:nth-child(5){animation-delay:.76s}
 .seqstats .stat:nth-child(1){animation-delay:.2s}.seqstats .stat:nth-child(2){animation-delay:.34s}.seqstats .stat:nth-child(3){animation-delay:.48s}
 .seqstats .stat b{font-size:2.3rem;color:#fff;text-shadow:0 0 16px rgba(255,138,31,.45)}
 .seqtop{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px}
@@ -349,7 +357,7 @@ const pick=a=>a[Math.floor(R()*a.length)];
 const f1=n=>(Math.round(n*10)/10).toFixed(1);
 const ht=h=>`${Math.floor(h/12)}'${h%12}"`;
 
-const esc=s=>String(s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 // ---------- storage: the one place the game touches the device's saved data ----------
 // Every other file asks Store, or better the owner of a saved thing (gems(), hallList(), achHave() ...).
 // Store never throws: with storage switched off (private browsing, a full disk) reads come back empty
@@ -817,7 +825,7 @@ function lgPlay(L,me){const z=lgZ(L,me),W={};
       p.ppg=Math.max(.5,(2+(p.ovr-50)*.56+([4,2,1][r]||0))*mf*era().pace+gauss()*1.3);
       p.rpg=Math.max(.3,(2+(p.ovr-50)*{C:.23,PF:.19,SF:.13,SG:.09,PG:.08}[p.pos])*mf+gauss()*.5);
       p.apg=Math.max(.2,(1+(p.ovr-50)*{PG:.21,SG:.12,SF:.09,PF:.06,C:.05}[p.pos])*mf+gauss()*.4);
-      p.spg=Math.max(.1,(.4+(p.d-50)*.02)*mf);p.tov=Math.max(.2,(.5+p.ppg*.075+p.apg*.22)*(1+gauss()*.12));p.fg=clamp(.445+(p.ovr-72)*.002+({C:.06,PF:.03,SF:0,SG:-.015,PG:-.02}[p.pos])+gauss()*.02,.38,.64);p.bpg=Math.max(0,(.1+(p.d-50)*(p.pos==='C'||p.pos==='PF'?.035:.01))*mf);
+      p.spg=Math.max(.1,(.35+(p.d-50)*{PG:.041,SG:.038,SF:.03,PF:.02,C:.015}[p.pos])*mf);p.tov=Math.max(.2,(.5+p.ppg*.075+p.apg*.22)*(1+gauss()*.12));p.fg=clamp(.445+(p.ovr-72)*.002+({C:.06,PF:.03,SF:0,SG:-.015,PG:-.02}[p.pos])+gauss()*.02,.38,.64);p.bpg=Math.max(0,(.1+(p.d-50)*{C:.063,PF:.042,SF:.016,SG:.009,PG:.009}[p.pos])*mf);
       p.wins=W[t];p.car.gp+=p.gp;p.car.pts+=p.ppg*p.gp;p.car.reb+=p.rpg*p.gp;p.car.ast+=p.apg*p.gp;p.pts=p.car.pts;}}
   L.z=z;L.lastWins=W;return{z,W};}
 // best of seven; mine=true hands the series to the detailed version that knows your traits
@@ -941,7 +949,7 @@ function simNBA(){syncPos();if(!R.get)R=makeRng((Math.random()*4294967296)>>>0);
   growPts(ovr()+clamp(gauss()*.8,-1,a>=30?.4:1.5));
   S.teamStr=clamp(S.teamStr+gauss()*4+(n<4&&S.pick<=10?2:0)+(50-S.teamStr)*.12+(X.team||0),20,85);
   // injury
-  const rest=ri(0,4);let lost=rest+(X.gp||0),inj=null;if(X.gp)notes.push(X.load?`🛋️ You sit ${Math.round(X.gp)} games by plan (load management)`:X.midrest&&X.gp<=6?`🛌 You sit ${Math.round(X.gp)} games to rest a nagging injury`:`🩹 You miss ${Math.round(X.gp)} games recovering from the offseason`);const pI=.11+(S.height-80)*.012+(3-t.dur)*.04+Math.max(0,a-30)*.015+FRAMES[S.frame].inj+(S.injuryProne?.06:0)+(X.inj||0);
+  const rest=ri(0,4);let lost=rest+(X.gp||0),inj=null;if(X.gp)notes.push(X.load?`🛋️ You sit ${Math.round(X.gp)} games by plan (load management)`:X.midrest&&X.gp<=6?`🛌 You sit ${Math.round(X.gp)} games to rest a nagging injury`:`🩹 You miss ${Math.round(X.gp)} games recovering from the offseason`);const pI=Math.max(.05,.11+(S.height-80)*.012+(3-t.dur)*.04+Math.max(0,a-30)*.015+FRAMES[S.frame].inj+(S.injuryProne?.06:0)+(X.inj||0));
   if(R()<pI){const r=R(),majP=clamp(.1*(1+(3-t.dur)*.3),.03,.2),modP=.3;
     if(r>=majP+modP){const g=ri(4,15);lost+=g;inj=`${capF(pick(INJ.minor))} (${g} games)`;}
     else if(r>=majP){const g=ri(18,40);lost+=g;inj=`${capF(pick(INJ.mod))} (${g} games)`;}
@@ -954,7 +962,7 @@ function simNBA(){syncPos();if(!R.get)R=makeRng((Math.random()*4294967296)>>>0);
   const RF=ROLE_F[(ARCHS[roleArch().id]||{}).fam]||{},ppg=(RF.p||1)*Math.max(mins/36*3,.86*(8+(o-55)*.45+(topScr()-72)*0.12+(eff('sho')+eff('fin')-120)*.1+(S.usage||0)+(X.usage||0)+(FRAMES[S.frame].ppg||0)+(es('offb')-50)*.03+bfx.pts/.86+(t.killer-3)*.9)*mf*nf()*era().pace),
     rpg=(RF.r||1)*Math.max(0,.64*(3.2+Math.max(-6,es('dreb')-40)*.14+Math.max(-6,es('oreb')-40)*.07+Math.max(0,S.height-74)*.3)*mf*nf()*(1+(t.motor-3)*.05)*(1+bfx.reb)),apg=(RF.a||1)*Math.max(0,.6*(1.3+(es('pass')-40)*.13+(es('handle')-40)*.05)*mf*nf()*(1-(t.killer-3)*.04)*(1+bfx.ast)),
     spg=(RF.s||1)*Math.max(.18*mf,(.45+(es('stl')-40)*.028+(es('speed')-50)*.006+(es('lat')-50)*.004)*mf*nf()*(1+(t.motor-3)*.05+(t.lock-3)*.05)*(1+bfx.stl)),bpg=(RF.b||1)*Math.max(.12*mf,(.12+(es('blk')-40)*.04+(es('vert')-50)*.005)*mf*nf()*(1+(t.lock-3)*.05)*(1+bfx.blk)),
-    fg=clamp(.40+(fin3()-50)*.0017+(es('offb')-50)*.0004+bfx.fg/100+(S.height-78)*.003+(t.touch-3)*.004+gauss()*.012,.36,.68),tp=clamp(.26+(es('three')-40)*.0029+(t.touch-3)*.008+era().tp+bfx.tp/100+gauss()*.015,.18,.48),ft=clamp(.52+(es('ft')-40)*.0068+(t.touch-3)*.015+bfx.ft/100+gauss()*.02,.4,.95),
+    fg=clamp(.40+(fin3()-50)*.0017+(es('offb')-50)*.0004+bfx.fg/100+(S.height-78)*.003+(t.touch-3)*.004+gauss()*.012,.36,.68),tp=clamp(.26+(es('three')-40)*.0029+(t.touch-3)*.008+era().tp+bfx.tp/100+gauss()*.015,.18,.48),ft=clamp(.52+(Math.max(es('ft'),es('ft')*.6+es('three')*.4)-40)*.0068+(t.touch-3)*.015+bfx.ft/100+gauss()*.02,.4,.95),
     tov=Math.max(.2,(.5+ppg*.075+apg*.22)*(1-(es('handle')-60)/250-(es('iq')-60)/350)*(1-bfx.tov)*nf());
   {const ar=roleArch(),rk=ar.id+S.team+(mins<26?'b':'');if(S.roleSeen!==rk){S.roleSeen=rk;notes.push(`📋 Role: ${mins<26?'off the bench, ':ppg<10?'as a low-usage starter, ':''}the ${tShort(S.team)} use you as a ${ar.n}`+(mins<26||ppg<10?'':{play:': the offense runs through you',shoot:': you get the shots',fin:': you attack the rim',perD:': you guard their best player',int:': you own the paint and the glass'}[(ARCHS[ar.id]||{}).fam]||''));}}
   const L=S.L;if(n){lgOffseason(L);leagueNews(n,news,notes);}
@@ -998,7 +1006,7 @@ function seasonPlayoffs(){const c=S.cur,t=S.traits,L=S.L,z=L.z,{n,a,prevO,o,gp,m
   const sc=top('ppg',1,c=>c.gp>=65)[0];if(sc)give(sc,'Scoring Title');
   const fm=C.filter(c=>c.team===br.champ&&c.gp>=20).sort((x,y)=>(y.pr+y.ovr*.25)-(x.pr+x.ovr*.25))[0];
   let mvpRank=null;if(gp>=58)mvpRank=1+C.filter(c=>!c.me&&c.gp>=58&&c.mv>ME.mv).length;
-  const scRank=ppg>=12?1+C.filter(c=>!c.me&&c.gp>=58&&c.ppg>ppg).length:null;
+  const scRank=ppg>=12?1+C.filter(c=>!c.me&&c.gp>=65&&c.ppg>ppg).length:null;
   if(rival&&mvp&&mvp.p===rival)notes.push(`👑 ${rival.name} wins MVP`);
   L.hist.push({yr:n+1,champ:br.champ,mvp:mvp?.name,roy:ry?.name,dpoy:dp?.name,sc:sc?`${sc.name} (${f1(sc.ppg)})`:'',fmvp:fm?.name});
   if(gp>=65&&mins<26&&ppg>=13&&R()<.5)aw.push('6MOY');
@@ -1094,6 +1102,8 @@ function talkPend(){const last=S.nba[S.nba.length-1];if(last.team!==S.team||last
     {label:'📤 Ask for a trade',desc:'Pick from the teams that call. Your contract comes with you.',fn:()=>{S.queue.unshift({trade:1});return 'You asked for a trade. Teams are calling';}},
     {label:'🧱 Stay and build',desc:'The front office promises help. The fans love you for it.',fn:()=>{addNext({team:2});S.hype+=2;return 'You stayed to help rebuild';}}]};}
 // a trade: like free agency, but your contract comes with you and there is no re-signing
+// asking out is a saved action (it rolls the offers and uses up the once-every-two-seasons request)
+function askTrade(){if(S.stage!=='nba'||S.pend)return;S.tradeAskAt=S.nba.length;S.pend=tradePend();}
 function tradePend(){const f=faPend(),left=Math.max(1,(S.faAt||0)-S.nba.length);f.kind='trade';f.title='📞 Trade Request';
   f.text=`Teams are calling about you. Pick your new home. Your contract comes with you (${left} season${left===1?'':'s'} left).`;
   f.opts=f.opts.filter(o=>!/^🤝|Ring chase|Team up|Retire now/.test(o.label)).slice(0,3).map(o=>({...o,desc:(o.desc||'').replace('Max money, featured role','Featured role').replace('Bench role, minimum deal','Bench role'),why:o.why?{pro:o.why.pro,con:o.why.con.map(x=>x.replace('Contenders are picky about who they sign','Contenders give up less to get you'))}:o.why,label:o.label.replace(/^🏀/,'📞'),fn:()=>(o.fn()||'').replace('You signed with','You were traded to')}));
@@ -2035,7 +2045,7 @@ const ABANDON=['abandon','refresh','Abandon build',''];
 function abandonHTML(){const n=esc(S.name||'this player');
   return`<div class="card"><div class="sh">${icon('alert')} <span class="grow">Give up on ${n}?</span></div><div class="sub">This deletes the run for good. ${n} won't go into your Hall of Builds and earns no GTP or achievements from this career. You go straight back to the creator to build someone new.</div><div class="note">Just want a break? Use <b>Main menu</b> instead: it keeps the run saved.</div></div>`
     +dock(`<div class="two"><button class="ghost" onclick="openMenu(null)">Keep playing</button><button class="danger" onclick="abandonRun()">Abandon build</button></div>`);}
-function nextGtp(){R=Math.random;S=newPlayer();UI().menu='gtp';render();scrollTo(0,0);}
+function nextGtp(){if(S.stage==='end'&&canSave())clearRun();R=Math.random;S=newPlayer();UI().menu='gtp';render();scrollTo(0,0);}
 function openMenu(k){document.activeElement?.blur?.();const u=UI();if(k==='prof'){u.menu=null;openProfile('over');return;}if(k==='how'){u.menu=null;u.intro=0;render();scrollTo(0,0);return;}if(k==='open'){drawerAnim=true;u.wig=1;}u.menu=k;u.confirmReset=false;if(k!=='settings')u.resetDone=false;if(k!=='open')scrollTo(0,0);render();}
 const hdr=t=>`<div class="row" style="justify-content:space-between;flex-wrap:nowrap"><h1>${t}</h1>${menuBtn()}</div>`;
 function menuBtn(){return`<button class="ham ${UI().wig?'':'wig'}" aria-label="Menu" onclick="openMenu('open')"><i></i><i></i><i></i></button>`;}
@@ -2067,10 +2077,12 @@ function settingsCard(){const u=UI(),ach=Object.keys(achHave()).length,hof=hallL
   return`${diffCard()}<div class="card"><div class="sh">🏅 <span class="grow">Your progress</span></div>
   <div class="sub">Saved on this device: <b>${gtpBank()} GTP</b> · <b>${ach}</b> achievements · <b>${hof}</b> career${hof===1?'':'s'} in your Hall of Builds.</div>
   ${u.resetDone?'<div class="ev good" style="margin-top:10px">Progress reset. Fresh start.</div>':''}
-  ${u.confirmReset?`<div class="ev bad" style="margin-top:10px">This erases your GTP, gems (including bought gems), equipment, perks, achievements, Badge Book, Hall of Builds${hasRun()?', daily results and your saved run':' and daily results'}. It can’t be undone.</div>
+  ${!resetOn()?'':u.confirmReset?`<div class="ev bad" style="margin-top:10px">This erases your GTP, gems (including bought gems), equipment, perks, achievements, Badge Book, Hall of Builds${hasRun()?', daily results and your saved run':' and daily results'}. It can’t be undone.</div>
     <div class="two" style="margin-top:8px;gap:10px"><button class="danger" onclick="resetProgress()">Yes, erase everything</button><button class="ghost" onclick="UI().confirmReset=false;render()">Cancel</button></div>`
   :`<button class="ghost" style="margin-top:10px;width:100%;color:#ff6b6b;border-color:rgba(255,107,107,.45)" onclick="UI().confirmReset=true;UI().resetDone=false;render()">Reset all progress</button>`}</div>`;}
-function resetProgress(){for(const k of[...SAVE_KEYS,...Object.values(SV)])Store.remove(k);R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,menu:'settings',resetDone:true};render();scrollTo(0,0);}
+// Reset all progress is a testing tool: the App Store build (build_www.py --release stamps BAG_ADS="live") leaves it out
+const resetOn=()=>globalThis.BAG_ADS!=='live';
+function resetProgress(){if(!resetOn())return;for(const k of[...SAVE_KEYS,...Object.values(SV)])Store.remove(k);R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,menu:'settings',resetDone:true};render();scrollTo(0,0);}
 // ---------- the equipment page ----------
 function gearCard(){const g=gear(),n=gems();
   return`<div class="card"><div class="sh">${icon('sparkle')} <span class="grow">Equipment</span><b class="gold">${n} gems</b></div><div class="sub">Gear is permanent: every future player wears it (not the Daily Build). Earn gems at the end of every career on Pro and Hall of Fame.</div>
@@ -2118,8 +2130,8 @@ function rivalryCard(){const rv=S.rival;if(!rv||!S.nba.length)return'';const c=c
   return`<details class="card"><summary>⚔️ Rivalry · ${esc(rv.name)}${rv.retired?' (retired)':rv.team===S.team?' (now your teammate)':''} <span class="${meR>=rvR?'good':'bad'}">· ${meR>=rvR?'you lead':'he leads'} on legacy</span></summary>
   <table style="margin-top:8px"><tr><th></th><th>YOU</th><th>${esc(rv.name.split(' ').slice(-1)[0]).toUpperCase()}</th></tr>${row('Rings',g('Champion'),rv.rings)}${row('MVPs',g('MVP'),rv.mvps)}${row('All-Star',g('All-Star'),rv.aw['All-Star']||0)}${row('Points',Math.round(c.pts),Math.round(rv.pts),x=>x.toLocaleString())}</table>
   <div class="note">Head-to-head: ${h.w}-${h.l} in the regular season · ${h.pw}-${h.pl} in playoff series${rv.retired?'':rv.team===S.team?` · You are teammates on the ${rv.team} now`:` · He plays for the ${rv.team}`}</div></details>`;}
-function continueCard(){const m=runMeta();if(!m||!m.sum)return'';const s=m.sum,where=s.stage==='nba'?`NBA · Season ${s.yr+1}${s.team?' · '+s.team:''}`:s.stage==='draft'?'Draft night':s.stage==='college'?(s.school||'College'):s.stage==='offers'?'Recruiting':`High School · ${YR[Math.min(s.hs,3)]} Year`;
-  return`<div class="card resume"><div class="hero">${avatar(s.look,s.age,60,1)}<div class="grow"><div class="sh" style="margin:0 0 4px">💾 <span class="grow">Saved run</span></div><div class="hn">${esc(s.name)}</div><div class="hm">${esc(s.arch||s.pos)} · Age ${s.age} · OVR ${s.ovr} · ${where}</div></div></div><button class="wide" style="margin-top:12px" onclick="resumeRun()">Continue run ▶</button></div>`;}
+function continueCard(){const m=runMeta();if(!m||!m.sum)return'';const s=m.sum,where=s.stage==='end'?'Career complete':s.stage==='nba'?`NBA · Season ${s.yr+1}${s.team?' · '+s.team:''}`:s.stage==='draft'?'Draft night':s.stage==='college'?(s.school||'College'):s.stage==='offers'?'Recruiting':`High School · ${YR[Math.min(s.hs,3)]} Year`;
+  return`<div class="card resume"><div class="hero">${avatar(s.look,s.age,60,1)}<div class="grow"><div class="sh" style="margin:0 0 4px">💾 <span class="grow">${s.stage==='end'?'Finished career':'Saved run'}</span></div><div class="hn">${esc(s.name)}</div><div class="hm">${esc(s.arch||s.pos)} · Age ${s.age} · OVR ${s.ovr} · ${where}</div></div></div><button class="wide" style="margin-top:12px" onclick="resumeRun()">${s.stage==='end'?'See your career recap':'Continue run'} ▶</button></div>`;}
 // ---------- what the buttons do: run the rule, then redraw ----------
 // The rules (career/, economy/, creator/, save/ ...) change the game and never draw. Each handler here is
 // the name a button calls, and the name a saved run's action log replays, so these names are part of the
@@ -2136,6 +2148,8 @@ function spinEra(){if(rollEra())render();}
 function applyArch(i){fillArch(i);render();}
 function randomBuild(){fillRandom();render();}
 function resumeRun(){const ok=loadRun();render();if(ok)scrollTo(0,0);return ok;}
+// leaving the recap for a new player: the finished career's saved copy is no longer needed
+function buildAnother(){if(canSave())clearRun();R=Math.random;S=newPlayer();render();scrollTo(0,0);}
 function quitRun(){leaveRun();render();scrollTo(0,0);}
 function abandonRun(){dropRun();render();scrollTo(0,0);}
 // ---------- league screens ----------
@@ -2465,7 +2479,7 @@ const EMOJI_ICON={
 
 // ---------- UI ----------
 const app=document.getElementById('app');
-function act(fn,...a){if((fn===choose||fn===chooseSummer)&&!document.documentElement.classList.contains('wt')&&performance.now()-(UI().seqT||0)<500)return;fn(...a);if(fn===choose&&UI().auto&&!UI().seq)autoStep();else render();}
+function act(fn,...a){if((fn===choose||fn===chooseSummer)&&!document.documentElement.classList.contains('wt')&&(d=>d>=0&&d<500)(performance.now()-(UI().seqT||0)))return;fn(...a);if(fn===choose&&UI().auto&&!UI().seq)autoStep();else render();}
 const UI=()=>S.ui||(S.ui={tab:'setup',open:null,spend:false});
 // every emoji in the game's text is swapped for a custom icon when a screen is drawn
 const EMO_RE=/(?:\p{Extended_Pictographic}|[←-⇿⌀-⏿■-◿☀-➿⬀-⯿])(?:️|‍(?:\p{Extended_Pictographic}|[☀-➿]))*️?/gu;
@@ -2539,9 +2553,11 @@ function startCareer(){syncPos();S.archId=archetype().id;S.name=(S.name||'').tri
   S.bank=START_BUDGET-spent();wearGear();S.cls=makeClass();S.pkO=0;S.pkArch=null;S.idLock=null;S.evoPend=null;S.evoUp=0;S.midSeen=[];S.midAt=null;S.roleSeen=null;S.oldRivals=[];S.clLines=[];S.endWhy=null;S.clsSeen=[];S.rvDone=0;S.clsAdj=0;S.starFloor=0;S.ceiling=ovr()+7+gauss()*(S.perks.dna?3.5:8)+(S.traits.work-3)*2.5+(S.traits.late-3)*1.2;if(S.perks.dna)S.ceiling+=4;if(S.perks.clutch)S.traits.clutch=Math.min(5,S.traits.clutch+1);if(S.perks.hype)S.hype+=15;S.armor=!!S.perks.armor;S.startOvr=OV();S.attrs0={...S.attrs};S.stage='hs';S.bdg={};S.lastResult=gearNote();UI().spend=false;render();scrollTo(0,0);}
 
 // ---------- player header ----------
+// one line of facts under the name: it wraps between facts, and the dots between them never start or end a line
+const hmLine=a=>`<div class="hm hmx"><div class="hml">${a.filter(Boolean).map(x=>Array.isArray(x)?`<span class="${x[0]}">${x[1]}</span>`:`<span>${x}</span>`).join('')}</div></div>`;
 function hero(tap){const o=OV(),st=S.stage;
-  return`<div class="hero${tap?' tap':''}"${tap?` role="button" tabindex="0" aria-label="Open your player profile" onclick="openProfile('over')"`:''}>${avatar(teamLook(S.look),S.age,60,1)}<div class="grow"><div class="hn">${esc(S.name)}</div><div class="hm">${archName()} · ${ht(S.height)} · ${S.frame} · Age ${S.age}</div>
-  <div class="hm">${era().name.replace(EMO_RE,'').trim()}${st!=='nba'?` · Hype ${Math.max(0,Math.round(S.hype))}`:''}${st==='hs'||st==='offers'?` · ${starsHTML(stars())}`:''}${S.rival&&st==='nba'?` · ⚔️ Rival ${S.rival.name}${S.rival.retired?' (retired)':S.rival.team===S.team?' (teammate)':''}`:''}</div></div>
+  return`<div class="hero${tap?' tap':''}"${tap?` role="button" tabindex="0" aria-label="Open your player profile" onclick="openProfile('over')"`:''}>${avatar(teamLook(S.look),S.age,60,1)}<div class="grow"><div class="hn">${esc(S.name)}</div>${hmLine([archName(),ht(S.height),S.frame,'Age '+S.age])}
+  ${hmLine([era().name.replace(EMO_RE,'').trim(),st!=='nba'&&`Hype ${Math.max(0,Math.round(S.hype))}`,(st==='hs'||st==='offers')&&starsHTML(stars()),S.rival&&st==='nba'&&['w',`⚔️ Rival ${S.rival.name}${S.rival.retired?' (retired)':S.rival.team===S.team?' (teammate)':''}`]])}</div>
   <div><div class="ovr" style="--p:${o}"><div><b>${o}</b><span>OVR</span></div></div><div class="role">${st==='nba'&&S.nba.length&&o<85?(l=>l.aw.some(x=>/All-NBA/.test(x))?'All-NBA':l.aw.includes('All-Star')?'All-Star':o>=77?ovrLabel(o)+' level':l.mins>=28?'Starter':l.mins>=18?'Rotation player':'End of the bench')(S.nba[S.nba.length-1]):st==='nba'?ovrLabel(o)+' level':st==='end'?ovrLabel(o):o<50?'Not NBA-ready yet':'NBA level: '+ovrLabel(o)}</div></div></div>${tap?`<button class="ghost sm wide profbtn" onclick="openProfile('over')">${icon('user','ici')} Profile · skills, badges, stats ›</button>`:''}`;}
 function traitsBlock(){const hi=TRAITS.filter(([k])=>S.traits[k]>=4).length,lo=TRAITS.filter(([k])=>S.traits[k]<=1).length;
   return`<details><summary>Traits · ${hi} strength${hi===1?'':'s'}${lo?` · ${lo} weakness${lo===1?'':'es'}`:''}</summary><div>${TRAITS.slice().sort((a,b)=>S.traits[b[0]]-S.traits[a[0]]).map(([k,l])=>`<span class="pill ${S.traits[k]<=1?'bad':''}">${l}${pips(S.traits[k])}</span>`).join('')}${S.badges.map(b=>`<span class="pill gold">🎯 ${b}</span>`).join('')}</div></details>`;}
@@ -2657,8 +2673,8 @@ function gtpCard(full){const bank=gtpBank(),cost=perkCost();
   const canBuy=PERKS_GTP.some(([k,l,d,c,mx])=>c<=bank-cost&&((S.perks&&S.perks[k])||0)<mx);
   return`<details class="card" ${full||cost||canBuy?'open':''}><summary role="button">🪙 <span class="grow">GTP Store · <span class="gold">${bank-cost} available</span>${cost?` · ${cost} in cart`:canBuy?' · tap a perk to buy':''}</span></summary>
   <div class="sub" style="margin-top:6px">${bank?'':'You have no GTP yet. Earn it on Pro or Hall of Fame from great seasons. '}Perks last for one player: they are used up when that career starts.</div>
-  ${PERKS_GTP.map(([k,l,d,c,mx])=>{const n=(S.perks&&S.perks[k])||0;return`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><div class="grow"><b>${l}</b>${n?` <span class="gold">×${n}</span>`:''}<div class="sub">${d} · ${c} GTP${k==='spin'&&S.spunEra&&n?' · already used, so it can’t be refunded':''}</div></div>
-    <button class="ghost sm" aria-label="Remove ${l}" onclick="buyPerk('${k}',-1)" ${n&&!(k==='spin'&&S.spunEra)?'':'disabled'}>−</button><button class="sm" aria-label="Buy ${l}" onclick="buyPerk('${k}',1)" ${n>=mx||bank-cost<c?'disabled':''}>+</button></div>`;}).join('')}</details>`;}
+  ${PERKS_GTP.map(([k,l,d,c,mx])=>{const n=(S.perks&&S.perks[k])||0;return`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><div class="grow"><b>${l}</b>${n?` <span class="gold">×${n}</span>`:''}<div class="sub">${d}${k==='spin'&&S.spunEra&&n?' · already used, so it can’t be refunded':''}</div></div>
+    ${n?`<button class="ghost sm" aria-label="Remove ${l}" onclick="buyPerk('${k}',-1)" ${k==='spin'&&S.spunEra?'disabled':''}>−</button>`:''}<button class="sm perkbuy" aria-label="Buy ${l} for ${c} GTP" onclick="buyPerk('${k}',1)" ${n>=mx||bank-cost<c?'disabled':''}>${n>=mx?'Added':c+' GTP'}</button></div>`;}).join('')}</details>`;}
 function diffCard(){const lock=S.stage!=='build';return`<div class="card"><div class="sh">🎚️ <span class="grow">Difficulty</span>${lock?'<b>Locked for this run</b>':''}</div><div class="seg">${Object.entries(DIFFS).map(([k,v])=>`<button class="${S.diff===k?'on':''}" onclick="setDiff('${k}')" ${(S.daily&&k!=='pro')||(lock&&S.diff!==k)?'disabled':''}>${v.name.replace(/^\S+\s/,'')}</button>`).join('')}</div><div class="note"><b>${diff().name.replace(/^\S+\s/,'')}:</b> ${(lock?diff().d.replace(/^Want a relaxed, less challenging career\? Play Rookie: /,'').replace(/^[^:]*\? /,''):diff().d).replace(S.daily?'Earns GTP, gems and achievements.':'@@@','Earns GTP and achievements.')+(S.daily?' The Daily Build is always played on Pro and earns no gems.':'')}</div></div>`;}
 const LOOK_GROUPS=[['face','Face',['skin','fs','no','face','fh','mk']],['eyes','Eyes',['ey','ec','br']],['hair','Hair',['hair','hc']],['gear','Gear',['head','arms','jew','guard']],['kit','Uniform',['jer','trim','js']]];
 // thumbnails of a face feature hide headwear and sunglasses, so the feature itself is what you compare
@@ -2709,12 +2725,12 @@ function buildHTML(){const u=UI(),left=START_BUDGET-spent(),ti=Math.max(0,TABS.f
     <div class="card"><div class="sh">💪 <span class="grow">Frame</span></div><div class="seg">${Object.keys(FRAMES).map(f=>`<button class="${S.frame===f?'on':''}" onclick="setF('frame','${f}')">${f}</button>`).join('')}</div><div class="note">${FRAMES[S.frame].d}</div>${frameFx()}</div>`;
   if(tab==='skills'&&!u.skillsPicked)h+=`${hd('Skills')}<div class="sub">Start from a premade build, or put every point in yourself.</div><div class="card"><div class="sh">⚡ <span class="grow">Quick start</span></div><div class="chips">${ARCH.map((a,i)=>[a,i]).sort((x,y)=>Math.abs(S.height-x[0][2])-Math.abs(S.height-y[0][2])).map(([a,i])=>`<button class="chip ${S.arch===a[0]?'on':''}" onclick="UI().skillsPicked=1;applyArch(${i})">${a[0]}<small>${Math.abs(S.height-a[2])<=2?'Fits your size':'Best at '+ht(a[2]-2)+' to '+ht(a[2]+2)}</small></button>`).join('')}<button class="chip" onclick="UI().skillsPicked=1;randomBuild()">🎲 Randomize<small>Random skills and traits</small></button></div><div class="note">Premade builds only fill in your skills. Your height and frame stay as you picked them. You can still change everything after.</div>
     <button class="ghost wide" style="margin-top:10px" onclick="UI().skillsPicked=1;render()">✍️ Build my own</button></div>`;
-  else if(tab==='skills')h+=`${hd('Skills')}<div class="row" style="margin-bottom:6px"><span class="grow sub" style="margin:0">${S.arch?`Using the <b>${S.arch}</b> build. Tweak anything below.`:'Your own build.'}</span><button class="ghost sm" onclick="UI().skillsPicked=0;render()">⚡ Premade builds</button></div>${left<=0?'<div class="ev gold">🔒 No points left: tap − on a skill to free points, then + works again.</div>':''}<div class="sub">Tap a group to open it. Skills cost 1 point each up to 80, then 2 up to 90, then 3 (the + button shows the price; it goes by the skill's base level, before height and frame). Max 90 here; grow higher during the career. Numbers shown include your height bonus. OVR rates you at the role you fit best, so the skills that matter shift as you build.</div>${projCard()}${skillAcc('build')}`;
+  else if(tab==='skills')h+=`${hd('Skills')}<div class="row" style="margin-bottom:6px"><span class="grow sub" style="margin:0">${S.arch?`Using the <b>${S.arch}</b> build. Tweak anything below.`:'Your own build.'}</span><button class="ghost sm" onclick="UI().skillsPicked=0;render()">⚡ Premade builds</button></div>${left<=0?'<div class="ev gold">🔒 No points left: tap − on a skill to free points, then + works again.</div>':''}<div class="sub" style="margin-bottom:0">Tap a group below to open it, then use + and − on each skill.</div><details class="howsk"><summary>How skills and points work</summary><div class="sub">Skills cost 1 point each up to 80, then 2 up to 90, then 3 (the + button shows the price; it goes by the skill's base level, before height and frame). Max 90 here; grow higher during the career. Numbers shown include your height bonus. OVR rates you at the role you fit best, so the skills that matter shift as you build.</div></details>${projCard()}${skillAcc('build')}`;
   if(tab==='traits')h+=`${hd('Traits')}<div class="sub">Every player has all ${TRAITS.length} traits, each rated from 1 (weak) to 5 (elite). Lock in ${traitLimit()} you care about most: they start at ${S.perks&&S.perks.maxed?'5':'4 or 5'}. The other ${TRAITS.length-traitLimit()} get a random 1 to 5 rating when your career starts, so you find out what you got in high school.</div><div class="note" style="text-align:center">Locked: <b>${S.picked.length}/${traitLimit()}</b></div><div class="card"><div class="chips">${TRAITS.map(([k,l,d])=>`<button class="chip ${S.picked.includes(k)?'on':''}" onclick="toggleTrait('${k}')">${l}<small>${d}</small></button>`).join('')}</div></div>`;
   const ready=S.picked.length>=traitLimit(),nxt=TABS[ti+1];
   return h+dock(`<div class="meta"><span><b>${left}</b> pts left${left>0&&ready?' <small class="muted">(saved as bonus pts)</small>':''}</span><span>OVR <b>${OV()}</b></span><span>Traits <b>${S.picked.length}/${traitLimit()}</b></span></div>
-    <div class="two">${nxt?`<button class="ghost" onclick="goTab('${nxt[0]}')">Next: ${nxt[1]} ▶</button>`:`<button class="ghost" onclick="goTab('skills')">◀ Back: Skills</button>`}<button onclick="${ready?(hasRun()?'UI().replaceOk=1;render()':'startCareer()'):"goTab('traits')"}" class="${ready?'':'ghost'}">${ready?'Start High School':`Pick ${traitLimit()-S.picked.length} trait${traitLimit()-S.picked.length===1?'':'s'}`}</button></div>
-    ${u.replaceOk&&hasRun()?`<div class="ev bad" style="margin:2px 0 0">Starting a new player replaces your saved run: <b>${esc((runMeta()?.sum?.name)||'your player')}</b>${(()=>{const s=runMeta()?.sum;return s?`, age ${s.age}${s.team?', '+esc(s.team):s.school?', '+esc(s.school):''}`:'';})()}.</div><div class="two"><button class="ghost" onclick="UI().replaceOk=0;render()">Keep my run</button><button class="danger" onclick="UI().replaceOk=0;startCareer()">Start new player</button></div>`:''}`);}
+    <div class="two">${nxt?`<button class="ghost" onclick="goTab('${nxt[0]}')">Next: ${nxt[1]} ▶</button>`:`<button class="ghost" onclick="goTab('skills')">◀ Back: Skills</button>`}<button onclick="${ready?(liveRun()?'UI().replaceOk=1;render()':'startCareer()'):"goTab('traits')"}" class="${ready?'':'ghost'}">${ready?'Start High School':`Pick ${traitLimit()-S.picked.length} trait${traitLimit()-S.picked.length===1?'':'s'}`}</button></div>
+    ${u.replaceOk&&liveRun()?`<div class="ev bad" style="margin:2px 0 0">Starting a new player replaces your saved run: <b>${esc((runMeta()?.sum?.name)||'your player')}</b>${(()=>{const s=runMeta()?.sum;return s?`, age ${s.age}${s.team?', '+esc(s.team):s.school?', '+esc(s.school):''}`:'';})()}.</div><div class="two"><button class="ghost" onclick="UI().replaceOk=0;render()">Keep my run</button><button class="danger" onclick="UI().replaceOk=0;startCareer()">Start new player</button></div>`:''}`);}
 
 // ---------- screens ----------
 // drawing a screen must never use the career dice, or a saved run could not be rebuilt exactly
@@ -2754,7 +2770,7 @@ function drawScreen(){const st=S.stage;let h='';const q=UI().seq;if(q&&q.st!==st
     <div class="card reveal" style="animation-delay:${d0+.7}s"><div class="ev">⚔️ <span>Also in this class: <b>${S.rival.name}</b>, taken by the ${S.rival.team}. The media is already calling him your rival.</span></div></div>`+dock(`<button onclick="startNBA()">Start NBA Career</button>`);}
   else if(st==='nba'&&S.pend&&S.pend.kind==='clutch')h=hdr('Playoffs')+clutchHTML();
   else if(st==='nba'){let dk='';const risk=!S.pend&&S.farewell===S.nba.length+1&&S.bank>=10&&ovr()>=63&&!(UI().auto&&UI().autoWhy)?`<div class="card result"><div class="ev gold">🏁 <b>This is your final season.</b></div><div class="sub">You have ${S.bank} unspent points. Spend them now: they are worth nothing after you retire.</div><button class="wide" style="margin-top:8px" onclick="openProfile('skills')">Spend points</button></div>`:!S.pend&&S.nba.length&&S.bank>0&&ovr()<63&&!(UI().auto&&UI().autoWhy)?`<div class="card result bad"><div class="ev bad">⚠️ <b>Your roster spot is at risk at ${OV()} OVR.</b></div><div class="sub">You have ${S.bank} unspent points. Spend them before the next season, or you could be cut.</div><button class="wide" style="margin-top:8px" onclick="openProfile('skills')">Spend points</button></div>`:'';h=S.pend?`${hdr('NBA Career')}${autoCard()}${resultCard()}${decisionCard()}${simmedCard()}${playerCard(true)}${legacyCard()}`:`${hdr('NBA Career')}${autoCard()}${risk}${simmedCard()}${playerCard(true)}${legacyCard()}${resultCard()}`;
-    if(S.pend)dk=`<button disabled>Make your call above</button>`;else{h+=goalsCard();if(S.nba.length>=2&&!S.farewell&&(S.faAt||0)>S.nba.length&&S.lastFa!==S.nba.length&&!S.nba[S.nba.length-1].aw.includes('Champion')&&(S.tradeAskAt==null||S.nba.length-S.tradeAskAt>=2))h+=`<div class="card"><div class="row" style="gap:10px;flex-wrap:nowrap"><div class="grow sub" style="margin:0">Not happy with the ${esc(tShort(S.team))}? You can ask out (once every two seasons).</div><button class="ghost sm" onclick="S.tradeAskAt=S.nba.length;S.pend=tradePend();render();scrollTo(0,0)">📞 Request a trade</button></div></div>`;dk=`<button onclick="UI().auto=0;UI().autoWhy=null;playSeason(simNBA)">Sim Season ${S.nba.length+1}</button><div class="two"><button class="ghost" onclick="simAll()">Next Decision ⏩</button><button class="ghost" onclick="wholeCareer()">Whole Career ⏭</button></div>`;}
+    if(S.pend)dk=`<button disabled>Make your call above</button>`;else{h+=goalsCard();if(S.nba.length>=2&&!S.farewell&&(S.faAt||0)>S.nba.length&&S.lastFa!==S.nba.length&&!S.nba[S.nba.length-1].aw.includes('Champion')&&(S.tradeAskAt==null||S.nba.length-S.tradeAskAt>=2))h+=`<div class="card"><div class="row" style="gap:10px;flex-wrap:nowrap"><div class="grow sub" style="margin:0">Not happy with the ${esc(tShort(S.team))}? You can ask out (once every two seasons).</div><button class="ghost sm" onclick="askTrade();render();scrollTo(0,0)">📞 Request a trade</button></div></div>`;dk=`<button onclick="UI().auto=0;UI().autoWhy=null;playSeason(simNBA)">Sim Season ${S.nba.length+1}</button><div class="two"><button class="ghost" onclick="simAll()">Next Decision ⏩</button><button class="ghost" onclick="wholeCareer()">Whole Career ⏭</button></div>`;}
     if(S.nba.length)h+=seasonCard(S.nba[S.nba.length-1]);
     h+=rivalryCard()+allTimeCard()+leagueCard();if(S.nba.length>1)h+=`<details class="card"><summary>📊 Season log · ${S.nba.length} season${S.nba.length===1?'':'s'}</summary>${seasonTable(true)}</details>`;
     h+=dock(dk);}
@@ -2807,9 +2823,9 @@ function endHTML(){const c=career(),sc=goatScore(c),[t,d]=tierOf(sc,c),k=c.cnt,g
   <details class="card"><summary>📊 More career numbers</summary><div class="stat3" style="margin-top:10px">${[['TOTAL STL',Math.round(c.stl||0).toLocaleString()],['TOTAL BLK',Math.round(c.blk||0).toLocaleString()],['GAMES',c.gp],['TOTAL REB',Math.round(c.reb).toLocaleString()],['TOTAL AST',Math.round(c.ast).toLocaleString()],['PEAK OVR',dsp(c.peak)]].map(([l,v])=>`<div class="stat"><b>${v}</b>${l}</div>`).join('')}</div></details>
   <details class="card"><summary>🌟 Legend benchmarks · ${bm.filter(x=>x[1]).length}/${bm.length}</summary>${bm.map(([l,ok])=>`<div class="ev ${ok?'good':'muted'}">${ok?'✅':'⬜'} ${l}</div>`).join('')}</details>
   ${(S.log||[]).length?`<details class="card"><summary>📝 Career decisions · ${S.log.length}</summary>${S.log.map(x=>`<div class="ev">${x}</div>`).join('')}</details>`:''}
-  ${rewardCard()}${eraCard()}<details class="card"><summary>🏀 Season log · ${c.seasons}</summary>${seasonTable(false)}</details>${S.nba.length?`<div class="sh" style="margin:14px 0 6px">${icon('calendar','ici')} <span class="grow">Your final season</span></div>`+seasonCard({...S.nba[S.nba.length-1],notes:(S.nba[S.nba.length-1].notes||[]).map(x=>x.replace(/📈 Development: \+\d+ pts to spend · /,'📉 ')).filter(x=>!/pts to spend/.test(x))})+((S.nba[S.nba.length-1].clutch||[]).length?`<div class="card">${S.nba[S.nba.length-1].clutch.map(x=>`<div class="ev ${x.won?'good':'bad'}">${x.won?'✅':'💔'} ${x.title}: ${esc(x.text)}</div>`).join('')}</div>`:''):''}${achHTML(S.newAch)}${hofHTML()}`+dock(`<button onclick="R=Math.random;S=newPlayer();render();scrollTo(0,0)">Build Another</button>`);}
+  ${rewardCard()}${eraCard()}<details class="card"><summary>🏀 Season log · ${c.seasons}</summary>${seasonTable(false)}</details>${S.nba.length?`<div class="sh" style="margin:14px 0 6px">${icon('calendar','ici')} <span class="grow">Your final season</span></div>`+seasonCard({...S.nba[S.nba.length-1],notes:(S.nba[S.nba.length-1].notes||[]).map(x=>x.replace(/📈 Development: \+\d+ pts to spend · /,'📉 ')).filter(x=>!/pts to spend/.test(x))})+((S.nba[S.nba.length-1].clutch||[]).length?`<div class="card">${S.nba[S.nba.length-1].clutch.map(x=>`<div class="ev ${x.won?'good':'bad'}">${x.won?'✅':'💔'} ${x.title}: ${esc(x.text)}</div>`).join('')}</div>`:''):''}${achHTML(S.newAch)}${hofHTML()}`+dock(`<button onclick="buildAnother()">Build Another</button>`);}
 function hofHTML(full){const h=hallList();if(!h.length)return'';
-  return`<details class="card" ${full?'open':''}><summary>🏛️ Your Hall of Builds · ${h.length}</summary><div class="hofl">${h.map((x,i)=>`<div class="hofr"><div class="row" style="gap:8px;align-items:baseline;flex-wrap:nowrap"><b class="muted" style="min-width:22px">${i+1}</b><div class="grow" style="min-width:0"><b>${esc(x.name)}</b> <span class="muted">${x.arch?esc(x.arch):x.pos}${x.bd?` · ${x.bd} badges`:''}</span></div><b class="gold" style="white-space:nowrap">${x.tier}</b></div><div class="sub" style="margin:3px 0 0 30px">${x.diff?DIFFS[x.diff].name.split(' ')[0]+' ':''}Score <b>${x.score}</b> · ${f1(x.ppg)} PPG · ${x.rings} ring${x.rings===1?'':'s'} · ${x.mvp} MVP · ${x.pick>=61?'Undrafted':'Pick #'+x.pick}</div>${x.hl&&x.hl.length?`<div class="note" style="margin:3px 0 0 30px">${x.hl.map(esc).join(' · ')}</div>`:''}</div>`).join('')}</div></details>`;}
+  return`<details class="card" ${full?'open':''}><summary>🏛️ Your Hall of Builds · ${h.length}</summary><div class="hofl">${h.map((x,i)=>`<div class="hofr"><div class="hk">${i+1}</div><div><div class="hname"><b>${esc(x.name)}</b><span class="htier">${x.tier}</span></div><div class="hrole">${x.arch?esc(x.arch):x.pos}${x.bd?` · ${x.bd} badge${x.bd===1?'':'s'}`:''}</div><div class="hstats"><span>${x.diff?DIFFS[x.diff].name.split(' ')[0]+' ':''}Score <b>${x.score}</b></span><span><b>${f1(x.ppg)}</b> PPG</span><span><b>${x.rings}</b> ring${x.rings===1?'':'s'}</span><span><b>${x.mvp}</b> MVP</span><span>${x.pick>=61?'Undrafted':'Pick <b>#'+x.pick+'</b>'}</span></div>${x.hl&&x.hl.length?`<div class="note">${x.hl.map(esc).join(' · ')}</div>`:''}</div></div>`).join('')}</div></details>`;}
 function achHTML(fresh,full){const have=achHave(),n=Object.keys(have).length;fresh=fresh||[];
   return`<details class="card" ${full||fresh.length?'open':''}><summary>🏆 Achievements · ${n}/${ACH.length}${S.diff==='rookie'?' · none on Rookie':''}${fresh.length?` · <span class="gold">${fresh.length} new</span>`:''}</summary>${S.diff==='rookie'&&S.stage==='end'?'<div class="note">🔒 Achievements don’t unlock on Rookie.</div>':S.stage!=='end'&&S.stage!=='build'?'<div class="note">Achievements unlock when your career ends.</div>':''}
   <div class="ach">${ACH.map(([id,l,d])=>`<div class="${have[id]?'got':''} ${fresh.includes(id)?'new':''}"><b>${have[id]?l:'🔒 '+l.replace(EMO_RE,'').trim()}</b>${have[id]?'<span class="gotlbl">Unlocked</span>':''}<small>${d}${fresh.includes(id)?' · New':''}</small></div>`).join('')}</div></details>`;}
@@ -2818,7 +2834,7 @@ function achHTML(fresh,full){const have=achHave(),n=Object.keys(have).length;fre
 // ---------- sound: every effect is synthesized live (no files); music plays music/1.mp3, 2.mp3 ... if present ----------
 const SND=(()=>{let ctx=null,master=null,last={};const pref=k=>Store.get(k)!=='0';
   const P={sfx:pref('bag_sfx'),music:pref('bag_music'),haptics:pref('bag_haptics')};
-  function unlock(){if(typeof AudioContext==='undefined'&&typeof webkitAudioContext==='undefined')return;if(!ctx){ctx=new(window.AudioContext||window.webkitAudioContext)();master=ctx.createGain();master.gain.value=1;master.connect(ctx.destination);}if(ctx.state==='suspended')ctx.resume();M.start();}
+  function unlock(){if(typeof AudioContext==='undefined'&&typeof webkitAudioContext==='undefined')return;if(!ctx){ctx=new(window.AudioContext||window.webkitAudioContext)();master=ctx.createGain();master.gain.value=1;master.connect(ctx.destination);}if(ctx.state!=='running')ctx.resume();M.start();}
   const now=()=>ctx.currentTime;
   function env(g,t,a,peak,d){g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(0.0001,t+a+d);}
   function tone(f,t,{type='sine',a=.005,d=.15,v=.3,to=null,dest=master}={}){const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(to)o.frequency.exponentialRampToValueAtTime(to,t+a+d);env(g,t,a,v,d);o.connect(g);g.connect(dest);o.start(t);o.stop(t+a+d+.05);}
@@ -2853,8 +2869,9 @@ const SND=(()=>{let ctx=null,master=null,last={};const pref=k=>Store.get(k)!=='0
 // nba) and `ls` is the pro season just played (null before the pros). A piece that has nothing to
 // show returns '' and is left out.
 const SEQ={
-  season:{title:'Season Results',html(st,ls){let v;if(st==='nba'){const n=S.nba[S.nba.length-1];v=[n.ppg,n.rpg,n.apg];}else{const a=st==='hs'?S.hs:S.col,m=(a[a.length-1].line.match(/[\d.]+(?= [PRA]PG)/g)||[]).map(Number);v=m.slice(0,3);}
-    const tiles=st!=='nba'&&v.length===3?`<div class="stat3 seqstats">${['PPG','RPG','APG'].map((l,j)=>`<div class="stat"><b class="cu" data-v="${v[j]}">${f1(v[j])}</b>${l}</div>`).join('')}</div>`:'';
+  season:{title:'Season Results',html(st,ls){let v;if(st==='nba'){const n=S.nba[S.nba.length-1];v=[n.ppg,n.rpg,n.apg];}else{const a=st==='hs'?S.hs:S.col,r=lvlRows([a[a.length-1]])[0];v=r?[r.ppg,r.rpg,r.apg,r.spg,r.bpg]:[];}
+    // high school and college show steals and blocks too, the same five numbers as an NBA season
+    const tiles=st!=='nba'&&v.length===5?`<div class="seqstats s5">${['PPG','RPG','APG','SPG','BPG'].map((l,j)=>`<div class="stat"><b class="cu" data-v="${v[j]}">${f1(v[j])}</b>${l}</div>`).join('')}</div>`:'';
     return tiles+(st==='nba'?seasonCard(S.nba[S.nba.length-1],true):seasonList(st==='hs'?S.hs:S.col,true));}},
   clutch:{title:'The Final Play',html(st,ls){return ls&&ls.clutch&&ls.clutch.length?`<div class="card">${ls.clutch.map(x=>`<div class="clres ${x.won?'won':'lost'}"><div class="sh">${x.won?'✅':'💔'} <span class="grow">${x.title}</span></div><div class="t">${x.label.replace(EMO_RE,'').trim()}</div><div class="sub">${x.text}</div></div>`).join('')}${ls.path.filter(x=>/your game-winner|your stop|final play/.test(x)).map(x=>`<div class="ev ${x.includes(': beat')?'good':'bad'}">${x.includes(': beat')?'✅':'❌'} <span>${x}</span></div>`).join('')}</div>`:'';}},
   goals:{title:'Season Goals',html(st,ls){return ls&&ls.goals&&ls.goals.length?goalsResult(ls):'';}},
@@ -2880,8 +2897,10 @@ function seqHTML(){const q=UI().seq,k=q.k[q.i],nx=q.k[q.i+1],arr=S.stage==='coll
   const title=k==='clutch'&&(S.nba[S.nba.length-1]?.clutch||[]).length>1?'The Final Plays':k==='season'?(S.stage==='end'?'Final Season':S.stage==='nba'?`Season ${S.nba.length}`:`${YR[arr.length-1]} Year`):SEQ[k].title;
   return`<div class="seqtop"><div class="dots" aria-label="Step ${q.i+1} of ${q.k.length}">${q.k.map((_,j)=>`<i class="${j<q.i?'done':j===q.i?'on':''}"></i>`).join('')}</div><button class="ghost sm" onclick="seqSkip()">Skip</button></div>
   <h1 class="seqh">${title}</h1>${S.stage==='end'&&k==='season'&&S.endWhy?`<div class="note" style="text-align:center;margin:-4px 0 8px">${S.farewell?'Your farewell tour':S.retired==='Out of the league'?'Your last season in the league':'Your last season'}: the story first, then why it ended.</div>`:''}<div class="seqcard">${seqPiece(k)}</div>${UI().auto&&S.stage==='nba'?'<div class="note" style="text-align:center">⏭ Whole Career is on: tap Next through this season’s story, or Skip to go straight to the next season.'+(S.bank>=40&&OV()<99?` 💰 You have ${S.bank} points banked: spend them any time.`:'')+'</div>':''}`+dock((k==='summer'&&S.summerPend)||(k==='decision'&&S.pend)?`<button disabled>Make your pick above</button>`:`<button onclick="seqNext()">${nx?'Next: '+SEQ[nx].title:S.stage==='end'?'Your legacy':UI().auto&&S.stage==='nba'?'Next season':'Continue'} ▶</button>${UI().auto?'<button class="ghost" onclick="UI().auto=0;render()">⏹ Stop the career sim</button>':''}`);}
-function seqNext(){const q=UI().seq;if(!q)return;if(q.k[q.i]==='spend'){clearUndo();UI().spend=false;}const c=document.querySelector('.seqcard'),go=()=>{if(UI().seq!==q)return;q.i++;UI().seqT=performance.now();if(q.i>=q.k.length){UI().seq=null;if(q.k.includes('summer'))UI().seenRes=S.lastResult;if(UI().auto)return autoStep();}render();scrollTo(0,0);};
-  if(c&&!document.documentElement.classList.contains('wt')){c.classList.add('leave');document.querySelector('.seqh')?.classList.add('leave');setTimeout(go,210);}else go();}
+// a second tap while the card is still sliding out must not advance twice (kept out of the saved state on purpose)
+let seqBusy=null;
+function seqNext(){const q=UI().seq;if(!q||seqBusy===q)return;if(q.k[q.i]==='spend'){clearUndo();UI().spend=false;}const c=document.querySelector('.seqcard'),go=()=>{seqBusy=null;if(UI().seq!==q)return;q.i++;UI().seqT=performance.now();if(q.i>=q.k.length){UI().seq=null;if(q.k.includes('summer'))UI().seenRes=S.lastResult;if(UI().auto)return autoStep();}render();scrollTo(0,0);};
+  if(c&&!document.documentElement.classList.contains('wt')){seqBusy=q;c.classList.add('leave');document.querySelector('.seqh')?.classList.add('leave');setTimeout(go,210);}else go();}
 function seqSkip(){if(UI().seq&&UI().seq.k.includes('summer'))UI().seenRes=S.lastResult;UI().seq=null;UI().spend=false;if(UI().auto)return autoStep();render();scrollTo(0,0);}
 // ---------- motion: entrance on new screens, OVR bump, new-season glow, confetti for big moments ----------
 let FXprev=null,FXcur=null;
@@ -2937,20 +2956,30 @@ const runSafe=()=>!S.summerPend&&!S.pend&&!(S.queue&&S.queue.length)&&S.stage!==
 function lsSet(k,v){const ok=Store.set(k,v);if(!ok)console.warn('save failed: '+k);return ok;}
 function runMeta(){try{return JSON.parse(teamRename(Store.get(SV.meta))||'null');}catch{return null;}}
 const hasRun=()=>!!runMeta();
+// a finished career is kept only so its recap can be reopened: it is not a run in progress
+const liveRun=()=>{const s=runMeta()?.sum;return!!s&&s.stage!=='end';};
 function getS(){return S;} // tests read the live run through this (a reload swaps S for a new object)
 function runSummary(){return{name:S.name,stage:S.stage,age:S.age,ovr:OV(),look:S.look,pos:S.pos,arch:archName(),yr:S.nba.length,hs:S.hs.length,col:S.col.length,school:S.school||null,team:S.team||null,diff:S.diff,ts:Date.now()};}
 // the rival also lives in the league list, so he is stored by id and linked back on load
 // sets (like recently seen events) are stored as lists and turned back into sets on load
 const snapJSON=()=>JSON.stringify(S,(k,v)=>k==='ui'?undefined:v instanceof Set?{__set:[...v]}:k==='rival'&&v&&typeof v==='object'?{__ref:v.id}:v);
-function writeSnap(){if(!canSave()||!R.get)return;RUNID++;if(!lsSet(SV.snap,snapJSON()))return;
-  lsSet(SV.meta,JSON.stringify({v:GAME_V,id:RUNID,rs:R.get(),sum:runSummary()}));RUNLOG=[];writeLog();}
+// a refused write (storage full) must not strand the old snapshot: the run id only moves on once the new one is stored
+function writeSnap(){if(!canSave()||!R.get)return;if(!lsSet(SV.snap,snapJSON()))return false;RUNID++;
+  lsSet(SV.meta,JSON.stringify({v:GAME_V,id:RUNID,rs:R.get(),sum:runSummary()}));RUNLOG=[];writeLog();return true;}
 function writeLog(){if(!canSave())return;lsSet(SV.log,JSON.stringify({id:RUNID,log:RUNLOG}));if(S.stage!=='build'&&S.stage!=='end'&&RUNID){try{const m=Store.json(SV.meta);if(m&&m.id===RUNID){m.sum=runSummary();lsSet(SV.meta,JSON.stringify(m));}}catch{}}}
 function clearRun(){for(const k of[SV.snap,SV.meta,SV.log,SV.ui])Store.remove(k);RUNLOG=[];}
-function afterAction(n,a){if(!canSave())return;if(S.stage==='end'||S.stage==='build'){clearRun();return;}
+// the screen side sets onSaveFail to tell the player (once) that the device refused a save
+let SAVE_WARNED=false,onSaveFail=null;
+function saveFailed(){if(SAVE_WARNED)return;SAVE_WARNED=true;if(onSaveFail)onSaveFail();}
+function afterAction(n,a){if(!canSave())return;if(S.stage==='build'){clearRun();return;}
+  // a finished career stays saved, so its recap survives the app being closed; Build Another clears it (rewards are already paid)
+  if(S.stage==='end'){const w=writeSnap();if(w!==true){clearRun();if(w===false)saveFailed();}return;}
   // spending points is a cheap log entry; anything bigger folds into a fresh snapshot once nothing is waiting
-  if(runSafe()&&!['spend','smartSpend','unspend','undoSpend','clearUndo'].includes(n))writeSnap();else{RUNLOG.push([n,...a]);if(runSafe()&&RUNLOG.length>=40)writeSnap();else writeLog();}}
+  const snap=runSafe()&&!['spend','smartSpend','unspend','undoSpend','clearUndo'].includes(n);
+  if(snap&&writeSnap()!==false)return;
+  RUNLOG.push([n,...a]);if(snap)saveFailed();if(!snap&&runSafe()&&RUNLOG.length>=40&&writeSnap()!==false)return;writeLog();}
 function autosave(){if(!canSave())return;if(S.stage==='build')lsSet(SV.build,JSON.stringify(S));else if(S.stage!=='end'&&RUNID)lsSet(SV.ui,JSON.stringify(S.ui||{}));}
-const LOGGED=['simHS','simCol','simNBA','chooseSummer','chooseSchool','declare','returnSchool','choose','simAll','simEnd','spend','smartSpend','startNBA','unspend','undoSpend','clearUndo'];
+const LOGGED=['simHS','simCol','simNBA','chooseSummer','chooseSchool','declare','returnSchool','choose','simAll','simEnd','spend','smartSpend','startNBA','unspend','undoSpend','clearUndo','askTrade'];
 for(const n of LOGGED){const f=globalThis[n];if(typeof f!=='function')continue;
   globalThis[n]=function(...a){if(REPLAY||LOGD||!S.seed||S.stage==='build')return f.apply(this,a);LOGD++;let r;try{r=f.apply(this,a);}finally{LOGD--;}try{afterAction(n,a);}catch(e){console.warn(e);}return r;};}
 // a started career uses up the build it came from: drop that draft, or the next launch reopens the same player in the creator
@@ -2960,10 +2989,15 @@ function loadRun(){const meta=runMeta();let snap=null,lg=null;try{snap=JSON.pars
   REPLAY=true;
   try{S=Object.assign(newPlayer(),snap);if(S.rival&&S.rival.__ref!=null)S.rival=(S.L&&S.L.P.find(p=>p.id===S.rival.__ref))||null;
     convertRun(meta);R=makeRng(meta.rs);RUNID=meta.id;RUNLOG=[];
-    if(lg&&lg.id===meta.id)for(const e of lg.log){try{globalThis[e[0]](...e.slice(1));RUNLOG.push(e);}catch(err){console.warn('replay stopped at',e[0],err);break;}}}
+    // live play re-reads the listed position on every screen, so the replay does it after every action too
+    if(S.stage!=='end')syncPos();
+    if(lg&&lg.id===meta.id&&snap.stage!=='end')for(const e of lg.log){try{globalThis[e[0]](...e.slice(1));syncPos();RUNLOG.push(e);}catch(err){console.warn('replay stopped at',e[0],err);break;}}}
   finally{REPLAY=false;}
   const ui=Store.json(SV.ui);
-  S.ui=Object.assign({tab:'setup',open:null,spend:false},ui||{},{menu:null,wig:1});writeLog();return true;}
+  // seqT and pendKey are clock readings from the last launch: carried over, they leave the decision buttons dead
+  S.ui=Object.assign({tab:'setup',open:null,spend:false},S.stage==='end'?{}:ui||{},{menu:null,wig:1,seqT:0,pendKey:null});
+  // a replay that ended the career has just paid its rewards: store the finished run so no later Continue pays them again
+  if(S.stage==='end'&&snap.stage!=='end'){if(writeSnap()!==true)clearRun();}else writeLog();return true;}
 // leave a run without losing it: back to a fresh build screen, with the run waiting on Continue
 function leaveRun(){if(S.stage!=='build'&&S.stage!=='end'&&canSave())lsSet(SV.ui,JSON.stringify(Object.assign({},S.ui,{menu:null})));R=Math.random;S=newPlayer();S.ui={tab:'setup',open:null,spend:false,wig:1};}
 // give up on a run: it is deleted (no Hall of Builds entry, no GTP), and a fresh player waits in the creator
@@ -2975,7 +3009,7 @@ function bootSave(){if(!canSave())return;try{const b=Store.json(SV.build);if(b&&
     // drafts saved while skills started at 25 (2026-11-08 to 11-10): lift them to today's start, then hand back any points over the budget
     for(const k of SUBKEYS)if(!(S.attrs[k]>=START_A))S.attrs[k]=START_A;trimToBudget();S.ui=Object.assign({tab:'setup',open:null,spend:false},b.ui||{},{menu:null,replaceOk:0});}}catch{}
   if(hasRun())(S.ui=S.ui||{tab:'setup',open:null,spend:false}).tab='setup';}
-const SAVE_KEYS=['bag_gtp','bag_ach','bag_hof','bag_recent','bag_daily','bag_diff','bag_rec','bag_goats','bag_gems','bag_gear','bag_intro'];
+const SAVE_KEYS=['bag_gtp','bag_ach','bag_hof','bag_recent','bag_daily','bag_diff','bag_rec','bag_goats','bag_gems','bag_gear','bag_intro','bag_bbook'];
 // ---------- start: a fresh player (or the saved creator build), then the first screen ----------
 // This runs before the platform file below it has loaded: code the first screen reaches must not need Plat.
 S=newPlayer();bootSave();render();
@@ -3014,7 +3048,7 @@ const SHOP_PACKS=[{sku:'bag_gems_t1',gems:40,usd:1.99},{sku:'bag_gems_t2',gems:1
 const SHOP_NOADS={sku:'bag_noads',usd:3.99};
 const SHOP_SKUS=()=>[...SHOP_PACKS.map(p=>p.sku),SHOP_NOADS.sku];
 const noAds=()=>Store.get('bag_noads')==='1';
-const Plat=(()=>{let busy=false,booted=null,mt=null;
+const Plat=(()=>{let busy=false,booted=null,mt=null,lastTxs=null;
   const sh=()=>window.Shell&&window.Shell.native?window.Shell:null;
   const wt=()=>!!globalThis.__witnessApi;
   const dev=()=>!sh()&&!wt()&&typeof location!=='undefined'&&/[?&]dev=1(&|$)/.test(location.search);
@@ -3041,22 +3075,25 @@ const Plat=(()=>{let busy=false,booted=null,mt=null;
     banner(){const s=sh();if(s){if(noAds())s.ads.removeBanner();else s.ads.showBanner();return;}
       if(dev()){document.documentElement.classList.toggle('adsim',!noAds());setBanner(noAds()?0:50);}},
     boot(){if(booted)return booted;const s=sh();if(wt())return booted=Promise.resolve();if(!s){P.banner();return booted=Promise.resolve();}
-      watchStorage();s.app.onState(on=>{if(!on)mirrorNow();});
+      watchStorage();s.app.onState(on=>{if(!on)mirrorNow();else if(booted)syncPurchases();});
       return booted=s.store.hydrate(NKEY).then(j=>{if(!j)return;let o=null;try{o=JSON.parse(j);}catch(e){}if(!o)return;
           for(const k in o)if(MIRROR(k))Store.set(k,o[k]);S=newPlayer();bootSave();render();})
         .catch(()=>{}).then(()=>{
           s.configure({rewarded:live()?PLAT_IDS.rewarded:PLAT_IDS.testRewarded,banner:live()?PLAT_IDS.banner:PLAT_IDS.testBanner,
             rcKey:PLAT_IDS.rcKey,products:SHOP_SKUS(),nonConsumables:[SHOP_NOADS.sku]});
           s.ads.onBanner(setBanner);P.banner();
-          if(s.iap.available()){s.iap.owned().then(ids=>{if(ids.includes(SHOP_NOADS.sku)&&!noAds())grantNoAds();}).catch(()=>{});
-            s.iap.getProducts(SHOP_SKUS()).then(()=>{if(UI().menu==='gear')render();}).catch(()=>{});}
+          if(s.iap.available()){syncPurchases();s.iap.owned().then(ids=>{if(ids.includes(SHOP_NOADS.sku)&&!noAds())grantNoAds();}).catch(()=>{});
+            s.iap.getProducts(SHOP_SKUS()).then(()=>{if(['gear','gems'].includes(UI().menu))render();}).catch(()=>{});}
           mirror();}).finally(()=>s.ready());},
     async ad(){if(busy||!P.adsOn())return false;busy=true;try{const s=sh();if(!s)return await sim('Rewarded ad');
         hush(true);try{const r=await s.ads.showRewarded();if(r&&r.reason==='nofill')platToast('No ad available right now. Try again in a minute.');return!!(r&&r.rewarded);}finally{hush(false);}}
       catch(e){return false;}finally{busy=false;}},
     async buy(sku){if(busy||!P.iapOn())return false;busy=true;try{const s=sh();if(!s)return await sim('Buy '+sku);
-        const r=await s.iap.purchase(sku);if(r&&!r.ok&&!r.cancelled)platToast('Purchase failed · '+String(r.error||'try again later').slice(0,80));return!!(r&&r.ok);}
+        const r=await s.iap.purchase(sku);if(r&&!r.ok&&!r.cancelled)platToast('Purchase failed · '+String(r.error||'try again later').slice(0,80));if(r&&r.ok)lastTxs=Array.isArray(r.txs)?r.txs:null;return!!(r&&r.ok);}
       catch(e){return false;}finally{busy=false;}},
+    // the store's list of one-time purchases ([{key,product}]), or null when it cannot be read right now
+    lastTxs:()=>lastTxs,
+    async txs(){const s=sh();if(!s||!s.iap.available()||typeof s.iap.transactions!=='function')return null;try{const l=await s.iap.transactions();return Array.isArray(l)?l:null;}catch(e){return null;}},
     async restore(){const s=sh();if(s)return s.iap.available()?await s.iap.restore():[];return dev()&&await sim('Restore purchases')?[SHOP_NOADS.sku]:[];}};
   return P;})();
 // hoisted so menu code can ask before Plat's const is initialized (render() runs once before the PLATFORM section loads)
@@ -3070,11 +3107,27 @@ function gemTradeCard(){const n=gems(),u=UI();
   ${GEM_TRADES.map(([g,p],i)=>`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><span class="bub">🪙</span><div class="grow"><b>+${p} GTP</b></div><button class="sm" aria-label="Trade ${g} gems for ${p} GTP" onclick="tradeGems(${i})" ${n<g?'disabled':''}>${g} gems</button></div>`).join('')}
   ${u.tradeMsg?`<div class="ev good" style="margin-top:10px">${esc(u.tradeMsg)}</div>`:''}${storeOn()?`<button class="ghost sm" style="margin-top:12px;width:100%" onclick="openMenu('gems')">${icon('gem')} Get more gems</button>`:''}</div>`;}
 function platToast(msg){let t=document.querySelector('.platToast');if(!t){t=document.createElement('div');t.className='platToast';document.body.appendChild(t);}t.textContent=msg;clearTimeout(platToast.t);platToast.t=setTimeout(()=>t.remove(),3200);}
+onSaveFail=()=>platToast('Could not save your progress. Your device may be out of storage.');
 function grantNoAds(){Store.set('bag_noads','1');Plat.banner();}
+// Gem packs are paid out once per store transaction. bag_tx lists the transactions already settled; bag_txdue counts packs
+// paid on the spot whose transaction had not reached the list yet. A pack that is approved after its purchase call returned
+// (Ask to Buy, a bank approval, the app killed under the payment sheet) is in neither, so syncPurchases() pays it later.
+// The first list ever seen only sets the baseline: nothing in it is paid. only=true settles the list without paying (restore).
+function settleTx(txs,paid,only){const due=Store.obj('bag_txdue');let seen=Store.json('bag_tx'),got=0,mine=!paid;
+  if(!Array.isArray(txs)){if(paid){due[paid]=(due[paid]||0)+1;Store.setJson('bag_txdue',due);}return 0;}
+  const first=!Array.isArray(seen);if(first)seen=[];
+  for(const t of txs){if(!t||seen.includes(t.key))continue;seen.push(t.key);const p=SHOP_PACKS.find(x=>x.sku===t.product);if(!p)continue;
+    if(!mine&&t.product===paid){mine=true;continue;}
+    if(first||only)continue;
+    if(due[t.product]>0){due[t.product]--;continue;}
+    addGems(p.gems);got+=p.gems;}
+  if(!mine)due[paid]=(due[paid]||0)+1;
+  Store.setJson('bag_tx',seen.slice(-400));Store.setJson('bag_txdue',due);return got;}
+function syncPurchases(){return Plat.txs().then(l=>{const got=settleTx(l);if(got){platToast(`Your purchase came through: +${got.toLocaleString()} gems`);render();}return got;}).catch(()=>0);}
 function shopBuy(sku){if(Plat.busy())return;UI().shopMsg='';const go=Plat.buy(sku);render();go.then(ok=>{if(ok){const p=SHOP_PACKS.find(x=>x.sku===sku);
-    if(p){addGems(p.gems);UI().shopMsg=`+${p.gems.toLocaleString()} gems added. Thank you!`;}
+    if(p){addGems(p.gems);settleTx(Plat.lastTxs(),sku);UI().shopMsg=`+${p.gems.toLocaleString()} gems added. Thank you!`;}
     else if(sku===SHOP_NOADS.sku){grantNoAds();UI().shopMsg='Banner ads removed. Thank you!';}}render();});}
-function shopRestore(){if(Plat.busy())return;Plat.restore().then(ids=>{const had=ids.includes(SHOP_NOADS.sku);if(had)grantNoAds();UI().shopMsg=had?'Remove Ads restored.':'Nothing to restore on this Apple ID.';render();})
+function shopRestore(){if(Plat.busy())return;Plat.restore().then(ids=>{Plat.txs().then(l=>settleTx(l,null,true));const had=ids.includes(SHOP_NOADS.sku);if(had)grantNoAds();UI().shopMsg=had?'Remove Ads restored.':'Nothing to restore on this Apple ID.';render();})
   .catch(e=>{UI().shopMsg=String(e&&e.message||e);render();});}
 // the gem shop, under Equipment: only in the iOS app (or ?dev=1)
 function shopCard(){if(!Plat.iapOn())return'';const u=UI(),b=Plat.busy()?'disabled':'';
@@ -3085,11 +3138,13 @@ function shopCard(){if(!Plat.iapOn())return'';const u=UI(),b=Plat.busy()?'disabl
   <button class="ghost sm" style="margin-top:12px;width:100%" onclick="shopRestore()" ${b}>Restore purchases</button></div>`;}
 // end of a career: the gems card, with one rewarded ad that doubles this career's gems and GTP (never Rookie or the Daily Build)
 function rewardCard(){if(!S.gemsRun)return'';const can=!S.dbl&&!S.daily&&S.diff!=='rookie'&&Plat.adsOn();
-  return`<div class="card"><div class="sh">${icon('sparkle')} <span class="grow">+${S.gemsRun} gems${S.dbl?' <span class="gold">· doubled</span>':''}</span><b class="gold">${gems()} total</b></div><div class="sub">Spend them on permanent Equipment from the menu. Better careers pay more: Role Player 10 · Solid Starter 15 · All-Star 20 · Hall of Famer 35 · THE GOAT 60${S.diff==='hof'?' (×1.5 on Hall of Fame)':''}.</div>
+  return`<div class="card"><div class="sh">${icon('sparkle')} <span class="grow">+${S.gemsRun} gems${S.dbl?' <span class="gold">· doubled</span>':''}</span><b class="gold">${gems()} total</b></div><div class="sub">Spend them on permanent Equipment from the menu. Better careers pay more: ${[['Role Player'],['Solid Starter'],['All-Star'],['Hall of Famer'],['🐐 THE GOAT','THE GOAT']].map(([t,l])=>`${l||t} ${Math.round(GEM_TIER[t]*EARN)}`).join(' · ')}${S.diff==='hof'?' (×1.5 on Hall of Fame)':''}.</div>
   ${can?`<button class="wide" style="margin-top:12px" onclick="doubleRewards()" ${Plat.busy()?'disabled':''}>${icon('video')} Watch an ad: double to +${S.gemsRun*2} gems${S.gtpRun?` and +${S.gtpRun*2} GTP`:''}</button>`:''}</div>`;}
-function doubleRewards(){if(S.dbl||Plat.busy()||S.stage!=='end')return;const run=S;const go=Plat.ad();render();
-  go.then(ok=>{if(!ok||run!==S||S.dbl||S.stage!=='end'){render();return;}S.dbl=true;addGems(S.gemsRun);S.gemsRun*=2;
-    if(S.gtpRun){setGtp(gtpBank()+S.gtpRun);(S.gtpLog=S.gtpLog||[]).push(['Ad bonus',S.gtpRun]);S.gtpRun*=2;}render();});}
+function doubleRewards(){if(S.dbl||Plat.busy()||S.stage!=='end')return;const run=S,g=S.gemsRun,t=S.gtpRun;const go=Plat.ad();render();
+  go.then(ok=>{if(!ok||run.dbl){render();return;}run.dbl=true;addGems(g);run.gemsRun=g*2;
+    if(t){setGtp(gtpBank()+t);(run.gtpLog=run.gtpLog||[]).push(['Ad bonus',t]);run.gtpRun=t*2;}
+    // still on the recap: remember the ad was used. Already building the next player: say what arrived
+    if(run===S)writeSnap();else platToast(`Ad bonus: +${g} gems${t?` and +${t} GTP`:''}`);render();});}
 Plat.boot();
 // Bulk career sim for balance data (used by Witness; never called in normal play)
 function autosim(n,build,college,faMode){SAVE_OFF=true;const save=S,rend=render,keep=['bag_ach','bag_daily','bag_recent','bag_gtp','bag_diff','bag_rec','bag_goats','bag_gems','bag_gear'].map(k=>[k,Store.get(k)]);render=()=>{};const tiers={},rows=[];

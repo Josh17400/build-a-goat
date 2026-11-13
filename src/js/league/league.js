@@ -35,7 +35,7 @@ function lgPlay(L,me){const z=lgZ(L,me),W={};
       p.ppg=Math.max(.5,(2+(p.ovr-50)*.56+([4,2,1][r]||0))*mf*era().pace+gauss()*1.3);
       p.rpg=Math.max(.3,(2+(p.ovr-50)*{C:.23,PF:.19,SF:.13,SG:.09,PG:.08}[p.pos])*mf+gauss()*.5);
       p.apg=Math.max(.2,(1+(p.ovr-50)*{PG:.21,SG:.12,SF:.09,PF:.06,C:.05}[p.pos])*mf+gauss()*.4);
-      p.spg=Math.max(.1,(.4+(p.d-50)*.02)*mf);p.tov=Math.max(.2,(.5+p.ppg*.075+p.apg*.22)*(1+gauss()*.12));p.fg=clamp(.445+(p.ovr-72)*.002+({C:.06,PF:.03,SF:0,SG:-.015,PG:-.02}[p.pos])+gauss()*.02,.38,.64);p.bpg=Math.max(0,(.1+(p.d-50)*(p.pos==='C'||p.pos==='PF'?.035:.01))*mf);
+      p.spg=Math.max(.1,(.35+(p.d-50)*{PG:.041,SG:.038,SF:.03,PF:.02,C:.015}[p.pos])*mf);p.tov=Math.max(.2,(.5+p.ppg*.075+p.apg*.22)*(1+gauss()*.12));p.fg=clamp(.445+(p.ovr-72)*.002+({C:.06,PF:.03,SF:0,SG:-.015,PG:-.02}[p.pos])+gauss()*.02,.38,.64);p.bpg=Math.max(0,(.1+(p.d-50)*{C:.063,PF:.042,SF:.016,SG:.009,PG:.009}[p.pos])*mf);
       p.wins=W[t];p.car.gp+=p.gp;p.car.pts+=p.ppg*p.gp;p.car.reb+=p.rpg*p.gp;p.car.ast+=p.apg*p.gp;p.pts=p.car.pts;}}
   L.z=z;L.lastWins=W;return{z,W};}
 // best of seven; mine=true hands the series to the detailed version that knows your traits

@@ -1,6 +1,6 @@
 // ---------- UI ----------
 const app=document.getElementById('app');
-function act(fn,...a){if((fn===choose||fn===chooseSummer)&&!document.documentElement.classList.contains('wt')&&performance.now()-(UI().seqT||0)<500)return;fn(...a);if(fn===choose&&UI().auto&&!UI().seq)autoStep();else render();}
+function act(fn,...a){if((fn===choose||fn===chooseSummer)&&!document.documentElement.classList.contains('wt')&&(d=>d>=0&&d<500)(performance.now()-(UI().seqT||0)))return;fn(...a);if(fn===choose&&UI().auto&&!UI().seq)autoStep();else render();}
 const UI=()=>S.ui||(S.ui={tab:'setup',open:null,spend:false});
 // every emoji in the game's text is swapped for a custom icon when a screen is drawn
 const EMO_RE=/(?:\p{Extended_Pictographic}|[←-⇿⌀-⏿■-◿☀-➿⬀-⯿])(?:️|‍(?:\p{Extended_Pictographic}|[☀-➿]))*️?/gu;
