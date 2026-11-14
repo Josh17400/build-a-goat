@@ -38,7 +38,8 @@ appstoreconnect.apple.com > Apps > **+** > New App.
 
 ### 3. App Store Connect: in-app purchases
 The app > Monetization > In-App Purchases > **+**, one per row of the table in `native/README.md`
-("In-app products"): five **Consumable** gem packs and one **Non-Consumable** `bag_noads`. Each needs
+("In-app products"): five **Consumable** gem packs and two **Non-Consumable** products, `bag_noads` and `bag_starter`
+(the New Player Special). Each needs
 a price, an English display name and description, and a review screenshot (the Equipment screen
 with the Gem shop is fine).
 
@@ -47,7 +48,7 @@ app.revenuecat.com > **+ New project** "Build a GOAT" > add an **App Store** app
 `com.buildagoat.game`.
 - Connect App Store Connect: an In-App Purchase key (.p8) from App Store Connect > Users and
   Access > Integrations > In-App Purchase. The Fort's project has one you can reuse.
-- Products: import the five `bag_*` products. Optional: an entitlement `no_ads` attached to
+- Products: import the seven `bag_*` products. Optional: an entitlement `no_ads` attached to
   `bag_noads` (the shell reads owned product ids directly, so it isn't required).
 - Copy the **public App Store SDK key** (`appl_...`) into `index.html` `PLAT_IDS.rcKey`. The shop
   is hidden in the app until this key is set.

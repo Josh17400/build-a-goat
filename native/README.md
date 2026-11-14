@@ -130,6 +130,7 @@ Store product ids are unique across a developer account, and Euchre and The Fort
 | `bag_gems_t4` | consumable | 550 gems | $19.99 |
 | `bag_gems_t5` | consumable | 1,500 gems (tagged Best value) | $49.99 |
 | `bag_noads` | non-consumable | removes the banner (the reward ad stays optional) | $3.99 |
+| `bag_starter` | non-consumable | New Player Special, one per Apple ID: 250 gems and 100 GTP (paid once, for its transaction, like a pack; not again on Restore) and Remove Ads | $9.99 |
 
 For scale: a Pro career pays about 5 to 16 gems, a GOAT career 45, Hall of Fame 1.5×, and maxing
 every piece of gear costs 1,700. Each pack gives about 10-14% more gems per dollar than the one

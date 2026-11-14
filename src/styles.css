@@ -186,6 +186,9 @@ h1 span{filter:drop-shadow(0 0 14px rgba(255,138,31,.45))}
 h2{font-family:var(--fc);font-weight:800;font-size:1.2rem;letter-spacing:.01em}
 .card{background:var(--grain),linear-gradient(180deg,rgba(33,30,32,.94),rgba(22,21,25,.95));border-color:rgba(255,255,255,.08);
   box-shadow:0 14px 34px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06)}
+.card.deal{background:var(--grain),radial-gradient(120% 140% at 50% 0,rgba(255,200,74,.22),rgba(255,138,31,.08) 55%,rgba(22,21,25,.95));border-color:rgba(255,200,74,.55);box-shadow:0 0 0 1px rgba(255,200,74,.12),0 12px 32px rgba(255,170,40,.14)}
+.card.deal .sh{color:var(--gold)}.card.deal .pill{margin:0}
+.dealis{display:flex;flex-wrap:wrap;gap:6px 14px;font-weight:700;font-size:.98rem;color:var(--tx)}.dealis span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .sh{font-family:var(--fc);font-size:.84rem;letter-spacing:.14em;color:#c9b8a6}
 .sh .ic{color:var(--acc)}
 button{font-family:var(--fc);font-size:1.08rem;letter-spacing:.02em;

@@ -203,6 +203,9 @@ h1 span{filter:drop-shadow(0 0 14px rgba(255,138,31,.45))}
 h2{font-family:var(--fc);font-weight:800;font-size:1.2rem;letter-spacing:.01em}
 .card{background:var(--grain),linear-gradient(180deg,rgba(33,30,32,.94),rgba(22,21,25,.95));border-color:rgba(255,255,255,.08);
   box-shadow:0 14px 34px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.06)}
+.card.deal{background:var(--grain),radial-gradient(120% 140% at 50% 0,rgba(255,200,74,.22),rgba(255,138,31,.08) 55%,rgba(22,21,25,.95));border-color:rgba(255,200,74,.55);box-shadow:0 0 0 1px rgba(255,200,74,.12),0 12px 32px rgba(255,170,40,.14)}
+.card.deal .sh{color:var(--gold)}.card.deal .pill{margin:0}
+.dealis{display:flex;flex-wrap:wrap;gap:6px 14px;font-weight:700;font-size:.98rem;color:var(--tx)}.dealis span{display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 .sh{font-family:var(--fc);font-size:.84rem;letter-spacing:.14em;color:#c9b8a6}
 .sh .ic{color:var(--acc)}
 button{font-family:var(--fc);font-size:1.08rem;letter-spacing:.02em;
@@ -3065,8 +3068,15 @@ const SHOP_PACKS=[{sku:'bag_gems_t1',gems:40,usd:1.99},{sku:'bag_gems_t2',gems:1
   {sku:'bag_gems_t3',gems:250,usd:9.99,tag:'Popular'},{sku:'bag_gems_t4',gems:550,usd:19.99},
   {sku:'bag_gems_t5',gems:1500,usd:49.99,tag:'Best value'}];
 const SHOP_NOADS={sku:'bag_noads',usd:3.99};
-const SHOP_SKUS=()=>[...SHOP_PACKS.map(p=>p.sku),SHOP_NOADS.sku];
+// New Player Special: a one-time (non-consumable) bundle. Its gems and GTP are paid once, for its store transaction, like a gem
+// pack; owning it (also after Restore purchases or on a new device) removes the banner. bag_starter marks it owned here.
+const SHOP_STARTER={sku:'bag_starter',gems:250,gtp:100,usd:9.99};
+const SHOP_SKUS=()=>[...SHOP_PACKS.map(p=>p.sku),SHOP_NOADS.sku,SHOP_STARTER.sku];
+const SHOP_OWNED=[SHOP_NOADS.sku,SHOP_STARTER.sku];
 const noAds=()=>Store.get('bag_noads')==='1';
+const starterOwned=()=>Store.get('bag_starter')==='1';
+// what one store transaction pays: gems, GTP, and for the bundle Remove Ads
+const payOf=sku=>{const p=SHOP_PACKS.find(x=>x.sku===sku);if(p)return{gems:p.gems,gtp:0};const s=SHOP_STARTER;return sku===s.sku?{gems:s.gems,gtp:s.gtp,starter:true}:null;};
 const Plat=(()=>{let busy=false,booted=null,mt=null,lastTxs=null;
   const sh=()=>window.Shell&&window.Shell.native?window.Shell:null;
   const wt=()=>!!globalThis.__witnessApi;
@@ -3091,6 +3101,8 @@ const Plat=(()=>{let busy=false,booted=null,mt=null,lastTxs=null;
     adsOn:()=>{const s=sh();return s?s.ads.available():dev();},
     iapOn:()=>{const s=sh();return s?s.iap.available():dev();},
     price(sku,usd){const s=sh(),p=s&&s.iap.price(sku);return p||'$'+usd.toFixed(2);},
+    // in the app: the store has loaded this product (so a product not yet set up in App Store Connect is never offered)
+    known(sku){const s=sh();return!s||!!s.iap.price(sku);},
     banner(){const s=sh();if(s){if(noAds())s.ads.removeBanner();else s.ads.showBanner();return;}
       if(dev()){document.documentElement.classList.toggle('adsim',!noAds());setBanner(noAds()?0:50);}},
     boot(){if(booted)return booted;const s=sh();if(wt())return booted=Promise.resolve();if(!s){P.banner();return booted=Promise.resolve();}
@@ -3099,9 +3111,9 @@ const Plat=(()=>{let busy=false,booted=null,mt=null,lastTxs=null;
           for(const k in o)if(MIRROR(k))Store.set(k,o[k]);S=newPlayer();bootSave();render();})
         .catch(()=>{}).then(()=>{
           s.configure({rewarded:live()?PLAT_IDS.rewarded:PLAT_IDS.testRewarded,banner:live()?PLAT_IDS.banner:PLAT_IDS.testBanner,
-            rcKey:PLAT_IDS.rcKey,products:SHOP_SKUS(),nonConsumables:[SHOP_NOADS.sku]});
+            rcKey:PLAT_IDS.rcKey,products:SHOP_SKUS(),nonConsumables:SHOP_OWNED});
           s.ads.onBanner(setBanner);P.banner();
-          if(s.iap.available()){syncPurchases();s.iap.owned().then(ids=>{if(ids.includes(SHOP_NOADS.sku)&&!noAds())grantNoAds();}).catch(()=>{});
+          if(s.iap.available()){syncPurchases();s.iap.owned().then(ids=>{grantOwned(ids);if(['gear','gems'].includes(UI().menu))render();}).catch(()=>{});
             s.iap.getProducts(SHOP_SKUS()).then(()=>{if(['gear','gems'].includes(UI().menu))render();}).catch(()=>{});}
           mirror();}).finally(()=>s.ready());},
     async ad(){if(busy||!P.adsOn())return false;busy=true;try{const s=sh();if(!s)return await sim('Rewarded ad');
@@ -3128,29 +3140,42 @@ function gemTradeCard(){const n=gems(),u=UI();
 function platToast(msg){let t=document.querySelector('.platToast');if(!t){t=document.createElement('div');t.className='platToast';document.body.appendChild(t);}t.textContent=msg;clearTimeout(platToast.t);platToast.t=setTimeout(()=>t.remove(),3200);}
 onSaveFail=()=>platToast('Could not save your progress. Your device may be out of storage.');
 function grantNoAds(){Store.set('bag_noads','1');Plat.banner();}
+function grantStarter(){Store.set('bag_starter','1');if(!noAds())grantNoAds();}
+// the one-time purchases the store says this Apple ID owns
+function grantOwned(ids){ids=Array.isArray(ids)?ids:[];if(ids.includes(SHOP_NOADS.sku)&&!noAds())grantNoAds();if(ids.includes(SHOP_STARTER.sku)&&!starterOwned())grantStarter();}
+function pay(p){addGems(p.gems);if(p.gtp)setGtp(gtpBank()+p.gtp);if(p.starter)grantStarter();}
+const payText=p=>p.starter?`+${p.gems} gems, +${p.gtp} GTP and Remove Ads`:`+${p.gems.toLocaleString()} gems`;
 // Gem packs are paid out once per store transaction. bag_tx lists the transactions already settled; bag_txdue counts packs
 // paid on the spot whose transaction had not reached the list yet. A pack that is approved after its purchase call returned
 // (Ask to Buy, a bank approval, the app killed under the payment sheet) is in neither, so syncPurchases() pays it later.
 // The first list ever seen only sets the baseline: nothing in it is paid. only=true settles the list without paying (restore).
-function settleTx(txs,paid,only){const due=Store.obj('bag_txdue');let seen=Store.json('bag_tx'),got=0,mine=!paid;
-  if(!Array.isArray(txs)){if(paid){due[paid]=(due[paid]||0)+1;Store.setJson('bag_txdue',due);}return 0;}
+// Returns what it paid now: [{gems,gtp,starter?}].
+function settleTx(txs,paid,only){const due=Store.obj('bag_txdue'),got=[];let seen=Store.json('bag_tx'),mine=!paid;
+  if(!Array.isArray(txs)){if(paid){due[paid]=(due[paid]||0)+1;Store.setJson('bag_txdue',due);}return got;}
   const first=!Array.isArray(seen);if(first)seen=[];
-  for(const t of txs){if(!t||seen.includes(t.key))continue;seen.push(t.key);const p=SHOP_PACKS.find(x=>x.sku===t.product);if(!p)continue;
+  for(const t of txs){if(!t||seen.includes(t.key))continue;seen.push(t.key);const p=payOf(t.product);if(!p)continue;
     if(!mine&&t.product===paid){mine=true;continue;}
     if(first||only)continue;
     if(due[t.product]>0){due[t.product]--;continue;}
-    addGems(p.gems);got+=p.gems;}
+    pay(p);got.push(p);}
   if(!mine)due[paid]=(due[paid]||0)+1;
   Store.setJson('bag_tx',seen.slice(-400));Store.setJson('bag_txdue',due);return got;}
-function syncPurchases(){return Plat.txs().then(l=>{const got=settleTx(l);if(got){platToast(`Your purchase came through: +${got.toLocaleString()} gems`);render();}return got;}).catch(()=>0);}
-function shopBuy(sku){if(Plat.busy())return;UI().shopMsg='';const go=Plat.buy(sku);render();go.then(ok=>{if(ok){const p=SHOP_PACKS.find(x=>x.sku===sku);
-    if(p){addGems(p.gems);settleTx(Plat.lastTxs(),sku);UI().shopMsg=`+${p.gems.toLocaleString()} gems added. Thank you!`;}
+function syncPurchases(){return Plat.txs().then(l=>{const got=settleTx(l);if(got.length){platToast(`Your purchase came through: ${got.map(payText).join(' · ')}`);render();}return got.reduce((n,p)=>n+p.gems,0);}).catch(()=>0);}
+function shopBuy(sku){if(Plat.busy())return;UI().shopMsg='';const go=Plat.buy(sku);render();go.then(ok=>{if(ok){const p=payOf(sku);
+    if(p){pay(p);settleTx(Plat.lastTxs(),sku);UI().shopMsg=p.starter?`New Player Special unlocked: ${payText(p)}. Thank you!`:`${payText(p)} added. Thank you!`;}
     else if(sku===SHOP_NOADS.sku){grantNoAds();UI().shopMsg='Banner ads removed. Thank you!';}}render();});}
-function shopRestore(){if(Plat.busy())return;Plat.restore().then(ids=>{Plat.txs().then(l=>settleTx(l,null,true));const had=ids.includes(SHOP_NOADS.sku);if(had)grantNoAds();UI().shopMsg=had?'Remove Ads restored.':'Nothing to restore on this Apple ID.';render();})
+function shopRestore(){if(Plat.busy())return;Plat.restore().then(ids=>{Plat.txs().then(l=>settleTx(l,null,true));grantOwned(ids);
+    const had=[ids.includes(SHOP_STARTER.sku)&&'New Player Special',ids.includes(SHOP_NOADS.sku)&&'Remove Ads'].filter(Boolean);
+    UI().shopMsg=had.length?had.join(' and ')+' restored.':'Nothing to restore on this Apple ID.';render();})
   .catch(e=>{UI().shopMsg=String(e&&e.message||e);render();});}
+// the one-time bundle, above the gem packs until it is owned
+function starterCard(b){const s=SHOP_STARTER;if(starterOwned()||!Plat.known(s.sku))return'';
+  return`<div class="card deal"><div class="sh">${icon('gift')} <span class="grow">New Player Special</span><span class="pill gold">One time only</span></div>
+  <div class="row" style="margin-top:10px;flex-wrap:nowrap"><div class="grow"><div class="dealis"><span>${icon('gem','ici')} ${s.gems} gems</span><span>🪙 ${s.gtp} GTP</span><span>${icon('ban','ici')} Remove Ads</span></div>
+  <div class="sub">The best deal in the shop. One per Apple ID.</div></div><button class="sm" aria-label="Buy the New Player Special" onclick="shopBuy('${s.sku}')" ${b}>${Plat.price(s.sku,s.usd)}</button></div></div>`;}
 // the gem shop, under Equipment: only in the iOS app (or ?dev=1)
 function shopCard(){if(!Plat.iapOn())return'';const u=UI(),b=Plat.busy()?'disabled':'';
-  return`<div class="card"><div class="sh">${icon('gem')} <span class="grow">Gem shop</span><b class="gold">${gems()} gems</b></div><div class="sub">Gems buy permanent Equipment. 100 gems is one Gold item.</div>
+  return`${starterCard(b)}<div class="card"><div class="sh">${icon('gem')} <span class="grow">Gem shop</span><b class="gold">${gems()} gems</b></div><div class="sub">Gems buy permanent Equipment. 100 gems is one Gold item.</div>
   ${SHOP_PACKS.map(p=>`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><span class="bub">${icon('sparkle')}</span><div class="grow"><b>${p.gems.toLocaleString()} gems</b>${p.tag?` <span class="gold">${p.tag}</span>`:''}</div><button class="sm" aria-label="Buy ${p.gems} gems" onclick="shopBuy('${p.sku}')" ${b}>${Plat.price(p.sku,p.usd)}</button></div>`).join('')}
   <div class="row" style="margin-top:12px;flex-wrap:nowrap"><span class="bub">${icon('ban')}</span><div class="grow"><b>Remove Ads</b><div class="sub">No more banner. The double-reward ad stays optional.</div></div>${noAds()?'<b class="gold">Owned</b>':`<button class="sm" aria-label="Buy Remove Ads" onclick="shopBuy('${SHOP_NOADS.sku}')" ${b}>${Plat.price(SHOP_NOADS.sku,SHOP_NOADS.usd)}</button>`}</div>
   ${u.shopMsg?`<div class="ev good" style="margin-top:10px">${esc(u.shopMsg)}</div>`:''}

@@ -377,7 +377,7 @@ const PLAY = `;globalThis.__play=function(stop){
     else if(st==='college'){if(S.summerPend)chooseSummer(0);else if(!S.col.length||S.colNext)simCol();else declare();}else if(st==='draft')startNBA();
     else if(st==='nba'){if(S.pend){const p=S.pend;choose(p.kind==='clutch'?p.best||0:0);}else{spendAll();simNBA();}}}
   UI().seq=null;render();return S.stage==='end';};`;
-const CAREER_EXPORTS = RUN_EXPORTS.replace(/};$/, '') + ',resumeRun,buildAnother,liveRun,continueCard,doubleRewards,rewardCard,render,act,playSeason,seqSkip,esc,settleTx,syncPurchases,shopBuy,shopRestore,SHOP_PACKS,askTrade,get chooseSummer(){return chooseSummer},get simHS(){return simHS},play:s=>globalThis.__play(s)};';
+const CAREER_EXPORTS = RUN_EXPORTS.replace(/};$/, '') + ',resumeRun,buildAnother,liveRun,continueCard,doubleRewards,rewardCard,render,act,playSeason,seqSkip,esc,settleTx,syncPurchases,shopBuy,shopRestore,shopCard,SHOP_PACKS,SHOP_STARTER,starterOwned,askTrade,get chooseSummer(){return chooseSummer},get simHS(){return simHS},play:s=>globalThis.__play(s)};';
 // opts.clock = {t} is the page clock (performance.now), which starts again near zero every time the app is launched
 function launch(storage, opts = {}) {
   const pg = page([], Object.assign({ storage }, opts.page));
@@ -510,6 +510,56 @@ test('a gem pack is paid exactly once: on the spot, or later if the store approv
   g.shopRestore(); await tick();
   await g.syncPurchases();
   eq(g.gems(), want, 'restore settles the list without paying');
+});
+
+test('the New Player Special pays its gems and GTP once, removes ads, and only restores Remove Ads', async () => {
+  let txs = [], owned = [];
+  const { shell } = fakeShell();
+  shell.iap.available = () => true;
+  shell.iap.transactions = () => Promise.resolve(txs.slice());
+  shell.iap.owned = () => Promise.resolve(owned.slice());
+  shell.iap.purchase = (sku) => { txs.push({ key: 'st-1', product: sku }); owned.push(sku); return Promise.resolve({ ok: true, txs: txs.slice() }); };
+  shell.iap.restore = () => Promise.resolve(owned.slice());
+  const dev = device();
+  let { g } = launch(dev, { page: { shell }, withPage: true });
+  await g.Plat.boot(); await tick();
+  const st = g.SHOP_STARTER;
+  ok(!/Buy the New Player Special/.test(g.shopCard()), 'not offered while the store does not know the product');
+  shell.iap.price = (sku) => (sku === st.sku ? '$9.99' : null);
+  ok(/Buy the New Player Special/.test(g.shopCard()), 'the shop offers it once the store has it');
+  g.shopBuy(st.sku); await tick();
+  eq([g.gems(), g.gtpBank(), g.noAds(), g.starterOwned()], [st.gems, st.gtp, true, true], 'paid on the spot, ads removed');
+  ok(!/Buy the New Player Special/.test(g.shopCard()), 'once owned it leaves the shop');
+  await g.syncPurchases();
+  eq([g.gems(), g.gtpBank()], [st.gems, st.gtp], 'not paid again when the store list is read later');
+  ({ g } = launch(dev, { page: { shell }, withPage: true }));
+  await g.Plat.boot(); await tick();
+  eq([g.gems(), g.gtpBank()], [st.gems, st.gtp], 'not paid again on the next launch');
+
+  // a new phone with the same Apple ID: Restore gives back Remove Ads, not a second batch of gems
+  const fresh = device();
+  ({ g } = launch(fresh, { page: { shell }, withPage: true }));
+  await g.Plat.boot(); await tick();
+  eq([g.gems(), g.noAds(), g.starterOwned()], [0, true, true], 'owned at launch: ads off, no gems');
+  fresh.removeItem('bag_noads'); fresh.removeItem('bag_starter');
+  ({ g } = launch(fresh, { page: { shell }, withPage: true }));
+  g.shopRestore(); await tick(); await g.syncPurchases();
+  eq([g.gems(), g.gtpBank(), g.noAds(), g.starterOwned()], [0, 0, true, true], 'Restore purchases');
+});
+
+test('a New Player Special approved late (Ask to Buy) is paid when the app next looks', async () => {
+  let txs = [];
+  const { shell } = fakeShell();
+  shell.iap.available = () => true;
+  shell.iap.transactions = () => Promise.resolve(txs.slice());
+  shell.iap.purchase = () => Promise.resolve({ ok: false, error: 'Payment is pending' });
+  const { g } = launch(device(), { page: { shell }, withPage: true });
+  await g.Plat.boot(); await tick();
+  g.shopBuy(g.SHOP_STARTER.sku); await tick();
+  eq([g.gems(), g.noAds()], [0, false], 'nothing while it is pending');
+  txs.push({ key: 'st-late', product: g.SHOP_STARTER.sku });
+  await g.syncPurchases(); await g.syncPurchases();
+  eq([g.gems(), g.gtpBank(), g.noAds()], [g.SHOP_STARTER.gems, g.SHOP_STARTER.gtp, true], 'paid once on approval');
 });
 
 test('a name with a quote mark survives being drawn into a text field', () => {
