@@ -148,6 +148,7 @@ const EMOJI_ICON={
   "🎓":'gradCap',
   "💍":['ring','c-gold'],
   "🪑":'bench',
+  "🗳":'clipboard',
   "🎙":'mic',
   "🥇":['medal','c-gold'],
   "⚠":['alert','c-gold'],

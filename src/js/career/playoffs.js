@@ -1,3 +1,6 @@
+// how much each MVP in a row costs a player in the next MVP vote (the vote's own luck is about 1.2 either way). It keeps adding up,
+// so even a dominant player rarely wins more than three or four straight: the real league's record is three
+const MVP_FATIGUE=2;
 // the playoffs: the real bracket with your series game by game. Game 7s and the last games of the Finals stop for your call,
 // then the bracket is replayed from the same dice with your result locked in, so nothing else changes
 function seasonPlayoffs(){const c=S.cur,t=S.traits,L=S.L,z=L.z,{n,a,prevO,o,gp,mins,ppg,rpg,apg,spg,bpg,fg,tp,ft,tov,wins,inj,rv,h2h}=c,prev=n?S.nba[n-1]:null;
@@ -24,12 +27,19 @@ function seasonPlayoffs(){const c=S.cur,t=S.traits,L=S.L,z=L.z,{n,a,prevO,o,gp,m
   for(const c of C){c.pr=prodScore(c);c.mv=c.ovr*.6+c.pr*.5+(c.wins-41)*.25+gauss()*1.2;c.as=c.ovr*.6+c.star+c.pr*.7+c.ppg*.25+(c.wins-41)*.05+gauss()*1.5;c.dp=c.d-Math.min(4,c.dw||0)*1.6+gauss()*2;c.ry=c.pr*.6+c.ppg*.4+gauss()*1.5;}
   const top=(k,f,g)=>C.filter(g).sort((x,y)=>y[k]-x[k]).slice(0,f),aw=[],W={},give=(c,x)=>{if(c.me)aw.push(x);else c.p.aw[x]=(c.p.aw[x]||0)+1;(W[x]=W[x]||[]).push(c);};
   const an=top('mv',15,c=>c.gp>=65);an.forEach((c,i)=>give(c,i<5?'All-NBA 1st':i<10?'All-NBA 2nd':'All-NBA 3rd'));
-  const mvp=an[0];if(mvp){give(mvp,'MVP');if(!mvp.me)mvp.p.mvps++;}
+  // voter fatigue: every MVP in a row makes the next one harder to win (for you and for the league's stars alike);
+  // one season without the trophy wipes the slate clean. All-NBA teams are not affected.
+  const run=L.mvpRun||null,held=c=>!!run&&(c.me?!!run.me:!run.me&&c.p.id===run.id),tired=c=>held(c)?run.n*MVP_FATIGUE:0;for(const c of C)c.mvv=c.mv-tired(c);
+  const mvp=an.slice().sort((x,y)=>y.mvv-x.mvv)[0];if(mvp){give(mvp,'MVP');if(!mvp.me)mvp.p.mvps++;}
+  {const streak=mvp?(held(mvp)?run.n+1:1):0;
+    if(run&&mvp&&an[0]!==mvp&&held(an[0])){const h=an[0];notes.push(h.me?`🗳️ Voter fatigue: after ${run.n===1?'last year’s MVP':run.n+' straight MVPs'}, the voters went with ${mvp.name}`:mvp.me?`🗳️ The voters were ready for a new face after ${h.name}’s ${run.n===1?'MVP':run.n+' straight MVPs'}`:`🗳️ Voter fatigue costs ${h.name} another MVP: ${mvp.name} wins it`);}
+    else if(mvp&&mvp.me&&streak>=2)notes.push(`🗳️ ${streak} MVPs in a row. The voters are getting restless: the next one is harder to win`);
+    L.mvpRun=mvp?{me:mvp.me?1:0,id:mvp.me?null:mvp.p.id,n:streak}:null;}
   const dp=top('dp',1,c=>c.gp>=65)[0];const asg=new Set([...top('as',24,c=>c.gp>=35),...an,...top('pr',6,c=>c.gp>=50),...top('ppg',5,c=>c.gp>=50),...(dp&&dp.ppg>=10?[dp]:[])]);asg.forEach(c=>give(c,'All-Star'));const asRank=ME.gp>=35?1+C.filter(c=>c!==ME&&c.gp>=35&&c.as>ME.as).length:0,dpRank=ME.gp>=65?1+C.filter(c=>c!==ME&&c.gp>=65&&c.dp>ME.dp).length:0,dpWin=dp&&!dp.me?dp.name:'';
   if(dp)give(dp,'DPOY');const ry=top('ry',1,c=>c.gp>=65&&c.rook)[0];if(ry)give(ry,'ROY');
   const sc=top('ppg',1,c=>c.gp>=65)[0];if(sc)give(sc,'Scoring Title');
   const fm=C.filter(c=>c.team===br.champ&&c.gp>=20).sort((x,y)=>(y.pr+y.ovr*.25)-(x.pr+x.ovr*.25))[0];
-  let mvpRank=null;if(gp>=58)mvpRank=1+C.filter(c=>!c.me&&c.gp>=58&&c.mv>ME.mv).length;
+  let mvpRank=null;if(gp>=58)mvpRank=1+C.filter(c=>!c.me&&c.gp>=58&&c.mvv>ME.mvv).length;
   const scRank=ppg>=12?1+C.filter(c=>!c.me&&c.gp>=65&&c.ppg>ppg).length:null;
   if(rival&&mvp&&mvp.p===rival)notes.push(`👑 ${rival.name} wins MVP`);
   L.hist.push({yr:n+1,champ:br.champ,mvp:mvp?.name,roy:ry?.name,dpoy:dp?.name,sc:sc?`${sc.name} (${f1(sc.ppg)})`:'',fmvp:fm?.name});

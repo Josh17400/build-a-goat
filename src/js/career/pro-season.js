@@ -1,5 +1,7 @@
 // how a team uses you follows your archetype: scorers get shots, playmakers run the offense, bigs own the glass
 const ROLE_F={play:{p:.94,a:1.15},shoot:{p:1.06},fin:{p:1.05,r:1.03},perD:{p:.92,s:1.2,b:1.05},int:{p:.9,r:1.15,b:1.15},all:{}};
+// the most minutes a game for each rung of a roster: starters, rotation, bench, deep bench (the league's own players get 36, 27, 16, 7)
+const ROSTER_MIN=[36,27,17,9];
 function simNBA(){syncPos();if(!R.get)R=makeRng((Math.random()*4294967296)>>>0);const n=S.nba.length,prev=n?S.nba[n-1]:null;
   // a midseason moment can stop the season before it is played: your call shapes the year
   if(S.midAt!==n&&!S.pend){S.midAt=n;const m=midPend(n);if(m){S.pend=m;S.lastResult=null;return;}}
@@ -21,6 +23,11 @@ function simNBA(){syncPos();if(!R.get)R=makeRng((Math.random()*4294967296)>>>0);
   const gp=clamp(82-lost,0,82);const o=ovr(),bch=updBadges('season'),bfx=badgeFx();notes.push(growWhy(dsp(prevO),'nba',{hurt:!!inj&&gp<70})[1]);for(const x of badgeLines(bch))notes.push(x);
   let opp=0;if(n<2)opp=S.pick<=5?5:S.pick<=14?3:S.pick<=30?0:S.pick<=60?-4:-6;
   let mins=clamp(minBase(o,14.5+(o-55)*1.2+opp+(FRAMES[S.frame].mins||0)+(es('stam')-60)*.08+(t.motor-3)*.6+bfx.min)+(S.minAdj||0)+(X.mins||0),4,36);if(S.roleMin&&!X.mins)mins=Math.max(mins,Math.min(36,S.roleMin));if(S.roleMax)mins=Math.min(mins,S.roleMax);if(o<52)mins=Math.min(mins,8);
+  // minutes follow your place on your own roster, the same ladder the league's players climb: the top 5 by OVR start, the next 3
+  // are the rotation, then the bench. A contract holds the rung it promised until your next free agency, and a lottery pick
+  // plays one rung up in his first two seasons.
+  {const rk=S.L?roster(S.L,S.team).filter(p=>p.ovr>o).length:0,byRank=rk<5?0:rk<8?1:rk<10?2:3,promised=S.roleMin>=28?0:S.roleMin>=18?1:3,rung=Math.min(promised,Math.max(0,byRank-(n<2&&S.pick<=14?1:0))),capM=ROSTER_MIN[rung];
+    if(mins>capM){mins=capM;notes.push(`🪑 You are ${ord(rk+1)} on the ${S.team.split(' ').slice(-1)[0]} by OVR: ${['starter','rotation','bench','deep bench'][rung]} minutes, ${capM} a game at most`);}}
   const mf=mins/36,nf=()=>1+gauss()*.075*(1.25-(es('cons')-40)/120)*(1-bfx.var);
   const RF=ROLE_F[(ARCHS[roleArch().id]||{}).fam]||{},ppg=(RF.p||1)*Math.max(mins/36*3,.86*(8+(o-55)*.45+(topScr()-72)*0.12+(eff('sho')+eff('fin')-120)*.1+(S.usage||0)+(X.usage||0)+(FRAMES[S.frame].ppg||0)+(es('offb')-50)*.03+bfx.pts/.86+(t.killer-3)*.9)*mf*nf()*era().pace),
     rpg=(RF.r||1)*Math.max(0,.64*(3.2+Math.max(-6,es('dreb')-40)*.14+Math.max(-6,es('oreb')-40)*.07+Math.max(0,S.height-74)*.3)*mf*nf()*(1+(t.motor-3)*.05)*(1+bfx.reb)),apg=(RF.a||1)*Math.max(0,.6*(1.3+(es('pass')-40)*.13+(es('handle')-40)*.05)*mf*nf()*(1-(t.killer-3)*.04)*(1+bfx.ast)),

@@ -30,7 +30,7 @@ function faPend(){const last=S.nba[S.nba.length-1],rv=S.rival&&!S.rival.retired&
     const pv=o+(S.perks&&S.perks.agent?3:0)+clamp((last.ppg-14)*.45+Math.max(0,last.rpg-8)*.35+Math.max(0,last.apg-6)*.35,-3,7),rk=S.L?roster(S.L,team).filter(p=>p.ovr>pv).length:(kind==='Contender'?2:0);
     let u=rk===0?(kind==='Rebuilding'?5:3):rk===1?1:rk<=4?(kind==='Contender'?-2:-1):-1.5,m=rk===0?(kind==='Rebuilding'?4:2):rk===1?0:rk<=4?-1:-2;
     u+=fit==='Great'?1.5:fit==='Poor'?-1.5:0;m+=(fit==='Poor'?-2:0)+(lvl==='High'?1:lvl==='Low'?-3:0);
-    const em=clamp(minBase(o,14.5+(o-55)*1.2)+m,4,38),role=em<17?(lvl==='Low'?'Bench role, minimum deal':'Bench role'):rk===0?(lvl==='High'?'Max money, featured role':'Featured role'):rk===1?'Co-star role':rk<=4||em>=28||(stay&&last&&last.mins>=28)?'Starter role':'Rotation role';
+    const em=clamp(minBase(o,14.5+(o-55)*1.2)+m,4,38),role=em<17?(lvl==='Low'?'Bench role, minimum deal':'Bench role'):rk===0?(lvl==='High'?'Max money, featured role':'Featured role'):rk===1?'Co-star role':rk<=4||(stay&&last&&last.mins>=28&&rk<=7)?'Starter role':rk<=7?'Rotation role':'Bench role';
     const pro=[],con=[],ev=eraValue();
     if(o>=80)pro.push(`You are a star (${OV()} OVR)`);else if(o>=72)pro.push(`You are a proven starter (${OV()} OVR)`);else if(o<64)con.push(`Your ${OV()} OVR is below what they want`);
     if(last.ppg>=20)pro.push(`You scored ${f1(last.ppg)} a game last year`);else if(last.ppg<8)con.push(`Only ${f1(last.ppg)} points a game last year`);
