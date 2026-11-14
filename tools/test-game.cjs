@@ -547,6 +547,24 @@ test('the New Player Special pays its gems and GTP once, removes ads, and only r
   eq([g.gems(), g.gtpBank(), g.noAds(), g.starterOwned()], [0, 0, true, true], 'Restore purchases');
 });
 
+test('opening the shop asks the store again for a product it did not have, and only test builds show the store line', async () => {
+  let ready = false, asks = 0;
+  const { shell } = fakeShell();
+  shell.iap.available = () => true;
+  shell.iap.transactions = () => Promise.resolve([]);
+  shell.iap.getProducts = () => { asks++; return Promise.resolve([]); };
+  shell.iap.price = (sku) => (sku !== 'bag_starter' || ready ? '$1' : null);
+  const { g } = launch(device(), { page: { shell }, withPage: true });
+  await g.Plat.boot(); await tick();
+  eq(asks, 1, 'asked once at launch');
+  ok(/missing bag_starter/.test(g.shopCard()), 'the test-build line names the missing product');
+  ready = true;
+  ok(/Buy the New Player Special/.test(g.shopCard()), 'offered once the store has it');
+  ok(/7 of 7 products loaded/.test(g.shopCard()));
+  shell.liveAds = true;
+  ok(!/Test build/.test(g.shopCard()), 'the App Store build never shows the store line');
+});
+
 test('a New Player Special approved late (Ask to Buy) is paid when the app next looks', async () => {
   let txs = [];
   const { shell } = fakeShell();

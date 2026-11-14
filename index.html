@@ -3077,7 +3077,7 @@ const noAds=()=>Store.get('bag_noads')==='1';
 const starterOwned=()=>Store.get('bag_starter')==='1';
 // what one store transaction pays: gems, GTP, and for the bundle Remove Ads
 const payOf=sku=>{const p=SHOP_PACKS.find(x=>x.sku===sku);if(p)return{gems:p.gems,gtp:0};const s=SHOP_STARTER;return sku===s.sku?{gems:s.gems,gtp:s.gtp,starter:true}:null;};
-const Plat=(()=>{let busy=false,booted=null,mt=null,lastTxs=null;
+const Plat=(()=>{let busy=false,booted=null,mt=null,lastTxs=null,prodAt=0,prodBusy=false,prodErr='';
   const sh=()=>window.Shell&&window.Shell.native?window.Shell:null;
   const wt=()=>!!globalThis.__witnessApi;
   const dev=()=>!sh()&&!wt()&&typeof location!=='undefined'&&/[?&]dev=1(&|$)/.test(location.search);
@@ -3103,6 +3103,14 @@ const Plat=(()=>{let busy=false,booted=null,mt=null,lastTxs=null;
     price(sku,usd){const s=sh(),p=s&&s.iap.price(sku);return p||'$'+usd.toFixed(2);},
     // in the app: the store has loaded this product (so a product not yet set up in App Store Connect is never offered)
     known(sku){const s=sh();return!s||!!s.iap.price(sku);},
+    // asks the store for the products again (at launch, and whenever the shop opens with one still missing, at most every 15 s),
+    // so a product Apple makes available while the app is open shows up without a relaunch
+    loadProducts(){const s=sh();if(!s||!s.iap.available()||prodBusy||Date.now()-prodAt<15000)return;prodBusy=true;prodAt=Date.now();
+      s.iap.getProducts(SHOP_SKUS()).then(()=>{prodErr='';},e=>{prodErr=String(e&&e.message||e||'error').slice(0,80);})
+        .then(()=>{prodBusy=false;if(['gear','gems'].includes(UI().menu))render();});},
+    // TestFlight builds only (never the App Store build): what the store has answered, to diagnose a missing product on a phone
+    storeNote(){const s=sh();if(!s||live())return'';const n=SHOP_SKUS().filter(k=>s.iap.price(k)).length;
+      return`Test build · store: ${prodBusy?'checking… · ':''}${n} of ${SHOP_SKUS().length} products loaded${SHOP_SKUS().filter(k=>!s.iap.price(k)).map(k=>' · missing '+k).join('')}${prodErr?' · '+prodErr:''}`;},
     banner(){const s=sh();if(s){if(noAds())s.ads.removeBanner();else s.ads.showBanner();return;}
       if(dev()){document.documentElement.classList.toggle('adsim',!noAds());setBanner(noAds()?0:50);}},
     boot(){if(booted)return booted;const s=sh();if(wt())return booted=Promise.resolve();if(!s){P.banner();return booted=Promise.resolve();}
@@ -3114,7 +3122,7 @@ const Plat=(()=>{let busy=false,booted=null,mt=null,lastTxs=null;
             rcKey:PLAT_IDS.rcKey,products:SHOP_SKUS(),nonConsumables:SHOP_OWNED});
           s.ads.onBanner(setBanner);P.banner();
           if(s.iap.available()){syncPurchases();s.iap.owned().then(ids=>{grantOwned(ids);if(['gear','gems'].includes(UI().menu))render();}).catch(()=>{});
-            s.iap.getProducts(SHOP_SKUS()).then(()=>{if(['gear','gems'].includes(UI().menu))render();}).catch(()=>{});}
+            P.loadProducts();}
           mirror();}).finally(()=>s.ready());},
     async ad(){if(busy||!P.adsOn())return false;busy=true;try{const s=sh();if(!s)return await sim('Rewarded ad');
         hush(true);try{const r=await s.ads.showRewarded();if(r&&r.reason==='nofill')platToast('No ad available right now. Try again in a minute.');return!!(r&&r.rewarded);}finally{hush(false);}}
@@ -3175,11 +3183,13 @@ function starterCard(b){const s=SHOP_STARTER;if(starterOwned()||!Plat.known(s.sk
   <div class="sub">The best deal in the shop. One per Apple ID.</div></div><button class="sm" aria-label="Buy the New Player Special" onclick="shopBuy('${s.sku}')" ${b}>${Plat.price(s.sku,s.usd)}</button></div></div>`;}
 // the gem shop, under Equipment: only in the iOS app (or ?dev=1)
 function shopCard(){if(!Plat.iapOn())return'';const u=UI(),b=Plat.busy()?'disabled':'';
+  if(SHOP_SKUS().some(k=>!Plat.known(k)))setTimeout(()=>Plat.loadProducts(),0);const note=Plat.storeNote();
   return`${starterCard(b)}<div class="card"><div class="sh">${icon('gem')} <span class="grow">Gem shop</span><b class="gold">${gems()} gems</b></div><div class="sub">Gems buy permanent Equipment. 100 gems is one Gold item.</div>
   ${SHOP_PACKS.map(p=>`<div class="row" style="margin-top:12px;flex-wrap:nowrap"><span class="bub">${icon('sparkle')}</span><div class="grow"><b>${p.gems.toLocaleString()} gems</b>${p.tag?` <span class="gold">${p.tag}</span>`:''}</div><button class="sm" aria-label="Buy ${p.gems} gems" onclick="shopBuy('${p.sku}')" ${b}>${Plat.price(p.sku,p.usd)}</button></div>`).join('')}
   <div class="row" style="margin-top:12px;flex-wrap:nowrap"><span class="bub">${icon('ban')}</span><div class="grow"><b>Remove Ads</b><div class="sub">No more banner. The double-reward ad stays optional.</div></div>${noAds()?'<b class="gold">Owned</b>':`<button class="sm" aria-label="Buy Remove Ads" onclick="shopBuy('${SHOP_NOADS.sku}')" ${b}>${Plat.price(SHOP_NOADS.sku,SHOP_NOADS.usd)}</button>`}</div>
   ${u.shopMsg?`<div class="ev good" style="margin-top:10px">${esc(u.shopMsg)}</div>`:''}
-  <button class="ghost sm" style="margin-top:12px;width:100%" onclick="shopRestore()" ${b}>Restore purchases</button></div>`;}
+  <button class="ghost sm" style="margin-top:12px;width:100%" onclick="shopRestore()" ${b}>Restore purchases</button>
+  ${note?`<div class="sub" style="margin-top:10px;font-size:.72rem;word-break:break-word">${esc(note)}</div>`:''}</div>`;}
 // end of a career: the gems card, with one rewarded ad that doubles this career's gems and GTP (never Rookie or the Daily Build)
 function rewardCard(){if(!S.gemsRun)return'';const can=!S.dbl&&!S.daily&&S.diff!=='rookie'&&Plat.adsOn();
   return`<div class="card"><div class="sh">${icon('sparkle')} <span class="grow">+${S.gemsRun} gems${S.dbl?' <span class="gold">· doubled</span>':''}</span><b class="gold">${gems()} total</b></div><div class="sub">Spend them on permanent Equipment from the menu. Better careers pay more: ${[['Role Player'],['Solid Starter'],['All-Star'],['Hall of Famer'],['🐐 THE GOAT','THE GOAT']].map(([t,l])=>`${l||t} ${Math.round(GEM_TIER[t]*EARN)}`).join(' · ')}${S.diff==='hof'?' (×1.5 on Hall of Fame)':''}.</div>
