@@ -565,6 +565,29 @@ test('opening the shop asks the store again for a product it did not have, and o
   ok(!/Test build/.test(g.shopCard()), 'the App Store build never shows the store line');
 });
 
+test('an old purchase from another install that shows up at a purchase (account merge) is not paid again', async () => {
+  const day = 86400000, now = Date.now();
+  let txs = [];
+  const { shell } = fakeShell();
+  shell.iap.available = () => true;
+  shell.iap.transactions = () => Promise.resolve(txs.slice());
+  shell.iap.price = () => '$1';
+  shell.iap.purchase = (sku) => {
+    // RevenueCat merges the older install's account: its gem pack from 8 days ago arrives with the new purchase
+    txs.push({ key: 'old-t2', product: 'bag_gems_t2', at: now - 8 * day }, { key: 'new-st', product: sku, at: Date.now() });
+    return Promise.resolve({ ok: true, txs: txs.slice() });
+  };
+  const { g } = launch(device(), { page: { shell }, withPage: true });
+  await g.Plat.boot(); await tick();
+  g.shopBuy('bag_starter'); await tick();
+  await g.syncPurchases();
+  eq([g.gems(), g.gtpBank()], [g.SHOP_STARTER.gems, g.SHOP_STARTER.gtp], 'only the New Player Special is paid');
+  // a purchase approved after this install started tracking is still paid when it shows up
+  txs.push({ key: 'late-t1', product: 'bag_gems_t1', at: Date.now() });
+  await g.syncPurchases();
+  eq(g.gems(), g.SHOP_STARTER.gems + g.SHOP_PACKS[0].gems, 'a late approval is still paid');
+});
+
 test('a New Player Special approved late (Ask to Buy) is paid when the app next looks', async () => {
   let txs = [];
   const { shell } = fakeShell();

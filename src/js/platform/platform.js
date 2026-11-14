@@ -119,14 +119,19 @@ const payText=p=>p.starter?`+${p.gems} gems, +${p.gtp} GTP and Remove Ads`:`+${p
 // Gem packs are paid out once per store transaction. bag_tx lists the transactions already settled; bag_txdue counts packs
 // paid on the spot whose transaction had not reached the list yet. A pack that is approved after its purchase call returned
 // (Ask to Buy, a bank approval, the app killed under the payment sheet) is in neither, so syncPurchases() pays it later.
-// The first list ever seen only sets the baseline: nothing in it is paid. only=true settles the list without paying (restore).
+// The first list ever seen only sets the baseline: nothing in it is paid, and neither is anything bought before it that turns up
+// later. only=true settles the list without paying (restore).
 // Returns what it paid now: [{gems,gtp,starter?}].
 function settleTx(txs,paid,only){const due=Store.obj('bag_txdue'),got=[];let seen=Store.json('bag_tx'),mine=!paid;
   if(!Array.isArray(txs)){if(paid){due[paid]=(due[paid]||0)+1;Store.setJson('bag_txdue',due);}return got;}
   const first=!Array.isArray(seen);if(first)seen=[];
+  // bag_txsince: when this install started keeping track. A purchase made before it that only now shows up (RevenueCat merging
+  // an older install's account into this one at a purchase or restore) is recorded, not paid; 10 minutes of slack for the clock.
+  let since=+Store.get('bag_txsince')||0;if(first||!since){since=Date.now();Store.set('bag_txsince',String(since));}
   for(const t of txs){if(!t||seen.includes(t.key))continue;seen.push(t.key);const p=payOf(t.product);if(!p)continue;
     if(!mine&&t.product===paid){mine=true;continue;}
     if(first||only)continue;
+    if(t.at>0&&t.at<since-6e5)continue;
     if(due[t.product]>0){due[t.product]--;continue;}
     pay(p);got.push(p);}
   if(!mine)due[paid]=(due[paid]||0)+1;

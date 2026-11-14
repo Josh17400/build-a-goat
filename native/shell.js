@@ -590,8 +590,10 @@
     return p && p.priceString ? p.priceString : null;
   }
 
-  // Every one-time purchase RevenueCat knows of, consumables included: [{ key, product }].
+  // Every one-time purchase RevenueCat knows of, consumables included: [{ key, product, at? }].
   // key is stable for one purchase, so the game can tell which ones it has already paid out.
+  // at is the purchase time (ms) when the store gives one, so the game can tell an old purchase that
+  // only now appears (an older install's account merged in) from one approved late.
   function txList(info) {
     var txs = (info && info.nonSubscriptionTransactions) || [];
     var out = [];
@@ -599,7 +601,11 @@
       var t = txs[i] || {};
       var id = typeof t.productIdentifier === 'string' ? t.productIdentifier.split(':')[0] : '';
       var key = t.transactionIdentifier || (t.purchaseDate ? id + '|' + t.purchaseDate : '');
-      if (id && key) out.push({ key: String(key), product: id });
+      var at = typeof t.purchaseDateMillis === 'number' ? t.purchaseDateMillis : Date.parse(t.purchaseDate || '');
+      if (!id || !key) continue;
+      var row = { key: String(key), product: id };
+      if (at > 0) row.at = at;
+      out.push(row);
     }
     return out;
   }

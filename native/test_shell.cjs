@@ -454,7 +454,7 @@ async function iap() {
   await txEnv.advance(50);
   const txs = await txEnv.Shell.iap.transactions();
   check('iap: transactions lists every one-time purchase with a stable key, skipping ones it cannot key',
-    JSON.stringify(txs) === '[{"key":"rc_1","product":"fort_gems_80"},{"key":"fort_gems_500|2026-11-02T10:00:00Z","product":"fort_gems_500"}]', txs);
+    JSON.stringify(txs) === '[{"key":"rc_1","product":"fort_gems_80","at":' + Date.parse('2026-11-01T10:00:00Z') + '},{"key":"fort_gems_500|2026-11-02T10:00:00Z","product":"fort_gems_500","at":' + Date.parse('2026-11-02T10:00:00Z') + '}]', txs);
   const bought = await txEnv.Shell.iap.purchase('fort_gems_80');
   check('iap: a purchase result carries the same list', bought.ok === true && JSON.stringify(bought.txs) === JSON.stringify(txs), bought);
   const unknown = await env.Shell.iap.purchase('fort_gems_1200');
